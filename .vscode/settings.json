@@ -1,0 +1,19 @@
+{
+  "cSpell.words": [
+    "identificator"
+  ],
+  "conventionalCommits.scopes": [
+  ],
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/build": true,
+    // Hide all spec files
+    // "packages/*/src/**/*.spec.ts": true,
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
+}

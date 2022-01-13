@@ -1,0 +1,165 @@
+{
+	"PDF dictionary Boolean field": {
+		"scope": "typescript",
+		"prefix": "fieldBoolean",
+		"body": [
+			"/**",
+			" * $0",
+			" */",
+			"@PDFBooleanField(\"$1\", true, false)",
+			"public $1!: boolean;"
+		],
+		"description": "Adds PDF Boolean field"
+	},
+	"PDF dictionary Integer field": {
+		"scope": "typescript",
+		"prefix": "fieldInteger",
+		"body": [
+			"/**",
+			" * $0",
+			" */",
+			"@PDFIntegerField(\"$1\")",
+			"public $1!: number;"
+		],
+		"description": "Adds PDF Integer field"
+	},
+	"PDF dictionary Integer optional field": {
+		"scope": "typescript",
+		"prefix": "fieldIntegerOpt",
+		"body": [
+			"/**",
+			" * $0",
+			" */",
+			"@PDFIntegerField(\"$1\", true)",
+			"public $1!: number | null;"
+		],
+		"description": "Adds PDF Integer optional field"
+	},
+	"PDF dictionary Array field": {
+		"scope": "typescript",
+		"prefix": "fieldArray",
+		"body": [
+			"/**",
+			" * $0",
+			" */",
+			"@PDFArrayField(\"$1\")",
+			"public $1!: PDFArray;"
+		],
+		"description": "Adds PDF Array field"
+	},
+	"PDF dictionary Array optional field": {
+		"scope": "typescript",
+		"prefix": "fieldArrayOpt",
+		"body": [
+			"/**",
+			" * $0",
+			" */",
+			"@PDFArrayField(\"$1\", true)",
+			"public $1!: PDFArray | null;"
+		],
+		"description": "Adds PDF Array field"
+	},
+	"PDF dictionary Stream field": {
+		"scope": "typescript",
+		"prefix": "fieldStream",
+		"body": [
+			"/**",
+			" * $0",
+			" */",
+			"@PDFStreamField(\"$1\")",
+			"public $1!: PDFStream;"
+		],
+		"description": "Adds PDF Stream field"
+	},
+	"PDF dictionary Stream optional field": {
+		"scope": "typescript",
+		"prefix": "fieldStreamOpt",
+		"body": [
+			"/**",
+			" * $0",
+			" */",
+			"@PDFStreamField(\"$1\", true)",
+			"public $1!: PDFStream | null;"
+		],
+		"description": "Adds PDF Stream optional field"
+	},
+	"PDF dictionary Name field": {
+		"scope": "typescript",
+		"prefix": "fieldName",
+		"body": [
+			"/**",
+			" * $0",
+			" */",
+			"@PDFNameField(\"$1\")",
+			"public $1!: PDFName;"
+		],
+		"description": "Adds PDF Name field"
+	},
+	"PDF dictionary Name optional field": {
+		"scope": "typescript",
+		"prefix": "fieldNameOpt",
+		"body": [
+			"/**",
+			" * $0",
+			" */",
+			"@PDFNameField(\"$1\", true)",
+			"public $1!: PDFName | null;"
+		],
+		"description": "Adds PDF Name optional field"
+	},
+	"PDF dictionary Byte string field": {
+		"scope": "typescript",
+		"prefix": "fieldByteString",
+		"body": [
+			"/**",
+			" * $0",
+			" */",
+			"@PDFHexStringField(\"$1\")",
+			"public $1!: PDFHexString;"
+		],
+		"description": "Adds PDF Byte string field"
+	},
+	"PDF dictionary Byte string optional field": {
+		"scope": "typescript",
+		"prefix": "fieldByteStringOpt",
+		"body": [
+			"/**",
+			" * $0",
+			" */",
+			"@PDFHexStringField(\"$1\", true)",
+			"public $1!: PDFHexString | null;"
+		],
+		"description": "Adds PDF Byte string optional field"
+	},
+	"PDF dictionary Dictionary field": {
+		"scope": "typescript",
+		"prefix": "fieldDictionary",
+		"body": [
+			"/**",
+			" * $0",
+			" */",
+			"@PDFDictionaryField({",
+			"  name: \"$1\",",
+			"  type: $2,",
+			"})",
+			"public $1!: $2;"
+		],
+		"description": "Adds PDF Dictionary field"
+	},
+	"PDF dictionary Dictionary optional field": {
+		"scope": "typescript",
+		"prefix": "fieldDictionaryOpt",
+		"body": [
+			"/**",
+			" * $0",
+			" */",
+			"@PDFDictionaryField({",
+			"  name: \"$1\",",
+			"  type: $2,",
+			"  optional: true,",
+			"})",
+			"public $1!: $2 | null;"
+		],
+		"description": "Adds PDF Dictionary optional field"
+	},
+}

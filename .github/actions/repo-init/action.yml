@@ -1,0 +1,36 @@
+name: repo-init
+description: Prepares the repository
+inputs:
+  token:
+    description: GitHub token
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 16
+        registry-url: "https://npm.pkg.github.com/"
+
+    - name: Setup .npmrc
+      shell: bash
+      run: |
+        npm set @PeculiarVentures:registry=https://npm.pkg.github.com/
+        npm set //npm.pkg.github.com/:_authToken=${{ inputs.token }}
+
+    - name: Ensure access
+      shell: bash
+      run: npm whoami --registry https://npm.pkg.github.com/
+      env:
+        NODE_AUTH_TOKEN: ${{ inputs.token }}
+
+    - name: Config git user
+      shell: bash
+      run: |
+        git config --global user.name "${{ github.actor }}"
+        git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+
+    - name: Install dependencies
+      shell: bash
+      run: yarn

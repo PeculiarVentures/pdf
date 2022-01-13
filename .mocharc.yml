@@ -1,0 +1,8 @@
+require:
+  - 'tsconfig-paths/register'
+  - 'ts-node/register'
+extension:
+  - ts
+spec:
+  - 'packages/**/*.spec.ts'
+exit: true

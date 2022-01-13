@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.compile.json",
+  "compilerOptions": {
+    "incremental": true,
+    "importHelpers": false,
+    "allowJs": true,
+    "target": "ES2018",
+    "baseUrl": ".",
+    "paths": {
+      "@PeculiarVentures/pdf-core": ["./packages/core/src"],
+      "@PeculiarVentures/pdf-cli": ["./packages/cli/src"],
+      "@PeculiarVentures/pdf-doc": ["./packages/doc/src"],
+      "@PeculiarVentures/pdf-font": ["./packages/font/src"],
+    }
+  },
+  "exclude": [
+    "packages/*/build",
+    "packages/**/*/*.js"
+  ]
+}

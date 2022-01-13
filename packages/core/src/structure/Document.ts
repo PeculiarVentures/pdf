@@ -1,0 +1,324 @@
+import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+
+import type { clientSideParametersPublicKey } from "../encryption/Constants";
+import type { PageObjectDictionary } from "./dictionaries";
+import type { ViewReader } from "../ViewReader";
+import type { PDFDocumentObject } from "./DocumentObject";
+
+export interface FindIndexOptions {
+  reversed?: boolean;
+  offset?: number;
+}
+
+export enum XrefStructure {
+  Stream,
+  Table,
+}
+
+export interface DocumentOptions {
+  xref?: XrefStructure;
+  password?: {
+    user?: string;
+    owner?: string;
+  };
+  disableAscii85Encoding?: boolean;
+  disableCompressedStreams?: boolean;
+  disableCompressedObjects?: boolean
+  crypto?: clientSideParametersPublicKey;
+}
+
+const headerChars = new Uint8Array(Convert.FromUtf8String("%PDF-"));
+
+export class PDFDocument {
+
+  public static fromPDF(reader: ViewReader): Promise<PDFDocument>;
+  public static fromPDF(data: BufferSource, offset?: number): Promise<PDFDocument>;
+  public static fromPDF(text: string): Promise<PDFDocument>;
+  public static fromPDF(data: BufferSource | ViewReader | string, offset?: number): Promise<PDFDocument>;
+  public static async fromPDF(data: BufferSource | ViewReader | string, offset = 0): Promise<PDFDocument> {
+    const doc = new PDFDocument();
+
+    await doc.fromPDF(data, offset);
+
+    return doc;
+  }
+
+  public static readonly DEFAULT_VERSION = 1.5;
+  public static readonly DEFAULT_VIEW = new Uint8Array();
+
+  public view = PDFDocument.DEFAULT_VIEW;
+  public version = PDFDocument.DEFAULT_VERSION;
+  public update = new PDFDocumentUpdate(this);
+
+  public options: DocumentOptions = {};
+
+  public async writePDF(writer: ViewWriter): Promise<void> {
+    const startOffset = writer.length;
+
+    if (this.view.length) {
+      writer.write(this.view);
+    } else {
+      writer.write(headerChars);
+      writer.writeString(`${this.version.toFixed(1)}\n`);
+    }
+
+    const updates: PDFDocumentUpdate[] = [];
+    let update: PDFDocumentUpdate | null = this.update;
+    while (update) {
+      updates.push(update);
+      update = update.previous;
+    }
+    updates.reverse();
+    for (const update of updates) {
+      if (!update.view.length) {
+        await update.writePDF(writer);
+      }
+    }
+
+    const length = writer.length;
+    writer.write(new Uint8Array(), (subarray) => {
+      this.view = new Uint8Array(subarray.buffer).subarray(startOffset, length);
+    });
+  }
+
+  public async toPDF(): Promise<ArrayBuffer> {
+    const writer = new ViewWriter();
+
+    await this.writePDF(writer);
+
+    return writer.toArrayBuffer();
+  }
+
+  public fromPDF(reader: ViewReader): Promise<number>;
+  public fromPDF(data: BufferSource, offset?: number): Promise<number>;
+  public fromPDF(text: string): Promise<number>;
+  public fromPDF(data: BufferSource | ViewReader | string, offset?: number): Promise<number>;
+  public async fromPDF(data: BufferSource | ViewReader | string, offset = 0): Promise<number> {
+    const reader = objects.PDFObject.getReader(data, offset);
+
+    // Find out header %PDF-<version>
+    if (!headerChars.every(c => c === reader.readByte())) {
+      throw new ParsingError("PDF header is not found", reader.position - 1);
+    }
+
+    // Read version
+    const version = objects.PDFNumeric.fromPDF(reader);
+    this.version = version.value;
+
+    // Find '%%EOF' keyword from the end of the file
+    reader.end();
+    reader.backward = true;
+    reader.position = reader.findIndex("%%EOF");
+    if (reader.position === -1) {
+      throw new ParsingError("Cannot get %%EOF keyword");
+    }
+    reader.read(5);
+
+    // Find 'startxref' keyword
+    reader.position = reader.findIndex("startxref");
+    if (reader.position === -1) {
+      throw new Error("Cannot find 'startxref' keyword");
+    }
+
+    reader.backward = false;
+    reader.readByte();
+
+    objects.PDFObjectReader.skip(reader);
+    const xrefPosition = objects.PDFNumeric.fromPDF(reader);
+    reader.position = xrefPosition.value;
+
+
+    this.update = new PDFDocumentUpdate(this);
+    await this.update.fromPDF(reader);
+
+    this.view = reader.view; // view must be set before decompress
+
+    await this.update.decompress();
+    reader.end();
+
+    this.options.xref = this.update.xref instanceof CrossReferenceTable
+      ? XrefStructure.Table
+      : XrefStructure.Stream;
+
+    return reader.position;
+  }
+
+  public getObject(ref: objects.IPDFIndirect): PDFDocumentObject;
+  public getObject(id: number, generationNumber?: number): PDFDocumentObject;
+  public getObject(id: number | objects.IPDFIndirect, generationNumber?: number): PDFDocumentObject {
+    if (typeof id === "object") {
+      return this.getObject(id.id, id.generation);
+    } else {
+      return this.update.getObject(id, generationNumber);
+    }
+  }
+
+  public delete(element: number | PDFDocumentObject): void {
+    this.update.delete(element);
+  }
+
+  public append(element: objects.PDFObject | PDFDocumentObject, compressed?: boolean): PDFDocumentObject {
+    return this.update.append(element, compressed);
+  }
+
+  //#region Pages
+
+  public async addPage(page?: PageObjectDictionary | PDFDocumentObject): Promise<PageObjectDictionary> {
+    const catalog = (!this.update.catalog)
+      ? this.update.addCatalog()
+      : this.update.catalog;
+
+    const result = await catalog.Pages.addPageOld(page);
+
+    // TODO Implement getValue for PDFDocumentObject
+    return result.value as PageObjectDictionary;
+  }
+  //#endregion
+
+  public async createUpdate(): Promise<PDFDocumentUpdate> {
+    if (!this.update.view.length) {
+      await this.toPDF();
+    }
+
+    if (!this.update.view.length) {
+      return this.update;
+    }
+
+    const update = new PDFDocumentUpdate(this);
+    update.previous = this.update;
+    this.update = update;
+    this.update.addCatalog();
+
+    return update;
+  }
+
+  protected findIndex(cb: (c: number, i: number, array: Uint8Array) => boolean, options: FindIndexOptions = {}): number {
+    const offset = options.offset || 0;
+    const step = options.reversed ? -1 : 1;
+
+    for (let i = offset; true; i = i + step) {
+      const value = this.view[i];
+      if (value === undefined) {
+        break;
+      }
+      if (cb(value, i, this.view)) {
+        return i;
+      }
+    }
+
+    return -1;
+  }
+
+  public async toString(): Promise<string> {
+    const res: string[] = [];
+
+    res.push(`%PDF-${this.version.toFixed(1)}`);
+
+    const updates = [];
+    let update: PDFDocumentUpdate | null = this.update;
+    while (update) {
+      updates.push(update);
+
+      update = update.previous;
+    }
+    updates.reverse();
+
+    for (const update of updates) {
+      const updateString = await update.toString();
+      res.push(updateString);
+    }
+
+    return res.join("\n");
+  }
+
+  public createNull(): objects.PDFNull {
+    const obj = objects.PDFNull.create(this.update);
+
+    return obj;
+  }
+
+  public createBoolean(value: boolean): objects.PDFBoolean {
+    const obj = objects.PDFBoolean.create(this.update);
+
+    obj.value = value;
+
+    return obj;
+  }
+
+  public createNumber(number: number, padding?: number): objects.PDFNumeric {
+    const obj = objects.PDFNumeric.create(this.update);
+
+    obj.value = number;
+
+    if (padding) {
+      obj.padding = padding;
+    }
+
+    return obj;
+  }
+
+  public createName(text: string): objects.PDFName {
+    const obj = objects.PDFName.create(this.update);
+
+    obj.text = text;
+
+    return obj;
+  }
+
+  public createString(text: string): objects.PDFLiteralString {
+    const obj = objects.PDFLiteralString.create(this.update);
+
+    obj.text = text;
+
+    return obj;
+  }
+
+  public createHexString(data?: BufferSource): objects.PDFHexString {
+    const obj = objects.PDFHexString.create(this.update);
+
+    if (data) {
+      obj.text = Convert.ToHex(data);
+    }
+
+    return obj;
+  }
+
+  public createArray(...items: objects.PDFObjectTypes[]): objects.PDFArray {
+    const obj = objects.PDFArray.create(this.update);
+
+    obj.items.push(...items);
+
+    return obj;
+  }
+
+  public createDictionary(...items: [string, objects.PDFObjectTypes][]): objects.PDFDictionary {
+    const obj = objects.PDFDictionary.create(this.update);
+
+    for (const item of items) {
+      obj.set(item[0], item[1]);
+    }
+
+    return obj;
+  }
+
+  public createStream(view?: BufferSource): objects.PDFStream {
+    const obj = objects.PDFStream.create(this.update);
+
+    if (view) {
+      obj.stream = BufferSourceConverter.toUint8Array(view);
+    }
+
+    return obj;
+  }
+
+  public createRectangle(llX: number, llY: number, urX: number, urY: number): PDFRectangle {
+    return PDFRectangle.createWithData(this.update, llX, llY, urX, urY);
+  }
+}
+
+import * as objects from "../objects";
+import { ParsingError } from "../ParsingError";
+import { ViewWriter } from "../ViewWriter";
+import { PDFDocumentUpdate } from "./DocumentUpdate";
+import { PDFRectangle } from "./common";
+import { CrossReferenceTable } from "./CrossReferenceTable";

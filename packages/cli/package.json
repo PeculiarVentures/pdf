@@ -1,0 +1,39 @@
+{
+  "name": "@PeculiarVentures/pdf-cli",
+  "version": "1.0.10",
+  "description": "> TODO: description",
+  "author": "microshine <microshine@mail.ru>",
+  "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/pdf-cli#readme",
+  "license": "AGPL",
+  "main": "build/peculiar.pdf.cli.js",
+  "bin": {
+    "pvpdf": "build/peculiar.pdf.cli.js"
+  },
+  "files": [
+    "build",
+    "README.md"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PeculiarVentures/pdf.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "clear": "rimraf build/*",
+    "build": "yarn run build:module",
+    "build:module": "rollup -c",
+    "rebuild": "yarn run clear && yarn run build",
+    "prepack": "npm run rebuild"
+  },
+  "bugs": {
+    "url": "https://github.com/PeculiarVentures/pdf/issues"
+  },
+  "dependencies": {
+    "@PeculiarVentures/pdf-core": "^1.0.9",
+    "@PeculiarVentures/pdf-doc": "^1.0.10",
+    "commander": "^8.1.0"
+  }
+}

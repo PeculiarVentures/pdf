@@ -1,0 +1,43 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "packages/**/src/**/*.ts",
+        "test/**/*.ts"
+      ],
+      "rules": {
+        "@typescript-eslint/no-this-alias": 1,
+        "@typescript-eslint/ban-ts-comment": 1,
+        "@typescript-eslint/no-var-requires": 1,
+        "eol-last": 1,
+        "@typescript-eslint/explicit-module-boundary-types": 1,
+        "@typescript-eslint/no-explicit-any": 1,
+        "newline-before-return": 1,
+        "@typescript-eslint/semi": 1,
+        "no-constant-condition": 0,
+        "@typescript-eslint/quotes": [
+          "warn",
+          "double"
+        ],
+        "brace-style": [
+          "error",
+          "1tbs",
+          {
+            "allowSingleLine": true
+          }
+        ],
+        "@typescript-eslint/no-empty-interface": 0
+      }
+    }
+  ]
+}
