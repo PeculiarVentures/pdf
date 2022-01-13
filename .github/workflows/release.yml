@@ -1,13 +1,13 @@
 name: release
 
 on:
-  push:
-    branches:
-      - main
-  # pull_request:
+  # push:
   #   branches:
   #     - main
-  #   types: [closed]
+  pull_request:
+    branches:
+      - main
+    types: [closed]
 
 env:
   CI: true
@@ -21,11 +21,11 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
 
-      # - name: Pull Request Merged
-      #   if: github.event.pull_request.merged == false
-      #   run: |
-      #     echo 'The pull request has not been merged'
-      #     exit 1
+      - name: Pull Request Merged
+        if: github.event.pull_request.merged == false
+        run: |
+          echo 'The pull request has not been merged'
+          exit 1
 
       - uses: actions/checkout@v2
         with:
@@ -50,21 +50,21 @@ jobs:
           npx lerna version --yes --conventional-commits --create-release github --message 'chore(release): publish'
           npx lerna publish from-package --yes
 
-      # - name: Get Current Version
-      #   shell: bash -ex {0}
-      #   run: |
-      #     CURRENT_VERSION=$(node -p 'require("./lerna.json").version')
-      #     echo "::set-env name=CURRENT_VERSION::${CURRENT_VERSION}"
+      - name: Get Current Version
+        shell: bash -ex {0}
+        run: |
+          CURRENT_VERSION=$(node -p 'require("./lerna.json").version')
+          echo "::set-env name=CURRENT_VERSION::${CURRENT_VERSION}"
 
-      # - name: Create comment
-      #   uses: actions/github-script@0.8.0
-      #   if: env.PREV_VERSION != env.CURRENT_VERSION
-      #   with:
-      #     github-token: ${{secrets.GITHUB_TOKEN}}
-      #     script: |
-      #       github.issues.createComment({
-      #         issue_number: context.issue.number,
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #         body: 'NPM package v${{ env.CURRENT_VERSION }} has been published 🎉'
-      #       })
+      - name: Create comment
+        uses: actions/github-script@0.8.0
+        if: env.PREV_VERSION != env.CURRENT_VERSION
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'NPM package v${{ env.CURRENT_VERSION }} has been published 🎉'
+            })
