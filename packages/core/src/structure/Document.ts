@@ -31,6 +31,8 @@ const headerChars = new Uint8Array(Convert.FromUtf8String("%PDF-"));
 
 export class PDFDocument {
 
+  public wrongStructure = false;
+
   public static fromPDF(reader: ViewReader): Promise<PDFDocument>;
   public static fromPDF(data: BufferSource, offset?: number): Promise<PDFDocument>;
   public static fromPDF(text: string): Promise<PDFDocument>;

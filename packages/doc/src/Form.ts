@@ -1088,7 +1088,7 @@ export interface SignatureBoxSignParameters {
 
 export type SignatureType = "signature" | "timestamp" | "certified";
 
-type SignatureStateType = "info" | "invalid" | "valid";
+type SignatureStateType = "info" | "invalid" | "valid" | "warn";
 
 export interface SignatureState {
   type: SignatureStateType;
@@ -1180,7 +1180,7 @@ export interface SignerCertificateState extends SignatureState {
 }
 
 export interface FormattingState extends SignatureState {
-  type: "valid" | "invalid";
+  type: "valid" | "invalid" | "warn";
   code: "formatting";
   data: {
     error?: Error;
@@ -1828,6 +1828,14 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
 
   protected verifyFormatting(signatureValue: core.SignatureDictionary): FormattingState {
     try {
+      if (this.document.target.wrongStructure) {
+        return {
+          type: "warn",
+          code: "formatting",
+          text: "Document structure doesn't match PDF specification.",
+          data: {}
+        };
+      }
       const byteRange = signatureValue.ByteRange.get(true);
       const contentView = signatureValue.Contents.view;
       if (!signatureValue.documentUpdate) {
