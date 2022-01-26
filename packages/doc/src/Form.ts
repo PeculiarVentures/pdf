@@ -1,5 +1,6 @@
 import { AsnConvert } from "@peculiar/asn1-schema";
 import * as core from "@PeculiarVentures/pdf-core";
+import { TSTInfo } from "@peculiar/asn1-tsp";
 import { X509Certificate, X509Certificates } from "@peculiar/x509";
 import { Convert } from "pvtsutils";
 
@@ -1137,6 +1138,7 @@ export interface EmbeddedSigningTimeState extends SigningTimeState {
     signature?: cms.CMSSignedDataVerifyResult;
     signer?: X509Certificate;
     chain?: cms.CertificateChainResult;
+    info: TSTInfo
   }
 }
 
@@ -1166,6 +1168,7 @@ export interface LtvState extends SignatureState {
   code: "ltv";
   data: {
     state: boolean;
+    reason?: string;
   };
 }
 
@@ -1429,14 +1432,14 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
 
           // if chain status is no revocation then verify chain with online revocations
           if (chainResult.resultCode === cms.CertificateChainStatusCode.revocationNotFound) {
-            result.states.push(this.makeLtvState(false));
+            result.states.push(this.makeLtvState(false, chainResult.resultMessage));
             chainResult = await chain.build(verificationResult.signerCertificate, { checkDate, revocationMode: "online" });
           } else {
             result.states.push(this.makeLtvState(true));
           }
         } else {
           // verify chain with online revocations
-          result.states.push(this.makeLtvState(false));
+          result.states.push(this.makeLtvState(false, "PDF document doesn't have revocation items"));
           chainResult = await chain.build(verificationResult.signerCertificate, { checkDate, revocationMode: "online" });
         }
 
@@ -1672,7 +1675,9 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
     return revocations;
   }
 
-  protected makeLtvState(state: boolean): LtvState {
+  protected makeLtvState(state: true): LtvState;
+  protected makeLtvState(state: false, reason: string): LtvState;
+  protected makeLtvState(state: boolean, reason?: string): LtvState {
     if (state) {
       return {
         type: "info",
@@ -1689,6 +1694,7 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
         code: "ltv",
         data: {
           state,
+          reason,
         }
       };
     }
@@ -1711,6 +1717,7 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
           type: "embedded",
           date: timeStamp.info.genTime,
           signature: tsaResult,
+          info: tsaResult.info,
         },
       };
 
