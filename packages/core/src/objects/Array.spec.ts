@@ -8,7 +8,7 @@ import { PDFName } from "./Name";
 import { PDFNumeric } from "./Numeric";
 import { PDFObjectTypes } from "./ObjectReader";
 
-context.only("PDFArray", () => {
+context("PDFArray", () => {
   context("fromPDF", () => {
     const vector: [string, number][] = [
       [
