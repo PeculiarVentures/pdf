@@ -2,10 +2,9 @@ import * as core from "@PeculiarVentures/pdf-core";
 import * as cms from "./cms";
 import { X509Certificate } from "@peculiar/x509";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
-import { PDFDocument } from "./Document";
+import { PDFDocument, PDFVersion } from "./Document";
 import { WrapObject } from "./WrapObject";
 import { CRL, OCSP, TimeStampToken } from "./cms";
-import { PDFVersion } from ".";
 
 export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
 
