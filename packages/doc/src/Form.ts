@@ -79,9 +79,9 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
    * Get the name of the component
    */
   public get name(): string {
-    const filed = FormComponentFactory.getField(this.target);
+    const field = FormComponentFactory.getField(this.target);
 
-    return filed.t.text;
+    return field.t.text;
   }
 
   public get left(): number {
@@ -1350,6 +1350,10 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
   public async verify(checkDate?: Date): Promise<SignatureVerifyResult> {
     const dateNow = new Date();
     checkDate ||= dateNow;
+    
+    // TODO Decrypt values on PDF reading
+    await FormComponentFactory.getField(this.target as any).t.decode();
+
     const result: SignatureVerifyResult = {
       verificationResult: false,
       hasSHA1: false,
@@ -1389,8 +1393,8 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
       }
 
       result.name = this.name;
-      result.reason = signatureValue.Reason.has() ? signatureValue.Reason.get().text : null;
-      result.location = signatureValue.Location.has() ? signatureValue.Location.get().text : null;
+      result.reason = signatureValue.Reason.has() ? await signatureValue.Reason.get().decode() : null;
+      result.location = signatureValue.Location.has() ? await signatureValue.Location.get().decode() : null;
       result.signingTime = signingTime;
       result.signatureType = signatureType;
 
