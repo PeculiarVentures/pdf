@@ -15,3 +15,4 @@ export * from "./CRL";
 export * from "./OCSP";
 export * from "./PKIUtils";
 export * from "./AdobeRevocationInfoArchival";
+export * from "./CertID";

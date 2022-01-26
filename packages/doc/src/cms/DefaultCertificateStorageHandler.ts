@@ -1,13 +1,13 @@
-const pkijs = require("pkijs");
-import { isEqualBuffer } from "pvutils";
-import { ICertificateStorageHandler, IResult } from "./ICertificateStorageHandler";
+import { AsnConvert, OctetString } from "@peculiar/asn1-schema";
+import { CertID, id_pkix_ocsp_nonce, OCSPRequest, OCSPResponse, OCSPResponseStatus, Request, TBSRequest } from "@peculiar/asn1-ocsp";
+import { id_ce_cRLDistributionPoints, CRLDistributionPoints, id_pe_authorityInfoAccess, AuthorityInfoAccessSyntax, id_ad_ocsp, Extension } from "@peculiar/asn1-x509";
 import { SubjectKeyIdentifierExtension, X509Certificate, X509Certificates } from "@peculiar/x509";
-import { BufferSourceConverter, Convert } from "pvtsutils";
+import { isEqualBuffer } from "pvutils";
+import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { ICertificateStorageHandler, IResult, IsTrustedResult, RevocationType } from "./ICertificateStorageHandler";
 import { PKIUtils } from "./PKIUtils";
-import { CRL } from "./CRL";
-import { OCSP } from "./OCSP";
-import { IsTrustedResult } from ".";
 
+const pkijs = require("pkijs");
 export class DefaultCertificateStorageHandler implements ICertificateStorageHandler {
 
   public parent: ICertificateStorageHandler | null = null;
@@ -52,7 +52,7 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
         publicKey: issuer,
         signatureOnly: true,
       });
-      
+
       return res;
     } catch {
       return false;
@@ -150,14 +150,29 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
     };
   }
 
-  public async findCRL(cert: X509Certificate): Promise<IResult<CRL | null>> {
-    if (this.parent) {
-      const res = await this.parent.findCRL(cert);
-      if (res.result) {
-        return res;
-      }
+  public findRevocation(type: "crl", cert: X509Certificate): Promise<IResult<CRL | null>>
+  public findRevocation(type: "ocsp", cert: X509Certificate): Promise<IResult<OCSP | null>>
+  public async findRevocation(type: RevocationType, cert: X509Certificate): Promise<IResult<CRL | OCSP | null>> {
+    let res;
+    switch (type) {
+      case "crl":
+        res = await this.findCRL(cert);
+        break;
+      case "ocsp":
+        res = await this.findOCSP(cert);
+        break;
+      default:
+        throw new Error("Unknown type of the revocation item");
     }
 
+    if (!(res && res.result) && this.parent) {
+      return this.parent.findRevocation(type, cert);
+    }
+
+    return res;
+  }
+
+  protected async findCRL(cert: X509Certificate): Promise<IResult<CRL | null>> {
     // Looking for the crl in internal items
     for (const crl of this.crls) {
       const issuer = await this.findIssuer(cert);
@@ -178,12 +193,103 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
     };
   }
 
-  public async findOCSP(cert: X509Certificate): Promise<IResult<OCSP | null>> {
-    if (this.parent) {
-      const result = await this.parent.findOCSP(cert);
+  protected async fetchCRL(cert: X509Certificate): Promise<IResult<CRL | null>>;
+  protected async fetchCRL(uri: string): Promise<IResult<CRL | null>>;
+  protected async fetchCRL(uriOrCert: any): Promise<IResult<CRL | null>> {
+    let uri = "";
+    if (uriOrCert instanceof X509Certificate) {
+      const crlPoints = uriOrCert.getExtension(id_ce_cRLDistributionPoints);
+      if (crlPoints) {
+        const asnCrlPoints = AsnConvert.parse(crlPoints.value, CRLDistributionPoints);
+        for (const point of asnCrlPoints) {
+          if (point.distributionPoint && point.distributionPoint.fullName) {
+            for (const fullName of point.distributionPoint.fullName) {
+              if (fullName.uniformResourceIdentifier && fullName.uniformResourceIdentifier.startsWith("http")) {
+                const crl = await this.fetchCRL(fullName.uniformResourceIdentifier);
+                if (crl.result) {
+                  return crl;
+                }
+              }
+            }
+          }
+        }
+      }
 
-      if (result) {
-        return result;
+      return {
+        result: null,
+        target: this,
+      };
+    }
+    uri = uriOrCert;
+
+    try {
+      const raw = await this.requestCRL(uri);
+      CRL.fromBER(raw);
+    } catch (e) {
+      return {
+        result: null,
+        target: this,
+        error: e instanceof Error
+          ? e
+          : new Error("Unknown error on CRL fetching"),
+      };
+    }
+
+    return {
+      result: null,
+      target: this,
+    };
+  }
+
+  public async requestCRL(uri: string): Promise<ArrayBuffer> {
+    if (!globalThis.fetch) {
+      throw new Error("`globalThis.fetch` is undefined.");
+    }
+
+    const resp = await fetch(uri);
+    if (resp.status === 200) {
+      return resp.arrayBuffer();
+    }
+
+    throw new Error(`Error on CRL requesting (HTTP status: ${resp.status}).`);
+  }
+
+  public fetchRevocation(type: "crl", cert: X509Certificate): Promise<IResult<CRL | null>>;
+  public fetchRevocation(type: "ocsp", cert: X509Certificate): Promise<IResult<OCSP | null>>;
+  public async fetchRevocation(type: RevocationType, cert: X509Certificate): Promise<IResult<CRL | OCSP | null>> {
+    if (this.parent) {
+      const res = await this.parent.fetchRevocation(type, cert);
+      if (res && res.result) {
+        return res;
+      }
+    }
+
+    switch (type) {
+      case "crl":
+        return this.fetchCRL(cert);
+      case "ocsp":
+        return this.fetchOCSP(cert);
+      default:
+        throw new Error("Unknown type of the revocation item");
+    }
+  }
+
+  protected async findOCSP(cert: X509Certificate): Promise<IResult<OCSP | null>> {
+    for (const ocsp of this.ocsps) {
+      const issuer = await this.findIssuer(cert);
+      if (issuer) {
+        for (const ocspResponse of ocsp.asn.tbsResponseData.responses) {
+          const certId = new CertificateID();
+          certId.fromSchema(ocspResponse.certID);
+
+          const currentCertID = await CertificateID.create(certId.hashAlgorithm, cert, issuer);
+          if (currentCertID.equal(certId)) {
+            return {
+              result: ocsp,
+              target: this,
+            };
+          }
+        }
       }
     }
 
@@ -192,4 +298,98 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
       result: null,
     };
   }
+
+  public async fetchOCSP(cert: X509Certificate): Promise<IResult<OCSP | null>> {
+    const authorityInfoAccess = cert.getExtension(id_pe_authorityInfoAccess);
+    if (authorityInfoAccess) {
+      const asnAuthorityInfoAccess = AsnConvert.parse(authorityInfoAccess.value, AuthorityInfoAccessSyntax);
+      for (const accessDesc of asnAuthorityInfoAccess) {
+        if (accessDesc.accessMethod === id_ad_ocsp && accessDesc.accessLocation.uniformResourceIdentifier) {
+          try {
+            const issuer = await this.findIssuer(cert);
+            if (issuer) {
+              const request = await this.createOCSPRequest(cert, issuer, "SHA-1");
+              const ocspRespRaw = await this.requestOCSP(accessDesc.accessLocation.uniformResourceIdentifier, request);
+
+              const ocspResp = AsnConvert.parse(ocspRespRaw, OCSPResponse);
+              if (ocspResp.responseStatus !== OCSPResponseStatus.successful) {
+                return {
+                  result: null,
+                  target: this,
+                  error: new Error(`Bad OCSP response status '${OCSPResponseStatus[ocspResp.responseStatus] || ocspResp.responseStatus}'.`),
+                };
+              }
+
+              return {
+                result: OCSP.fromBER(ocspResp.responseBytes!.response),
+                target: this,
+              };
+            }
+          } catch (e) {
+            return {
+              result: null,
+              target: this,
+              error: e instanceof Error
+                ? e
+                : new Error("Unknown error on OCSP fetching"),
+            };
+          }
+        }
+      }
+    }
+
+    return {
+      result: null,
+      target: this,
+      error: new Error("Not implemented"),
+    };
+  }
+
+  public async createOCSPRequest(cert: X509Certificate, issuer: X509Certificate, hashAlgorithm: AlgorithmIdentifier = "SHA-256"): Promise<ArrayBuffer> {
+    const certID = await CertificateID.create(hashAlgorithm, cert, issuer);
+    const nonce = pkijs.getEngine().crypto.getRandomValues(new Uint8Array(20));
+    const ocspReq = new OCSPRequest({
+      tbsRequest: new TBSRequest({
+        requestList: [
+          new Request({
+            reqCert: AsnConvert.parse(certID.toBER(), CertID),
+            singleRequestExtensions: [
+              new Extension({
+                extnID: id_pkix_ocsp_nonce,
+                extnValue: new OctetString(nonce),
+              })
+            ]
+          }),
+        ]
+      }),
+    });
+
+    return AsnConvert.serialize(ocspReq);
+  }
+
+  public async requestOCSP(uri: string, ocspRequest: BufferSource): Promise<ArrayBuffer> {
+    if (!globalThis.fetch) {
+      throw new Error("`globalThis.fetch` is undefined.");
+    }
+
+    const resp = await fetch(uri, {
+      method: "POST",
+      headers: {
+        "content-type": "application/ocsp-request"
+      },
+      body: BufferSourceConverter.toArrayBuffer(ocspRequest),
+    });
+    if (resp.status === 200) {
+      const ocspRespRaw = await resp.arrayBuffer();
+
+      return ocspRespRaw;
+    }
+
+    throw new Error(`Error on CRL requesting (HTTP status: ${resp.status}).`);
+  }
+
 }
+
+import { CRL } from "./CRL";
+import { OCSP } from "./OCSP";
+import { CertificateID } from "./CertID";

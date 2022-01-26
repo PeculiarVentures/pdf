@@ -1,15 +1,19 @@
-import { X509Certificate, X509Certificates } from "@peculiar/x509";
-import { CRL } from "./CRL";
-import { OCSP } from "./OCSP";
+import type { X509Certificate, X509Certificates } from "@peculiar/x509";
+import type { CRL } from "./CRL";
+import type { OCSP } from "./OCSP";
 
 export interface IResult<T> {
   target: ICertificateStorageHandler;
   result: T;
+  error?: Error;
 }
 
 export interface IsTrustedResult extends IResult<boolean> {
   source?: string;
 }
+
+export type RevocationType = "crl" | "ocsp";
+
 export interface ICertificateStorageHandler {
 
   parent: ICertificateStorageHandler | null;
@@ -33,9 +37,12 @@ export interface ICertificateStorageHandler {
    */
   findCertificate(spki: BufferSource): Promise<X509Certificate | null>;
 
-  findCRL(cert: X509Certificate): Promise<IResult<CRL | null>>;
-
-  findOCSP(cert: X509Certificate): Promise<IResult<OCSP | null>>;
+  findRevocation(type: "crl", cert: X509Certificate): Promise<IResult<CRL | null>>;
+  findRevocation(type: "ocsp", cert: X509Certificate): Promise<IResult<OCSP | null>>;
+  findRevocation(type: RevocationType, cert: X509Certificate): Promise<IResult<CRL | OCSP | null>>;
+  fetchRevocation(type: "crl", cert: X509Certificate): Promise<IResult<CRL | null>>;
+  fetchRevocation(type: "ocsp", cert: X509Certificate): Promise<IResult<OCSP | null>>;
+  fetchRevocation(type: RevocationType, cert: X509Certificate): Promise<IResult<CRL | OCSP | null>>;
 
   /**
    * Returns issuer certificate

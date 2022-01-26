@@ -64,3 +64,17 @@ export interface OCSPResponse extends PkiObject {
     response: any;
   }
 }
+
+interface CertIDCreateParameters {
+  hashAlgorithm: string;
+  issuerCertificate: Certificate;
+}
+
+export interface CertID extends PkiObject{
+  hashAlgorithm: any;
+  issuerNameHash: any;
+  issuerKeyHash: any;
+  serialNumber: any;
+	createForCertificate(certificate: Certificate, parameters: CertIDCreateParameters): Promise<void>;
+  isEqual(other: CertID): boolean;
+}
