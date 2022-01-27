@@ -5,7 +5,7 @@ import { AlgorithmFactory } from "./AlgorithmFactory";
 import { AsnEncoded } from "./AsnEncoded";
 import { ICertificateStorage } from "./ICertificateStorageHandler";
 import { OCSPResponse } from "./PKITypes";
-import { PKIUtils } from ".";
+import { PKIUtils } from "./PKIUtils";
 
 const asn1js = require("asn1js");
 const pkijs = require("pkijs");

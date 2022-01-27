@@ -79,7 +79,13 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
 
     // Load certificates
     if (this.signedData.certificates) {
-      const certificates = new X509Certificates(this.signedData.certificates.map((o: Certificate) => PKIUtils.certTox509(o)));
+      const certificates: X509Certificates = new X509Certificates();
+      for (const pkiCert of this.signedData.certificates) {
+        if (pkiCert instanceof pkijs.Certificate) {
+          const cert = PKIUtils.certTox509(pkiCert);
+          certificates.push(cert);
+        }
+      }
       this.certificateHandler.certificates = certificates;
       this.certificates = certificates;
     }

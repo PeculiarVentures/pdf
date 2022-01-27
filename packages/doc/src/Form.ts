@@ -1,5 +1,6 @@
 import { AsnConvert } from "@peculiar/asn1-schema";
 import * as core from "@PeculiarVentures/pdf-core";
+import { TSTInfo } from "@peculiar/asn1-tsp";
 import { X509Certificate, X509Certificates } from "@peculiar/x509";
 import { Convert } from "pvtsutils";
 
@@ -79,9 +80,9 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
    * Get the name of the component
    */
   public get name(): string {
-    const filed = FormComponentFactory.getField(this.target);
+    const field = FormComponentFactory.getField(this.target);
 
-    return filed.t.text;
+    return field.t.text;
   }
 
   public get left(): number {
@@ -1088,7 +1089,7 @@ export interface SignatureBoxSignParameters {
 
 export type SignatureType = "signature" | "timestamp" | "certified";
 
-type SignatureStateType = "info" | "invalid" | "valid";
+type SignatureStateType = "info" | "invalid" | "valid" | "warn";
 
 export interface SignatureState {
   type: SignatureStateType;
@@ -1137,6 +1138,7 @@ export interface EmbeddedSigningTimeState extends SigningTimeState {
     signature?: cms.CMSSignedDataVerifyResult;
     signer?: X509Certificate;
     chain?: cms.CertificateChainResult;
+    info: TSTInfo
   }
 }
 
@@ -1166,6 +1168,7 @@ export interface LtvState extends SignatureState {
   code: "ltv";
   data: {
     state: boolean;
+    reason?: string;
   };
 }
 
@@ -1180,7 +1183,7 @@ export interface SignerCertificateState extends SignatureState {
 }
 
 export interface FormattingState extends SignatureState {
-  type: "valid" | "invalid";
+  type: "valid" | "invalid" | "warn";
   code: "formatting";
   data: {
     error?: Error;
@@ -1347,7 +1350,13 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
     return this.target.V;
   }
 
-  public async verify(checkDate = new Date()): Promise<SignatureVerifyResult> {
+  public async verify(checkDate?: Date): Promise<SignatureVerifyResult> {
+    const dateNow = new Date();
+    checkDate ||= dateNow;
+    
+    // TODO Decrypt values on PDF reading
+    await FormComponentFactory.getField(this.target as any).t.decode();
+
     const result: SignatureVerifyResult = {
       verificationResult: false,
       hasSHA1: false,
@@ -1387,8 +1396,8 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
       }
 
       result.name = this.name;
-      result.reason = signatureValue.Reason.has() ? signatureValue.Reason.get().text : null;
-      result.location = signatureValue.Location.has() ? signatureValue.Location.get().text : null;
+      result.reason = signatureValue.Reason.has() ? await signatureValue.Reason.get().decode() : null;
+      result.location = signatureValue.Location.has() ? await signatureValue.Location.get().decode() : null;
       result.signingTime = signingTime;
       result.signatureType = signatureType;
 
@@ -1402,12 +1411,7 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
 
       //Check signature for "signature-time-stamp" attribute
       const ltvState = await this.isLTV(signedData);
-      let signingTimeState: SigningTimeState;
-      if (ltvState) {
-        signingTimeState = await this.verifySigningTime(signedData, signatureValue, signingTime || checkDate);
-      } else {
-        signingTimeState = await this.verifySigningTime(signedData, signatureValue, checkDate);
-      }
+      const signingTimeState = await this.verifySigningTime(signedData, signatureValue, dateNow);
       result.states.push(signingTimeState);
 
       //#region Certificate chain status
@@ -1416,33 +1420,27 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
         const chain = new cms.CertificateChain();
         chain.certificateHandler.parent = signedData.certificateHandler;
 
-        // Build chain without Revocations
-        let chainResult = result.certificatePath = await chain.build(verificationResult.signerCertificate);
-        if (chainResult.result) {
-          // If PDF is LTV
-          if (ltvState) {
-            // Try Chain validation with Revocations
-            // Get all revocations
-            const revocations = await this.getAllLtvRevocations(signedData);
-            chainResult = await chain.build(verificationResult.signerCertificate, {
-              checkDate: signingTime || checkDate,
-              revocations,
-            });
+        // If PDF is LTV
+        let chainResult: cms.CertificateChainResult | undefined;
+        if (ltvState) {
+          // Try Chain validation with Revocations
+          // Get all revocations
+          chainResult = await chain.build(verificationResult.signerCertificate, {
+            checkDate: signingTime || checkDate,
+            revocationMode: "offline",
+          });
 
-            // if chain status is no revocation then verify chain with online revocations
-            if (chainResult.resultCode === cms.CertificateChainStatusCode.revocationNotFound) {
-              result.states.push(this.makeLtvState(false));
-              const revocations = await this.getOnlineRevocations(chainResult.chain);
-              chainResult = await chain.build(verificationResult.signerCertificate, { checkDate, revocations });
-            } else {
-              result.states.push(this.makeLtvState(true));
-            }
+          // if chain status is no revocation then verify chain with online revocations
+          if (chainResult.resultCode === cms.CertificateChainStatusCode.revocationNotFound) {
+            result.states.push(this.makeLtvState(false, chainResult.resultMessage));
+            chainResult = await chain.build(verificationResult.signerCertificate, { checkDate, revocationMode: "online" });
           } else {
-            // verify chain with online revocations
-            result.states.push(this.makeLtvState(false));
-            const revocations = await this.getOnlineRevocations(chainResult.chain);
-            chainResult = await chain.build(verificationResult.signerCertificate, { checkDate, revocations });
+            result.states.push(this.makeLtvState(true));
           }
+        } else {
+          // verify chain with online revocations
+          result.states.push(this.makeLtvState(false, "PDF document doesn't have revocation items"));
+          chainResult = await chain.build(verificationResult.signerCertificate, { checkDate, revocationMode: "online" });
         }
 
         switch (chainResult.result) {
@@ -1458,9 +1456,11 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
             });
             break;
           case false:
+            result.verificationResult = false;
+            result.reason = "The signer's identity has not been verified";
             result.states.push({
               type: "invalid",
-              text: "The signer's identity has not been verified",
+              text: result.reason,
               code: "identity_verification",
               data: {
                 state: "not_verified",
@@ -1469,9 +1469,11 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
             });
             break;
           default:
+            result.verificationResult = false;
+            result.reason = "Signer's identity has not yet been verified";
             result.states.push({
               type: "info",
-              text: "Signer's identity has not yet been verified",
+              text: result.reason,
               code: "identity_verification",
               data: {
                 state: "not_verified",
@@ -1610,23 +1612,7 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
 
     return result;
   }
-  protected async getOnlineRevocations(chain: X509Certificates): Promise<Array<cms.CRL | cms.OCSP>> {
-    const revocations: Array<cms.CRL | cms.OCSP> = [];
 
-    for (const cert of chain) {
-      const ocsp = await this.document.certificateHandler.findOCSP(cert);
-      if (ocsp.result) {
-        revocations.push(ocsp.result);
-      } else {
-        const crl = await this.document.certificateHandler.findCRL(cert);
-        if (crl.result) {
-          revocations.push(crl.result);
-        }
-      }
-    }
-
-    return revocations;
-  }
   protected async getAllLtvRevocations(signedData: cms.CMSSignedData): Promise<Array<cms.CRL | cms.OCSP>> {
     const revocations: Array<cms.CRL | cms.OCSP> = [];
     if (signedData.crls) {
@@ -1689,7 +1675,9 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
     return revocations;
   }
 
-  protected makeLtvState(state: boolean): LtvState {
+  protected makeLtvState(state: true): LtvState;
+  protected makeLtvState(state: false, reason: string): LtvState;
+  protected makeLtvState(state: boolean, reason?: string): LtvState {
     if (state) {
       return {
         type: "info",
@@ -1706,6 +1694,7 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
         code: "ltv",
         data: {
           state,
+          reason,
         }
       };
     }
@@ -1728,6 +1717,7 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
           type: "embedded",
           date: timeStamp.info.genTime,
           signature: tsaResult,
+          info: tsaResult.info,
         },
       };
 
@@ -1741,10 +1731,12 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
         const tsaCertChain = new cms.CertificateChain();
         tsaCertChain.certificateHandler.parent = timeStamp.certificateHandler;
         state.data.signer = tsaSigner.signerCertificate;
-        state.data.chain = await tsaCertChain.build(tsaSigner.signerCertificate, { checkDate });
+        state.data.chain = await tsaCertChain.build(tsaSigner.signerCertificate, { checkDate, revocationMode: "online" });
       }
 
-      if (!tsaResult.signatureVerified || !state.data.chain || !state.data.chain.result) {
+      if (tsaResult.signatureVerified && state.data.chain && state.data.chain.resultCode === cms.CertificateChainStatusCode.badDate) {
+        state.text += " but it is expired";
+      } else if (!tsaResult.signatureVerified || !state.data.chain || !state.data.chain.result) {
         state.type = "invalid";
         state.text += " but it is invalid";
       }
@@ -1828,6 +1820,14 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
 
   protected verifyFormatting(signatureValue: core.SignatureDictionary): FormattingState {
     try {
+      if (this.document.target.wrongStructure) {
+        return {
+          type: "warn",
+          code: "formatting",
+          text: "Document structure doesn't match PDF specification.",
+          data: {}
+        };
+      }
       const byteRange = signatureValue.ByteRange.get(true);
       const contentView = signatureValue.Contents.view;
       if (!signatureValue.documentUpdate) {

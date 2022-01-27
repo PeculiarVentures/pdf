@@ -70,9 +70,9 @@ export class PDFDocumentUpdate {
   public fromPDF(data: string | Uint8Array | ViewReader, offset?: number): Promise<number>;
   public async fromPDF(data: string | Uint8Array | ViewReader, offset?: number): Promise<number> {
     const reader = objects.PDFObject.getReader(data, offset);
-    this.startXref = reader.position;
+    this.startXref = reader.view.byteOffset + reader.position;
 
-    let position = 0;
+    let position = 0; 
 
     // beginning with PDF 1.5 cross-reference information may bew stored in a cross-reference stream
     if (this.document.version >= 1.5 && reader.current !== 0x78) { // x
@@ -159,6 +159,19 @@ export class PDFDocumentUpdate {
 
     this.view = eofReader.view.subarray(0, eofReader.position + 5);
 
+    // Check file structure
+    if (!this.document.wrongStructure) {
+      if (this.previous && this.previous.startXref > this.startXref) {
+        this.document.wrongStructure = true;
+      } else {
+        for (const obj of this.getObjects()) {
+          if (obj.offset > this.startXref) {
+            this.document.wrongStructure = true;
+          }
+        }
+      }
+    }
+
     return position;
   }
 
@@ -172,7 +185,7 @@ export class PDFDocumentUpdate {
     if (!this.xref) {
       throw new Error("XRef is empty");
     }
-    
+
     if (!this.xref.objects.length) {
       // Don't serialize update without any changes
       return;

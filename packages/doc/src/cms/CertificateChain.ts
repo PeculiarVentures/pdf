@@ -4,7 +4,7 @@ import { CertificateRevocationList, BasicOCSPResponse, Certificate } from "./PKI
 import { DefaultCertificateStorageHandler } from "./DefaultCertificateStorageHandler";
 import { ICertificateStorage, ICertificateStorageHandler } from "./ICertificateStorageHandler";
 import { PKIUtils } from "./PKIUtils";
-import { IsTrustedResult } from "./ICertificateStorageHandler";
+import { IsTrustedResult, IResult, RevocationType } from "./ICertificateStorageHandler";
 import { CRL } from "./CRL";
 import { OCSP } from "./OCSP";
 
@@ -96,10 +96,14 @@ export interface CertificateChainResult {
   resultMessage: string;
 }
 
-export interface CertificateChainBuildParams {
+export type RevocationMode = "no" | "online" | "offline";
+export interface ChainBuildParams {
   checkDate?: Date;
-  revocations?: Array<CRL | OCSP>;
+  revocationMode?: RevocationMode;
+  preferCRL?: boolean
 }
+
+export type ChainRevocationMode = "no" | "online" | "offline" | "all";
 
 export class CertificateChain implements ICertificateStorage {
 
@@ -123,7 +127,8 @@ export class CertificateChain implements ICertificateStorage {
     return chain;
   }
 
-  public async build(cert: X509Certificate, params: CertificateChainBuildParams = {}): Promise<CertificateChainResult> {
+  public async build(cert: X509Certificate, params: ChainBuildParams = {}): Promise<CertificateChainResult> {
+    params = Object.assign<ChainBuildParams, ChainBuildParams>({ revocationMode: "no" }, params);
     const chain = await this.buildChainNoCheck(cert);
     const trustedChain = await this.certificateHandler.isTrusted(chain[chain.length - 1]);
     if (!trustedChain.result) {
@@ -144,6 +149,45 @@ export class CertificateChain implements ICertificateStorage {
         resultMessage: "Certificate chain without expiration date validation",
       };
     }
+    for (const chainCert of chain) {
+      if (chainCert.notBefore.getTime() > checkDate.getTime() || chainCert.notAfter.getTime() < checkDate.getTime()) {
+        return {
+          resultMessage: "The certificate is either not yet valid or expired",
+          chain,
+          result: false,
+          resultCode: CertificateChainStatusCode.badDate,
+        };
+      }
+    }
+
+    const revocations: (CRL | OCSP)[] = [];
+    if (params.revocationMode !== "no") {
+      const revocationTypeOrder: RevocationType[] = ["ocsp", "crl"];
+      if (params.preferCRL) {
+        revocationTypeOrder.reverse();
+      }
+
+      for (const cert of chain) {
+        if (cert === chain[chain.length - 1]) {
+          // Don't get revocation item for the trusted certificate
+          break;
+        }
+        let revocationResult: IResult<CRL | OCSP | null> | undefined;
+        for (const revocationType of revocationTypeOrder) {
+          if (revocationResult && revocationResult.result) {
+            break;
+          }
+          if (params.revocationMode === "offline") {
+            revocationResult = await this.certificateHandler.findRevocation(revocationType, cert);
+          } else if (params.revocationMode === "online") {
+            revocationResult = await this.certificateHandler.fetchRevocation(revocationType, cert);
+          }  
+        }
+        if (revocationResult && revocationResult.result) {
+          revocations.push(revocationResult.result);
+        }
+      }
+    }
 
     const chainEngineParams = {
       checkDate,
@@ -153,7 +197,6 @@ export class CertificateChain implements ICertificateStorage {
       ocsps: [] as BasicOCSPResponse[],
     };
 
-    const revocations = params.revocations || [];
     for (const revocation of revocations) {
       if (revocation instanceof CRL) {
         chainEngineParams.crls.push(revocation.asn);
@@ -168,13 +211,14 @@ export class CertificateChain implements ICertificateStorage {
     chainEngineParams.certs.reverse();
     chainEngineParams.trustedCerts.push(PKIUtils.x509ToCert(chain[chain.length - 1]));
 
+    const chainEngine = new pkijs.CertificateChainValidationEngine(chainEngineParams);
+    
+    const chainEngineResult = await chainEngine.verify();
     // console.log({
     //   cert: cert.subject,
     //   params: chainEngineParams,
+    //   chainEngineResult,  
     // });
-    const chainEngine = new pkijs.CertificateChainValidationEngine(chainEngineParams);
-
-    const chainEngineResult = await chainEngine.verify();
     chainEngineResult.chain = chain;
     chainEngineResult.trustListSource = trustedChain.source;
 

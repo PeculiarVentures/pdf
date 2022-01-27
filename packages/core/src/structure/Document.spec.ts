@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { PDFArray, PDFDictionary, PDFIndirectReference, PDFLiteralString, PDFName, PDFNumeric, PDFStream } from "../objects";
+import { PDFArray, PDFDictionary, PDFNumeric, PDFStream } from "../objects";
 import { PDFTextString } from "../objects/TextString";
 import { PDFDocument, XrefStructure } from "./Document";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -13,7 +13,7 @@ import * as assert from "assert";
 import * as pdfLib from "pdf-lib";
 import { PDFDocumentObjectTypes } from "./DocumentObject";
 import { CrossReferenceStream } from "./CrossReferenceStream";
-import fetch from "node-fetch";
+const fetch = require("node-fetch") as typeof globalThis.fetch;
 
 
 const filesDir = path.join(__dirname, "..", "..", "..", "..", "files");
