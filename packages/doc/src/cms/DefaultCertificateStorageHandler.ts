@@ -224,7 +224,11 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
 
     try {
       const raw = await this.requestCRL(uri);
-      CRL.fromBER(raw);
+
+      return {
+        result: CRL.fromBER(raw),
+        target: this,
+      };
     } catch (e) {
       return {
         result: null,
