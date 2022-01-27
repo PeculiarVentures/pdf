@@ -28,8 +28,12 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
       const _crls = this.#crls;
       for (const crl of target.CRLs.get()) {
         if (crl instanceof core.PDFStream) {
-          const objCrl = cms.CRL.fromBER(crl.decodeSync());
-          _crls.push(objCrl);
+          try {
+            const objCrl = cms.CRL.fromBER(crl.decodeSync());
+            _crls.push(objCrl);
+          } catch {
+            // nothing
+          }
         }
       }
     }
@@ -37,9 +41,13 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
       const _ocsps = this.#ocsps;
       for (const ocsp of target.OCSPs.get()) {
         if (ocsp instanceof core.PDFStream) {
-          const data = ocsp.decodeSync();
-          const objOcsp = cms.OCSP.fromOCSPResponse(data);
-          _ocsps.push(objOcsp);
+          try {
+            const data = ocsp.decodeSync();
+            const objOcsp = cms.OCSP.fromOCSPResponse(data);
+            _ocsps.push(objOcsp);
+          } catch {
+            // nothing
+          }
         }
       }
     }
