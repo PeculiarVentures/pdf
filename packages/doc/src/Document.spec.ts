@@ -1,6 +1,6 @@
 import * as assert from "assert";
 import * as fs from "fs";
-import * as core from "@PeculiarVentures/pdf-core";
+import * as core from "@peculiarventures/pdf-core";
 import * as path from "path";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
 import { PDFDocument, PDFVersion } from "./Document";

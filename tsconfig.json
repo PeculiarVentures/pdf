@@ -7,10 +7,10 @@
     "target": "ES2018",
     "baseUrl": ".",
     "paths": {
-      "@PeculiarVentures/pdf-core": ["./packages/core/src"],
-      "@PeculiarVentures/pdf-cli": ["./packages/cli/src"],
-      "@PeculiarVentures/pdf-doc": ["./packages/doc/src"],
-      "@PeculiarVentures/pdf-font": ["./packages/font/src"],
+      "@peculiarventures/pdf-core": ["./packages/core/src"],
+      "@peculiarventures/pdf-cli": ["./packages/cli/src"],
+      "@peculiarventures/pdf-doc": ["./packages/doc/src"],
+      "@peculiarventures/pdf-font": ["./packages/font/src"],
     }
   },
   "exclude": [

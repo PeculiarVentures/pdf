@@ -16,7 +16,7 @@ runs:
     - name: Setup .npmrc
       shell: bash
       run: |
-        npm set @PeculiarVentures:registry=https://npm.pkg.github.com/
+        npm set @peculiarventures:registry=https://npm.pkg.github.com/
         npm set //npm.pkg.github.com/:_authToken=${{ inputs.token }}
 
     - name: Ensure access

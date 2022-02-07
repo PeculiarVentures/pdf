@@ -1,5 +1,5 @@
 {
-  "name": "@PeculiarVentures/pdf-doc",
+  "name": "@peculiarventures/pdf-doc",
   "version": "1.1.0",
   "description": "High level PDF module",
   "keywords": [],
@@ -34,7 +34,7 @@
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
   "dependencies": {
-    "@PeculiarVentures/pdf-core": "^1.1.0",
+    "@peculiarventures/pdf-core": "^1.1.0",
     "@peculiar/asn1-ocsp": "^2.0.38",
     "@peculiar/asn1-schema": "^2.0.38",
     "@peculiar/asn1-tsp": "^2.0.38",

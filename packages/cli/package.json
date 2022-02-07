@@ -1,5 +1,5 @@
 {
-  "name": "@PeculiarVentures/pdf-cli",
+  "name": "@peculiarventures/pdf-cli",
   "version": "1.1.0",
   "description": "> TODO: description",
   "author": "microshine <microshine@mail.ru>",
@@ -32,8 +32,8 @@
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
   "dependencies": {
-    "@PeculiarVentures/pdf-core": "^1.1.0",
-    "@PeculiarVentures/pdf-doc": "^1.1.0",
+    "@peculiarventures/pdf-core": "^1.1.0",
+    "@peculiarventures/pdf-doc": "^1.1.0",
     "commander": "^8.1.0"
   }
 }

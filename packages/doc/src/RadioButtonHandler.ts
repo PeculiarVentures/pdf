@@ -1,4 +1,4 @@
-import * as core from "@PeculiarVentures/pdf-core";
+import * as core from "@peculiarventures/pdf-core";
 import { RadioButtonGroup } from "./Form";
 import { CheckBoxHandler, ICheckBoxCreateParameters, ICheckBoxHandler, ICheckBoxParameters } from "./CheckBoxHandler";
 import { IFormComponentParameters } from "./FormComponentHandler";

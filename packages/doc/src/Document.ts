@@ -1,5 +1,5 @@
-import * as core from "@PeculiarVentures/pdf-core";
-import { DefaultFonts } from "@PeculiarVentures/pdf-font";
+import * as core from "@peculiarventures/pdf-core";
+import { DefaultFonts } from "@peculiarventures/pdf-font";
 import { BufferSource, Convert } from "pvtsutils";
 import { CheckBoxHandler } from "./CheckBoxHandler";
 import { Image } from "./Image";

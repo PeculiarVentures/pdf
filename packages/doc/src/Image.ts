@@ -1,4 +1,4 @@
-import * as core from "@PeculiarVentures/pdf-core";
+import * as core from "@peculiarventures/pdf-core";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
 import * as fastPng from "fast-png";
 import type { PDFDocument } from "./Document";

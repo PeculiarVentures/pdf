@@ -1,5 +1,5 @@
 import { AsnConvert } from "@peculiar/asn1-schema";
-import * as core from "@PeculiarVentures/pdf-core";
+import * as core from "@peculiarventures/pdf-core";
 import { TSTInfo } from "@peculiar/asn1-tsp";
 import { X509Certificate, X509Certificates } from "@peculiar/x509";
 import { Convert } from "pvtsutils";

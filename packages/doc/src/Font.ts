@@ -1,9 +1,9 @@
-import * as core from "@PeculiarVentures/pdf-core";
-import * as pdfFont from "@PeculiarVentures/pdf-font";
+import * as core from "@peculiarventures/pdf-core";
+import * as pdfFont from "@peculiarventures/pdf-font";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
 import { PDFDocument } from "./Document";
 import { WrapObject } from "./WrapObject";
-import { PDFLiteralString, Type1FontDictionary } from "@PeculiarVentures/pdf-core";
+import { PDFLiteralString, Type1FontDictionary } from "@peculiarventures/pdf-core";
 
 export interface FontComponentParams {
   fontDictionary: core.FontDictionary;

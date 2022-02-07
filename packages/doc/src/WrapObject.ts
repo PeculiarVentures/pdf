@@ -1,4 +1,4 @@
-import type { PDFDictionary } from "@PeculiarVentures/pdf-core";
+import type { PDFDictionary } from "@peculiarventures/pdf-core";
 import type { PDFDocument } from "./Document";
 
 export class WrapObject<T extends PDFDictionary> {
