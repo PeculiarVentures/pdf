@@ -1,4 +1,3 @@
-import { TimeStampToken } from "../TimeStampToken";
 import { CmsAttribute } from "./Attribute";
 import { CmsAttributeFactory } from "./AttributeFactory";
 
@@ -38,3 +37,5 @@ export class TimeStampTokenAttribute extends CmsAttribute {
 }
 
 CmsAttributeFactory.register(TimeStampTokenAttribute.DEFAULT_IDENTIFIER, TimeStampTokenAttribute);
+
+import { TimeStampToken } from "../TimeStampToken";

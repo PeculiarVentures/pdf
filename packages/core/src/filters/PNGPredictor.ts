@@ -1,14 +1,14 @@
-import { ByteStream, SeqStream } from "bytestreamjs";
+import * as bytestreamjs from "bytestreamjs";
 import { Predictor } from "./Predicator";
 
 export class PNGPredictor extends Predictor {
 
 	public static readonly className = "PNGPredictor";
 
-	public decode(stream: ByteStream): ByteStream {
+	public decode(stream: bytestreamjs.ByteStream): bytestreamjs.ByteStream {
 		//#region Initial variables
-		const result = new SeqStream({
-			stream: new ByteStream(),
+		const result = new bytestreamjs.SeqStream({
+			stream: new bytestreamjs.ByteStream(),
 			appendBlock: stream.buffer.byteLength
 		});
 
@@ -33,7 +33,7 @@ export class PNGPredictor extends Predictor {
 			switch (type) {
 				//#region Filter type 0: None
 				case 0:
-					result.append(new ByteStream({
+					result.append(new bytestreamjs.ByteStream({
 						view: row
 					}));
 					break;
@@ -122,7 +122,7 @@ export class PNGPredictor extends Predictor {
 		return stream;
 	}
 
-	public encode(stream: ByteStream): ByteStream {
+	public encode(stream: bytestreamjs.ByteStream): bytestreamjs.ByteStream {
 		return stream;
 	}
 

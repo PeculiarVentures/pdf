@@ -1,7 +1,8 @@
 import * as core from "@peculiarventures/pdf-core";
-import * as cms from "./cms";
 import { X509Certificate } from "@peculiar/x509";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
+
+import * as cms from "./cms";
 import { PDFDocument, PDFVersion } from "./Document";
 import { WrapObject } from "./WrapObject";
 

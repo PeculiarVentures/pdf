@@ -1,8 +1,10 @@
 import * as asn1js from "asn1js";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
+
+const pkijs = require("pkijs");
+
 import { AsnEncoded } from "../AsnEncoded";
 import { Attribute } from "../PKITypes";
-const pkijs = require("pkijs");
 
 export interface CmsAttributeConstructor {
   new(): CmsAttribute;

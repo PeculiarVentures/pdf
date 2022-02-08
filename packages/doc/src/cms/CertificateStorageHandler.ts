@@ -1,6 +1,6 @@
 import { X509Certificate } from "@peculiar/x509";
+
 import { DefaultCertificateStorageHandler } from "./DefaultCertificateStorageHandler";
-import { CMSSignedData } from "./SignedData";
 
 export class CmsCertificateStorageHandler extends DefaultCertificateStorageHandler {
 
@@ -23,3 +23,5 @@ export class CmsCertificateStorageHandler extends DefaultCertificateStorageHandl
   }
 
 }
+
+import type { CMSSignedData } from "./SignedData";

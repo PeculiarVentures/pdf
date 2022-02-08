@@ -1,21 +1,20 @@
 import { X509Certificate } from "@peculiar/x509";
 import { BufferSource, BufferSourceConverter, } from "pvtsutils";
-import { DefaultCertificateStorageHandler } from "./DefaultCertificateStorageHandler";
-import { AlgorithmFactory } from "./AlgorithmFactory";
-import { AsnEncoded } from "./AsnEncoded";
-import { ICertificateStorage } from "./ICertificateStorageHandler";
-import { OCSPResponse } from "./PKITypes";
-import { PKIUtils } from "./PKIUtils";
 
 const asn1js = require("asn1js");
 const pkijs = require("pkijs");
 
-export class OCSPCertificateStorageHandler extends DefaultCertificateStorageHandler {
-}
+import { AsnEncoded } from "./AsnEncoded";
 
 export class OCSP extends AsnEncoded implements ICertificateStorage {
   
-  certificateHandler = new OCSPCertificateStorageHandler();
+  public certificateHandler: ICertificateStorageHandler;
+
+  constructor() {
+    super();
+
+    this.certificateHandler = new DefaultCertificateStorageHandler();
+  }
 
   public toOCSPResponse(): ArrayBuffer {
     const ocspRespSimpl = new pkijs.OCSPResponse();
@@ -83,3 +82,11 @@ export class OCSP extends AsnEncoded implements ICertificateStorage {
   }
 
 }
+
+import { AlgorithmFactory } from "./AlgorithmFactory";
+import { PKIUtils } from "./PKIUtils";
+import { DefaultCertificateStorageHandler } from "./DefaultCertificateStorageHandler";
+
+import type { ICertificateStorage, ICertificateStorageHandler } from "./ICertificateStorageHandler";
+import type { OCSPResponse } from "./PKITypes";
+

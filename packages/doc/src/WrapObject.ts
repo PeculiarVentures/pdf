@@ -1,7 +1,7 @@
-import type { PDFDictionary } from "@peculiarventures/pdf-core";
+import type * as core from "@peculiarventures/pdf-core";
 import type { PDFDocument } from "./Document";
 
-export class WrapObject<T extends PDFDictionary> {
+export class WrapObject<T extends core.PDFDictionary> {
   public readonly target: T;
   public readonly document: PDFDocument;
 
