@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="../pkijs.d.ts" />
+
 import * as asn1js from "asn1js";
 import { ByteStream } from "bytestreamjs";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
