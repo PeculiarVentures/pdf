@@ -2,8 +2,8 @@ import { AsnConvert } from "@peculiar/asn1-schema";
 import { X509Certificate, X509Certificates } from "@peculiar/x509";
 import { BufferSourceConverter, BufferSource } from "pvtsutils";
 
-const pkijs = require("pkijs");
-const asn1js = require("asn1js");
+import * as asn1js from "asn1js";
+import * as pkijs from "pkijs";
 
 import { CMSContentInfo } from "./ContentInfo";
 

@@ -1,7 +1,6 @@
 import { X509Certificate } from "@peculiar/x509";
 import { Convert } from "pvtsutils";
-
-const pkijs = require("pkijs");
+import * as pkijs from "pkijs";
 
 import { AsnEncoded } from "./AsnEncoded";
 

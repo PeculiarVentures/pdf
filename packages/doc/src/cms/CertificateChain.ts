@@ -1,6 +1,5 @@
 import { X509Certificate, X509Certificates } from "@peculiar/x509";
-
-const pkijs = require("pkijs");
+import * as pkijs from "pkijs";
 
 export enum CertificateChainStatusCode {
   unknown = -1,

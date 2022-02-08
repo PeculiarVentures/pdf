@@ -1,6 +1,7 @@
 import * as core from "@peculiarventures/pdf-core";
 import { DefaultFonts } from "@peculiarventures/pdf-font";
 import { BufferSource, Convert } from "pvtsutils";
+import * as pkijs from "pkijs";
 import { CheckBoxHandler } from "./CheckBoxHandler";
 import { Image } from "./Image";
 import { SignatureBoxHandler } from "./SignatureBoxHandler";
@@ -15,7 +16,6 @@ import { FormObject } from "./FormObject";
 import { WrapObject } from "./WrapObject";
 import { Dss } from "./Dss";
 import { IPdfCertificateStorageHandler, PDFCertificateStorageHandler } from "./CertificateStorageHandler";
-const pkijs = require("pkijs");
 
 export enum PDFVersion {
   v1_1 = 1.1,

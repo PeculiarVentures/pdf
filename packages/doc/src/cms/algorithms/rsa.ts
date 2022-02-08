@@ -1,5 +1,5 @@
 import * as asn1js from "asn1js";
-const pkijs = require("pkijs");
+import * as pkijs from "pkijs";
 import { Convert } from "pvtsutils";
 import { AlgorithmFactory, AlgorithmConverter, HashedAlgorithm } from "../AlgorithmFactory";
 

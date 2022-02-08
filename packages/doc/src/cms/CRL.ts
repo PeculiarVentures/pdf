@@ -1,6 +1,5 @@
 import { X509Certificate, Name } from "@peculiar/x509";
-
-const pkijs = require("pkijs");
+import * as pkijs from "pkijs";
 
 import { AsnEncoded } from "./AsnEncoded";
 

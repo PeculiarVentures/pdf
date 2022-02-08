@@ -2,8 +2,7 @@ import * as asn1js from "asn1js";
 import { ByteStream } from "bytestreamjs";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
 import { utilConcatBuf } from "pvutils";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { getRandomValues } = require("pkijs");
+import * as pkijs from "pkijs";
 
 import { PDFArray, PDFTextString } from "../objects";
 import { FilterDictionary } from "../structure/dictionaries/Filter";
@@ -11,15 +10,10 @@ import { PublicKeyEncryptDictionary } from "../structure/dictionaries/PublicKeyE
 import { algorithms, clientSideParametersPublicKey, staticDataFF } from "./Constants";
 import { EncryptionHandler } from "./EncryptionHandler";
 
-
-
 export interface globalParametersPublicKey {
   stmKey?: CryptoKey;
   strKey?: CryptoKey;
 }
-
-
-const { ContentInfo, EnvelopedData } = require("pkijs");
 
 const defaultLength = 256;
 const supportedAlgorithm = ["AES-CBC", "AES-GCM"];
@@ -34,7 +28,7 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
 
   public async encrypt(stream: BufferSource): Promise<ArrayBuffer> {
     const dataIV = new Uint8Array(16);
-    getRandomValues(dataIV);
+    pkijs.getRandomValues(dataIV);
 
     const clientSideParameters = await this.getClientSideParameters();
     const encryptOptions = this.dictionary.documentUpdate?.document.options?.crypto?.encrypt;
@@ -176,13 +170,13 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
         throw new Error(`Incorrect structure for item #${i} of "Recipients" array`);
 
       try {
-        cmsContentInfo = new ContentInfo({ schema: asn1.result });
+        cmsContentInfo = new pkijs.ContentInfo({ schema: asn1.result });
       } catch (ex) {
         throw new Error(`Incorrect structure for item #${i} of "Recipients" array`);
       }
 
       try {
-        cmsEnveloped = new EnvelopedData({ schema: cmsContentInfo.content });
+        cmsEnveloped = new pkijs.EnvelopedData({ schema: cmsContentInfo.content });
       } catch (ex) {
         throw new Error(`Incorrect structure for item #${i} of "Recipients" array`);
       }

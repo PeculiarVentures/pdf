@@ -1,8 +1,7 @@
 import { X509Certificate } from "@peculiar/x509";
 import { BufferSource, BufferSourceConverter, } from "pvtsutils";
-
-const asn1js = require("asn1js");
-const pkijs = require("pkijs");
+import * as asn1js from "asn1js";
+import * as pkijs from "pkijs";
 
 import { AsnEncoded } from "./AsnEncoded";
 

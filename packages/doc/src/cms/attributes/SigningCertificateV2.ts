@@ -1,8 +1,7 @@
 import { AsnType, AsnTypeTypes, AsnProp, AsnPropTypes, AsnIntegerArrayBufferConverter, AsnSerializer, AsnConvert } from "@peculiar/asn1-schema";
 import { AlgorithmIdentifier, GeneralName, PolicyInformation } from "@peculiar/asn1-x509";
 import { X509Certificate } from "@peculiar/x509";
-
-const pkijs = require("pkijs");
+import * as pkijs from "pkijs";
 
 import { AlgorithmFactory } from "../AlgorithmFactory";
 import { CmsAttribute } from "./Attribute";

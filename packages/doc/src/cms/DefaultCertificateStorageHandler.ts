@@ -4,8 +4,7 @@ import { id_ce_cRLDistributionPoints, CRLDistributionPoints, id_pe_authorityInfo
 import { SubjectKeyIdentifierExtension, X509Certificate, X509Certificates } from "@peculiar/x509";
 import { isEqualBuffer } from "pvutils";
 import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
-
-const pkijs = require("pkijs");
+import * as pkijs from "pkijs";
 
 export class DefaultCertificateStorageHandler implements ICertificateStorageHandler {
 

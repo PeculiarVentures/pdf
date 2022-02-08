@@ -1,7 +1,6 @@
 import * as asn1js from "asn1js";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
-
-const pkijs = require("pkijs");
+import * as pkijs from "pkijs";
 
 import { AsnEncoded } from "../AsnEncoded";
 import { Attribute } from "../PKITypes";
