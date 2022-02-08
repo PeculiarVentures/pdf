@@ -1,4 +1,4 @@
-import * as core from "@PeculiarVentures/pdf-core";
+import * as core from "@peculiarventures/pdf-core";
 import { WrapObject } from "./WrapObject";
 
 function flag(f: core.FontDescriptorFlags): PropertyDecorator {

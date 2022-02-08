@@ -1,4 +1,4 @@
-import * as core from "@PeculiarVentures/pdf-core";
+import * as core from "@peculiarventures/pdf-core";
 import { PDFDocument } from "./Document";
 import { FontComponent, TextBlockParams } from "./Font";
 import { FormObject } from "./FormObject";

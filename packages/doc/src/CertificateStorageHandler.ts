@@ -1,5 +1,4 @@
-const pkijs = require("pkijs");
-import * as core from "@PeculiarVentures/pdf-core";
+import * as core from "@peculiarventures/pdf-core";
 import { CMSSignedData, DefaultCertificateStorageHandler, ICertificateStorageHandler } from "./cms";
 import { PDFDocument } from "./Document";
 import { X509Certificate, X509Certificates } from "@peculiar/x509";

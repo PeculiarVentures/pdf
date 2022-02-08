@@ -1,11 +1,11 @@
-# `@PeculiarVentures/pdf-cli`
+# `@peculiarventures/pdf-cli`
 
 > TODO: description
 
 ## Usage
 
 ```
-const pdfCli = require('@PeculiarVentures/pdf-cli');
+const pdfCli = require('@peculiarventures/pdf-cli');
 
 // TODO: DEMONSTRATE API
 ```

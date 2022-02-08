@@ -1,9 +1,11 @@
 import { AsnConvert } from "@peculiar/asn1-schema";
-import * as core from "@PeculiarVentures/pdf-core";
+import * as core from "@peculiarventures/pdf-core";
 import { TSTInfo } from "@peculiar/asn1-tsp";
 import { X509Certificate, X509Certificates } from "@peculiar/x509";
 import { Convert } from "pvtsutils";
+import * as pkijs from "pkijs";
 
+import * as cms from "./cms";
 import { ICheckBoxHandler } from "./CheckBoxHandler";
 import type { PDFDocument } from "./Document";
 import { IFormComponentParameters } from "./FormComponentHandler";
@@ -14,9 +16,6 @@ import { IRadioButtonHandler } from "./RadioButtonHandler";
 import { ResourceManager } from "./ResourceManager";
 import { WrapObject } from "./WrapObject";
 import { FontComponent } from "./Font";
-import * as cms from "./cms";
-
-const pkijs = require("pkijs");
 
 function flag(f: core.AnnotationFlags, fieldFlag = false, repaint = false): PropertyDecorator {
   return (target: any, propertyKey: string | symbol) => {

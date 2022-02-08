@@ -1,8 +1,8 @@
 import { X509Certificate } from "@peculiar/x509";
-import { AsnEncoded } from "./AsnEncoded";
-import { Certificate, Extension } from "./PKITypes";
+import * as pkijs from "pkijs";
 
-const pkijs = require("pkijs");
+import { AsnEncoded } from "./AsnEncoded";
+import type  { Certificate, Extension } from "./PKITypes";
 
 class PKICertificate extends AsnEncoded {
 

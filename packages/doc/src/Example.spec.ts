@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as core from "@PeculiarVentures/pdf-core";
-import { AnnotationDictionary } from "@PeculiarVentures/pdf-core";
-import { DefaultFonts } from "@PeculiarVentures/pdf-font";
+import * as core from "@peculiarventures/pdf-core";
+import { AnnotationDictionary } from "@peculiarventures/pdf-core";
+import { DefaultFonts } from "@peculiarventures/pdf-font";
 import { TextAlignment } from ".";
 import { PDFDocument, PDFDocumentCreateParameters, PDFVersion } from "./Document";
 import { writeFile } from "./Document.spec";

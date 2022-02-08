@@ -1,5 +1,4 @@
-const { getCrypto } = require("pkijs");
-
+import * as pkijs from "pkijs";
 import { BufferSource } from "pvtsutils";
 import { IPDFIndirect } from "../objects";
 import { EncryptDictionary } from "../structure/dictionaries/Encrypt";
@@ -19,7 +18,7 @@ export abstract class EncryptionHandler {
   public abstract decrypt(text: BufferSource, parent: IPDFIndirect): Promise<ArrayBuffer>;
 
   public static getCrypto(): SubtleCrypto {
-    const crypto = getCrypto();
+    const crypto = pkijs.getCrypto();
     if (!crypto) {
       throw new Error("Unable to create WebCrypto object");
     }

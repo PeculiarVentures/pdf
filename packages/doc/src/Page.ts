@@ -1,4 +1,4 @@
-import * as core from "@PeculiarVentures/pdf-core";
+import * as core from "@peculiarventures/pdf-core";
 import { ICheckBoxCreateParameters } from "./CheckBoxHandler";
 import { CheckBox, SignatureBox, RadioButton, TextEditor, InputImageBox } from "./Form";
 import { ISignatureBoxCreateParameters } from "./SignatureBoxHandler";

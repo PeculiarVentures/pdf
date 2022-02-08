@@ -1,5 +1,4 @@
 import * as objects from "../objects";
-import { PDFNumeric } from "../objects";
 import { PDFDate } from "../structure/common/Date";
 import { SignatureReferenceDictionary } from "./SignatureReference";
 

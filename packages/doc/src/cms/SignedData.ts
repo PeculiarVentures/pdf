@@ -1,15 +1,11 @@
-const pkijs = require("pkijs");
-const asn1js = require("asn1js");
 import { AsnConvert } from "@peculiar/asn1-schema";
 import { X509Certificate, X509Certificates } from "@peculiar/x509";
 import { BufferSourceConverter, BufferSource } from "pvtsutils";
-import { AlgorithmFactory, HashedAlgorithm } from "./AlgorithmFactory";
-import { CmsAttribute } from "./attributes";
+
+import * as asn1js from "asn1js";
+import * as pkijs from "pkijs";
+
 import { CMSContentInfo } from "./ContentInfo";
-import { ICertificateStorage, ICertificateStorageHandler } from "./ICertificateStorageHandler";
-import { Attribute, BasicOCSPResponse, Certificate, CertificateRevocationList } from "./PKITypes";
-import { PKIUtils } from "./PKIUtils";
-import { id_adbe_revocationInfoArchival, RevocationInfoArchival } from "./AdobeRevocationInfoArchival";
 
 export interface CMSSignedDataVerifyResult {
   date: Date;
@@ -328,7 +324,14 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
 
 }
 
+import { PKIUtils } from "./PKIUtils";
 import { CMSSignerInfo, CMSSignerInfoVerifyResult, CMSSignerInfoVerifyResultCodes } from "./SignerInfo";
 import { CmsCertificateStorageHandler } from "./CertificateStorageHandler";
 import { CRL } from "./CRL";
 import { OCSP } from "./OCSP";
+import { id_adbe_revocationInfoArchival, RevocationInfoArchival } from "./AdobeRevocationInfoArchival";
+import { AlgorithmFactory, HashedAlgorithm } from "./AlgorithmFactory";
+
+import type { CmsAttribute } from "./attributes";
+import type { ICertificateStorage, ICertificateStorageHandler } from "./ICertificateStorageHandler";
+import type { Attribute, BasicOCSPResponse, Certificate, CertificateRevocationList } from "./PKITypes";

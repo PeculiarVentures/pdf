@@ -4,10 +4,8 @@ import { id_ce_cRLDistributionPoints, CRLDistributionPoints, id_pe_authorityInfo
 import { SubjectKeyIdentifierExtension, X509Certificate, X509Certificates } from "@peculiar/x509";
 import { isEqualBuffer } from "pvutils";
 import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
-import { ICertificateStorageHandler, IResult, IsTrustedResult, RevocationType } from "./ICertificateStorageHandler";
-import { PKIUtils } from "./PKIUtils";
+import * as pkijs from "pkijs";
 
-const pkijs = require("pkijs");
 export class DefaultCertificateStorageHandler implements ICertificateStorageHandler {
 
   public parent: ICertificateStorageHandler | null = null;
@@ -397,3 +395,6 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
 import { CRL } from "./CRL";
 import { OCSP } from "./OCSP";
 import { CertificateID } from "./CertID";
+import { PKIUtils } from "./PKIUtils";
+
+import type { ICertificateStorageHandler, IResult, IsTrustedResult, RevocationType } from "./ICertificateStorageHandler";

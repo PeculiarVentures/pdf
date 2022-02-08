@@ -1,10 +1,10 @@
 import { BufferSourceConverter, Convert } from "pvtsutils";
 import { BufferSource } from "pvtsutils";
-import { utilConcatBuf } from "pvutils";
+import { isEqualBuffer, utilConcatBuf } from "pvutils";
 import { IPDFIndirect } from "../objects/Object";
 import { FilterDictionary } from "../structure/dictionaries/Filter";
 import { StandardEncryptDictionary } from "../structure/dictionaries/StandardEncrypt";
-const { getRandomValues, isEqualBuffer } = require("pkijs");
+import * as pkijs from "pkijs";
 
 import { algorithms, globalParametersCryptFilter, staticData, staticDataFF } from "./Constants";
 import { EncryptionHandler } from "./EncryptionHandler";
@@ -33,7 +33,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
     const globalParameters = await this.getGlobalParameters();
     
     const dataIV = new Uint8Array(16);
-    getRandomValues(dataIV);
+    pkijs.getRandomValues(dataIV);
 
     const id = new Int32Array([parent.id]);
     const generation = new Int32Array([parent.generation]);
@@ -446,7 +446,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
   public async algorithm5(hashedOwnerPassword: BufferSource, fileIdentifier: ArrayBuffer, pEntry: number, revision: number, keyLength = 40, metadataEncrypted = false, password = (new ArrayBuffer(0))): Promise<ArrayBuffer> {
     const arbitraryPaddingBuffer = new ArrayBuffer(16);
     const arbitraryPaddingView = new Uint8Array(arbitraryPaddingBuffer);
-    getRandomValues(arbitraryPaddingView);
+    pkijs.getRandomValues(arbitraryPaddingView);
 
     // TODO left operations?
     // const passwordBuffer = this.mixedPassword(password);
@@ -707,7 +707,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
   public async algorithm8(fileEncryptionKey: ArrayBuffer, password = (new ArrayBuffer(0))): Promise<[ArrayBuffer, ArrayBuffer]> {
     const randomBuffer = new ArrayBuffer(16);
     const randomView = new Uint8Array(randomBuffer);
-    getRandomValues(randomView);
+    pkijs.getRandomValues(randomView);
 
     const hashU = await this.algorithm2B(utilConcatBuf(password, randomBuffer.slice(0, 8)), false, password);
     const uKey = utilConcatBuf(hashU, randomBuffer);
@@ -734,7 +734,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
   public async algorithm9(hashedUserPassword: ArrayBuffer, fileEncryptionKey: ArrayBuffer, password = (new ArrayBuffer(0))): Promise<[ArrayBuffer, ArrayBuffer]> {
     const randomBuffer = new ArrayBuffer(16);
     const randomView = new Uint8Array(randomBuffer);
-    getRandomValues(randomView);
+    pkijs.getRandomValues(randomView);
 
     const hashO = await this.algorithm2B(utilConcatBuf(password, randomBuffer.slice(0, 8), hashedUserPassword), true, password, hashedUserPassword.slice(0, 48));
     const oKey = utilConcatBuf(hashO, randomBuffer);
@@ -764,7 +764,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
 
     const randomBuffer = new ArrayBuffer(4);
     const randomView = new Uint8Array(randomBuffer);
-    getRandomValues(randomView);
+    pkijs.getRandomValues(randomView);
 
     const key = await this.crypto.importKey("raw", fileEncryptionKey, algorithms.aesecb, false, ["encrypt"]);
     const encryptionsKey = await this.crypto.encrypt({

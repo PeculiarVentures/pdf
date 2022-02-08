@@ -1,4 +1,5 @@
-const pkijs = require("pkijs");
+import * as pkijs from "pkijs";
+
 import { AsnEncoded } from "./AsnEncoded";
 
 export class CMSContentInfo extends AsnEncoded {

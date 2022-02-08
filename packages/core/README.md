@@ -1,11 +1,11 @@
-# `@PeculiarVentures/pdf-core`
+# `@peculiarventures/pdf-core`
 
 > TODO: description
 
 ## Usage
 
 ```
-const pdfCore = require('@PeculiarVentures/pdf-core');
+const pdfCore = require('@peculiarventures/pdf-core');
 
 // TODO: DEMONSTRATE API
 ```

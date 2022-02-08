@@ -2,8 +2,9 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 import * as asn1js from "asn1js";
-import { BufferSource, BufferSourceConverter, Convert, TextEncoding } from "pvtsutils";
-import { AsnObject, PkiObject } from "./PKITypes";
+import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+
+import type { AsnObject, PkiObject } from "./PKITypes";
 
 export type AsnEncodedStringFormat = "hex" | "base64" | "base64url";
 

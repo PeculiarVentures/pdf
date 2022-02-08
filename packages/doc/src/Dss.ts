@@ -1,16 +1,16 @@
-import * as core from "@PeculiarVentures/pdf-core";
-import * as cms from "./cms";
+import * as core from "@peculiarventures/pdf-core";
 import { X509Certificate } from "@peculiar/x509";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
+
+import * as cms from "./cms";
 import { PDFDocument, PDFVersion } from "./Document";
 import { WrapObject } from "./WrapObject";
-import { CRL, OCSP, TimeStampToken } from "./cms";
 
 export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
 
   #certs: X509Certificate[] = [];
-  #crls: CRL[] = [];
-  #ocsps: OCSP[] = [];
+  #crls: cms.CRL[] = [];
+  #ocsps: cms.OCSP[] = [];
 
   constructor(target: core.DocumentSecurityStoreDictionary, document: PDFDocument) {
     super(target, document);
@@ -57,11 +57,11 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
     return this.#certs;
   }
 
-  public get crls(): ReadonlyArray<CRL> {
+  public get crls(): ReadonlyArray<cms.CRL> {
     return this.#crls;
   }
 
-  public get ocsps(): ReadonlyArray<OCSP> {
+  public get ocsps(): ReadonlyArray<cms.OCSP> {
     return this.#ocsps;
   }
 
@@ -91,7 +91,7 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
     }
   }
 
-  public add(view: BufferSource | X509Certificate | CRL | OCSP, vri?: string): void {
+  public add(view: BufferSource | X509Certificate | cms.CRL | cms.OCSP, vri?: string): void {
     this.addToCatalog();
 
     if (BufferSourceConverter.isBufferSource(view)) {
@@ -113,18 +113,18 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
       }
     } else if (view instanceof X509Certificate) {
       this.pushCert(view, vri);
-    } else if (view instanceof CRL) {
+    } else if (view instanceof cms.CRL) {
       this.pushCrl(view, vri);
-    } else if (view instanceof OCSP) {
+    } else if (view instanceof cms.OCSP) {
       this.pushOcsp(view, vri);
     }
   }
 
-  public addTimeStamp(token: TimeStampToken | BufferSource, signatureThumbprint: string): void {
+  public addTimeStamp(token: cms.TimeStampToken | BufferSource, signatureThumbprint: string): void {
     signatureThumbprint = signatureThumbprint.toUpperCase();
 
     if (BufferSourceConverter.isBufferSource(token)) {
-      return this.addTimeStamp(TimeStampToken.fromBER(token), signatureThumbprint);
+      return this.addTimeStamp(cms.TimeStampToken.fromBER(token), signatureThumbprint);
     }
 
     this.addToCatalog();
@@ -186,7 +186,7 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
     return stream;
   }
 
-  private pushCrl(crl: CRL, vri?: string): core.PDFStream {
+  private pushCrl(crl: cms.CRL, vri?: string): core.PDFStream {
     let stream: core.PDFStream | null = null;
     const crlArray = this.target.CRLs.get();
     for (const item of crlArray) {
@@ -216,7 +216,7 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
     return stream;
   }
 
-  private pushOcsp(ocsp: OCSP, vri?: string): core.PDFStream {
+  private pushOcsp(ocsp: cms.OCSP, vri?: string): core.PDFStream {
     let stream: core.PDFStream | null = null;
     const ocspArray = this.target.OCSPs.get();
     const ocspResp = ocsp.toOCSPResponse();

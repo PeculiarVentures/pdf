@@ -1,7 +1,7 @@
 import { X509Certificate, Name } from "@peculiar/x509";
+import * as pkijs from "pkijs";
+
 import { AsnEncoded } from "./AsnEncoded";
-import { PKIUtils } from "./PKIUtils";
-const pkijs = require("pkijs");
 
 export class CRL extends AsnEncoded {
 
@@ -32,3 +32,5 @@ export class CRL extends AsnEncoded {
   }
 
 }
+
+import { PKIUtils } from "./PKIUtils";

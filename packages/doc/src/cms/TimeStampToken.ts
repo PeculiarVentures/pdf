@@ -1,7 +1,7 @@
 import { AsnConvert } from "@peculiar/asn1-schema";
 import { TSTInfo } from "@peculiar/asn1-tsp";
+
 import { CMSSignedData, CMSSignedDataVerifyResult } from "./SignedData";
-import { CMSSignerInfo } from "./SignerInfo";
 
 export interface TimeStampVerifyResult extends CMSSignedDataVerifyResult {
   info: TSTInfo;
@@ -32,3 +32,5 @@ export class TimeStampToken extends CMSSignedData {
   }
 
 }
+
+import type { CMSSignerInfo } from "./SignerInfo";

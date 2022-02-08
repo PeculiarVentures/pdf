@@ -1,12 +1,8 @@
-const pkijs = require("pkijs");
-import { CmsAttribute } from "./attributes/Attribute";
-import { CmsAttributeFactory } from "./attributes/AttributeFactory";
-import { AlgorithmFactory } from "./AlgorithmFactory";
-import { AsnEncoded } from "./AsnEncoded";
-import type { CMSSignedData } from "./SignedData";
 import { X509Certificate } from "@peculiar/x509";
 import { BufferSource } from "pvtsutils";
-import { Attribute } from "./PKITypes";
+import * as pkijs from "pkijs";
+
+import { AsnEncoded } from "./AsnEncoded";
 
 export enum CMSSignerInfoVerifyResultCodes {
   /**
@@ -84,8 +80,8 @@ export class CMSSignerInfo extends AsnEncoded {
 
   public parent: CMSSignedData | null = null;
 
-  public signedAttributes: ReadonlyArray<CmsAttribute> = [];
-  public unsignedAttributes: CmsAttribute[] = [];
+  public signedAttributes: ReadonlyArray<attributes.CmsAttribute> = [];
+  public unsignedAttributes: attributes.CmsAttribute[] = [];
 
   constructor() {
     super();
@@ -109,11 +105,11 @@ export class CMSSignerInfo extends AsnEncoded {
     return result;
   }
 
-  protected readAttributes(attrs?: any[]): CmsAttribute[] {
-    const res: CmsAttribute[] = [];
+  protected readAttributes(attrs?: any[]): attributes.CmsAttribute[] {
+    const res: attributes.CmsAttribute[] = [];
     if (attrs) {
       for (const attr of attrs) {
-        const attrConst = CmsAttributeFactory.get(attr.type);
+        const attrConst = attributes.CmsAttributeFactory.get(attr.type);
         const cmsAttr = new attrConst();
         cmsAttr.fromBER(attr.toSchema().toBER());
 
@@ -195,3 +191,9 @@ export class CMSSignerInfo extends AsnEncoded {
   }
 
 }
+
+import * as attributes from "./attributes";
+import { AlgorithmFactory } from "./AlgorithmFactory";
+
+import type { CMSSignedData } from "./SignedData";
+import type { Attribute } from "./PKITypes";

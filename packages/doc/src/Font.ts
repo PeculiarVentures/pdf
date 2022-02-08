@@ -1,9 +1,8 @@
-import * as core from "@PeculiarVentures/pdf-core";
-import * as pdfFont from "@PeculiarVentures/pdf-font";
+import * as core from "@peculiarventures/pdf-core";
+import * as pdfFont from "@peculiarventures/pdf-font";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
 import { PDFDocument } from "./Document";
 import { WrapObject } from "./WrapObject";
-import { PDFLiteralString, Type1FontDictionary } from "@PeculiarVentures/pdf-core";
 
 export interface FontComponentParams {
   fontDictionary: core.FontDictionary;
@@ -76,8 +75,8 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
   }
 
   public addText(text: string): void {
-    if (this.target instanceof Type1FontDictionary) {
-      const maxUnicode = PDFLiteralString.getMaxUnicode(text);
+    if (this.target instanceof core.Type1FontDictionary) {
+      const maxUnicode = core.PDFLiteralString.getMaxUnicode(text);
       if (maxUnicode > 255 && this.target.BaseFont !== pdfFont.DefaultFonts.Symbol && this.target.BaseFont !== pdfFont.DefaultFonts.ZapfDingbats) {
         throw new Error("Unsupported unicodes for this default font");
       }

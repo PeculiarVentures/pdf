@@ -1,11 +1,11 @@
-# `@PeculiarVentures/pdf-font`
+# `@peculiarventures/pdf-font`
 
 > TODO: description
 
 ## Usage
 
 ```
-const pdfFont = require('@PeculiarVentures/pdf-font');
+const pdfFont = require('@peculiarventures/pdf-font');
 
 // TODO: DEMONSTRATE API
 ```

@@ -1,12 +1,5 @@
-const pkijs = require("pkijs");
 import { X509Certificate, X509Certificates } from "@peculiar/x509";
-import { CertificateRevocationList, BasicOCSPResponse, Certificate } from "./PKITypes";
-import { DefaultCertificateStorageHandler } from "./DefaultCertificateStorageHandler";
-import { ICertificateStorage, ICertificateStorageHandler } from "./ICertificateStorageHandler";
-import { PKIUtils } from "./PKIUtils";
-import { IsTrustedResult, IResult, RevocationType } from "./ICertificateStorageHandler";
-import { CRL } from "./CRL";
-import { OCSP } from "./OCSP";
+import * as pkijs from "pkijs";
 
 export enum CertificateChainStatusCode {
   unknown = -1,
@@ -105,14 +98,14 @@ export interface ChainBuildParams {
 
 export type ChainRevocationMode = "no" | "online" | "offline" | "all";
 
-export class CertificateChain implements ICertificateStorage {
+export class CertificateChain implements storageHandler.ICertificateStorage {
 
-  public certificateHandler: ICertificateStorageHandler = new DefaultCertificateStorageHandler();
+  public certificateHandler: storageHandler.ICertificateStorageHandler = new DefaultCertificateStorageHandler();
 
   protected async buildChainNoCheck(cert: X509Certificate): Promise<X509Certificates> {
     const chain = new X509Certificates;
     let lastCert: X509Certificate | null = cert;
-    let isTrusted: IsTrustedResult | null = null;
+    let isTrusted: storageHandler.IsTrustedResult | null = null;
     while (lastCert) {
       chain.push(lastCert);
 
@@ -162,7 +155,7 @@ export class CertificateChain implements ICertificateStorage {
 
     const revocations: (CRL | OCSP)[] = [];
     if (params.revocationMode !== "no") {
-      const revocationTypeOrder: RevocationType[] = ["ocsp", "crl"];
+      const revocationTypeOrder: storageHandler.RevocationType[] = ["ocsp", "crl"];
       if (params.preferCRL) {
         revocationTypeOrder.reverse();
       }
@@ -172,7 +165,7 @@ export class CertificateChain implements ICertificateStorage {
           // Don't get revocation item for the trusted certificate
           break;
         }
-        let revocationResult: IResult<CRL | OCSP | null> | undefined;
+        let revocationResult: storageHandler.IResult<CRL | OCSP | null> | undefined;
         for (const revocationType of revocationTypeOrder) {
           if (revocationResult && revocationResult.result) {
             break;
@@ -226,3 +219,11 @@ export class CertificateChain implements ICertificateStorage {
   }
 
 }
+
+import { DefaultCertificateStorageHandler } from "./DefaultCertificateStorageHandler";
+import { PKIUtils } from "./PKIUtils";
+import { CRL } from "./CRL";
+import { OCSP } from "./OCSP";
+
+import type * as storageHandler from "./ICertificateStorageHandler";
+import type { CertificateRevocationList, BasicOCSPResponse, Certificate } from "./PKITypes";

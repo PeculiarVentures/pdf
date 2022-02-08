@@ -1,10 +1,8 @@
 import { X509Certificate } from "@peculiar/x509";
-import { PKIUtils } from "./PKIUtils";
-import { CertID } from "./PKITypes";
-import { AsnEncoded } from "./AsnEncoded";
-import { AlgorithmFactory } from "./AlgorithmFactory";
 import { Convert } from "pvtsutils";
-const pkijs = require("pkijs");
+import * as pkijs from "pkijs";
+
+import { AsnEncoded } from "./AsnEncoded";
 
 export class CertificateID extends AsnEncoded<CertID> {
   public static DEFAULT_VIEW = new Uint8Array(0);
@@ -54,3 +52,8 @@ export class CertificateID extends AsnEncoded<CertID> {
   }
 
 }
+
+import { PKIUtils } from "./PKIUtils";
+import { AlgorithmFactory } from "./AlgorithmFactory";
+
+import type { CertID } from "./PKITypes";
