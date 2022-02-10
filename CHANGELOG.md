@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.2](https://github.com/PeculiarVentures/pdf/compare/v1.1.1...v1.1.2) (2022-02-10)
+
+
+### Bug Fixes
+
+* Add signedData object to verification result ([b152155](https://github.com/PeculiarVentures/pdf/commit/b152155e310fa8fa4f945f65d44302ae35e276cd))
+* Type declaration ([37e2de6](https://github.com/PeculiarVentures/pdf/commit/37e2de6ef309635df301643e3dadacd64ad479f5))
+
+
+
+
+
 ## [1.1.1](https://github.com/PeculiarVentures/pdf/compare/v1.1.0...v1.1.1) (2022-02-08)
 
 
