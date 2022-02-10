@@ -1199,6 +1199,7 @@ export type SignatureStates =
   DocumentModificationState;
 
 export interface SignatureVerifyResult {
+  signedData: cms.CMSSignedData | null;
   verificationResult: boolean;
   message?: string;
   checkDate: Date | null;
@@ -1358,6 +1359,7 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
 
     const result: SignatureVerifyResult = {
       verificationResult: false,
+      signedData: null,
       hasSHA1: false,
       name: this.name,
       reason: null,
@@ -1371,7 +1373,7 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
 
     try {
       const signatureValue = this.getSignatureValue();
-      const signedData = this.getSignedData(signatureValue);
+      const signedData = result.signedData = this.getSignedData(signatureValue);
       const signer = this.getSigner(signedData);
       const timeStamp = await this.getTimeStamp(signedData);
       const signingTime = await this.getSigningTime(timeStamp);
@@ -1770,7 +1772,10 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
   }
 
   protected getSignedData(signatureValue: core.SignatureDictionary): cms.CMSSignedData {
-    const signedData = cms.CMSSignedData.fromBER(signatureValue.Contents.data);
+    const cmsSignaedDataType = signatureValue.subFilter === "ETSI.RFC3161"
+      ? cms.TimeStampToken
+      : cms.CMSSignedData;
+    const signedData = cmsSignaedDataType.fromBER(signatureValue.Contents.data);
     signedData.certificateHandler.parent = this.document.certificateHandler;
 
     return signedData;
