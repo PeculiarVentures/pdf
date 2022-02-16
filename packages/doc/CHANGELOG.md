@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.3](https://github.com/PeculiarVentures/pdf/compare/v1.1.2...v1.1.3) (2022-02-16)
+
+
+### Bug Fixes
+
+* Enable LTV sate if VRI is null and revocations present ([ef6eb51](https://github.com/PeculiarVentures/pdf/commit/ef6eb516cad33956241a7fd67a245853214159ba))
+
+
+
+
+
 ## [1.1.2](https://github.com/PeculiarVentures/pdf/compare/v1.1.1...v1.1.2) (2022-02-10)
 
 
