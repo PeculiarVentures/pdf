@@ -1353,7 +1353,7 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
   public async verify(checkDate?: Date): Promise<SignatureVerifyResult> {
     const dateNow = new Date();
     checkDate ||= dateNow;
-    
+
     // TODO Decrypt values on PDF reading
     await FormComponentFactory.getField(this.target as any).t.decode();
 
@@ -1375,8 +1375,6 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
       const signatureValue = this.getSignatureValue();
       const signedData = result.signedData = this.getSignedData(signatureValue);
       const signer = this.getSigner(signedData);
-      const timeStamp = await this.getTimeStamp(signedData);
-      const signingTime = await this.getSigningTime(timeStamp);
       const content = this.getContent();
 
       const subFilter = signatureValue.subFilter;
@@ -1396,6 +1394,9 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
         }
       }
 
+      const timeStamp = await this.getTimeStamp(signedData);
+      const signingTime = await this.getSigningTime(signedData instanceof cms.TimeStampToken ? signedData : timeStamp);
+
       result.name = this.name;
       result.reason = signatureValue.Reason.has() ? await signatureValue.Reason.get().decode() : null;
       result.location = signatureValue.Location.has() ? await signatureValue.Location.get().decode() : null;
@@ -1412,8 +1413,10 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
 
       //Check signature for "signature-time-stamp" attribute
       const ltvState = await this.isLTV(signedData);
-      const signingTimeState = await this.verifySigningTime(signedData, signatureValue, dateNow);
-      result.states.push(signingTimeState);
+      if (signatureType !== "timestamp") {
+        const signingTimeState = await this.verifySigningTime(signedData, signatureValue, dateNow);
+        result.states.push(signingTimeState);
+      }
 
       //#region Certificate chain status
       if (verificationResult.signerCertificate) {
@@ -1930,6 +1933,8 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
         || (vri.OCSP.has() && vri.OCSP.get().length)) {
         return true;
       }
+    } else if (this.document.dss.crls.length || this.document.dss.ocsps.length) {
+      return true;
     }
 
     // CAdES
