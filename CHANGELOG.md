@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.4](https://github.com/PeculiarVentures/pdf/compare/v1.1.3...v1.1.4) (2022-02-16)
+
+
+### Bug Fixes
+
+* Error on padded header parsing ([c9c1d5b](https://github.com/PeculiarVentures/pdf/commit/c9c1d5b7ec973990835446e73cfea61c2a1198dd))
+* Error on padded xref table ([9839135](https://github.com/PeculiarVentures/pdf/commit/98391352c7711ae6a539e4c8995b19717b5e84bf))
+
+
+
+
+
 ## [1.1.3](https://github.com/PeculiarVentures/pdf/compare/v1.1.2...v1.1.3) (2022-02-16)
 
 
