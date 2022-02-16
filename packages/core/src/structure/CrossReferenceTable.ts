@@ -15,6 +15,7 @@ export class CrossReferenceTable extends TrailerDictionary implements CrossRefer
   public objects: PDFDocumentObject[] = [];
 
   protected override onFromPDF(reader: ViewReader): void {
+    reader.findIndex(c => !CharSet.whiteSpaceChars.includes(c));
     if (!CharSet.xrefChars.every(c => c === reader.readByte())) {
       throw new BadCharError(reader.position - 1);
     }

@@ -96,9 +96,13 @@ export class PDFDocument {
   public fromPDF(text: string): Promise<number>;
   public fromPDF(data: BufferSource | ViewReader | string, offset?: number): Promise<number>;
   public async fromPDF(data: BufferSource | ViewReader | string, offset = 0): Promise<number> {
-    const reader = objects.PDFObject.getReader(data, offset);
+    let reader = objects.PDFObject.getReader(data, offset);
 
     // Find out header %PDF-<version>
+    reader.findIndex(c => !CharSet.whiteSpaceChars.includes(c));
+    if (reader.position) {
+      reader = objects.PDFObject.getReader(data, reader.position);
+    }
     if (!headerChars.every(c => c === reader.readByte())) {
       throw new ParsingError("PDF header is not found", reader.position - 1);
     }
@@ -323,4 +327,5 @@ import { ParsingError } from "../ParsingError";
 import { ViewWriter } from "../ViewWriter";
 import { PDFDocumentUpdate } from "./DocumentUpdate";
 import { PDFRectangle } from "./common";
-import { CrossReferenceTable } from "./CrossReferenceTable";
+import { CrossReferenceTable } from "./CrossReferenceTable";import { CharSet } from "../CharSet";
+
