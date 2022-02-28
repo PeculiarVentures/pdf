@@ -37,19 +37,23 @@ export const ecAlgorithmConverter: AlgorithmConverter = {
     return null;
   },
 
-  fromBER(raw: ArrayBuffer): HashedAlgorithm | null {
+  fromBER(raw: ArrayBuffer): Algorithm | null {
     const asn = asn1js.fromBER(raw);
     const algorithmIdentifier = new pkijs.AlgorithmIdentifier({ schema: asn.result });
 
     switch (algorithmIdentifier.algorithmId) {
       case id_sha1WithECDSA:
-        return { name: "ECDSA", hash: { name: "SHA-1" } };
+        return { name: "ECDSA", hash: { name: "SHA-1" } } as Algorithm;
       case id_sha256WithECDSA:
-        return { name: "ECDSA", hash: { name: "SHA-256" } };
+        return { name: "ECDSA", hash: { name: "SHA-256" } } as Algorithm;
       case id_sha384WithECDSA:
-        return { name: "ECDSA", hash: { name: "SHA-384" } };
+        return { name: "ECDSA", hash: { name: "SHA-384" } } as Algorithm;
       case id_sha512WithECDSA:
-        return { name: "ECDSA", hash: { name: "SHA-512" } };
+        return { name: "ECDSA", hash: { name: "SHA-512" } } as Algorithm;
+      case "1.3.101.112": // curveEd25519
+      return { name: "EdDSA", namedCurve: "Ed25519" } as Algorithm;
+      case "1.3.101.113": // curveEd448
+        return { name: "EdDSA", namedCurve: "Ed448" } as Algorithm;
     }
 
     return null;

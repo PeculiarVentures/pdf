@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./pkijs.d.ts" />
 
-import { getRandomValues, CryptoEngine } from "pkijs";
+import { getRandomValues, CryptoEngine, AlgorithmParameters } from "pkijs";
 
 function md5(data: ArrayBuffer | Uint8Array, offset: number, length: number): Promise<ArrayBuffer> {
 	const r = new Uint8Array([
@@ -218,6 +218,113 @@ export class PDFCryptoEngine extends CryptoEngine {
 
 	constructor(parameters = {}) {
 		super(parameters);
+	}
+
+	public override getAlgorithmByOID(oid: string): Algorithm {
+		const alg = super.getAlgorithmByOID(oid) as Algorithm;
+
+		if (!alg || !alg.name) {
+			switch (oid) {
+				case "1.3.36.3.3.2.8.1.1.7": // brainpoolP256r1 
+					return { name: "ECDSA", namedCurve: "brainpoolP256r1" } as Algorithm;
+				case "1.3.36.3.3.2.8.1.1.11": // brainpoolP384r1 
+					return { name: "ECDSA", namedCurve: "brainpoolP384r1" } as Algorithm;
+				case "1.3.36.3.3.2.8.1.1.12": // brainpoolP512r1 
+					return { name: "ECDSA", namedCurve: "brainpoolP512r1" } as Algorithm;
+				case "1.3.101.112": // curveEd25519 
+					return { name: "EdDSA", namedCurve: "Ed25519" } as Algorithm;
+				case "1.3.101.113": // curveEd448 
+					return { name: "EdDSA", namedCurve: "Ed448" } as Algorithm;
+				case "2.16.840.1.101.3.4.2.11": // shake128 
+					return { name: "shake128" } as Algorithm;
+				case "2.16.840.1.101.3.4.2.12": // shake256 
+					return { name: "shake256" } as Algorithm;
+			}
+		}
+
+		return alg;
+	}
+
+	public override async getPublicKey(publicKeyInfo: any, signatureAlgorithm: Algorithm, parameters?: any): Promise<CryptoKey> {
+		if (parameters === null) {
+			parameters = this.fillPublicKeyParameters(publicKeyInfo, signatureAlgorithm);
+		}
+
+		const publicKeyInfoSchema = publicKeyInfo.toSchema();
+		const publicKeyInfoBuffer = publicKeyInfoSchema.toBER(false);
+		const publicKeyInfoView = new Uint8Array(publicKeyInfoBuffer);
+
+		try {
+			switch (parameters.algorithm.algorithm.name.toLowerCase()) {
+				case "ecdsa":
+					{
+						const algorithm: EcKeyImportParams = {
+							name: "ECDSA",
+							namedCurve: "P-256",
+						};
+						const namedCurve = publicKeyInfo.algorithm.algorithmParams.valueBlock.toString();
+						switch (namedCurve) {
+							case "1.2.840.10045.3.1.7":
+								algorithm.namedCurve = "P-256";
+								break;
+							case "1.3.36.3.3.2.8.1.1.7":
+								algorithm.namedCurve = "brainpoolP256r1";
+								break;
+							case "1.3.36.3.3.2.8.1.1.11":
+								algorithm.namedCurve = "brainpoolP384r1";
+								break;
+							case "1.3.132.0.34":
+								algorithm.namedCurve = "P-384";
+								break;
+							case "1.3.36.3.3.2.8.1.1.12":
+								algorithm.namedCurve = "brainpoolP512r1";
+								break;
+							case "1.3.132.0.35":
+								algorithm.namedCurve = "P-521";
+								break;
+						}
+
+						return this.subtle.importKey("spki", publicKeyInfoView, algorithm, true, ["verify"]);
+					}
+				case "eddsa":
+					{
+						const algorithm = this.getAlgorithmByOID(publicKeyInfo.algorithm.algorithmId);
+
+						return this.subtle.importKey("spki", publicKeyInfoView, algorithm, true, ["verify"]);
+					}
+			}
+		} catch (e) {
+			// nothing
+		}
+
+		return super.getPublicKey(publicKeyInfo, signatureAlgorithm, parameters);
+	}
+
+	public override getAlgorithmParameters(algName: string, usage: keyof SubtleCrypto): AlgorithmParameters {
+		const params = super.getAlgorithmParameters(algName, usage) || {};
+
+		if (!params.algorithm.name) {
+			switch (algName.toLowerCase()) {
+				case "eddsa": {
+					params.algorithm = {
+						name: "EdDSA",
+					};
+					switch (usage.toLowerCase()) {
+						case "importkey":
+							params.usages = ["verify"];
+							break;
+						case "sign":
+							params.usages = ["sign"];
+							break;
+						case "verify":
+							params.usages = ["verify"];
+							break;
+					}
+				}
+			}
+		}
+
+		return params;
 	}
 
 	public override async digest(algorithm: AlgorithmIdentifier, data: ArrayBuffer | Uint8Array): Promise<ArrayBuffer> {
