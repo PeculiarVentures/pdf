@@ -39,8 +39,8 @@
     "pako": "^2.0.3",
     "pdf-lib": "^1.16.0",
     "pkijs": "^2.1.95",
-    "pvtsutils": "^1.1.7",
-    "pvutils": "^1.0.17",
+    "pvtsutils": "^1.2.2",
+    "pvutils": "^1.1.2",
     "tslib": "^2.3.1"
   }
 }
