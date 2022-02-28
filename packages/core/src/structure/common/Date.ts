@@ -2,7 +2,7 @@ import { PDFString } from "../../objects";
 import { PDFLiteralString } from "../../objects/LiteralString";
 import type { PDFDocumentUpdate } from "../DocumentUpdate";
 
-const regexData = /D:(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(?:(Z)|(?:([-+])(\d{2})'(\d{2})))?/;
+const regexData = /D.(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(?:(Z)|(?:([-+])(\d{2})'(\d{2})))?/;
 
 export class PDFDate extends PDFLiteralString {
 
