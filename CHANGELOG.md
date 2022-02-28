@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/PeculiarVentures/pdf/compare/v1.1.4...v1.2.0) (2022-02-28)
+
+
+### Bug Fixes
+
+* Incorrect Date regular expresion ([7a81575](https://github.com/PeculiarVentures/pdf/commit/7a81575f182901ff63a8ce3c9f332faf92d5bc9e))
+
+
+### Features
+
+* Support new ECC and Hash mechanisms ([ba71c82](https://github.com/PeculiarVentures/pdf/commit/ba71c82b110d28f2b208f12f4f72164ebfecc9cd))
+
+
+
+
+
 ## [1.1.4](https://github.com/PeculiarVentures/pdf/compare/v1.1.3...v1.1.4) (2022-02-16)
 
 
