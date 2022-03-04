@@ -1,10 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./pkijs.d.ts" />
 
-import { getRandomValues, CryptoEngine, AlgorithmParameters, SignatureParameters } from "pkijs";
+import * as pkijs from "pkijs";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const pkijs = require("pkijs");
 
 function md5(data: ArrayBuffer | Uint8Array, offset: number, length: number): Promise<ArrayBuffer> {
 	const r = new Uint8Array([
@@ -217,7 +216,7 @@ async function decryptWithPadding(crypto: SubtleCrypto, algorithm: AesCtrParams,
 	return crypto.decrypt(algorithm, key, dataWithPadBuffer);
 }
 
-export class PDFCryptoEngine extends CryptoEngine {
+export class PDFCryptoEngine extends pkijs.CryptoEngine {
 
 	constructor(parameters = {}) {
 		super(parameters);
@@ -259,7 +258,7 @@ export class PDFCryptoEngine extends CryptoEngine {
 		return super.getOIDByAlgorithm(algorithm);
 	}
 
-	public override getSignatureParameters(privateKey: CryptoKey, hashAlgorithm = "SHA-1"): SignatureParameters {
+	public override getSignatureParameters(privateKey: CryptoKey, hashAlgorithm = "SHA-1"): pkijs.SignatureParameters {
 		const signatureAlgorithm = new pkijs.AlgorithmIdentifier();
 
 		//region Get a "default parameters" for current algorithm
@@ -368,7 +367,7 @@ export class PDFCryptoEngine extends CryptoEngine {
 		return super.getPublicKey(publicKeyInfo, signatureAlgorithm, parameters);
 	}
 
-	public override getAlgorithmParameters(algName: string, usage: keyof SubtleCrypto): AlgorithmParameters {
+	public override getAlgorithmParameters(algName: string, usage: keyof SubtleCrypto): pkijs.AlgorithmParameters {
 		const params = super.getAlgorithmParameters(algName, usage) || {};
 
 		if (!params.algorithm.name) {
@@ -395,7 +394,7 @@ export class PDFCryptoEngine extends CryptoEngine {
 		return params;
 	}
 
-	public override async digest(algorithm: AlgorithmIdentifier, data: ArrayBuffer | Uint8Array): Promise<ArrayBuffer> {
+	public override async digest(algorithm: pkijs.AlgorithmIdentifier, data: ArrayBuffer | Uint8Array): Promise<ArrayBuffer> {
 		if (algorithm instanceof Object) {
 			if (algorithm.name.toLowerCase() === "md5")
 				return md5(data, 0, (data as any).length);
@@ -414,7 +413,7 @@ export class PDFCryptoEngine extends CryptoEngine {
 	public override async generateKey(...args: any[]): Promise<CryptoKey | CryptoKeyPair | ArrayBuffer> {
 		if (args[0].name.toLowerCase() === "rc4") {
 			const key = new Uint8Array(args[0].length);
-			getRandomValues(key);
+			pkijs.getRandomValues(key);
 
 			return Promise.resolve(key.buffer); // TODO Change to CryptoKey
 		}
