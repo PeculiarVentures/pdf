@@ -1,6 +1,6 @@
 {
   "name": "@peculiarventures/pdf-doc",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "High level PDF module",
   "keywords": [],
   "author": "microshine <microshine@mail.ru>",
@@ -39,7 +39,7 @@
     "@peculiar/asn1-tsp": "^2.0.38",
     "@peculiar/asn1-x509": "^2.0.44",
     "@peculiar/x509": "^1.3.2",
-    "@peculiarventures/pdf-core": "^1.2.1",
+    "@peculiarventures/pdf-core": "^1.2.2",
     "@peculiarventures/pdf-font": "^1.2.0",
     "asn1js": "^2.1.1",
     "bytestreamjs": "1.1.3",

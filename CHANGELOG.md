@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.2](https://github.com/PeculiarVentures/pdf/compare/v1.2.1...v1.2.2) (2022-03-04)
+
+
+### Bug Fixes
+
+* ESM module with require statement ([4af13f0](https://github.com/PeculiarVentures/pdf/commit/4af13f0f821a68eecc171f6c092bec3e4d699255))
+
+
+
+
+
 ## [1.2.1](https://github.com/PeculiarVentures/pdf/compare/v1.2.0...v1.2.1) (2022-03-04)
 
 
