@@ -1,7 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./pkijs.d.ts" />
 
-import { getRandomValues, CryptoEngine, AlgorithmParameters } from "pkijs";
+import { getRandomValues, CryptoEngine, AlgorithmParameters, SignatureParameters } from "pkijs";
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const pkijs = require("pkijs");
 
 function md5(data: ArrayBuffer | Uint8Array, offset: number, length: number): Promise<ArrayBuffer> {
 	const r = new Uint8Array([
@@ -218,6 +221,71 @@ export class PDFCryptoEngine extends CryptoEngine {
 
 	constructor(parameters = {}) {
 		super(parameters);
+	}
+
+	public override getOIDByAlgorithm(algorithm: Algorithm | EcKeyAlgorithm): string | null {
+		switch (algorithm.name.toLowerCase()) {
+			case "shake128":
+				return "2.16.840.1.101.3.4.2.11";
+			case "shake256":
+				return "2.16.840.1.101.3.4.2.12";
+			case "ecdsa":
+				if ("namedCurve" in algorithm) {
+					switch (algorithm.namedCurve.toLowerCase()) {
+						case "brainpoolP256r1":
+							return "1.3.36.3.3.2.8.1.1.7";
+						case "brainpoolP384r1":
+							return "1.3.36.3.3.2.8.1.1.11";
+						case "brainpoolP512r1":
+							return "1.3.36.3.3.2.8.1.1.12";
+					}
+				}
+
+				return super.getOIDByAlgorithm(algorithm);
+
+			case "eddsa":
+				if ("namedCurve" in algorithm) {
+					switch (algorithm.namedCurve.toLowerCase()) {
+						case "ed25519":
+							return "1.3.101.112";
+						case "ed448":
+							return "1.3.101.113";
+					}
+				}
+
+				return super.getOIDByAlgorithm(algorithm);
+		}
+
+		return super.getOIDByAlgorithm(algorithm);
+	}
+
+	public override getSignatureParameters(privateKey: CryptoKey, hashAlgorithm = "SHA-1"): SignatureParameters {
+		const signatureAlgorithm = new pkijs.AlgorithmIdentifier();
+
+		//region Get a "default parameters" for current algorithm
+		const parameters = this.getAlgorithmParameters(privateKey.algorithm.name, "sign");
+		parameters.algorithm = {
+			...parameters.algorithm,
+			hash: {
+				name: hashAlgorithm,
+			}
+		} as EcdsaParams;
+		//endregion
+
+		//region Fill internal structures base on "privateKey" and "hashAlgorithm"
+		switch (privateKey.algorithm.name.toUpperCase()) {
+			case "EDDSA":
+				signatureAlgorithm.algorithmId = this.getOIDByAlgorithm(privateKey.algorithm);
+				break;
+			default:
+				return super.getSignatureParameters(privateKey, hashAlgorithm);
+		}
+		//endregion
+
+		return {
+			signatureAlgorithm,
+			parameters
+		};
 	}
 
 	public override getAlgorithmByOID(oid: string): Algorithm {

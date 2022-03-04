@@ -4,6 +4,12 @@ declare module "pkijs" {
     algorithm: Algorithm; 
     usages: KeyUsage[];
   }
+
+  interface SignatureParameters {
+    signatureAlgorithm: any;
+    parameters: AlgorithmParameters;
+  }
+
   export class CryptoEngine {
     constructor(parameters: any);
     subtle: SubtleCrypto;
@@ -15,6 +21,8 @@ declare module "pkijs" {
     getAlgorithmParameters(algName: string, usage: keyof SubtleCrypto): AlgorithmParameters;
     getPublicKey(publicKeyInfo: any, signatureAlgorithm: Algorithm, parameters?: any): Promise<CryptoKey>;
     fillPublicKeyParameters(publicKeyInfo: any, signatureAlgorithm: Algorithm): AlgorithmParameters;
+    getOIDByAlgorithm(algorithm: Algorithm): string | null;
+    getSignatureParameters(privateKey: CryptoKey, hashAlgorithm?: string): SignatureParameters;
   }
 
   export class Time {
