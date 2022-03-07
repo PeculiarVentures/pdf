@@ -236,7 +236,7 @@ export class PDFCryptoEngine extends pkijs.CryptoEngine {
 						case "brainpoolP384r1":
 							return "1.3.36.3.3.2.8.1.1.11";
 						case "brainpoolP512r1":
-							return "1.3.36.3.3.2.8.1.1.12";
+							return "1.3.36.3.3.2.8.1.1.13";
 					}
 				}
 
@@ -296,7 +296,7 @@ export class PDFCryptoEngine extends pkijs.CryptoEngine {
 					return { name: "ECDSA", namedCurve: "brainpoolP256r1" } as Algorithm;
 				case "1.3.36.3.3.2.8.1.1.11": // brainpoolP384r1 
 					return { name: "ECDSA", namedCurve: "brainpoolP384r1" } as Algorithm;
-				case "1.3.36.3.3.2.8.1.1.12": // brainpoolP512r1 
+				case "1.3.36.3.3.2.8.1.1.13": // brainpoolP512r1 
 					return { name: "ECDSA", namedCurve: "brainpoolP512r1" } as Algorithm;
 				case "1.3.101.112": // curveEd25519 
 					return { name: "EdDSA", namedCurve: "Ed25519" } as Algorithm;
@@ -343,7 +343,7 @@ export class PDFCryptoEngine extends pkijs.CryptoEngine {
 							case "1.3.132.0.34":
 								algorithm.namedCurve = "P-384";
 								break;
-							case "1.3.36.3.3.2.8.1.1.12":
+							case "1.3.36.3.3.2.8.1.1.13":
 								algorithm.namedCurve = "brainpoolP512r1";
 								break;
 							case "1.3.132.0.35":
