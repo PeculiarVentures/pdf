@@ -15,7 +15,7 @@ export interface CMSSignedDataVerifyResult {
 
 export interface RevocationItem {
   type: "crl" | "ocsp";
-  value: CertificateRevocationList | BasicOCSPResponse;
+  value: pkijs.CertificateRevocationList | pkijs.BasicOCSPResponse;
 }
 
 export interface CMSSignedDataCreateSignerParameters {
@@ -135,7 +135,7 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
 
   public override toSchema(): any {
     if (this.certificates.length) {
-      const pkiCerts: Certificate[] = this.signedData.certificates = [];
+      const pkiCerts: pkijs.Certificate[] = this.signedData.certificates = [];
       for (const cert of this.certificates) {
         pkiCerts.push(PKIUtils.x509ToCert(cert));
       }
@@ -287,7 +287,7 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
     });
 
     if (params.signedAttributes) {
-      const attrs: Attribute[] = [];
+      const attrs: pkijs.Attribute[] = [];
       for (const attr of params.signedAttributes) {
         attrs.push(attr.asn);
       }
@@ -299,7 +299,7 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
     }
 
     if (params.unsignedAttributes) {
-      const attrs: Attribute[] = [];
+      const attrs: pkijs.Attribute[] = [];
       for (const attr of params.unsignedAttributes) {
         attrs.push(attr.asn);
       }
@@ -334,4 +334,3 @@ import { AlgorithmFactory, HashedAlgorithm } from "./AlgorithmFactory";
 
 import type { CmsAttribute } from "./attributes";
 import type { ICertificateStorage, ICertificateStorageHandler } from "./ICertificateStorageHandler";
-import type { Attribute, BasicOCSPResponse, Certificate, CertificateRevocationList } from "./PKITypes";

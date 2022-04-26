@@ -35,11 +35,11 @@
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
   "dependencies": {
-    "@peculiar/asn1-schema": "^2.0.37",
+    "@peculiar/asn1-schema": "^2.1.0",
     "bytestreamjs": "1.1.3",
     "fontjs": "^2.2.0-beta.5",
     "pako": "^2.0.4",
     "pvtsutils": "^1.2.2",
-    "tslib": "^2.3.1"
+    "tslib": "^2.4.0"
   }
 }

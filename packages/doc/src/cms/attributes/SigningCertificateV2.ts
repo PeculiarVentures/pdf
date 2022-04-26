@@ -79,7 +79,7 @@ export class SigningCertificateV2Attribute extends CmsAttribute {
 
   public static async create(algorithm: globalThis.AlgorithmIdentifier, cert: X509Certificate): Promise<SigningCertificateV2Attribute> {
     const essCert = new ESSCertIDv2();
-    essCert.certHash = await pkijs.getEngine().subtle.digest(algorithm, cert.rawData);
+    essCert.certHash = await pkijs.getCrypto(true).digest(algorithm, cert.rawData);
     essCert.hashAlgorithm = AsnConvert.parse(AlgorithmFactory.toBER(algorithm), AlgorithmIdentifier);
 
     const signingCert = new SigningCertificateV2();

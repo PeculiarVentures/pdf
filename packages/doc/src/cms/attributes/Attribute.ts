@@ -3,13 +3,12 @@ import { BufferSource, BufferSourceConverter } from "pvtsutils";
 import * as pkijs from "pkijs";
 
 import { AsnEncoded } from "../AsnEncoded";
-import { Attribute } from "../PKITypes";
 
 export interface CmsAttributeConstructor {
   new(): CmsAttribute;
 }
 
-export class CmsAttribute extends AsnEncoded<Attribute> {
+export class CmsAttribute extends AsnEncoded<pkijs.Attribute> {
 
   public get type(): string {
     return this.asn.type;

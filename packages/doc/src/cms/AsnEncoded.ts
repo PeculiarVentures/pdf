@@ -2,13 +2,12 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 import * as asn1js from "asn1js";
+import * as pkijs from "pkijs";
 import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
-
-import type { AsnObject, PkiObject } from "./PKITypes";
 
 export type AsnEncodedStringFormat = "hex" | "base64" | "base64url";
 
-export abstract class AsnEncoded<TAsn extends PkiObject = any> {
+export abstract class AsnEncoded<TAsn extends pkijs.PkiObject = any> {
 
   /**
    * Creates new object from the ASN.1 encoded buffer source
@@ -60,7 +59,7 @@ export abstract class AsnEncoded<TAsn extends PkiObject = any> {
     this.asn = this.onFromSchema(schema);
   }
 
-  public toSchema(): AsnObject {
+  public toSchema(): any {
     return this.asn.toSchema();
   }
 

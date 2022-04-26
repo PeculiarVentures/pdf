@@ -1,9 +1,16 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="./pkijs.d.ts" />
-
 import * as pkijs from "pkijs";
+import { BufferSourceConverter } from "pvtsutils";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+const id_SHA3_256 = "2.16.840.1.101.3.4.2.8";
+const id_SHA3_384 = "2.16.840.1.101.3.4.2.9";
+const id_SHA3_512 = "2.16.840.1.101.3.4.2.10";
+const name_SHA3_256 = "SHA3-256";
+const name_SHA3_384 = "SHA3-384";
+const name_SHA3_512 = "SHA3-512";
+
+const id_ECDSA_with_SHA3_256 = "2.16.840.1.101.3.4.3.10";
+const id_ECDSA_with_SHA3_384 = "2.16.840.1.101.3.4.3.11";
+const id_ECDSA_with_SHA3_512 = "2.16.840.1.101.3.4.3.12";
 
 function md5(data: ArrayBuffer | Uint8Array, offset: number, length: number): Promise<ArrayBuffer> {
 	const r = new Uint8Array([
@@ -218,19 +225,21 @@ async function decryptWithPadding(crypto: SubtleCrypto, algorithm: AesCtrParams,
 
 export class PDFCryptoEngine extends pkijs.CryptoEngine {
 
-	constructor(parameters = {}) {
-		super(parameters);
-	}
-
-	public override getOIDByAlgorithm(algorithm: Algorithm | EcKeyAlgorithm): string | null {
+	public override getOIDByAlgorithm(algorithm: Algorithm, safety?: boolean, target?: string): string {
 		switch (algorithm.name.toLowerCase()) {
+			case name_SHA3_256.toLowerCase():
+				return id_SHA3_256;
+			case name_SHA3_384.toLowerCase():
+				return id_SHA3_384;
+			case name_SHA3_512.toLowerCase():
+				return id_SHA3_512;
 			case "shake128":
 				return "2.16.840.1.101.3.4.2.11";
 			case "shake256":
 				return "2.16.840.1.101.3.4.2.12";
 			case "ecdsa":
 				if ("namedCurve" in algorithm) {
-					switch (algorithm.namedCurve.toLowerCase()) {
+					switch ((algorithm as any).namedCurve.toLowerCase()) {
 						case "brainpoolP256r1":
 							return "1.3.36.3.3.2.8.1.1.7";
 						case "brainpoolP384r1":
@@ -240,11 +249,11 @@ export class PDFCryptoEngine extends pkijs.CryptoEngine {
 					}
 				}
 
-				return super.getOIDByAlgorithm(algorithm);
+				return super.getOIDByAlgorithm(algorithm, safety, target);
 
 			case "eddsa":
 				if ("namedCurve" in algorithm) {
-					switch (algorithm.namedCurve.toLowerCase()) {
+					switch ((algorithm as any).namedCurve.toLowerCase()) {
 						case "ed25519":
 							return "1.3.101.112";
 						case "ed448":
@@ -252,13 +261,13 @@ export class PDFCryptoEngine extends pkijs.CryptoEngine {
 					}
 				}
 
-				return super.getOIDByAlgorithm(algorithm);
+				return super.getOIDByAlgorithm(algorithm, safety, target);
 		}
 
-		return super.getOIDByAlgorithm(algorithm);
+		return super.getOIDByAlgorithm(algorithm, safety, target);
 	}
 
-	public override getSignatureParameters(privateKey: CryptoKey, hashAlgorithm = "SHA-1"): pkijs.SignatureParameters {
+	public override async getSignatureParameters(privateKey: CryptoKey, hashAlgorithm = "SHA-1"): Promise<pkijs.CryptoEngineSignatureParams> {
 		const signatureAlgorithm = new pkijs.AlgorithmIdentifier();
 
 		//region Get a "default parameters" for current algorithm
@@ -273,6 +282,21 @@ export class PDFCryptoEngine extends pkijs.CryptoEngine {
 
 		//region Fill internal structures base on "privateKey" and "hashAlgorithm"
 		switch (privateKey.algorithm.name.toUpperCase()) {
+			case "ECDSA":
+				switch (hashAlgorithm.toUpperCase()) {
+					case name_SHA3_256:
+						signatureAlgorithm.algorithmId = id_ECDSA_with_SHA3_256;
+						break;
+					case name_SHA3_384:
+						signatureAlgorithm.algorithmId = id_ECDSA_with_SHA3_384;
+						break;
+					case name_SHA3_512:
+						signatureAlgorithm.algorithmId = id_ECDSA_with_SHA3_512;
+						break;
+					default:
+						return super.getSignatureParameters(privateKey, hashAlgorithm);
+				}
+				break;
 			case "EDDSA":
 				signatureAlgorithm.algorithmId = this.getOIDByAlgorithm(privateKey.algorithm);
 				break;
@@ -306,23 +330,33 @@ export class PDFCryptoEngine extends pkijs.CryptoEngine {
 					return { name: "shake128" } as Algorithm;
 				case "2.16.840.1.101.3.4.2.12": // shake256 
 					return { name: "shake256" } as Algorithm;
+				case id_SHA3_256:
+					return { name: name_SHA3_256 };
+				case id_SHA3_384:
+					return { name: name_SHA3_384 };
+				case id_SHA3_512:
+					return { name: name_SHA3_512 };
+				case id_ECDSA_with_SHA3_256:
+					return { name: "ECDSA", hash: name_SHA3_256 } as Algorithm;
+				case id_ECDSA_with_SHA3_384:
+					return { name: "ECDSA", hash: name_SHA3_384 } as Algorithm;
+				case id_ECDSA_with_SHA3_512:
+					return { name: "ECDSA", hash: name_SHA3_512 } as Algorithm;
 			}
 		}
 
 		return alg;
 	}
 
-	public override async getPublicKey(publicKeyInfo: any, signatureAlgorithm: Algorithm, parameters?: any): Promise<CryptoKey> {
-		if (parameters === null) {
-			parameters = this.fillPublicKeyParameters(publicKeyInfo, signatureAlgorithm);
-		}
+	public override async getPublicKey(publicKeyInfo: pkijs.PublicKeyInfo, signatureAlgorithm: pkijs.AlgorithmIdentifier, parameters?: pkijs.CryptoEnginePublicKeyParams): Promise<CryptoKey> {
+		parameters ??= this.fillPublicKeyParameters(publicKeyInfo, signatureAlgorithm);
 
 		const publicKeyInfoSchema = publicKeyInfo.toSchema();
 		const publicKeyInfoBuffer = publicKeyInfoSchema.toBER(false);
 		const publicKeyInfoView = new Uint8Array(publicKeyInfoBuffer);
 
 		try {
-			switch (parameters.algorithm.algorithm.name.toLowerCase()) {
+			switch ((parameters.algorithm as any).algorithm.name.toLowerCase()) {
 				case "ecdsa":
 					{
 						const algorithm: EcKeyImportParams = {
@@ -367,10 +401,10 @@ export class PDFCryptoEngine extends pkijs.CryptoEngine {
 		return super.getPublicKey(publicKeyInfo, signatureAlgorithm, parameters);
 	}
 
-	public override getAlgorithmParameters(algName: string, usage: keyof SubtleCrypto): pkijs.AlgorithmParameters {
+	public override getAlgorithmParameters(algName: string, usage: pkijs.CryptoEngineAlgorithmOperation): pkijs.CryptoEngineAlgorithmParams {
 		const params = super.getAlgorithmParameters(algName, usage) || {};
 
-		if (!params.algorithm.name) {
+		if (!(params.algorithm as any).name) {
 			switch (algName.toLowerCase()) {
 				case "eddsa": {
 					params.algorithm = {
@@ -394,50 +428,41 @@ export class PDFCryptoEngine extends pkijs.CryptoEngine {
 		return params;
 	}
 
-	public override async digest(algorithm: pkijs.AlgorithmIdentifier, data: ArrayBuffer | Uint8Array): Promise<ArrayBuffer> {
+	public override async digest(algorithm: AlgorithmIdentifier, data: BufferSource): Promise<ArrayBuffer> {
+		const buf = BufferSourceConverter.toArrayBuffer(data);
+
 		if (algorithm instanceof Object) {
 			if (algorithm.name.toLowerCase() === "md5")
-				return md5(data, 0, (data as any).length);
+				return md5(buf, 0, buf.byteLength);
 		} else {
 			if (algorithm.toLowerCase() === "md5")
-				return md5(data, 0, (data as any).length);
+				return md5(buf, 0, buf.byteLength);
 		}
 
-		return super.digest(algorithm, data);
+		return super.digest(algorithm, buf);
 	}
 
-	/**
-	 * Wrapper for standard function "generateKey"
-	 * @param args
-	 */
-	public override async generateKey(...args: any[]): Promise<CryptoKey | CryptoKeyPair | ArrayBuffer> {
-		if (args[0].name.toLowerCase() === "rc4") {
-			const key = new Uint8Array(args[0].length);
+	public override async generateKey(algorithm: RsaHashedKeyGenParams | EcKeyGenParams, extractable: boolean, keyUsages: KeyUsage[]): Promise<CryptoKeyPair>;
+	public override async generateKey(algorithm: AesKeyGenParams | HmacKeyGenParams | Pbkdf2Params, extractable: boolean, keyUsages: KeyUsage[]): Promise<CryptoKey>;
+	public override async generateKey(algorithm: globalThis.AlgorithmIdentifier, extractable: boolean, keyUsages: KeyUsage[]): Promise<CryptoKeyPair | CryptoKey>;
+	public override async generateKey(algorithm: globalThis.AlgorithmIdentifier, extractable: boolean, keyUsages: KeyUsage[]): Promise<CryptoKeyPair | CryptoKey> {
+		if (typeof algorithm !== "string" && algorithm.name.toLowerCase() === "rc4") {
+			const key = new Uint8Array((algorithm as any).length);
 			pkijs.getRandomValues(key);
 
-			return Promise.resolve(key.buffer); // TODO Change to CryptoKey
+			return key.buffer as unknown as CryptoKey; // TODO Change to CryptoKey
 		}
 
-		return super.generateKey(...args);
+		return super.generateKey(algorithm, extractable, keyUsages);
 	}
 
-	/**
-	 * Wrapper for standard function "encrypt"
-	 * @param args
-	 * @returns {Promise}
-	 */
-	public override async encrypt(...args: any[]): Promise<ArrayBuffer> {
-		if (args[0].name.toLowerCase() === "rc4")
-			return rc4(args[1], args[2]);
+	public override async encrypt(algorithm: AlgorithmIdentifier | RsaOaepParams | AesCtrParams | AesCbcParams | AesGcmParams, key: CryptoKey, data: BufferSource): Promise<ArrayBuffer> {
+		if (typeof algorithm !== "string" && algorithm.name.toLowerCase() === "rc4")
+			return rc4(key as any, BufferSourceConverter.toUint8Array(data));
 
-		return super.encrypt(...args);
+		return super.encrypt(algorithm, key, data);
 	}
 
-	/**
-	 * Wrapper for standard function "decrypt"
-	 * @param args
-	 * @returns {Promise}
-	 */
 	public override decrypt(...args: any[]): Promise<ArrayBuffer> {
 		switch (args[0].name.toLowerCase()) {
 			case "rc4":
@@ -452,7 +477,7 @@ export class PDFCryptoEngine extends pkijs.CryptoEngine {
 			default:
 		}
 
-		return super.decrypt(...args);
+		return (super.decrypt as any)(...args);
 	}
 
 }

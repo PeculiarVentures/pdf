@@ -4,7 +4,7 @@ import * as pkijs from "pkijs";
 
 import { AsnEncoded } from "./AsnEncoded";
 
-export class CertificateID extends AsnEncoded<CertID> {
+export class CertificateID extends AsnEncoded<pkijs.CertID> {
   public static DEFAULT_VIEW = new Uint8Array(0);
 
   public static async create(algorithm: AlgorithmIdentifier, cert: X509Certificate, issuer: X509Certificate): Promise<CertificateID> {
@@ -55,5 +55,3 @@ export class CertificateID extends AsnEncoded<CertID> {
 
 import { PKIUtils } from "./PKIUtils";
 import { AlgorithmFactory } from "./AlgorithmFactory";
-
-import type { CertID } from "./PKITypes";

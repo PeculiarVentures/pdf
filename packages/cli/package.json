@@ -34,6 +34,6 @@
   "dependencies": {
     "@peculiarventures/pdf-core": "^1.2.3",
     "@peculiarventures/pdf-doc": "^1.2.3",
-    "commander": "^8.1.0"
+    "commander": "^9.2.0"
   }
 }

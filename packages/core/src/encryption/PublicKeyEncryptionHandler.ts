@@ -1,6 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../pkijs.d.ts" />
-
 import * as asn1js from "asn1js";
 import { ByteStream } from "bytestreamjs";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
@@ -45,7 +42,7 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
       encryptOptions.recipientsBuffer,
       false);
 
-      const streamBuffer = BufferSourceConverter.toArrayBuffer(stream);
+    const streamBuffer = BufferSourceConverter.toArrayBuffer(stream);
 
     const encryptionsKey = await this.crypto.encrypt({
       name: clientSideParameters.algorithm,
@@ -194,9 +191,11 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
         throw new Error(`Incorrect value in "recipientInfos" for item #${i} of "Recipients" array`);
       }
 
+      const recipientInfo = cmsEnveloped.recipientInfos[0].value as any;
+
       for (let j = 0; j < clientSideParameters.certificates.length; j++) {
-        if (clientSideParameters.certificates[j].issuer.isEqual(cmsEnveloped.recipientInfos[0].value.rid.issuer)) {
-          if (clientSideParameters.certificates[j].serialNumber.isEqual(cmsEnveloped.recipientInfos[0].value.rid.serialNumber)) {
+        if (clientSideParameters.certificates[j].issuer.isEqual(recipientInfo.rid.issuer)) {
+          if (clientSideParameters.certificates[j].serialNumber.isEqual(recipientInfo.rid.serialNumber)) {
             recipientIndex = i;
             certificateIndex = j;
             break;
@@ -210,10 +209,13 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
 
     if (recipientIndex === (-1))
       throw new Error("Can not find a recipient");
+    if (!cmsEnveloped) {
+      throw new Error("'cmsEnveloped' is empty");
+    }
 
     const decryptedKey = await cmsEnveloped.decrypt(0, {
       recipientCertificate: clientSideParameters.certificates[certificateIndex],
-      recipientPrivateKey: clientSideParameters.keys[certificateIndex]
+      recipientPrivateKey: await pkijs.getCrypto(true).exportKey("pkcs8", clientSideParameters.keys[certificateIndex]),
     });
 
     // Generate symmetric key

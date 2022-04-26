@@ -176,7 +176,7 @@ export class CMSSignerInfo extends AsnEncoded {
 
   public override toSchema(): any {
     if (this.unsignedAttributes.length) {
-      const attrs: Attribute[] = [];
+      const attrs: pkijs.Attribute[] = [];
       for (const attr of this.unsignedAttributes) {
         attrs.push(attr.asn);
       }
@@ -196,4 +196,3 @@ import * as attributes from "./attributes";
 import { AlgorithmFactory } from "./AlgorithmFactory";
 
 import type { CMSSignedData } from "./SignedData";
-import type { Attribute } from "./PKITypes";

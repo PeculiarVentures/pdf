@@ -34,20 +34,20 @@
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
   "dependencies": {
-    "@peculiar/asn1-ocsp": "^2.0.38",
-    "@peculiar/asn1-schema": "^2.0.38",
-    "@peculiar/asn1-tsp": "^2.0.38",
-    "@peculiar/asn1-x509": "^2.0.44",
+    "@peculiar/asn1-ocsp": "^2.1.4",
+    "@peculiar/asn1-schema": "^2.1.0",
+    "@peculiar/asn1-tsp": "^2.1.4",
+    "@peculiar/asn1-x509": "^2.1.4",
     "@peculiar/x509": "^1.3.2",
     "@peculiarventures/pdf-core": "^1.2.3",
     "@peculiarventures/pdf-font": "^1.2.0",
-    "asn1js": "^2.1.1",
+    "asn1js": "^2.4.0",
     "bytestreamjs": "1.1.3",
     "fast-png": "^6.1.0",
     "pako": "^2.0.3",
-    "pkijs": "^2.1.96",
+    "pkijs": "3.0.1-1",
     "pvtsutils": "^1.2.2",
-    "pvutils": "^1.1.2",
-    "tslib": "^2.3.1"
+    "pvutils": "^1.1.3",
+    "tslib": "^2.4.0"
   }
 }

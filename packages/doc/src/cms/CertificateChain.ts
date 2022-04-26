@@ -93,7 +93,7 @@ export type RevocationMode = "no" | "online" | "offline";
 export interface ChainBuildParams {
   checkDate?: Date;
   revocationMode?: RevocationMode;
-  preferCRL?: boolean
+  preferCRL?: boolean;
 }
 
 export type ChainRevocationMode = "no" | "online" | "offline" | "all";
@@ -174,7 +174,7 @@ export class CertificateChain implements storageHandler.ICertificateStorage {
             revocationResult = await this.certificateHandler.findRevocation(revocationType, cert);
           } else if (params.revocationMode === "online") {
             revocationResult = await this.certificateHandler.fetchRevocation(revocationType, cert);
-          }  
+          }
         }
         if (revocationResult && revocationResult.result) {
           revocations.push(revocationResult.result);
@@ -184,10 +184,10 @@ export class CertificateChain implements storageHandler.ICertificateStorage {
 
     const chainEngineParams = {
       checkDate,
-      certs: [] as Certificate[],
-      trustedCerts: [] as Certificate[],
-      crls: [] as CertificateRevocationList[],
-      ocsps: [] as BasicOCSPResponse[],
+      certs: [] as pkijs.Certificate[],
+      trustedCerts: [] as pkijs.Certificate[],
+      crls: [] as pkijs.CertificateRevocationList[],
+      ocsps: [] as pkijs.BasicOCSPResponse[],
     };
 
     for (const revocation of revocations) {
@@ -205,8 +205,8 @@ export class CertificateChain implements storageHandler.ICertificateStorage {
     chainEngineParams.trustedCerts.push(PKIUtils.x509ToCert(chain[chain.length - 1]));
 
     const chainEngine = new pkijs.CertificateChainValidationEngine(chainEngineParams);
-    
-    const chainEngineResult = await chainEngine.verify();
+
+    const chainEngineResult = await chainEngine.verify() as CertificateChainResult;
     // console.log({
     //   cert: cert.subject,
     //   params: chainEngineParams,
@@ -226,4 +226,3 @@ import { CRL } from "./CRL";
 import { OCSP } from "./OCSP";
 
 import type * as storageHandler from "./ICertificateStorageHandler";
-import type { CertificateRevocationList, BasicOCSPResponse, Certificate } from "./PKITypes";

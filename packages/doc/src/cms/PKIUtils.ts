@@ -2,7 +2,6 @@ import { X509Certificate } from "@peculiar/x509";
 import * as pkijs from "pkijs";
 
 import { AsnEncoded } from "./AsnEncoded";
-import type  { Certificate, Extension } from "./PKITypes";
 
 class PKICertificate extends AsnEncoded {
 
@@ -17,13 +16,13 @@ export class PKIUtils {
   public static AUTHORITY_KEY_IDENTIFIER = "2.5.29.35";
   public static SUBJECT_KEY_IDENTIFIER = "2.5.29.14";
 
-  public static x509ToCert(x509Cert: X509Certificate): Certificate {
+  public static x509ToCert(x509Cert: X509Certificate): pkijs.Certificate {
     const pkiCert = PKICertificate.fromBER(x509Cert.rawData);
 
     return pkiCert.asn;
   }
 
-  public static certTox509(cert: Certificate): X509Certificate {
+  public static certTox509(cert: pkijs.Certificate): X509Certificate {
     const pkiCert = new PKICertificate();
     pkiCert.asn = cert;
     const raw = pkiCert.toBER();
@@ -31,7 +30,7 @@ export class PKIUtils {
     return new X509Certificate(raw);
   }
 
-  public static findExtension(cert: Certificate, extnID: string): Extension | null {
+  public static findExtension(cert: pkijs.Certificate, extnID: string): pkijs.Extension | null {
     if (cert.extensions) {
       for (const extension of cert.extensions) {
         if (extension.extnID === extnID) {

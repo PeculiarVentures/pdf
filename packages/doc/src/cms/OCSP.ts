@@ -6,7 +6,7 @@ import * as pkijs from "pkijs";
 import { AsnEncoded } from "./AsnEncoded";
 
 export class OCSP extends AsnEncoded implements ICertificateStorage {
-  
+
   public certificateHandler: ICertificateStorageHandler;
 
   constructor() {
@@ -25,12 +25,12 @@ export class OCSP extends AsnEncoded implements ICertificateStorage {
     return ocspRespSimpl.toSchema().toBER(false);
   }
 
-  public static fromOCSPResponse(data: BufferSource | OCSPResponse): OCSP {
-    const ocspResp: OCSPResponse = (BufferSourceConverter.isBufferSource(data))
-      ? new pkijs.OCSPResponse({ schema: asn1js.fromBER(BufferSourceConverter.toArrayBuffer(data)).result })
+  public static fromOCSPResponse(data: BufferSource | pkijs.OCSPResponse): OCSP {
+    const ocspResp: pkijs.OCSPResponse = (BufferSourceConverter.isBufferSource(data))
+      ? pkijs.OCSPResponse.fromBER(data)
       : data;
 
-    if (ocspResp.responseBytes.responseType === "1.3.6.1.5.5.7.48.1.1") {
+    if (ocspResp.responseBytes && ocspResp.responseBytes.responseType === "1.3.6.1.5.5.7.48.1.1") {
       const asnBasicResp = asn1js.fromBER(ocspResp.responseBytes.response.valueBlock.valueHex);
       const basicOcsp = new pkijs.BasicOCSPResponse({ schema: asnBasicResp.result });
 
@@ -75,7 +75,7 @@ export class OCSP extends AsnEncoded implements ICertificateStorage {
 
   public async verify(issuer: X509Certificate): Promise<boolean> {
     const issuerPublicKey = await issuer.publicKey.export(this.signatureAlgorithm, ["verify"]);
-    const ok = await pkijs.getEngine().subtle.verify(this.signatureAlgorithm, issuerPublicKey, this.signatureValue, this.asn.tbsResponseData.tbs);
+    const ok = await pkijs.getCrypto(true).verify(this.signatureAlgorithm, issuerPublicKey, this.signatureValue, this.asn.tbsResponseData.tbs);
 
     return ok;
   }
@@ -87,5 +87,4 @@ import { PKIUtils } from "./PKIUtils";
 import { DefaultCertificateStorageHandler } from "./DefaultCertificateStorageHandler";
 
 import type { ICertificateStorage, ICertificateStorageHandler } from "./ICertificateStorageHandler";
-import type { OCSPResponse } from "./PKITypes";
 

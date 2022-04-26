@@ -34,13 +34,13 @@
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
   "dependencies": {
-    "asn1js": "^2.1.1",
+    "asn1js": "^2.4.0",
     "bytestreamjs": "1.1.3",
     "pako": "^2.0.3",
     "pdf-lib": "^1.16.0",
-    "pkijs": "^2.1.95",
+    "pkijs": "3.0.1-1",
     "pvtsutils": "^1.2.2",
-    "pvutils": "^1.1.2",
-    "tslib": "^2.3.1"
+    "pvutils": "^1.1.3",
+    "tslib": "^2.4.0"
   }
 }

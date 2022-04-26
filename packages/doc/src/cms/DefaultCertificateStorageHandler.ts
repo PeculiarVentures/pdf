@@ -16,7 +16,7 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
       return Convert.FromHex(skiExt.keyId);
     }
     // compute SHA-1 digest from certificate's public key
-    const crypto = pkijs.getCrypto() as Crypto;
+    const crypto = pkijs.getEngine().crypto!;
 
     return cert.publicKey.getKeyIdentifier(crypto);
   }
@@ -148,8 +148,8 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
     };
   }
 
-  public findRevocation(type: "crl", cert: X509Certificate): Promise<IResult<CRL | null>>
-  public findRevocation(type: "ocsp", cert: X509Certificate): Promise<IResult<OCSP | null>>
+  public findRevocation(type: "crl", cert: X509Certificate): Promise<IResult<CRL | null>>;
+  public findRevocation(type: "ocsp", cert: X509Certificate): Promise<IResult<OCSP | null>>;
   public async findRevocation(type: RevocationType, cert: X509Certificate): Promise<IResult<CRL | OCSP | null>> {
     let res;
     switch (type) {
@@ -349,7 +349,7 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
 
   public async createOCSPRequest(cert: X509Certificate, issuer: X509Certificate, hashAlgorithm: AlgorithmIdentifier = "SHA-256"): Promise<ArrayBuffer> {
     const certID = await CertificateID.create(hashAlgorithm, cert, issuer);
-    const nonce = pkijs.getEngine().crypto.getRandomValues(new Uint8Array(20));
+    const nonce = pkijs.getCrypto(true).getRandomValues(new Uint8Array(20));
     const ocspReq = new OCSPRequest({
       tbsRequest: new TBSRequest({
         requestList: [

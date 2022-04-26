@@ -5,7 +5,6 @@ export * from "./AsnEncoded";
 export * from "./attributes";
 export * from "./algorithms";
 export * from "./AlgorithmFactory";
-export * from "./PKITypes";
 export * from "./CertificateChain";
 export * from "./CertificateStorageHandler";
 export * from "./ContentInfo";
