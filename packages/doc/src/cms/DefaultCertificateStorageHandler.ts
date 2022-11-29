@@ -16,7 +16,7 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
       return Convert.FromHex(skiExt.keyId);
     }
     // compute SHA-1 digest from certificate's public key
-    const crypto = pkijs.getEngine().crypto!;
+    const crypto = pkijs.getCrypto(true).crypto;
 
     return cert.publicKey.getKeyIdentifier(crypto);
   }
