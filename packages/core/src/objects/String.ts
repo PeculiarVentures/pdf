@@ -11,7 +11,7 @@ export abstract class PDFString extends PDFObject {
   constructor(view: BufferSource);
   constructor(string: PDFString);
   constructor(text: string);
-  constructor(param?: PDFString | string | BufferSource)
+  constructor(param?: PDFString | string | BufferSource);
   constructor(param?: PDFString | string | BufferSource) {
     super();
 
