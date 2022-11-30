@@ -1,6 +1,6 @@
 {
   "name": "@peculiarventures/pdf-cli",
-  "version": "1.2.3",
+  "version": "1.3.0",
   "description": "> TODO: description",
   "author": "microshine <microshine@mail.ru>",
   "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/pdf-cli#readme",
@@ -32,9 +32,9 @@
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
   "dependencies": {
-    "@peculiarventures/pdf-core": "^1.2.3",
-    "@peculiarventures/pdf-doc": "^1.2.3",
     "@peculiar/webcrypto": "^1.4.1",
+    "@peculiarventures/pdf-core": "^1.3.0",
+    "@peculiarventures/pdf-doc": "^1.3.0",
     "commander": "^9.2.0",
     "pkijs": "^3.0.9"
   }

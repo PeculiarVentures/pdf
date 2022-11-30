@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/PeculiarVentures/pdf/compare/v1.2.3...v1.3.0) (2022-11-30)
+
+
+### Bug Fixes
+
+* **doc:** problems with getEngine ([518444a](https://github.com/PeculiarVentures/pdf/commit/518444a9ff90d0698089dd7edbed06cfc785b85b))
+* TS errors after tsc update ([f2f332a](https://github.com/PeculiarVentures/pdf/commit/f2f332a275f112a7382ed99c09588a488dc868b4))
+
+
+### Features
+
+* use pkijs TS beta version ([a26bf46](https://github.com/PeculiarVentures/pdf/commit/a26bf46d1e179866efb0cbc9fd254d61ccb616f7))
+
+
+
+
+
 ## [1.2.3](https://github.com/PeculiarVentures/pdf/compare/v1.2.2...v1.2.3) (2022-03-07)
 
 **Note:** Version bump only for package @peculiarventures/pdf-doc
