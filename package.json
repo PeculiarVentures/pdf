@@ -27,7 +27,7 @@
   "homepage": "https://github.com/PeculiarVentures/pdf#readme",
   "devDependencies": {
     "@acme-ra/client": "^0.0.15",
-    "@peculiar/webcrypto": "^1.3.3",
+    "@peculiar/webcrypto": "^1.4.1",
     "@peculiar/x509": "^1.3.2",
     "@rollup/plugin-commonjs": "^22.0.0",
     "@rollup/plugin-node-resolve": "^13.2.1",
