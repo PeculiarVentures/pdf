@@ -4,14 +4,20 @@ import { ParsingError } from "../ParsingError";
 import { ViewReader } from "../ViewReader";
 import { ViewWriter } from "../ViewWriter";
 
+function isPdfIndirect(data: unknown): data is IPDFIndirect {
+  return typeof data === "object" && !!data &&
+    "id" in data && typeof data.id === "number" &&
+    "generation" in data && typeof data.generation === "number";
+}
+
 export interface PDFObjectConstructor<T extends PDFObject> {
   fromPDF(this: new () => T, reader: ViewReader): T;
   fromPDF(this: new () => T, data: Uint8Array, offset?: number): T;
   fromPDF(this: new () => T, text: string): T;
   fromPDF(this: new () => T, data: Uint8Array | ViewReader | string, offset?: number): T;
-  create(this: new () => T, update: PDFDocumentUpdate): T
+  create(this: new () => T, update: PDFDocumentUpdate): T;
 
-  new(): T
+  new(): T;
 }
 
 export interface IPDFIndirect {
@@ -62,14 +68,12 @@ export abstract class PDFObject {
   public ownerElement: PDFObject | null = null;
 
   public isIndirect(): boolean {
-    return !!(this.ownerElement &&
-      "id" in this.ownerElement &&
-      "generation" in this.ownerElement);
+    return isPdfIndirect(this.ownerElement);
   }
 
   public findIndirect(deep = false): IPDFIndirect | null {
     if (this.ownerElement) {
-      if ("id" in this.ownerElement && "generation" in this.ownerElement) {
+      if (isPdfIndirect(this.ownerElement)) {
         return this.ownerElement;
       } else if (deep) {
         return this.ownerElement.findIndirect(deep);

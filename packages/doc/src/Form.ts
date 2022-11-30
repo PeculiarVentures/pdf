@@ -1111,14 +1111,14 @@ export interface SigningTimeState extends SignatureState {
   code: "signing_time";
   data: {
     type: "local" | "empty" | "embedded";
-  }
+  };
 }
 
 export interface EmptySigningTimeState extends SigningTimeState {
   type: "info";
   data: {
     type: "empty";
-  }
+  };
 }
 
 export interface LocalSigningTimeState extends SigningTimeState {
@@ -1126,7 +1126,7 @@ export interface LocalSigningTimeState extends SigningTimeState {
   data: {
     type: "local";
     date: Date;
-  }
+  };
 }
 
 export interface EmbeddedSigningTimeState extends SigningTimeState {
@@ -1137,8 +1137,8 @@ export interface EmbeddedSigningTimeState extends SigningTimeState {
     signature?: cms.CMSSignedDataVerifyResult;
     signer?: X509Certificate;
     chain?: cms.CertificateChainResult;
-    info: TSTInfo
-  }
+    info: TSTInfo;
+  };
 }
 
 export type SigningTimeStates = EmptySigningTimeState | LocalSigningTimeState | EmbeddedSigningTimeState;
@@ -1211,7 +1211,7 @@ export interface SignatureVerifyResult {
   signatureType: SignatureType;
   signerCertificate: X509Certificate | null;
   certificatePath?: cms.CertificateChainResult;
-  states: SignatureStates[]
+  states: SignatureStates[];
 }
 
 export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, SignatureBox> {
@@ -1337,7 +1337,7 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
   public async thumbprint(crypto: Crypto = this.document.crypto): Promise<string> {
     const signatureValue = this.getSignatureValue();
 
-    const digest = await (crypto || pkijs.getEngine()).subtle.digest("SHA-1", signatureValue.Contents.data);
+    const digest = await (crypto || pkijs.getCrypto(true)).subtle.digest("SHA-1", signatureValue.Contents.data);
 
     return Convert.ToHex(digest).toUpperCase();
   }

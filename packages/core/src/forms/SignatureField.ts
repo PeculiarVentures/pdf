@@ -1,6 +1,8 @@
 import * as objects from "../objects";
+import { Maybe } from "../objects";
 import { PDFField } from "./Field";
 import { SignatureDictionary } from "./Signature";
+import { SignatureLockDictionary } from "./SignatureLock";
 
 export class SignatureFiled extends PDFField {
 
@@ -16,24 +18,22 @@ export class SignatureFiled extends PDFField {
    * 
    * The Ff entry indicates whether this shall be treated as a required constraint.
    */
-   @objects.PDFDictionaryField({
+  @objects.PDFDictionaryField({
     name: "V",
     type: SignatureDictionary,
     optional: true
   })
   public override V!: SignatureDictionary | null;
-  
+
   /**
    * A signature field lock dictionary that specifies 
    * a set of form fields that shall be locked when this
    * signature field is signed
+   * 
+   * @remarks PDF 1.5
    */
-  @objects.PDFDictionaryField({
-    name: "Lock",
-    type: objects.PDFDictionary,
-    optional: true,
-  })
-  public lock!: objects.PDFDictionary | null;
+  @objects.PDFMaybeField("Lock", SignatureLockDictionary, true)
+  public Lock!: Maybe<SignatureLockDictionary>;
 
   /**
    * A seed value dictionary containing information 

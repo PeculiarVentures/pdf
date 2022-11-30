@@ -34,6 +34,8 @@
   "dependencies": {
     "@peculiarventures/pdf-core": "^1.2.3",
     "@peculiarventures/pdf-doc": "^1.2.3",
-    "commander": "^9.2.0"
+    "@peculiar/webcrypto": "^1.4.1",
+    "commander": "^9.2.0",
+    "pkijs": "^3.0.9"
   }
 }

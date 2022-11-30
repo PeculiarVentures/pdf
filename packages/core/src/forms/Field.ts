@@ -84,9 +84,22 @@ export interface IFieldDictionary extends PDFDictionary {
 
 export class PDFField extends objects.PDFDictionary implements IFieldDictionary {
 
+  /**
+   * The type of field that this dictionary describes
+   * 
+   * - Btn Button (see 12.7.5.2, "Button fields")
+   * - Tx Text (see 12.7.5.3, "Text fields")
+   * - Ch Choice (see 12.7.5.4, "Choice fields")
+   * - Sig (PDF 1.3) Signature (see 12.7.5.5, "Signature fields")
+   */
   @objects.PDFNameField("FT")
   public ft!: string;
 
+  /**
+   * The field that is the immediate parent of this one
+   * 
+   * Required if this field is the child of another in the field hierarchy; absent otherwise
+   */
   @objects.PDFDictionaryField({
     name: "Parent",
     type: PDFField,
@@ -95,12 +108,21 @@ export class PDFField extends objects.PDFDictionary implements IFieldDictionary 
   })
   public Parent!: PDFField | null;
 
+  /**
+   * An array of indirect references to the immediate children of this field
+   */
   @objects.PDFMaybeField("Kids", objects.PDFArray)
   public Kids!: objects.Maybe<objects.PDFArray>;
 
+  /**
+   * The partial field name
+   */
   @objects.PDFTextStringField("T")
   public t!: objects.PDFTextString;
 
+  /**
+   * An alternative field name that shall be used in place of the actual field name wherever the field shall be identified in the user interface
+   */
   @objects.PDFDictionaryField({
     name: "TU",
     type: objects.PDFLiteralString,
@@ -108,6 +130,9 @@ export class PDFField extends objects.PDFDictionary implements IFieldDictionary 
   })
   public TU!: objects.PDFLiteralString | null;
 
+  /**
+   * The mapping name that shall be used when exporting interactive form field data from the document
+   */
   @objects.PDFDictionaryField({
     name: "TM",
     type: objects.PDFLiteralString,
@@ -115,21 +140,33 @@ export class PDFField extends objects.PDFDictionary implements IFieldDictionary 
   })
   public tm!: objects.PDFLiteralString | null;
 
+  /**
+   * A set of flags specifying various characteristics of the field. Default is 0
+   */
   @objects.PDFNumberField("Ff", true, 0)
   public ff!: FieldFlags | number;
 
+  /**
+   * The field’s value, whose format varies depending on the field type
+   */
   @objects.PDFDictionaryField({
     name: "V",
     optional: true,
   })
   public V!: objects.PDFObjectTypes | null;
 
+  /**
+   * The default value to which the field reverts when a reset-form action is executed
+   */
   @objects.PDFDictionaryField({
     name: "DV",
     optional: true,
   })
   public dv!: objects.PDFObjectTypes | null;
 
+  /**
+   * An additional-actions dictionary defining the field’s behavior in response to various trigger events
+   */
   @objects.PDFDictionaryField({
     name: "AA",
     type: AdditionalActionsDictionary,

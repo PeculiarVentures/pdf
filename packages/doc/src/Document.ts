@@ -130,7 +130,7 @@ export class PDFDocument {
     this.signatureBoxHandler = new SignatureBoxHandler(this);
     this.inputImageHandler = new InputImageBoxHandler(this);
     this.certificateHandler = new PDFCertificateStorageHandler(this);
-    this.crypto = pkijs.getEngine().crypto!;
+    this.crypto = pkijs.getCrypto(true).crypto;
   }
 
   public get dss(): Dss {

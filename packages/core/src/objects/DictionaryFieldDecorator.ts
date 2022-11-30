@@ -88,7 +88,7 @@ export function PDFDictionaryField<T extends PDFObjectTypes = PDFObjectTypes, TR
             result.ownerElement = this;
           }
           this.modify();
-          this.set(parameters.name, result);
+          this.set(parameters.name, result as PDFObjectTypes);
         }
 
         // Erase PDF object content
