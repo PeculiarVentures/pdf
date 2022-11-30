@@ -1337,7 +1337,7 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
   public async thumbprint(crypto: Crypto = this.document.crypto): Promise<string> {
     const signatureValue = this.getSignatureValue();
 
-    const digest = await (crypto || pkijs.getEngine()).subtle.digest("SHA-1", signatureValue.Contents.data);
+    const digest = await (crypto || pkijs.getCrypto(true)).subtle.digest("SHA-1", signatureValue.Contents.data);
 
     return Convert.ToHex(digest).toUpperCase();
   }
