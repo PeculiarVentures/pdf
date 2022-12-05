@@ -1,6 +1,6 @@
 import * as objects from "../../objects";
 import { PDFContent } from "../../content";
-import { TypographyConverter, TypographySize } from "../../TypographyConverter"; 
+import { TypographyConverter, TypographySize } from "../../TypographyConverter";
 import { UUID } from "../../UUID";
 import { PDFDate, PDFRectangle } from "../common";
 import type { AnnotationDictionary } from "./Annotation";
@@ -58,7 +58,7 @@ export class PageObjectDictionary extends objects.PDFDictionary {
     type: PageTreeNodesDictionary,
     indirect: true
   })
-  public parent!: PageTreeNodesDictionary;
+  public Parent!: PageTreeNodesDictionary;
 
   /**
    * The date and time when the page’s contents were most recently modified. 

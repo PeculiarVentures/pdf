@@ -1,16 +1,39 @@
 import * as objects from "../../objects";
+import { PDFDocument } from "../Document";
 import { PDFDocumentObject } from "../DocumentObject";
 import type { PDFDocumentUpdate } from "../DocumentUpdate";
+
+function setCount(this: PageTreeNodesDictionary, value: number) {
+  const oldValue = this.has("Count") ? this.Count : 0;
+  const diff = value - oldValue;
+  if (this.Parent) {
+    this.Parent.Count += diff;
+  }
+
+  return new objects.PDFNumeric(value);
+}
+
+function getCount(this: PageTreeNodesDictionary, o: objects.PDFNumeric) {
+  return o.value;
+}
 
 export class PageTreeNodesDictionary extends objects.PDFDictionary {
 
   public static readonly TYPE = "Pages";
 
+  public static override create<T extends objects.PDFObject>(this: new () => T, target: PDFDocument | PDFDocumentUpdate, ...items: Array<PageTreeNodesDictionary | PageObjectDictionary>): T {
+    const res = super.create(target) as PageTreeNodesDictionary;
+
+    res.push(...items);
+
+    return res as unknown as T;
+  }
+
   /**
    * The type of PDF object that this dictionary describes
    */
   @objects.PDFNameField("Type")
-  public type!: string;
+  public Type!: string;
 
   /**
    * The page tree node that is the immediate parent of this one
@@ -20,40 +43,32 @@ export class PageTreeNodesDictionary extends objects.PDFDictionary {
     type: PageTreeNodesDictionary,
     optional: true,
   })
-  public parent!: PageTreeNodesDictionary | null;
+  public Parent!: PageTreeNodesDictionary | null;
 
   /**
    * An array of indirect references to the immediate children of this node
    */
   @objects.PDFArrayField("Kids", true)
-  public kids!: objects.PDFArray;
+  public Kids!: objects.PDFArray;
 
   /**
    * The number of leaf nodes (page objects) that are descendants 
    * of this node within the page tree
    */
-  @objects.PDFNumberField("Count")
-  public count!: number;
-
-  // public modify(update: PDFDocumentUpdate): PageTreeNodesDictionary {
-  //   if (this.documentUpdate === update) {
-  //     return this;
-  //   } else {
-  //     const indirect = this.getIndirect();
-  //     const obj = this.getDocumentUpdate().getObject(indirect.id, indirect.generation);
-  //     update.append(obj);
-
-  //     return new PageTreeNodesDictionary(obj.value as objects.PDFDictionary);
-  //   }
-  // }
+  @objects.PDFDictionaryField({
+    name: "Count",
+    type: objects.PDFNumeric,
+    get: getCount,
+    set: setCount,
+  })
+  public Count!: number;
 
   protected override onCreate(): void {
     const update = this.getDocumentUpdate();
 
-
-    this.type = PageTreeNodesDictionary.TYPE;
-    this.kids = update.document.createArray();
-    this.count = 0;
+    this.Type = PageTreeNodesDictionary.TYPE;
+    this.Kids = update.document.createArray();
+    this.Count = 0;
   }
 
   /**
@@ -65,19 +80,7 @@ export class PageTreeNodesDictionary extends objects.PDFDictionary {
   }
 
   public indexOf(page: PageObjectDictionary): number {
-    if (this.kids && page.isIndirect()) {
-      for (let i = 0; i < this.kids.items.length; i++) {
-        const kid = this.kids.items[i];
-        const kidRef = kid.getIndirect();
-        const pageRef = page.getIndirect();
-
-        if (kidRef.id === pageRef.id && kidRef.generation === pageRef.generation) {
-          return i;
-        }
-      }
-    }
-
-    return -1;
+    return this.Kids.indexOf(page);
   }
 
   public insertBefore(newPage: PageObjectDictionary, refPage?: PageObjectDictionary): void {
@@ -89,33 +92,31 @@ export class PageTreeNodesDictionary extends objects.PDFDictionary {
       const refIndex = this.indexOf(refPage);
 
       if (newIndex !== -1) {
-        this.kids.items.splice(newIndex, 1);
+        this.Kids.items.splice(newIndex, 1);
       }
-      this.kids.items.splice(refIndex, 0, newPage);
+      this.Kids.items.splice(refIndex, 0, newPage);
     } else {
-      this.kids.items.push(newPage);
+      this.Kids.items.push(newPage);
     }
 
-    this.count = this.kids.length;
-    newPage.parent = this;
+    this.Count++;
+    newPage.Parent = this;
   }
 
   public remove(page: PageObjectDictionary | number): void {
     if (typeof page === "number") {
-      return this.remove(this.kids.get(page, PageObjectDictionary));
+      return this.remove(this.Kids.get(page, PageObjectDictionary));
     }
 
     const pageIndex = this.indexOf(page);
 
     if (pageIndex !== -1) {
-      this.kids.items.splice(pageIndex, 1);
+      this.Kids.splice(pageIndex, 1);
 
       // TODO Should we remove resources?
       // TODO Change Page status to free
 
-      this.modify();
-      this.count = this.kids.length;
-      page.parent = this;
+      this.Count--;
     }
   }
 
@@ -133,14 +134,14 @@ export class PageTreeNodesDictionary extends objects.PDFDictionary {
       const page = PageObjectDictionary.create(documentUpdate);
 
       // Set Parent
-      page.parent = this;
+      page.Parent = this;
 
       // Add Page to the document
       const objPage = documentUpdate.append(page);
 
       // Update Pages
-      this.kids.items.push(objPage.createReference());
-      this.count++;
+      this.Kids.items.push(objPage.createReference());
+      this.Count++;
 
       return objPage;
     } else {
@@ -168,8 +169,8 @@ export class PageTreeNodesDictionary extends objects.PDFDictionary {
       addedPageValue.delete("Parent");
 
       // Add page to catalog
-      this.kids.items.push(addedPage.createReference());
-      this.count++;
+      this.Kids.items.push(addedPage.createReference());
+      this.Count++;
 
       // Download all indirect references of object
       if (page.documentUpdate && page.documentUpdate.document !== documentUpdate.document) {
@@ -192,7 +193,7 @@ export class PageTreeNodesDictionary extends objects.PDFDictionary {
    * @param key 
    * @returns 
    */
-  public async copyAllRef(element: PDFDocumentObject | objects.PDFObject, secondUpdate: PDFDocumentUpdate, references: Map<string, { id: number, generation: number }> = new Map(), key?: string): Promise<void> {
+  public async copyAllRef(element: PDFDocumentObject | objects.PDFObject, secondUpdate: PDFDocumentUpdate, references: Map<string, { id: number, generation: number; }> = new Map(), key?: string): Promise<void> {
     if (element instanceof PDFDocumentObject) {
       // PDFDocumentObject
       await this.copyAllRef(element.value, secondUpdate, references);
@@ -254,6 +255,54 @@ export class PageTreeNodesDictionary extends objects.PDFDictionary {
       }
     }
   }
+
+  /**
+   * Returns all pages of the tree node
+   */
+  public getPages(): PageObjectDictionary[] {
+    const res: PageObjectDictionary[] = [];
+
+    for (let i = 0; i < this.Kids.length; i++) {
+      const item = this.Kids.get(i, objects.PDFDictionary, true);
+      const type = item.get("Type", objects.PDFName).text;
+      switch (type) {
+        case PageTreeNodesDictionary.TYPE: {
+          const tree = item.to(PageTreeNodesDictionary, true);
+          res.push(...tree.getPages());
+          break;
+        }
+        case PageObjectDictionary.TYPE: {
+          const page = item.to(PageObjectDictionary, true);
+          res.push(page);
+          break;
+        }
+      }
+    }
+
+    return res;
+  }
+
+  public push(...items: Array<PageTreeNodesDictionary | PageObjectDictionary>): void {
+    this.modify();
+
+    for (const item of items) {
+      // TODO remove from another document
+      // TODO remove from Parent
+
+      this.Kids.push(item);
+      item.Parent = this;
+
+      // Update Count
+      if (item instanceof PageTreeNodesDictionary) {
+        // PageTreeNodesDictionary
+        this.Count += item.Count;
+      } else {
+        // PageObjectDictionary
+        this.Count++;
+      }
+    }
+  }
+
 }
 
 import { PageObjectDictionary } from "./PageObject";

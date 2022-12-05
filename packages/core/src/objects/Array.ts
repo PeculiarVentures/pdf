@@ -8,7 +8,7 @@ const rightSquareBracketChar = 0x5d;
 
 export class PDFArray extends PDFObject implements Iterable<PDFObject> {
 
-  [Symbol.iterator](): Iterator<PDFObject, any, undefined> {
+  [Symbol.iterator](): Iterator<PDFObject, unknown, undefined> {
     let pointer = 0;
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const _this = this;
@@ -52,9 +52,9 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
     return this.items.length;
   }
 
-  public get(index: number): PDFObjectTypes;
-  public get<T extends PDFObject>(index: number, type: abstract new () => T, replace?: boolean): T;
-  public get(index: number, type?: any, replace = false): any {
+  public find(index: number): PDFObjectTypes;
+  public find<T extends PDFObject>(index: number, type: abstract new () => T, replace?: boolean): T;
+  public find(index: number, type?: abstract new () => PDFObject, replace = false): PDFObject | null {
     const item = this.items[index];
 
     if (item) {
@@ -62,7 +62,9 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
         ? item.getValue()
         : item;
 
-      const resType = PDFTypeConverter.convert(res, type, replace);
+      const resType = type
+        ? PDFTypeConverter.convert(res, type, replace)
+        : PDFTypeConverter.convert(res);
       if (replace && !resType.isIndirect) {
         this.items[index] = resType as PDFObjectTypes;
       }
@@ -70,7 +72,21 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
       return resType;
     }
 
-    throw new RangeError("Array index is out of bounds");
+    return null;
+  }
+
+  public get(index: number): PDFObjectTypes;
+  public get<T extends PDFObject>(index: number, type: abstract new () => T, replace?: boolean): T;
+  public get(index: number, type?: abstract new () => PDFObject, replace = false): PDFObject {
+    const item = type
+      ? this.find(index, type, replace)
+      : this.find(index);
+
+    if (!item) {
+      throw new RangeError("Array index is out of bounds");
+    }
+
+    return item;
   }
 
   public push(...items: PDFObjectTypes[]): void {
@@ -98,9 +114,13 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
   }
 
   public splice(start: number, deleteCount?: number): PDFObjectTypes[] {
-    this.modify();
 
-    return this.items.splice(start, deleteCount);
+    const res = this.items.splice(start, deleteCount);
+    if (res.length) {
+      this.modify();
+    }
+
+    return res;
   }
 
   protected onWritePDF(writer: ViewWriter): void {
