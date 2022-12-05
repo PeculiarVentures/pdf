@@ -29,6 +29,11 @@ export abstract class PDFObject {
 
   public static readonly DEFAULT_VIEW = new Uint8Array();
 
+  /**
+   * Creates new instance of the class and assigns it to the document
+   * @param target PDF document or update
+   * @returns 
+   */
   public static create<T extends PDFObject>(this: new () => T, target: PDFDocument | PDFDocumentUpdate): T {
     const obj = new this();
 
