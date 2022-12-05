@@ -15,18 +15,52 @@ export interface PDFPagesCreateParameters {
 
 export class PDFPages extends WrapObject<core.PageTreeNodesDictionary> {
 
+  [Symbol.iterator](): Iterator<PDFPage, unknown, undefined> {
+    let pointer = 0;
+    const pages = this.target.getPages();
+    const doc = this.document;
+
+    return {
+      next(): IteratorResult<PDFPage> {
+        if (pointer < pages.length) {
+          return {
+            done: false,
+            value: new PDFPage(pages[pointer++], doc),
+          };
+        } else {
+          return {
+            done: true,
+            value: null
+          };
+        }
+      }
+    };
+  }
+
   public get length(): number {
-    return this.target.count;
+    return this.target.getPages().length;
+  }
+
+  public find(index: number): PDFPage | null {
+    const page = this.target.getPages()[index];
+    if (page) {
+      return new PDFPage(page, this.document);
+    }
+
+    return null;
   }
 
   /**
-   * Returns page by page number
-   * @param pageNumber Page. Should be from 1 to N
+   * Returns page by index
+   * @param index Page index
    */
-  public get(pageNumber: number): PDFPage {
-    const page = this.target.kids.get(pageNumber, core.PageObjectDictionary);
+  public get(index: number): PDFPage {
+    const page = this.find(index);
+    if (!page) {
+      throw new Error(`Page by index ${index} not found`);
+    }
 
-    return new PDFPage(page, this.document);
+    return page;
   }
 
   public create({
@@ -46,7 +80,7 @@ export class PDFPages extends WrapObject<core.PageTreeNodesDictionary> {
   }
 
   public indexOf(page: PDFPage): number {
-    return this.target.indexOf(page.target);
+    return this.target.getPages().indexOf(page.target);
   }
 
   public insertBefore(newPage: PDFPage, refPage = this.last()): void {
@@ -60,14 +94,15 @@ export class PDFPages extends WrapObject<core.PageTreeNodesDictionary> {
   }
 
   public first(): PDFPage | null {
-    return (this.length)
-      ? this.get(0)
-      : null;
+    return this.find(0);
   }
 
   public last(): PDFPage | null {
-    return (this.length)
-      ? this.get(this.length - 1)
+    const pages = this.target.getPages();
+    const last = pages[pages.length - 1];
+
+    return last
+      ? new PDFPage(last, this.document)
       : null;
   }
 

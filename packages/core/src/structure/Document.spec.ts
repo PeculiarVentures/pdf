@@ -212,14 +212,14 @@ context("Document", () => {
       const doc = new PDFDocument();
       doc.options.xref = XrefStructure.Table;
       doc.update.addCatalog();
-      
+
       let pdf = await doc.toPDF();
 
       await doc.createUpdate();
       console.log(Convert.ToBinary(pdf));
-      
+
       const forms = doc.update.catalog!.AcroForm.get();
-      
+
       pdf = await doc.toPDF();
       console.log(Convert.ToBinary(pdf));
     });
