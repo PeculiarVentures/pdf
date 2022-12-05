@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/PeculiarVentures/pdf/compare/v1.3.0...v1.4.0) (2022-12-05)
+
+
+### Features
+
+* improve PageTreeNode ([28bc6d3](https://github.com/PeculiarVentures/pdf/commit/28bc6d35e811e03b48c621309d80b0f2b393ae29)), closes [#12](https://github.com/PeculiarVentures/pdf/issues/12)
+
+
+
+
+
 # [1.3.0](https://github.com/PeculiarVentures/pdf/compare/v1.2.3...v1.3.0) (2022-11-30)
 
 
