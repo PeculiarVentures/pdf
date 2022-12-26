@@ -110,7 +110,7 @@ export class PDFLiteralString extends PDFTextString {
 
     // Prepare text
     const text = Convert.ToBinary(data)
-      .replace(/\\(\d\d\d?|\r\n|\n|.)/gm, (substring, group1: string) => {
+      .replace(/\\([0-7][0-7][0-7]?|\r\n|\n|\r|.)/gm, (substring, group1: string) => {
         switch (true) {
           case (substring === "\\n"):
             return "\n";
@@ -130,16 +130,25 @@ export class PDFLiteralString extends PDFTextString {
             return "\\";
           case (substring === "\\\r\n"):
           case (substring === "\\\n"):
+          case (substring === "\\\r"):
             return "";
-          case (/\d\d\d?/.test(group1)):
-            return globalThis.String.fromCharCode(parseInt(group1, 10));
+          case (/[0-7][0-7][0-7]?/.test(group1)): {
+            // encode unicode
+            let code = 0;
+            for (let i = 0; i < group1.length; i++) {
+              code <<= 3;
+              code += group1.charCodeAt(i) & 0x0f;
+            }
+
+            return globalThis.String.fromCharCode(code);
+          }
           default:
             return group1;
         }
       });
 
     if (text.startsWith("\xFE\xFF")) {
-      this.text = Convert.ToUtf16String(Convert.FromBinary(text.substring(2)))
+      this.text = Convert.ToUtf16String(Convert.FromBinary(text.substring(2)));
     } else {
       this.text = text;
     }
