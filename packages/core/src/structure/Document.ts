@@ -3,7 +3,6 @@ import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 import type { clientSideParametersPublicKey } from "../encryption/Constants";
 import type { PageObjectDictionary } from "./dictionaries";
 import type { ViewReader } from "../ViewReader";
-import type { PDFDocumentObject } from "./DocumentObject";
 
 export interface FindIndexOptions {
   reversed?: boolean;
@@ -23,7 +22,7 @@ export interface DocumentOptions {
   };
   disableAscii85Encoding?: boolean;
   disableCompressedStreams?: boolean;
-  disableCompressedObjects?: boolean
+  disableCompressedObjects?: boolean;
   crypto?: clientSideParametersPublicKey;
 }
 
@@ -62,6 +61,7 @@ export class PDFDocument {
     } else {
       writer.write(headerChars);
       writer.writeString(`${this.version.toFixed(1)}\n`);
+      writer.writeStringLine("%\xff\xff\xff\xff");
     }
 
     const updates: PDFDocumentUpdate[] = [];
@@ -320,6 +320,19 @@ export class PDFDocument {
   public createRectangle(llX: number, llY: number, urX: number, urY: number): PDFRectangle {
     return PDFRectangle.createWithData(this.update, llX, llY, urX, urY);
   }
+
+  public async decrypt(): Promise<void> {
+    let update: PDFDocumentUpdate | null = this.update;
+    const promises: Promise<void>[] = [];
+    while (update) {
+      promises.push(update.decrypt());
+
+      update = update.previous;
+    }
+
+    await Promise.all(promises);
+  }
+
 }
 
 import * as objects from "../objects";
@@ -327,5 +340,5 @@ import { ParsingError } from "../ParsingError";
 import { ViewWriter } from "../ViewWriter";
 import { PDFDocumentUpdate } from "./DocumentUpdate";
 import { PDFRectangle } from "./common";
-import { CrossReferenceTable } from "./CrossReferenceTable";import { CharSet } from "../CharSet";
-
+import { CrossReferenceTable } from "./CrossReferenceTable"; import { CharSet } from "../CharSet";
+import { PDFDocumentObject, PDFDocumentObjectTypes } from "./DocumentObject";

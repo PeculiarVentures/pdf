@@ -1,4 +1,4 @@
-import { PDFBooleanField, PDFDictionaryField, PDFHexStringField, PDFNumberField, PDFLiteralStringField } from "../../objects";
+import { PDFBooleanField, PDFDictionaryField, PDFHexStringField, PDFNumberField, PDFLiteralStringField, PDFTextStringField } from "../../objects";
 import { PDFTextString } from "../../objects/TextString";
 import { EncryptDictionary } from "./Encrypt";
 
@@ -37,15 +37,15 @@ export class StandardEncryptDictionary extends EncryptDictionary {
    * A 32-byte string, based on the owner and user
    * password, that shall be used in computing the file encryption key
    */
-  @PDFLiteralStringField("OE", true)
-  public oe!: string | null;
+  @PDFTextStringField("OE", true)
+  public oe!: PDFTextString | null;
 
   /**
    * A 32-byte string, based on the user password,
    * that shall be used in computing the file encryption key.
    */
-  @PDFLiteralStringField("UE", true)
-  public ue!: string | null;
+  @PDFTextStringField("UE", true)
+  public ue!: PDFTextString | null;
 
   /**
    * A set of flags specifying which operations shall be permitted when the document is opened with user access (see Table 22).
@@ -57,8 +57,8 @@ export class StandardEncryptDictionary extends EncryptDictionary {
    * A 16-byte string, encrypted with the file
    * encryption key, that contains an encrypted copy of the permissions flags.
    */
-  @PDFHexStringField("Perms", true)
-  public perms!: string | null;
+  @PDFTextStringField("Perms", true)
+  public perms!: PDFTextString | null;
 
   /**
    * Indicates whether the document-level metadata stream (see 14.3.2, "Metadata Streams") shall be encrypted.

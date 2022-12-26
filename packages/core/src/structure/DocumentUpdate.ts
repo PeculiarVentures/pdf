@@ -72,7 +72,7 @@ export class PDFDocumentUpdate {
     const reader = objects.PDFObject.getReader(data, offset);
     this.startXref = reader.view.byteOffset + reader.position;
 
-    let position = 0; 
+    let position = 0;
 
     // beginning with PDF 1.5 cross-reference information may bew stored in a cross-reference stream
     if (this.document.version >= 1.5 && reader.current !== 0x78) { // x
@@ -508,6 +508,66 @@ export class PDFDocumentUpdate {
     return root;
   }
 
+  protected getObjectReferences(obj: objects.PDFObject, refs: objects.PDFIndirect[] = []): objects.PDFIndirect[] {
+    if (obj instanceof objects.PDFDictionary) {
+      for (const [key, item] of obj.items) {
+        if (item.isIndirect()) {
+          const ref = item.getIndirect();
+          if (refs.find(o => o.id === ref.id && o.generation === ref.generation)) {
+            continue;
+          }
+
+          this.getObjectReferences(obj.get(key), refs);
+        }
+      }
+    }
+
+    return refs;
+  }
+
+  public async decrypt(): Promise<void> {
+    if (this.xref && this.xref.Encrypt) {
+
+      let encryptRef: objects.IPDFIndirect | null = null;
+      if (this.xref.Encrypt.isIndirect()) {
+        encryptRef = this.xref.Encrypt.getIndirect();
+      }
+
+      const promises: Promise<void>[] = [];
+      const items = this.xref.objects;
+      for (const obj of items) {
+        // decrypt 
+        if (obj.type !== PDFDocumentObjectTypes.inUse
+          || (encryptRef && encryptRef.id === obj.id && encryptRef.generation === obj.generation)) {
+          continue;
+        }
+
+        promises.push(this.decryptObject(obj.value));
+      }
+
+      await Promise.all(promises);
+    }
+  }
+  protected async decryptObject(value: objects.PDFObject): Promise<void> {
+    try {
+      if (value instanceof objects.PDFStream
+        || value instanceof objects.PDFTextString) {
+        await value.decode();
+      } else if (value instanceof objects.PDFDictionary) {
+        for (const [, item] of value.items) {
+          await this.decryptObject(item);
+        }
+      } else if (value instanceof objects.PDFArray) {
+        for (const item of value.items) {
+          await this.decryptObject(item);
+        }
+      }
+    } catch {
+      const r = value.getIndirect(true).id;
+      console.warn(`R ${r}: Cannot decrypt`);
+    }
+  }
+
 }
 
 import { CompressedObject } from "./CompressedObject";
@@ -518,3 +578,4 @@ import { PDFDocument, XrefStructure } from "./Document";
 import { PDFDocumentObject, PDFDocumentObjectTypes } from "./DocumentObject";
 import { EncryptDictionary } from "./dictionaries";
 import { EncryptionFactory, EncryptionHandler } from "../encryption";
+

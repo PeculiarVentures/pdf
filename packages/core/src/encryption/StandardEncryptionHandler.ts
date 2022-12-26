@@ -31,7 +31,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
 
     let result: ArrayBuffer;
     const globalParameters = await this.getGlobalParameters();
-    
+
     const dataIV = new Uint8Array(16);
     pkijs.getRandomValues(dataIV);
 
@@ -181,55 +181,22 @@ export class StandardEncryptionHandler extends EncryptionHandler {
       const trailerId = idSearch[0].toArrayBuffer();
 
       if (this.dictionary.r === 6) {
-        throw new Error("Method not implemented");
+        // throw new Error("Method not implemented");
 
-        // // Get values necessary in case we are working with PDF 2.0 formated file
-        //   // OE
-        //   const oeSearch = _this.encryptGlobalParameters.dictionary.valueByName(new Name({ value: "OE" }));
-        //   if (oeSearch.status === (-1))
-        //     return resultObject; // Can not find value for hashed owner's password (extension)
+        // Get values necessary in case we are working with PDF 2.0 formatted file
+        // OE
+        if (!this.dictionary.oe) {
+          return resultObject; // Can not find value for hashed owner's password (extension)
+        }
 
-        //   switch (true) {
-        //     case (oeSearch.value.constructor.className === HexString.className):
-        //       break;
-        //     case (oeSearch.value.constructor.className === LiteralString.className):
-        //       this.dictionary.oe = stringToArrayBuffer(oeSearch.value.value);
-        //       break;
-        //     default:
-        //       return resultObject; // Incorrect type of OE element
-        //   }
+        // UE
+        if (this.dictionary.ue)
+          return resultObject; // Can not find value for hashed user's password (extension)
 
-        //   // UE
-        //   const ueSearch = _this.encryptGlobalParameters.dictionary.valueByName(new Name({ value: "UE" }));
-        //   if (ueSearch.status === (-1))
-        //     return resultObject; // Can not find value for hashed user's password (extension)
-
-        //   switch (true) {
-        //     case (ueSearch.value.constructor.className === HexString.className):
-        //       this.dictionary.ue = ueSearch.value.decodedValue.buffer;
-        //       break;
-        //     case (ueSearch.value.constructor.className === LiteralString.className):
-        //       this.dictionary.ue = stringToArrayBuffer(ueSearch.value.value);
-        //       break;
-        //     default:
-        //       return resultObject; // Incorrect type of UE element
-        //   }
-
-        //   // Perms
-        //   const permsSearch = _this.encryptGlobalParameters.dictionary.valueByName(new Name({ value: "Perms" }));
-        //   if (ueSearch.status === (-1))
-        //     return resultObject; // Can not find value for Perms
-
-        //   switch (true) {
-        //     case (permsSearch.value.constructor.className === HexString.className):
-        //       this.dictionary.perms = permsSearch.value.decodedValue.buffer;
-        //       break;
-        //     case (permsSearch.value.constructor.className === LiteralString.className):
-        //       this.dictionary.perms = stringToArrayBuffer(permsSearch.value.value);
-        //       break;
-        //     default:
-        //       return resultObject; // Incorrect type of Perms element
-        //   }
+        // Perms
+        if (this.dictionary.perms) {
+          return resultObject;
+        }
       }
 
       // let value = this.dictionary.length;
@@ -247,7 +214,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
           }
 
           break;
-        // Case if we have equal crypto paramaters for both strings and streams
+        // Case if we have equal crypto parameters for both strings and streams
         case (this.dictionary.stmF === this.dictionary.strF):
           {
             let generatedKey;
@@ -260,14 +227,14 @@ export class StandardEncryptionHandler extends EncryptionHandler {
             let keyLength = 0;
 
             // TODO length have default value
-            if (this.dictionary.length) {
+            if (this.dictionary.has("Length")) {
               keyLength = this.dictionary.length;
             } else {
               keyLength = filterParameters.keyLength;
             }
 
             if (this.dictionary.v === 5) {
-              throw new Error("Metod not implemented");
+              throw new Error("Method not implemented");
               // generatedKey = await this.generateKeyPasswordBasedA(this.dictionary.o, this.dictionary.u, this.dictionary.oe, this.dictionary.ue, userPasswordBuffer);
             } else {
               generatedKey = await this.generateKeyPasswordBased(this.dictionary.o.toArrayBuffer(), trailerId, this.dictionary.p, this.dictionary.r, keyLength, this.dictionary.encryptMetadata, userPasswordBuffer);
