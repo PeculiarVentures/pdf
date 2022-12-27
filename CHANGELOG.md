@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/PeculiarVentures/pdf/compare/v1.4.0...v1.5.0) (2022-12-27)
+
+
+### Bug Fixes
+
+* error on null object getting [#14](https://github.com/PeculiarVentures/pdf/issues/14) ([a049632](https://github.com/PeculiarVentures/pdf/commit/a0496325ecf5808847bc849bf82b88c218579a03))
+
+
+### Features
+
+* add stopPropagation for CertificateStorage IResult ([bcdb90a](https://github.com/PeculiarVentures/pdf/commit/bcdb90a85a94696b6ef993f84bcc5851008b2006))
+* use params for verify ([faceb75](https://github.com/PeculiarVentures/pdf/commit/faceb754dd8782df89d5d10a0fe74b97fd4eda8a))
+
+
+
+
+
 # [1.4.0](https://github.com/PeculiarVentures/pdf/compare/v1.3.0...v1.4.0) (2022-12-05)
 
 
