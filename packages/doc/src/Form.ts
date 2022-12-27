@@ -1044,10 +1044,10 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
     return group.sign(params);
   }
 
-  public async verify(checkDate?: Date): Promise<SignatureVerifyResult> {
+  public async verify(params?: SignatureBoxGroupVerifyParams): Promise<SignatureVerifyResult> {
     const group = this.getGroup();
 
-    return group.verify(checkDate);
+    return group.verify(params);
   }
 
   protected getAppearance(): FormObject {
@@ -1214,6 +1214,11 @@ export interface SignatureVerifyResult {
   states: SignatureStates[];
 }
 
+export interface SignatureBoxGroupVerifyParams {
+  preferCRL?: boolean;
+  checkDate?: Date;
+}
+
 export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, SignatureBox> {
 
   public static readonly CONTAINER_SIZE = 2 * 1024;
@@ -1350,9 +1355,9 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
     return this.target.V;
   }
 
-  public async verify(checkDate?: Date): Promise<SignatureVerifyResult> {
+  public async verify(params: SignatureBoxGroupVerifyParams = {}): Promise<SignatureVerifyResult> {
     const dateNow = new Date();
-    checkDate ||= dateNow;
+    const checkDate = params.checkDate || dateNow;
 
     // TODO Decrypt values on PDF reading
     await FormComponentFactory.getField(this.target as any).t.decode();
@@ -1437,14 +1442,14 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
           // if chain status is no revocation then verify chain with online revocations
           if (chainResult.resultCode === cms.CertificateChainStatusCode.revocationNotFound) {
             result.states.push(this.makeLtvState(false, chainResult.resultMessage));
-            chainResult = await chain.build(verificationResult.signerCertificate, { checkDate, revocationMode: "online" });
+            chainResult = await chain.build(verificationResult.signerCertificate, { checkDate, revocationMode: "online", preferCRL: params.preferCRL });
           } else {
             result.states.push(this.makeLtvState(true));
           }
         } else {
           // verify chain with online revocations
           result.states.push(this.makeLtvState(false, "PDF document doesn't have revocation items"));
-          chainResult = await chain.build(verificationResult.signerCertificate, { checkDate, revocationMode: "online" });
+          chainResult = await chain.build(verificationResult.signerCertificate, { checkDate, revocationMode: "online", preferCRL: params.preferCRL });
         }
 
         switch (chainResult.result) {
