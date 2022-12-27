@@ -127,6 +127,17 @@ export class PDFDictionary extends PDFObject {
       res.ownerElement = this;
     }
 
+
+    if (type && res instanceof PDFNull) {
+      const newRes = type.create(this.documentUpdate) as PDFObjectTypes;
+      if (newRes.isIndirect()) {
+        newRes.makeIndirect();
+      }
+      res = newRes;
+
+      this.set(name, res);
+    }
+
     const resType = PDFTypeConverter.convert(res, type, replace);
     if (replace && !resType.isIndirect) {
       this.set(name, resType as PDFObjectTypes);

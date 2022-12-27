@@ -72,7 +72,7 @@ export class PDFDocumentUpdate {
     const reader = objects.PDFObject.getReader(data, offset);
     this.startXref = reader.view.byteOffset + reader.position;
 
-    let position = 0; 
+    let position = 0;
 
     // beginning with PDF 1.5 cross-reference information may bew stored in a cross-reference stream
     if (this.document.version >= 1.5 && reader.current !== 0x78) { // x
@@ -278,7 +278,13 @@ export class PDFDocumentUpdate {
       return prev.getObject(param, generation);
     }
 
-    throw new Error(`IndirectObject '${param} ${generation}' does not exist`);
+    return new PDFDocumentObject({
+      id: 0,
+      generation: 0,
+      offset: 0,
+      type: PDFDocumentObjectTypes.null,
+      documentUpdate: this,
+    });
   }
 
   protected getCompressedObjectNumbers(): number[] {

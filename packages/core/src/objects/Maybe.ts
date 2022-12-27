@@ -1,15 +1,16 @@
 import type { PDFDictionary } from "./Dictionary";
+import { PDFNull } from "./Null";
 
 export class Maybe<T extends PDFObject> {
 
   constructor(
-    public parent: PDFDictionary, 
-    public name: string, 
+    public parent: PDFDictionary,
+    public name: string,
     public indirect: boolean,
     private _type: PDFObjectConstructor<T>) { }
 
   public get(required = false): T {
-    if (!this.parent.has(this.name)) {
+    if (!this.parent.has(this.name) || this.parent.get(this.name) instanceof PDFNull) {
       if (required) {
         throw new Error(`Cannot get required field '${this.name}'. Field is empty.`);
       }
