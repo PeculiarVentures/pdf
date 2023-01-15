@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.1](https://github.com/PeculiarVentures/pdf/compare/v1.5.0...v1.5.1) (2023-01-15)
+
+
+### Bug Fixes
+
+* incorrect result for FormComponent.left ([7efdca6](https://github.com/PeculiarVentures/pdf/commit/7efdca646b4cb31830def56b6a81fa198fd71210))
+
+
+
+
+
 # [1.5.0](https://github.com/PeculiarVentures/pdf/compare/v1.4.0...v1.5.0) (2022-12-27)
 
 
