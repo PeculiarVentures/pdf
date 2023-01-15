@@ -85,7 +85,7 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
   }
 
   public get left(): number {
-    return this.target.rect.urX;
+    return this.target.rect.llX;
   }
 
   public set left(v: core.TypographySize) {
