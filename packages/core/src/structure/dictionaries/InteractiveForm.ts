@@ -1,5 +1,7 @@
 import { IFieldDictionary, PDFField } from "../../forms";
 import * as objects from "../../objects";
+import { Maybe, PDFMaybeField } from "../../objects";
+import { ResourceDictionary } from "./ResourceDictionary";
 
 export enum SignatureFlags {
   /**
@@ -39,7 +41,7 @@ export class InteractiveFormDictionary extends objects.PDFDictionary {
    */
   @objects.PDFBooleanField("NeedAppearances", true, false)
   public needAppearances!: boolean;
-  
+
   /**
    * A set of flags specifying various document-level characteristics related 
    * to signature fields
@@ -47,7 +49,7 @@ export class InteractiveFormDictionary extends objects.PDFDictionary {
    */
   @objects.PDFNumberField("SigFlags", true, 0)
   public SigFlags!: SignatureFlags;
-  
+
   /**
    * An array of indirect references to field dictionaries with calculation actions, 
    * defining the calculation order in which their values will be recalculated
@@ -59,32 +61,28 @@ export class InteractiveFormDictionary extends objects.PDFDictionary {
    */
   @objects.PDFArrayField("CO", true)
   public co!: objects.PDFArray | null;
-  
+
   /**
    * A resource dictionary containing default resources (such as fonts,
-   * patterns, or colour spaces) that shall be used by form field
+   * patterns, or color spaces) that shall be used by form field
    * appearance streams
    */
-  @objects.PDFDictionaryField({
-    name: "DR",
-    type: objects.PDFDictionary,
-    optional: true,
-  })
-  public dr!: objects.PDFDictionary | null;
-  
+  @PDFMaybeField("DR", ResourceDictionary)
+  public DR!: Maybe<ResourceDictionary>;
+
   /**
    * A document-wide default value for the DA attribute of variable text fields
    */
   @objects.PDFLiteralStringField("DA", true)
   public da!: string | null;
-  
+
   /**
    * A document-wide default value for the Q attribute 
    * of variable text fields
    */
   @objects.PDFNumberField("Q", true)
   public q!: number | null;
-  
+
   /**
    * A stream or array containing an XFA resource, 
    * whose format shall be described by the Data Package
@@ -105,11 +103,11 @@ export class InteractiveFormDictionary extends objects.PDFDictionary {
 
   public findFieldByGroup(type: string, group: string): PDFField | null {
     const field = this.Fields.items.find(o => {
-        if (o instanceof PDFField) {
-          if (o.ft === type && o.t.text === group) {
-            return o;
-          }
+      if (o instanceof PDFField) {
+        if (o.ft === type && o.t.text === group) {
+          return o;
         }
+      }
     });
     if (field && field instanceof PDFField) {
       return field;

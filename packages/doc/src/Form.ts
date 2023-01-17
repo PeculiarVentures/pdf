@@ -827,10 +827,23 @@ export class TextEditor extends FormComponent {
             const ap = this.target.AP.get().N;
             if (ap instanceof core.PDFDictionary) {
               const formAP = new FormObject(ap.to(core.FormDictionary), this.document);
-              const font = formAP.resources.get(fontName);
+              // Try to get Font from Appearance.Resources
+              let font = formAP.resources.find(fontName);
 
-              if (!(font.target instanceof core.PDFDictionary)) {
-                throw new TypeError();
+              if (!font) {
+                // Try to get Font from AcroForm.Resources
+                const catalog = this.document.target.update.catalog;
+                if (catalog && catalog.AcroForm.has()) {
+                  const acroForm = catalog.AcroForm.get();
+                  if (acroForm.DR.has()) {
+                    const res = new ResourceManager(acroForm.DR.get(), this.document);
+                    font = res.find(fontName);
+                  }
+                }
+              }
+
+              if (!(font && font.target instanceof core.PDFDictionary)) {
+                throw new TypeError("Cannot get Font from Resources. Incorrect type.");
               }
               const fontDictionary = FontComponent.toFontDictionary(font.target);
 
@@ -944,7 +957,12 @@ export class TextEditor extends FormComponent {
   }
 
   public override paint(): void {
-    const ap = this.target.AP.get(true);
+    const ap = this.target.AP.get();
+    if (!ap.has("N")) {
+      // If AP created by get() function it doesn't have a required filed N
+      ap.N = core.FormDictionary.create(this.target.documentUpdate!);
+    }
+
     if (ap.N instanceof core.PDFStream) {
       const formDict = ap.N.to(core.FormDictionary, true);
       const form = new FormObject(formDict, this.document);
