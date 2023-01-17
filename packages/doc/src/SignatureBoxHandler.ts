@@ -7,7 +7,7 @@ export interface ISignatureBoxCreateParameters extends IFormComponentCreateParam
   groupName?: string;
 }
 
-export interface ISignatureBoxParameters extends IFormComponentParameters {}
+export interface ISignatureBoxParameters extends IFormComponentParameters { }
 
 export interface ISignatureBoxHandler extends IFormComponentHandler {
   document: PDFDocument;
@@ -36,7 +36,7 @@ export class SignatureBoxHandler extends FormComponentHandler implements ISignat
       // Create new group
       group = this.createGroup(name);
     }
-    
+
     if (!(group instanceof SignatureBoxGroup)) {
       throw new TypeError(`Component group already exists '${name}'. It doesn't match to SignatureBoxGroup type.`);
     }
@@ -48,7 +48,7 @@ export class SignatureBoxHandler extends FormComponentHandler implements ISignat
     const update = this.document.target.update;
 
     const p = this.getParameters(params);
-    
+
     const x = p.left;
     const y = p.top - p.height;
 
@@ -65,7 +65,15 @@ export class SignatureBoxHandler extends FormComponentHandler implements ISignat
     // Assign widget to field
     group.target.Kids.get().push(widget.makeIndirect());
     widget.Parent = group.target.makeIndirect();
-    
+
+    if (widget.rect.llX === 0 &&
+      widget.rect.llY === 0 &&
+      widget.rect.urX === 0 &&
+      widget.rect.urY === 0) {
+      // invisible signature
+      return widget;
+    }
+
     const xObj = core.FormDictionary.create(update);
     xObj.bBox.urX = p.width;
     xObj.bBox.urY = -p.height;
