@@ -32,10 +32,9 @@ export class TrailerDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Root",
     type: CatalogDictionary,
-    optional: true,
     indirect: true,
   })
-  public Root!: null | CatalogDictionary;
+  public Root!: CatalogDictionary;
 
   /**
    * The document’s encryption dictionary
@@ -68,13 +67,8 @@ export class TrailerDictionary extends objects.PDFDictionary {
    * The document’s information dictionary.
    * @remarks Deprecated in PDF 2.0
    */
-  @objects.PDFDictionaryField({
-    name: "Info",
-    type: InformationDictionary,
-    optional: true,
-    indirect: true,
-  })
-  public Info!: null | InformationDictionary;
+  @objects.PDFMaybeField("Info", InformationDictionary, true)
+  public Info!: objects.Maybe<InformationDictionary>;
 
   /**
    * An array of two byte-strings constituting a file identifier for the file. 
@@ -101,7 +95,7 @@ export class TrailerDictionary extends objects.PDFDictionary {
     const xref = update.previous?.xref || null;
     if (xref) {
       for (const [key, value] of (xref as any as objects.PDFDictionary).items) {
-        // !!! Don't copy Filters and DecodeParms
+        // ! Don't copy Filters and DecodeParms
         // TODO Current implementation doesn't implement Predicator encoding
         if (key === "Filters" || key === "DecodeParms") {
           continue;
@@ -114,7 +108,8 @@ export class TrailerDictionary extends objects.PDFDictionary {
 
       // TODO Simplify
       const root = CatalogDictionary.create(update);
-      const objRoot = update.append(root);
+      // ! Catalog dictionary shall be in-use object otherwise Acrobat doesn't open protected document 
+      const objRoot = update.append(root, false);
       this.set("Root", objRoot.createReference());
 
       // ID is required in PDF 2.0

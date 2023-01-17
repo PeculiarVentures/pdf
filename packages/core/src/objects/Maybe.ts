@@ -3,12 +3,19 @@ import type { PDFDictionary } from "./Dictionary";
 export class Maybe<T extends PDFObject> {
 
   constructor(
-    public parent: PDFDictionary, 
-    public name: string, 
+    public parent: PDFDictionary,
+    public name: string,
     public indirect: boolean,
     private _type: PDFObjectConstructor<T>) { }
 
-  public get(required = false): T {
+  /**
+   * Gets or creates the internal value. Value creation depends on the `required` filed value.
+   * @param required If this parameter is `true` and the value is null, it throws an error.
+   * If this parameter is `false` and the value is empty, it creates a new value.
+   * @param compressed If `true`, object will be added to compressed stream, otherwise no. Default is `true`
+   * @returns returns internal value
+   */
+  public get(required = false, compressed?: boolean): T {
     if (!this.parent.has(this.name)) {
       if (required) {
         throw new Error(`Cannot get required field '${this.name}'. Field is empty.`);
@@ -19,7 +26,7 @@ export class Maybe<T extends PDFObject> {
 
       const value = this._type.create(this.parent.documentUpdate);
       if (this.indirect) {
-        value.makeIndirect();
+        value.makeIndirect(compressed);
       }
 
       this.parent

@@ -13,3 +13,4 @@ export * from "./TypographyConverter";
 export * from "./UUID";
 export * from "./ViewReader";
 export * from "./ViewWriter";
+export * from "./encryption";

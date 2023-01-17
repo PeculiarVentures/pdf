@@ -65,7 +65,7 @@ export class ResourceManager extends WrapObject<core.ResourceDictionary> {
    */
   public getMaxNameIndex(prefix: string): number {
     let index = -1;
-    for( const [,map] of this.target.items) {
+    for (const [, map] of this.target.items) {
       if (map instanceof core.PDFDictionary) {
         for (const [name] of map.items) {
           const reg = new RegExp(`${prefix}([0-9]+)`);
@@ -79,7 +79,7 @@ export class ResourceManager extends WrapObject<core.ResourceDictionary> {
         }
       }
     }
-    
+
     return index;
   }
 

@@ -122,13 +122,13 @@ context("Dictionary", () => {
           class PointDictionary extends PDFDictionary {
             @PDFNumberField("Left", true, 0)
             public Left!: number;
-            
+
             @PDFNumberField("Top", true, 0)
             public Top!: number;
           }
 
           class TestDictionary extends PDFDictionary {
-            
+
             @PDFDictionaryField({
               name: "Point",
               type: PointDictionary,

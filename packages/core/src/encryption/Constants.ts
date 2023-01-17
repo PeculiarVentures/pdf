@@ -6,7 +6,7 @@ export const algorithms = {
   sha256: { name: "SHA-256" },
   sha384: { name: "SHA-384" },
   sha512: { name: "SHA-512" },
-  aescbc: { name: "AES-CBC" },
+  AesCBC: { name: "AES-CBC" },
   aesecb: { name: "AES-ECB" }
 };
 
@@ -28,5 +28,5 @@ export interface clientSideParametersPublicKey {
   encrypt?: {
     seed: ArrayBuffer;
     recipientsBuffer: ArrayBuffer;
-  }
+  };
 }

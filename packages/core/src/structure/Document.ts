@@ -53,6 +53,26 @@ export class PDFDocument {
 
   public options: DocumentOptions = {};
 
+  #encryptHandler?: EncryptionHandler | null;
+  public get encryptHandler(): EncryptionHandler | null {
+    if (this.#encryptHandler === undefined) {
+      const encrypt = this.update.Encrypt;
+      if (encrypt) {
+        const encryptHandlerConstructor = EncryptionFactory.get(encrypt.Filter);
+        this.#encryptHandler = new encryptHandlerConstructor(encrypt);
+      } else {
+        this.#encryptHandler = null;
+      }
+    }
+
+    return this.#encryptHandler;
+  }
+  public set encryptHandler(v: EncryptionHandler | null) {
+    if (v !== this.#encryptHandler) {
+      this.#encryptHandler = v;
+    }
+  }
+
   public async writePDF(writer: ViewWriter): Promise<void> {
     const startOffset = writer.length;
 
@@ -139,7 +159,7 @@ export class PDFDocument {
 
     this.view = reader.view; // view must be set before decompress
 
-    await this.update.decompress();
+    // await this.update.decompress();
     reader.end();
 
     this.options.xref = this.update.xref instanceof CrossReferenceTable
@@ -183,6 +203,9 @@ export class PDFDocument {
 
   public async createUpdate(): Promise<PDFDocumentUpdate> {
     if (!this.update.view.length) {
+      if (this.encryptHandler) {
+        await this.update.encrypt();
+      }
       await this.toPDF();
     }
 
@@ -323,11 +346,25 @@ export class PDFDocument {
 
   public async decrypt(): Promise<void> {
     let update: PDFDocumentUpdate | null = this.update;
-    const promises: Promise<void>[] = [];
-    while (update) {
-      promises.push(update.decrypt());
 
-      update = update.previous;
+    if (this.encryptHandler) {
+      await this.encryptHandler.authenticate();
+
+      const promises: Promise<void>[] = [];
+      while (update) {
+        promises.push(update.decrypt());
+
+        update = update.previous;
+      }
+
+      await Promise.all(promises);
+    }
+  }
+
+  public async encrypt(): Promise<void> {
+    const promises: Promise<void>[] = [];
+    if (this.update) {
+      promises.push(this.update.encrypt());
     }
 
     await Promise.all(promises);
@@ -342,3 +379,4 @@ import { PDFDocumentUpdate } from "./DocumentUpdate";
 import { PDFRectangle } from "./common";
 import { CrossReferenceTable } from "./CrossReferenceTable"; import { CharSet } from "../CharSet";
 import { PDFDocumentObject, PDFDocumentObjectTypes } from "./DocumentObject";
+import { EncryptionFactory, EncryptionHandler } from "../encryption";

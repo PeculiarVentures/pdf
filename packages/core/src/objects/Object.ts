@@ -88,6 +88,13 @@ export abstract class PDFObject {
     return null;
   }
 
+  /**
+   * Returns indirect object of the object.
+   * 
+   * If deep is false and the object is not directly in Indirect object it throws an error.
+   * @param deep If `true`, then looks for the Indirect object through its parent.
+   * @returns
+   */
   public getIndirect(deep = false): IPDFIndirect {
     const indirect = this.findIndirect(deep);
     if (!indirect) {

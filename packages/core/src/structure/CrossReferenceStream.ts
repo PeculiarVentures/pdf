@@ -1,4 +1,4 @@
-import { PDFArray, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFName, PDFNameField, PDFNumeric, PDFStream } from "../objects";
+import { PDFArray, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFName, PDFNameField, PDFNumeric, PDFStream, Maybe, PDFMaybeField } from "../objects";
 import { CatalogDictionary } from "./dictionaries/Catalog";
 import { CrossReference } from "./CrossReference";
 import { PDFDocumentObject, PDFDocumentObjectTypes } from "./DocumentObject";
@@ -65,10 +65,9 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
   @PDFDictionaryField({
     name: "Root",
     type: CatalogDictionary,
-    optional: true,
     indirect: true,
   })
-  public Root!: null | CatalogDictionary;
+  public Root!: CatalogDictionary;
 
   /**
    * The document’s encryption dictionary
@@ -101,13 +100,8 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
    * The document’s information dictionary.
    * @remarks Deprecated in PDF 2.0
    */
-  @PDFDictionaryField({
-    name: "Info",
-    type: InformationDictionary,
-    optional: true,
-    indirect: true,
-  })
-  public Info!: null | InformationDictionary;
+  @PDFMaybeField("Info", InformationDictionary, true)
+  public Info!: Maybe<InformationDictionary>;
 
   /**
    * An array of two byte-strings constituting a file identifier for the file. 
@@ -267,7 +261,7 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
     this.Index = index;
   }
 
-  protected override onCreate(): void {
+  public override onCreate(): void {
     super.onCreate();
 
     this.Type = CrossReferenceStream.TYPE;

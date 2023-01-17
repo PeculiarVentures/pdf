@@ -4,7 +4,7 @@ import { PDFRectangle } from "../common";
 
 export enum FontDescriptorFlags {
   /**
-   * All glyphs have the same width (as opposed to proportional or variablepitch fonts, which have different widths).
+   * All glyphs have the same width (as opposed to proportional or variable pitch fonts, which have different widths).
    */
   fixedPitch = 1 << 0,
   /**
@@ -75,7 +75,7 @@ export class FontDescriptorDictionary extends PDFDictionary {
    */
   @PDFLiteralStringField("FontFamily", true)
   public fontFamily!: string | null;
-  
+
   /**
    * (Optional; PDF 1.5) The font stretch value. It shall be one of these names
    * (ordered from narrowest to widest): UltraCondensed, ExtraCondensed,

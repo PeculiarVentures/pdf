@@ -2,348 +2,460 @@ import { BufferSourceConverter, Convert } from "pvtsutils";
 import { BufferSource } from "pvtsutils";
 import { isEqualBuffer, utilConcatBuf } from "pvutils";
 import { IPDFIndirect } from "../objects/Object";
-import { FilterDictionary } from "../structure/dictionaries/Filter";
-import { StandardEncryptDictionary } from "../structure/dictionaries/StandardEncrypt";
+import { CryptoFilterMethods, CryptoFilterDictionary } from "../structure/dictionaries/CryptoFilter";
+import { StandardEncryptDictionary, UserAccessPermissionFlags } from "../structure/dictionaries/StandardEncrypt";
 import * as pkijs from "pkijs";
 
-import { algorithms, globalParametersCryptFilter, staticData, staticDataFF } from "./Constants";
-import { EncryptionHandler } from "./EncryptionHandler";
+import { algorithms, globalParametersCryptFilter as GlobalParametersCryptFilter, staticData, staticDataFF } from "./Constants";
+import { EncryptionHandler, EncryptionHandlerCreateParams } from "./EncryptionHandler";
+import { StandardEncryptionAlgorithm } from "./StandardEncryptionAlgorithms";
+import { EncryptDictionary, TrailerDictionary } from "../structure";
+import { PDFTextString, PDFStream } from "../objects";
 
 const passwordPadding = new Uint8Array([0x28, 0xBF, 0x4E, 0x5E, 0x4E, 0x75, 0x8A, 0x41,
   0x64, 0x00, 0x4E, 0x56, 0xFF, 0xFA, 0x01, 0x08, 0x2E, 0x2E, 0x00, 0xB6, 0xD0, 0x68,
   0x3E, 0x80, 0x2F, 0x0C, 0xA9, 0xFE, 0x64, 0x53, 0x69, 0x7A]);
+
+const keyUsages: KeyUsage[] = ["encrypt", "decrypt"];
 
 export interface Key {
   keyType: number;
   key: ArrayBuffer | null;
 }
 
+interface MakeGlobalCryptoParams {
+  dictionary: StandardEncryptDictionary;
+  id: ArrayBuffer;
+  keyType: string;
+  key: ArrayBuffer;
+}
+
+export type Password = string | BufferSource;
+
+/**
+ * Converts the Password into the Uint8Array
+ * @param password Password
+ * @returns 
+ */
+function passwordToView(password: Password): Uint8Array {
+  if (typeof password === "string") {
+    return new Uint8Array(Convert.FromUtf8String(password));
+  }
+
+  return BufferSourceConverter.toUint8Array(password);
+}
+
+interface UserValues {
+  /**
+   * Revision
+   */
+  r: number;
+  /**
+   * A 32-byte string, based on the user password
+   */
+  u: ArrayBuffer;
+}
+
+export interface StandardEncryptionHandlerCreateCommonParams {
+  permission?: UserAccessPermissionFlags;
+  ownerPassword?: Password;
+  userPassword?: Password;
+}
+
+export interface StandardEncryptionHandlerCreateParamsV4 extends EncryptionHandlerCreateParams, StandardEncryptionHandlerCreateCommonParams {
+  algorithm: CryptoFilterMethods.RC4 | CryptoFilterMethods.AES128;
+  encryptMetadata?: boolean;
+  disableString?: boolean;
+  disableStream?: boolean;
+}
+
+export interface EncryptionKey {
+  type: CryptoFilterMethods;
+  raw: Uint8Array;
+}
+
+export interface EncryptionKeys {
+  stream: EncryptionKey;
+  string: EncryptionKey;
+}
+
+export enum PasswordReason {
+  first,
+  incorrect,
+}
+
+const STD_CF = "StdCF";
+
+export type StandardEncryptionHandlerCreateParams = StandardEncryptionHandlerCreateParamsV4;
+
 export class StandardEncryptionHandler extends EncryptionHandler {
   public static readonly NAME = "Standard";
+
+  public static async create(params: StandardEncryptionHandlerCreateParams): Promise<StandardEncryptionHandler> {
+    const doc = params.document;
+    const crypto = pkijs.getCrypto(true);
+
+    // params
+    const userPassword = params.userPassword || "";
+    const ownerPassword = params.ownerPassword || crypto.getRandomValues(new Uint8Array(16));
+    const permissions = params.permission || 0;
+    const length = 128;
+
+    // create Encrypt dictionary
+    const encrypt = StandardEncryptDictionary.create(doc).makeIndirect(false);
+
+    // create StdCF Crypto Filter
+    if (!params.disableStream || !params.disableString) {
+      const filter = CryptoFilterDictionary.create(doc);
+      filter.CFM = params.algorithm;
+      filter.AuthEvent = "DocOpen";
+      encrypt.CF.get().set(STD_CF, filter);
+    }
+
+    // fill Encrypt dictionary
+    encrypt.Filter = "Standard";
+    encrypt.Length = length;
+    encrypt.P = new Int32Array([0xfffff000 | permissions])[0];
+    encrypt.R = 4;
+    encrypt.StmF = params.disableStream ? "Identity" : STD_CF;
+    encrypt.StrF = params.disableString ? "Identity" : STD_CF;
+    if (params.encryptMetadata !== undefined) {
+      encrypt.EncryptMetadata = params.encryptMetadata;
+    }
+    encrypt.V = 4; // CF, StmF, and StrF
+
+    // initialize Standard handler
+    const handler = new StandardEncryptionHandler(encrypt);
+    handler.crypto = crypto;
+
+    // cache passwords
+    handler.#userPassword = userPassword;
+    handler.#ownerPassword = ownerPassword;
+
+    // get xref for ID getting
+    if (!doc.update.xref) {
+      throw new Error("Cannot set ID for the PDF document handler. The XRef object is empty.");
+    }
+    const xref = doc.update.xref as unknown as TrailerDictionary;
+
+    // If PDF has encryption it shall have the ID filed in XRef object
+    if (!xref.has("ID")) {
+      // Create ID object
+      xref.set("ID", doc.createArray(
+        doc.createHexString(crypto.getRandomValues(new Uint8Array(16))),
+        doc.createHexString(crypto.getRandomValues(new Uint8Array(16))),
+      ));
+    }
+
+    // compute O values and set them into the Encrypt dictionary
+    const o = await handler.computeOwnerValues(ownerPassword, userPassword);
+    encrypt.set("O", doc.createHexString(o));
+
+    // compute U values and set them into the Encrypt dictionary
+    const uVal = await handler.computeUserValues(userPassword);
+    encrypt.set("U", doc.createHexString(uVal.u));
+
+    doc.update.xref!.Encrypt = encrypt;
+
+    return handler;
+  }
+
   public name = StandardEncryptionHandler.NAME;
 
+  /**
+   * PDF Standard Encrypt dictionary 
+   */
   public override dictionary!: StandardEncryptDictionary;
 
-  public globalParameters?: globalParametersCryptFilter;
+  /**
+   * Gets the revision number
+   */
+  public get revision(): number {
+    return this.dictionary.R;
+  }
 
-  public async encrypt(stream: BufferSource, parent: IPDFIndirect): Promise<ArrayBuffer> {
-    const streamBuffer = BufferSourceConverter.toUint8Array(stream);
+  /**
+   * Gets the encryption key length
+   */
+  public get length(): number {
+    return this.dictionary.Length;
+  }
 
-    let result: ArrayBuffer;
-    const globalParameters = await this.getGlobalParameters();
+  /**
+   * Gets ID from the Trailer dictionary
+   */
+  public get id(): ArrayBuffer {
+    const id = this.dictionary.documentUpdate?.id;
+    if (!id || id.length === 0) {
+      throw new Error("No ID element in document trailer");
+    }
 
-    const dataIV = new Uint8Array(16);
-    pkijs.getRandomValues(dataIV);
+    return id[0].toArrayBuffer();
+  }
 
-    const id = new Int32Array([parent.id]);
-    const generation = new Int32Array([parent.generation]);
-    let combinedKey = utilConcatBuf(globalParameters.stm.key, id.buffer.slice(0, 3), generation.buffer.slice(0, 2));
+  /**
+   * Pads the password the password using predefined PDF padding string
+   * @param password Password
+   * @returns 32-bytes buffer 
+   */
+  public static padPassword(password: Password = new Uint8Array(0)): ArrayBuffer {
+    // That is, if the password string is n bytes long, append the first 32 - n bytes of the padding string to
+    // the end of the password string. If the password string is empty (zero-length), meaning there is no
+    // user password, substitute the entire padding string in its place.
 
-    switch (globalParameters.stm.keyType) {
-      case "AESV2": {
-        combinedKey = utilConcatBuf(combinedKey, staticData.buffer);
+    const passwordView = passwordToView(password).subarray(0, 32);
+    if (passwordView.length === 32) {
+      return passwordView;
+    }
 
-        const cutHash = await this.getCutHashV2(combinedKey, globalParameters.stm.key.byteLength, this.crypto);
-        const key = await this.crypto.importKey("raw", cutHash, algorithms.aescbc, false, ["encrypt", "decrypt"]);
-
-        const encryptionKey = await this.crypto.encrypt({
-          name: "AES-CBC",
-          length: 128,
-          iv: dataIV
-        },
-          key,
-          streamBuffer);
-
-        result = utilConcatBuf(dataIV.buffer, encryptionKey);
-      }
-        break;
-      case "AESV3": {
-        const key = await this.crypto.importKey("raw", globalParameters.stm.key, algorithms.aescbc, false, ["encrypt", "decrypt"]);
-        const encryptionsKey = await this.crypto.encrypt({
-          name: "AES-CBC",
-          length: 256,
-          iv: dataIV
-        },
-          key,
-          streamBuffer);
-
-        result = utilConcatBuf(dataIV.buffer, encryptionsKey);
-      }
-        break;
-      case "V2":
-      default: {
-        const cutHash = await this.getCutHashV2(combinedKey, globalParameters.stm.key.byteLength, this.crypto);
-        result = await this.crypto.encrypt(algorithms.rc4, cutHash as any, streamBuffer);
-      }
+    const result = new Uint8Array(32);
+    // copy password into the 32-bytes buffer
+    result.set(passwordView);
+    if (passwordView.length < result.length) {
+      // copy padding string after the copied password
+      result.set(passwordPadding.subarray(0, 32 - passwordView.length), passwordView.length);
     }
 
     return result;
   }
 
-  public async decrypt(stream: BufferSource, parent: IPDFIndirect): Promise<ArrayBuffer> {
-    const streamBuffer = BufferSourceConverter.toUint8Array(stream);
-    if (this.dictionary.v === 4) {
-      if (this.dictionary.stmF === "Identity" && this.dictionary.strF === "Identity") {
-        return streamBuffer;
-      }
+  public async checkUserPassword(password: Password = ""): Promise<boolean> {
+    // StandardEncryptionAlgorithm.algorithm5({
+    //   id: this.id,
+    //   crypto: this.crypto,
+    // });
+    const values = await this.computeUserValues(password);
+    if (values.r === 6) {
+      return BufferSourceConverter.isEqual(values.u, this.dictionary.U.toArrayBuffer());
     }
 
-    let result: ArrayBuffer;
-    const globalParameters = await this.getGlobalParameters();
-
-    const dataBuffer = streamBuffer.slice(16, streamBuffer.byteLength);
-    const ivBuffer = streamBuffer.slice(0, 16);
-
-    const id = new Int32Array([parent.id]);
-    const generation = new Int32Array([parent.generation]);
-    let combinedKey = utilConcatBuf(globalParameters.stm.key, id.buffer.slice(0, 3), generation.buffer.slice(0, 2));
-
-    switch (globalParameters.stm.keyType) {
-      case "AESV2": {
-
-        combinedKey = utilConcatBuf(combinedKey, staticData);
-
-        const cutHash = await this.getCutHashV2(combinedKey, globalParameters.stm.key.byteLength, this.crypto);
-
-        const importedKey = await this.crypto.importKey("raw", cutHash, algorithms.aescbc, false, ["decrypt"]);
-        result = await this.crypto.decrypt({
-          name: "AES-CBC",
-          length: 128,
-          iv: ivBuffer
-        },
-          importedKey,
-          dataBuffer);
-      }
-        break;
-      case "AESV3": {
-        const importedKey = await this.crypto.importKey("raw", globalParameters.stm.key, algorithms.aescbc, false, ["encrypt", "decrypt"]);
-        result = await this.crypto.decrypt({
-          name: "AES-CBC",
-          length: 256,
-          iv: ivBuffer
-        },
-          importedKey,
-          dataBuffer);
-      }
-        break;
-      case "V2":
-      default: {
-        const cutHash = await this.getCutHashV2(combinedKey, globalParameters.stm.key.byteLength, this.crypto);
-        result = await this.crypto.decrypt(algorithms.rc4, cutHash as any, streamBuffer);
-      }
+    if (values.r === 3 || values.r === 4) {
+      return BufferSourceConverter.isEqual(
+        BufferSourceConverter.toUint8Array(values.u).subarray(0, 16), // encryption key is first 16 bytes
+        this.dictionary.U.toUint8Array().subarray(0, 16),
+      );
     }
 
-    return result;
+    return BufferSourceConverter.isEqual(values.u, this.dictionary.U.toArrayBuffer());
   }
 
-  public async getGlobalParameters(): Promise<globalParametersCryptFilter> {
-    if (!this.globalParameters) {
-      // let password = new ArrayBuffer(0);
+  public async checkOwnerPassword(owner: Password = ""): Promise<boolean> {
+    const values = await this.computeOwnerValues(owner);
 
-      const resultObject: globalParametersCryptFilter = {
-        stm: {
-          key: new ArrayBuffer(0),
-          keyType: "",
-        },
-        str: {
-          key: new ArrayBuffer(0),
-          keyType: "",
-        }
-      };
-
-      let userPasswordBuffer = new ArrayBuffer(0);
-      if (this.dictionary.documentUpdate?.document.options?.password?.user) {
-        userPasswordBuffer = Convert.FromString(this.dictionary.documentUpdate?.document.options?.password?.user);
-      }
-      // let ownerPasswordBuffer = new ArrayBuffer(0);
-
-      // // Check client-side parameters
-      // if ("Crypt" in _this.clientSideParameters) {
-      //   // noinspection JSUnresolvedVariable
-      //   if ("ownerPassword" in _Crypt) {
-      //     // noinspection JSUnresolvedVariable
-      //     //ownerPasswordBuffer = stringToArrayBuffer(_Crypt.ownerPassword);
-      //     ownerPasswordBuffer = _Crypt.ownerPassword.slice(0);
-      //   }
-
-      //   // noinspection JSUnresolvedVariable
-      //   if ("userPassword" in _Crypt) {
-      //     // noinspection JSUnresolvedVariable
-      //     //userPasswordBuffer = stringToArrayBuffer(_Crypt.userPassword);
-      //     userPasswordBuffer = _Crypt.userPassword.slice(0);
-      //   }
-      // }
-
-      const idSearch = this.dictionary.documentUpdate?.id;
-      if (!idSearch) {
-        throw new Error("No ID element in document trailer");
-      }
-      const trailerId = idSearch[0].toArrayBuffer();
-
-      if (this.dictionary.r === 6) {
-        // throw new Error("Method not implemented");
-
-        // Get values necessary in case we are working with PDF 2.0 formatted file
-        // OE
-        if (!this.dictionary.oe) {
-          return resultObject; // Can not find value for hashed owner's password (extension)
-        }
-
-        // UE
-        if (this.dictionary.ue)
-          return resultObject; // Can not find value for hashed user's password (extension)
-
-        // Perms
-        if (this.dictionary.perms) {
-          return resultObject;
-        }
-      }
-
-      // let value = this.dictionary.length;
-      // value = (value < 40) ? (value << 3) : value;
-
-      const metadataSearch = this.dictionary.encryptMetadata || true;
-
-      switch (true) {
-        // Old version of encryption algorithms do not use filter names
-        case (this.dictionary.v < 4):
-          {
-            const generatedKey = await this.generateKeyPasswordBased(this.dictionary.o.toArrayBuffer(), trailerId, this.dictionary.p, this.dictionary.r, this.dictionary.length, metadataSearch, userPasswordBuffer);
-            resultObject.stm.key = generatedKey;
-            resultObject.str.key = generatedKey;
-          }
-
-          break;
-        // Case if we have equal crypto parameters for both strings and streams
-        case (this.dictionary.stmF === this.dictionary.strF):
-          {
-            let generatedKey;
-
-            const filterParameters = this.getParametersByName(this.dictionary.stmF);
-            if (!filterParameters.keyType) {
-              throw new Error("Error getting necessary encryption parameters");
-            }
-
-            let keyLength = 0;
-
-            // TODO length have default value
-            if (this.dictionary.has("Length")) {
-              keyLength = this.dictionary.length;
-            } else {
-              keyLength = filterParameters.keyLength;
-            }
-
-            if (this.dictionary.v === 5) {
-              throw new Error("Method not implemented");
-              // generatedKey = await this.generateKeyPasswordBasedA(this.dictionary.o, this.dictionary.u, this.dictionary.oe, this.dictionary.ue, userPasswordBuffer);
-            } else {
-              generatedKey = await this.generateKeyPasswordBased(this.dictionary.o.toArrayBuffer(), trailerId, this.dictionary.p, this.dictionary.r, keyLength, this.dictionary.encryptMetadata, userPasswordBuffer);
-            }
-
-            resultObject.stm.key = generatedKey;
-            resultObject.stm.keyType = filterParameters.keyType;
-            resultObject.str.key = generatedKey;
-            resultObject.str.keyType = filterParameters.keyType;
-          }
-
-          break;
-        // Case if we have different parameters for strings and streams
-        default:
-          {
-            // Initial variables
-            let stmKeyLength = 0;
-            let strKeyLength = 0;
-
-            if ("length" in this.dictionary) {
-              stmKeyLength = this.dictionary.length;
-              strKeyLength = this.dictionary.length;
-            }
-
-            // Parameters for Stm
-            const stmFilterParameters = this.getParametersByName(this.dictionary.stmF);
-            if (!stmFilterParameters.keyType) {
-              throw new Error("Error getting necessary encryption parameters for Stm");
-            }
-
-            if (stmKeyLength === 0)
-              stmKeyLength = stmFilterParameters.keyLength;
-
-            if (this.dictionary.v !== 5)
-              resultObject.stm.key = await this.generateKeyPasswordBased(this.dictionary.o.toArrayBuffer().slice(0, 32), trailerId, this.dictionary.p, this.dictionary.r, stmKeyLength, this.dictionary.encryptMetadata, userPasswordBuffer);
-            else {
-              throw new Error("Method not implemented");
-              // resultObject.Stm.key = await this.generateKeyPasswordBasedA(this.dictionary.o, this.dictionary.u, this.dictionary.oe, this.dictionary.ue, userPasswordBuffer);
-            }
-
-            resultObject.stm.keyType = stmFilterParameters.keyType;
-
-            // Parameters for Str
-            const strFilterParameters = this.getParametersByName(this.dictionary.strF);
-            if (!strFilterParameters.keyType) {
-              throw new Error("Error getting necessary encryption parameters for Str");
-            }
-
-            if (strKeyLength === 0)
-              strKeyLength = strFilterParameters.keyLength;
-
-            if (this.dictionary.v !== 5)
-              resultObject.str.key = await this.generateKeyPasswordBased(this.dictionary.o.toArrayBuffer().slice(0, 32), trailerId, this.dictionary.p, this.dictionary.r, strKeyLength, this.dictionary.encryptMetadata, userPasswordBuffer);
-            else {
-              throw new Error("Method not implemented");
-              // resultObject.Str.key = await this.generateKeyPasswordBasedA(this.dictionary.o, this.dictionary.u, this.dictionary.oe, this.dictionary.ue, userPasswordBuffer);
-            }
-
-            resultObject.str.keyType = strFilterParameters.keyType;
-          }
-      }
-      this.globalParameters = resultObject;
-    }
-
-    return this.globalParameters;
+    return BufferSourceConverter.isEqual(values, this.dictionary.O.toArrayBuffer());
   }
 
-  public getParametersByName(filterName: string) {
-    const result = {
-      keyLength: 0,
-      keyType: ""
-    };
-
-    if (!this.dictionary.cf || !this.dictionary.cf.has(filterName)) {
-      return result;
-    }
-
-    const streamFilterParameters = this.dictionary.cf.get(filterName, FilterDictionary);
-    // TODO change check
-    if (!(streamFilterParameters instanceof FilterDictionary)) {
-      throw new Error(`${filterName} is not Filter Dictionary`);
-    }
-
-    const cfmSearch = streamFilterParameters.cfm;
-
-    switch (cfmSearch) {
-      case "V2":
+  protected async computeUserValues(password: Password): Promise<UserValues> {
+    switch (this.revision) {
+      case 2:
+      case 3:
+      case 4:
         {
-          result.keyType = cfmSearch;
+          // Compute "U" value
+          if (this.revision < 3) {
+            throw new Error("Not implemented");
+            // return {
+            //   r: this.revision,
+            //   u: await StandardEncryptionAlgorithm.algorithm4(this.dictionary.O.toArrayBuffer(), this.id, this.dictionary.P, this.revision, this.dictionary.Length, this.dictionary.EncryptMetadata, passwordView),
+            // };
+          } else {
+            const encryptionKey = await StandardEncryptionAlgorithm.algorithm2({
+              id: this.id,
+              password,
+              revision: this.dictionary.R,
+              encryptMetadata: this.dictionary.EncryptMetadata,
+              permissions: this.dictionary.P,
+              ownerValue: this.dictionary.O.toUint8Array(),
+              length: this.length,
+              crypto: this.crypto,
+            });
 
-          const length = streamFilterParameters.length;
-          if (!length) {
-            return result;
+            return {
+              r: this.revision,
+              u: await StandardEncryptionAlgorithm.algorithm5({
+                revision: this.revision,
+                encryptionKey,
+                id: this.id,
+                crypto: this.crypto,
+              }),
+            };
           }
-          result.keyLength = (length < 40) ? (length << 3) : length;
         }
         break;
-      case "AESV2":
-        result.keyType = cfmSearch;
-        result.keyLength = 128;
-        break;
-      case "AESV3":
-        result.keyType = cfmSearch;
-        result.keyLength = 256;
+      case 6:
+        {
+          throw new Error("Not implemented");
+          // // Compute "U" and "UE" values
+          // const [uValue, ueValue] = await this.algorithm8(key, userPasswordBuffer);
+          // //#endregion
+
+          // // Compute "O" and "OE" values
+          // const [oValue, oeValue] = await this.algorithm9(uValue, key, ownerPasswordBuffer);
+
+          // // Compute "Perms" value
+          // const permsValue = await this.algorithm10(pValueBuffer, key, encryptMetadata);
+        }
         break;
       default:
+        throw `Incorrect revision number: ${this.revision}`;
+    }
+  }
+
+  public async computeOwnerValues(owner: Password, user?: Password): Promise<ArrayBuffer> {
+    if (user === undefined) {
+      user = await this.#getUserPassword();
     }
 
-    return result;
+    switch (this.revision) {
+      case 2:
+      case 3:
+      case 4:
+        {
+          // Compute "O" value
+          return await StandardEncryptionAlgorithm.algorithm3({
+            length: this.length,
+            owner: owner,
+            revision: this.revision,
+            user,
+            crypto: this.crypto,
+          });
+
+        }
+        break;
+      case 6:
+        {
+          throw new Error("Not implemented");
+        }
+      default:
+        throw `Incorrect revision number: ${this.revision}`;
+    }
+  }
+
+  #userPassword?: Password;
+  #ownerPassword?: Password;
+
+  onUserPassword?: (reason: number) => Promise<Password>;
+
+  async #getUserPassword(): Promise<Password> {
+    if (this.#userPassword) {
+      // return cached password value
+      return this.#userPassword;
+    }
+
+    // try default password
+    if (await this.checkUserPassword()) {
+      this.#userPassword = "";
+    } else if (this.onUserPassword) {
+      // if callback is set do while get correct password or Error
+      let reason = PasswordReason.first;
+
+      while (true) {
+        const password = await this.onUserPassword(reason);
+        if (await this.checkUserPassword(password)) {
+          this.#userPassword = password;
+
+          break;
+        }
+
+        reason = PasswordReason.incorrect;
+      }
+    } else {
+      this.#userPassword = "";
+    }
+
+    return this.#userPassword;
+  }
+
+  #getOwnerPassword(): Password {
+    if (!this.#ownerPassword) {
+      throw new Error("Cannot get the Owner password. It is not set.");
+    }
+
+    return this.#ownerPassword;
+  }
+
+  protected async getKeyF(password: Password, filterName: string): Promise<EncryptionKey> {
+    if (filterName === EncryptDictionary.IDENTITY) {
+      return {
+        type: CryptoFilterMethods.None,
+        raw: new Uint8Array,
+      };
+    }
+
+    // get specified crypto filter
+    const filter = this.dictionary.CF.get(true).getItem(filterName);
+
+    // Use parameters from the crypto filter if it's needed
+    let length = filter.Length || this.length;
+    switch (filter.Type) {
+      // When CFM is AESV2, the Length key shall be ignored and a value of 128 bits used.
+      case CryptoFilterMethods.AES128:
+        length = 128;
+        break;
+      // When CFM is AESV3, the Length key shall be ignored and a value of 256 bits used.
+      case CryptoFilterMethods.AES256:
+        length = 256;
+        break;
+    }
+
+    // compute the encryption file
+    const encKey = await StandardEncryptionAlgorithm.algorithm2({
+      id: this.id,
+      password,
+      revision: this.dictionary.R,
+      encryptMetadata: this.dictionary.EncryptMetadata,
+      permissions: this.dictionary.P,
+      ownerValue: this.dictionary.O.toUint8Array(),
+      length,
+      crypto: this.crypto,
+    });
+
+    return {
+      type: filter.CFM as CryptoFilterMethods,
+      raw: BufferSourceConverter.toUint8Array(encKey),
+    };
+  }
+
+  /**
+   * Encryption keys
+   */
+  #keys?: EncryptionKeys;
+
+  /**
+   * Gets cached or computes encryption keys using the user password
+   * @returns 
+   */
+  async #getKeys(): Promise<EncryptionKeys> {
+    if (this.#keys) {
+      return this.#keys;
+    }
+
+    const password = await this.#getUserPassword();
+
+    if (this.dictionary.V >= 4) {
+      if (this.dictionary.StmF === this.dictionary.StrF) {
+        const key = await this.getKeyF(password, this.dictionary.StmF);
+
+        this.#keys = {
+          stream: key,
+          string: key,
+        };
+      } else {
+        const keys = await Promise.all([
+          this.getKeyF(password, this.dictionary.StmF),
+          this.getKeyF(password, this.dictionary.StrF),
+        ]);
+
+        this.#keys = {
+          stream: keys[0],
+          string: keys[1],
+        };
+      }
+    } else {
+      throw new Error("Crypto mechanisms with V less than 4 are not supported.");
+    }
+
+    return this.#keys;
   }
 
   /**
@@ -356,21 +468,20 @@ export class StandardEncryptionHandler extends EncryptionHandler {
    * @param metadataEncrypted Was PDF metadata encrypted or not ("EncryptMetadata" element of crypto dictionary)
    * @param password Used password
    */
-  public async generateKeyPasswordBased(hashedOwnerPassword: BufferSource, fileIdentifier: ArrayBuffer, pEntry: number, revision: number, keyLength = 40, metadataEncrypted = false, password?: ArrayBuffer): Promise<ArrayBuffer> {
+  public async generateKeyPasswordBased(hashedOwnerPassword: BufferSource, fileIdentifier: BufferSource, pEntry: number, revision: number, keyLength = 40, metadataEncrypted = false, password?: ArrayBuffer): Promise<ArrayBuffer> {
+    const pEntryArrayBuffer = new Uint32Array([pEntry]);
 
-    const ownerPassword = BufferSourceConverter.toArrayBuffer(hashedOwnerPassword).slice(0, 32);
-    const pEntryArrayBuffer = new Uint32Array([pEntry]).buffer;
-
-    const passwordBuffer = this.mixedPassword(password);
+    const passwordBuffer = StandardEncryptionHandler.padPassword(password);
 
     // Combine all necessary values and make the first hash
-    let combinedBuffer = utilConcatBuf(passwordBuffer,
-      ownerPassword,
+    let combinedBuffer = BufferSourceConverter.concat(
+      passwordBuffer,
+      hashedOwnerPassword,
       pEntryArrayBuffer,
       fileIdentifier);
 
     if (revision > 3 && !metadataEncrypted) {
-      combinedBuffer = utilConcatBuf(combinedBuffer, staticDataFF.buffer);
+      combinedBuffer = BufferSourceConverter.concat(combinedBuffer, staticDataFF);
     }
 
     let digestResult = await this.crypto.digest(algorithms.md5, combinedBuffer);
@@ -385,18 +496,49 @@ export class StandardEncryptionHandler extends EncryptionHandler {
     return digestResult.slice(0, keyLength >> 3);
   }
 
-  public mixedPassword(password?: ArrayBuffer): ArrayBuffer {
-    let passwordBuffer: ArrayBuffer;
-    if (!password) {
-      passwordBuffer = passwordPadding.buffer;
-    } else if (password.byteLength >= 32) {
-      passwordBuffer = password.slice(0, 32);
-    } else {
-      const additional = passwordPadding.subarray(0, 32 - password.byteLength);
-      passwordBuffer = utilConcatBuf(password, additional);
+  /**
+   * Computing a file encryption key in order to encrypt a document (revision 4 and earlier)
+   * @param password Password
+   * @returns Encryption key
+   */
+  protected async algorithm2(password: Password): Promise<Uint8Array> {
+    // a) Prepare password
+    const passwordPadded = StandardEncryptionHandler.padPassword(password);
+
+    const hashData = BufferSourceConverter.concat(
+      // b) Pass the padded password
+      passwordPadded,
+      // c) Pass the value of the encryption dictionary’s O entry to the MD5 hash function
+      this.dictionary.O.toArrayBuffer(),
+      // d) Convert the integer value of the P entry to a 32-bit unsigned binary 
+      //    number and pass these bytes to the MD5 hash function, low-order byte first.
+      new Int32Array([this.dictionary.P]),
+      // e) Pass the first element of the file’s file identifier array
+      this.id,
+      // f) If document metadata is not being encrypted, pass 4 bytes with 
+      //    the value 0xFFFFFFFF to the MD5 hash function
+      (this.revision > 4 && !this.dictionary.EncryptMetadata)
+        ? new Uint8Array([255, 255, 255, 255])
+        : new Uint8Array(),
+    );
+    // g) Finish the hash.
+    let hash = await this.crypto.digest(algorithms.md5, hashData);
+
+    // h) (Security handlers of revision 3 or greater) Do the following 50 times
+    let counter = 50;
+    while (this.revision > 3 && counter--) {
+      hash = await this.crypto.digest(algorithms.md5, hash);
     }
 
-    return passwordBuffer;
+    // i) Set the file encryption key to the first n bytes of the output from the final MD5 hash, where n shall always
+    //    be 5 for security handlers of revision 2 but, for security handlers of revision 3 or greater, shall depend on
+    //    the value of the encryption dictionary’s Length entry. 
+    const hashView = new Uint8Array(hash);
+    if (this.revision > 3) {
+      return hashView.slice(0, this.dictionary.Length >> 3);
+    }
+
+    return hashView.slice(0, 5);
   }
 
   /**
@@ -410,24 +552,22 @@ export class StandardEncryptionHandler extends EncryptionHandler {
    * @param Was PDF metadata encrypted or not ("EncryptMetadata" element of crypto dictionary)
    * @param Used password
    */
-  public async algorithm5(hashedOwnerPassword: BufferSource, fileIdentifier: ArrayBuffer, pEntry: number, revision: number, keyLength = 40, metadataEncrypted = false, password = (new ArrayBuffer(0))): Promise<ArrayBuffer> {
-    const arbitraryPaddingBuffer = new ArrayBuffer(16);
-    const arbitraryPaddingView = new Uint8Array(arbitraryPaddingBuffer);
-    pkijs.getRandomValues(arbitraryPaddingView);
+  public async algorithm5_old(hashedOwnerPassword: BufferSource, fileIdentifier: BufferSource, pEntry: number, revision: number, keyLength = 40, metadataEncrypted = false, password = (new ArrayBuffer(0))): Promise<ArrayBuffer> {
 
-    // TODO left operations?
-    // const passwordBuffer = this.mixedPassword(password);
+    const passwordBuffer = StandardEncryptionHandler.padPassword(password);
 
-    const key = await this.generateKeyPasswordBased(hashedOwnerPassword, fileIdentifier, pEntry, revision, keyLength, metadataEncrypted, password);
+    const key = await this.generateKeyPasswordBased(hashedOwnerPassword, fileIdentifier, pEntry, revision, keyLength, metadataEncrypted, passwordBuffer);
 
-    // Initialise the MD5 hash function and pass the 32-byte padding string
-    const hash = await this.crypto.digest(algorithms.md5, utilConcatBuf(passwordPadding.buffer, fileIdentifier));
+    // Initialize the MD5 hash function and pass the 32-byte padding string
+    const hash = await this.crypto.digest(algorithms.md5, BufferSourceConverter.concat(passwordPadding.buffer, fileIdentifier));
 
     let encryptionKey = await this.crypto.encrypt(algorithms.rc4, key as any, hash);
     encryptionKey = await this.makeAdditionalEncryption(encryptionKey);
 
+    const arbitraryPadding = this.crypto.getRandomValues(new Uint8Array(16));
+
     // Append arbitrary padding
-    return utilConcatBuf(encryptionKey, arbitraryPaddingBuffer);
+    return BufferSourceConverter.concat(encryptionKey, arbitraryPadding);
   }
 
   /**
@@ -443,7 +583,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
   public async algorithm4(hashedOwnerPassword: BufferSource, fileIdentifier: ArrayBuffer, pEntry: number, revision: number, keyLength = 40, metadataEncrypted = false, password = (new ArrayBuffer(0))): Promise<ArrayBuffer> {
     const key = await this.generateKeyPasswordBased(hashedOwnerPassword, fileIdentifier, pEntry, revision, keyLength, metadataEncrypted, password);
 
-    return this.crypto.encrypt(algorithms.rc4, key as any, passwordPadding.buffer);
+    return this.crypto.encrypt(algorithms.rc4, key as any, passwordPadding);
   }
 
   private async internalCycle(internalData: ArrayBuffer, roundNumber: number, check = false, isOwner = false, password = new ArrayBuffer(0), hashedUserPassword = new ArrayBuffer(0)): Promise<{
@@ -462,7 +602,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
       resultBuffer = utilConcatBuf(resultBuffer, combinedBuffer);
     }
 
-    const importedKey = await this.crypto.importKey("raw", internalData.slice(0, 16), algorithms.aescbc, false, ["encrypt"]);
+    const importedKey = await this.crypto.importKey("raw", internalData.slice(0, 16), algorithms.AesCBC, false, ["encrypt"]);
 
     let encryptedResult = await this.crypto.encrypt({
       name: "AES-CBC",
@@ -587,7 +727,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
     const combinedKeyUserBuffer = utilConcatBuf(password, hashedUserPassword.slice(40, 48));
     const combinedKeyOwnerBuffer = utilConcatBuf(password, hashedOwnerPassword.slice(40, 48), hashedUserPassword.slice(0, 48));
 
-    // TODO не красиво изменять input
+    // TODO don't change the input variable
     if (password.byteLength) {
       password = password.slice(0, password.byteLength > 127 ? 127 : password.byteLength);
     }
@@ -603,7 +743,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
     }
 
     // Import key
-    const importKeyResult = await this.crypto.importKey("raw", key.key, algorithms.aescbc, false, ["encrypt", "decrypt"]);
+    const importKeyResult = await this.crypto.importKey("raw", key.key, algorithms.AesCBC, false, keyUsages);
 
     return this.crypto.decrypt({
       name: "AES-CBC",
@@ -624,8 +764,8 @@ export class StandardEncryptionHandler extends EncryptionHandler {
   public async algorithm3(ownerPassword: ArrayBuffer, userPassword: ArrayBuffer, revision: number, keyLength = 40): Promise<ArrayBuffer> {
     let encryptionKey = new ArrayBuffer(keyLength >> 3);
 
-    const ownerPasswordBuffer = this.mixedPassword(ownerPassword.byteLength ? ownerPassword : userPassword);
-    const userPasswordBuffer = this.mixedPassword(userPassword);
+    const ownerPasswordBuffer = StandardEncryptionHandler.padPassword(ownerPassword.byteLength ? ownerPassword : userPassword);
+    const userPasswordBuffer = StandardEncryptionHandler.padPassword(userPassword);
 
     // Make first MD5 hash
     const firstHash = await this.crypto.digest(algorithms.md5, ownerPasswordBuffer);
@@ -681,7 +821,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
 
     const hashUE = await this.algorithm2B(utilConcatBuf(password, randomBuffer.slice(8, 16)), false, password);
 
-    const key = await this.crypto.importKey("raw", hashUE, algorithms.aescbc, false, ["encrypt"]);
+    const key = await this.crypto.importKey("raw", hashUE, algorithms.AesCBC, false, ["encrypt"]);
     const encryptionKey = await this.crypto.encrypt({
       name: "AES-CBC",
       length: 256,
@@ -708,7 +848,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
 
     // Compute the "OE" value
     const hashOE = await this.algorithm2B(utilConcatBuf(password, randomBuffer.slice(8, 16), hashedUserPassword), true, password, hashedUserPassword.slice(0, 48));
-    const key = await this.crypto.importKey("raw", hashOE, algorithms.aescbc, false, ["encrypt"]);
+    const key = await this.crypto.importKey("raw", hashOE, algorithms.AesCBC, false, ["encrypt"]);
     const encryptionKey = await this.crypto.encrypt({
       name: "AES-CBC",
       length: 256,
@@ -743,10 +883,319 @@ export class StandardEncryptionHandler extends EncryptionHandler {
     return encryptionsKey;
   }
 
-  private async getCutHashV2(combinedKey: ArrayBuffer, stmKeyByteLength: number, crypto: SubtleCrypto) {
-    const md = await crypto.digest(algorithms.md5, combinedKey);
+  private async getCutHashV2(combinedKey: BufferSource, stmKeyByteLength: number): Promise<ArrayBuffer> {
+    const md = await this.crypto.digest(algorithms.md5, combinedKey);
     const initialKeyLength = stmKeyByteLength + 5;
 
     return md.slice(0, ((initialKeyLength > 16) ? 16 : initialKeyLength));
   }
+
+  public async makeGlobalCryptoParameters(params: {
+    algorithmType?: string;
+    idBuffer?: ArrayBuffer;
+    userPassword?: ArrayBuffer;
+    ownerPassword?: ArrayBuffer;
+    permission?: number;
+    encryptMetadata?: boolean;
+    fileEncryptionKey?: ArrayBuffer;
+    revision: 2 | 3 | 4 | 6;
+    keyLength: number;
+  }): Promise<MakeGlobalCryptoParams> {
+    //#region Initial variables
+    let idBuffer: ArrayBuffer;
+    let idView: Uint8Array;
+    let userPasswordBuffer = new ArrayBuffer(0);
+    let ownerPasswordBuffer = new ArrayBuffer(0);
+
+    let keyLength = 40;
+
+    let oValue = new ArrayBuffer(0);
+    let oeValue = new ArrayBuffer(0);
+    let uValue = new ArrayBuffer(0);
+    let ueValue = new ArrayBuffer(0);
+    let permsValue = new ArrayBuffer(0);
+
+    let pValue = (-44);
+    let pValueBuffer = (new Uint8Array([0xD4, 0xFF, 0xFF, 0xFF])).buffer;
+
+    let encryptMetadata = true;
+
+    let keyType;
+    let key: ArrayBuffer | null = null;
+
+    let resultDictionary;
+    //#endregion
+
+    //#region Check input parameters
+    if (!params.idBuffer) {
+      idBuffer = new ArrayBuffer(64);
+      idView = new Uint8Array(idBuffer);
+      this.crypto.getRandomValues(idView);
+    } else {
+      idBuffer = params.idBuffer;
+      idView = new Uint8Array(idBuffer);
+    }
+
+    if (params.userPassword) {
+      userPasswordBuffer = params.userPassword.slice(0);
+    }
+    if (params.ownerPassword) {
+      ownerPasswordBuffer = params.ownerPassword.slice(0);
+    }
+
+    if ((ownerPasswordBuffer.byteLength === 0) && (userPasswordBuffer.byteLength === 0)) {
+      throw new Error("At least one of user and owner password must be present");
+    }
+
+    // TODO: Probably the block should be removed, NEED TO BE TESTED !!!
+    if (ownerPasswordBuffer.byteLength === 0) {
+      ownerPasswordBuffer = userPasswordBuffer.slice(0);
+    }
+
+    if (!params.revision) {
+      throw new Error("Parameter revision is mandatory for password-based encryption");
+    }
+
+    if (params.permission) {
+      pValue = params.permission;
+      pValueBuffer = (new Uint8Array((new Int32Array([pValue])).buffer)).buffer;
+    }
+
+    if (params.fileEncryptionKey) {
+      key = params.fileEncryptionKey;
+    }
+
+    if (params.encryptMetadata) {
+      encryptMetadata = params.encryptMetadata;
+    }
+    //#endregion
+
+    //#region Special actions depending on selected "revision"
+    switch (params.revision) {
+      case 2:
+      case 3:
+      case 4:
+        {
+          //#region Initial checks
+          if (ownerPasswordBuffer.byteLength === 0)
+            ownerPasswordBuffer = userPasswordBuffer.slice(0);
+
+          if (params.keyLength) {
+            if ((params.keyLength < 40) || (params.keyLength > 128)) {
+              throw new Error("Value of keyLength must be in range [40, 128]");
+            }
+
+            keyLength = params.keyLength;
+          }
+
+          let algorithmType = "RC4";
+
+          if (params.algorithmType)
+            algorithmType = params.algorithmType;
+
+          if ((algorithmType.toUpperCase() === "AES") && (params.revision === 4))
+            keyType = "AESV2";
+          else
+            keyType = "V2";
+          //#endregion
+
+          // Compute "O" value
+          oValue = await this.algorithm3(ownerPasswordBuffer, userPasswordBuffer, params.revision, keyLength);
+
+          // Compute "U" value
+          if (params.revision < 3) {
+            uValue = await this.algorithm4(oValue, idBuffer, pValue, params.revision, keyLength, encryptMetadata, userPasswordBuffer);
+          }
+          uValue = await this.algorithm5_old(oValue, idBuffer, pValue, params.revision, keyLength, encryptMetadata, userPasswordBuffer);
+
+          // Compute file encryption key value
+          key = await this.generateKeyPasswordBased(oValue, idBuffer, pValue, params.revision, keyLength, encryptMetadata, userPasswordBuffer);
+
+          //#region Create and return final "Dictionary" value
+          const doc = this.dictionary.documentUpdate!.document;
+          if (params.revision < 4) {
+            resultDictionary = doc.createDictionary(
+              ["Filter", doc.createName("Standard")],
+              ["V", doc.createNumber((params.revision === 2) ? 1 : 2)],
+              ["R", doc.createNumber(params.revision)],
+              ["P", doc.createNumber(pValue)],
+              ["Length", doc.createNumber(keyLength)],
+              ["O", doc.createString(Convert.ToBinary(oValue))],
+              ["U", doc.createString(Convert.ToBinary(uValue))],
+            );
+          } else {
+            resultDictionary = doc.createDictionary(
+              ["Filter", doc.createName("Standard")],
+              ["Length", doc.createNumber(keyLength)],
+              ["V", doc.createNumber(4)],
+              ["R", doc.createNumber(4)],
+              ["P", doc.createNumber(pValue)],
+              ["O", doc.createString(Convert.ToBinary(oValue))],
+              ["U", doc.createString(Convert.ToBinary(uValue))],
+              ["StmF", doc.createName("StdCF")],
+              ["StrF", doc.createName("StdCF")],
+              ["CF", doc.createDictionary(
+                ["StdCF", doc.createDictionary(
+                  ["AuthEvent", doc.createName("DocOpen")],
+                  ["CFM", doc.createName(keyType)],
+                  ["Length", doc.createNumber(16)],
+                )],
+              )],
+            );
+          }
+          //#endregion
+        }
+        break;
+      case 6:
+        {
+          keyType = "AESV3";
+          if (key === null) {
+            //#region Generate file encryption key
+            const generateKeyResult = await this.crypto.generateKey({
+              name: "AES-CBC",
+              length: 256
+            }, true, keyUsages);
+
+            key = await this.crypto.exportKey("raw", generateKeyResult);
+            //#endregion
+          }
+
+          //#region Compute "U" and "UE" values
+          [uValue, ueValue] = await this.algorithm8(key, userPasswordBuffer);
+          //#endregion
+
+          //#region Compute "O" and "OE" values
+          [oValue, oeValue] = await this.algorithm9(uValue, key, ownerPasswordBuffer);
+          //#endregion
+
+          //#region Compute "Perms" value
+          permsValue = await this.algorithm10(pValueBuffer, key, encryptMetadata);
+          //#endregion
+
+          //#region Create and return final "Dictionary" value
+          const doc = this.dictionary.documentUpdate!.document;
+          resultDictionary = doc.createDictionary(
+            ["Filter", doc.createName("Standard")],
+            ["Length", doc.createNumber(256)],
+            ["V", doc.createNumber(5)],
+            ["P", doc.createNumber(pValue)],
+            ["O", doc.createString(Convert.ToBinary(oValue))],
+            ["U", doc.createString(Convert.ToBinary(uValue))],
+            ["OE", doc.createString(Convert.ToBinary(oeValue))],
+            ["UE", doc.createString(Convert.ToBinary(ueValue))],
+            ["Perms", doc.createString(Convert.ToBinary(permsValue))],
+            ["StmF", doc.createName("StdCF")],
+            ["StrF", doc.createName("StdCF")],
+            ["CF", doc.createDictionary(
+              ["StdCF", doc.createDictionary(
+                ["AuthEvent", doc.createName("DocOpen")],
+                ["CFM", doc.createName("AESV3")],
+                ["Length", doc.createNumber(32)],
+              )],
+            )],
+          );
+          //#endregion
+        }
+        break;
+      default:
+        throw `Incorrect revision number: ${params.revision}`;
+    }
+    //#endregion
+
+    //#region Make output values
+    return {
+      dictionary: resultDictionary.to(StandardEncryptDictionary),
+      id: idBuffer,
+      keyType,
+      key
+    };
+    //#endregion
+  }
+
+  protected async cipher(encrypt: boolean, stream: BufferSource, target: PDFStream | PDFTextString): Promise<ArrayBuffer> {
+    const view = BufferSourceConverter.toUint8Array(stream);
+
+    // Get crypto key for the target object
+    const keys = await this.#getKeys();
+    const key = (target instanceof PDFStream)
+      ? keys.stream // use StmF key for Stream
+      : keys.string; // use StrF key for Literal and Hexadecimal strings
+
+    if (key.type === CryptoFilterMethods.None) {
+      return view;
+    }
+
+    let data: Uint8Array;
+    let iv: Uint8Array;
+    if (encrypt) {
+      iv = this.crypto.getRandomValues(new Uint8Array(16));
+      data = view;
+    } else {
+      iv = view.slice(0, 16);
+      data = view.slice(16, view.byteLength);
+    }
+
+    // Create combined key
+    const parent = target.getIndirect(true);
+    const id = new Int32Array([parent.id]);
+    const generation = new Int32Array([parent.generation]);
+    const combinedKey = BufferSourceConverter.concat([
+      key.raw,
+      id.buffer.slice(0, 3),
+      generation.buffer.slice(0, 2)
+    ]);
+
+    switch (key.type) {
+      case CryptoFilterMethods.AES128: {
+        const cutHash = await this.getCutHashV2(BufferSourceConverter.concat(combinedKey, staticData), key.raw.length);
+        const cryptoKey = await this.crypto.importKey("raw", cutHash, algorithms.AesCBC, false, keyUsages);
+        const alg = { name: "AES-CBC", iv };
+
+        if (encrypt) {
+          return BufferSourceConverter.concat([
+            iv,
+            await this.crypto.encrypt(alg, cryptoKey, data),
+          ]);
+        }
+
+        return await this.crypto.decrypt(alg, cryptoKey, data);
+      }
+      case CryptoFilterMethods.AES256: {
+        const cryptoKey = await this.crypto.importKey("raw", key.raw, algorithms.AesCBC, false, keyUsages);
+        const alg = { name: "AES-CBC", iv };
+
+        if (encrypt) {
+          return BufferSourceConverter.concat([
+            iv,
+            await this.crypto.encrypt(alg, cryptoKey, data),
+          ]);
+        }
+
+        return await this.crypto.decrypt(alg, cryptoKey, data);
+      }
+      case CryptoFilterMethods.RC4:
+      default: {
+        const cryptoKey = await this.getCutHashV2(combinedKey, key.raw.byteLength) as any;
+
+        if (encrypt) {
+          return await this.crypto.encrypt(algorithms.rc4, cryptoKey, data);
+        }
+
+        return await this.crypto.decrypt(algorithms.rc4, cryptoKey, data);
+      }
+    }
+  }
+
+  public async authenticate(): Promise<void> {
+    await this.#getKeys();
+  }
+
+  public async decrypt(stream: BufferSource, target: PDFStream | PDFTextString): Promise<ArrayBuffer> {
+    return this.cipher(false, stream, target);
+  }
+
+  public async encrypt(stream: BufferSource, target: PDFStream | PDFTextString): Promise<ArrayBuffer> {
+    return this.cipher(true, stream, target);
+  }
+
 }

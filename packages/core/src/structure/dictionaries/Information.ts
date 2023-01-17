@@ -4,29 +4,29 @@ import { PDFDate } from "../common/Date";
 export class InformationDictionary extends PDFDictionary {
 
   @PDFLiteralStringField("Title", true)
-  public title!: null | string;
+  public Title!: null | string;
 
   @PDFLiteralStringField("Author", true)
-  public author!: null | string;
+  public Author!: null | string;
 
   @PDFLiteralStringField("Subject", true)
-  public subject!: null | string;
+  public Subject!: null | string;
 
   @PDFLiteralStringField("Keywords", true)
-  public keywords!: null | string;
+  public Keywords!: null | string;
 
   @PDFLiteralStringField("Creator", true)
-  public creator!: null | string;
+  public Creator!: null | string;
 
   @PDFLiteralStringField("Producer", true)
-  public producer!: null | string;
+  public Producer!: null | string;
 
   @PDFDateField("CreationDate", true)
-  public creationDate!: null | PDFDate;
+  public CreationDate!: null | PDFDate;
 
   @PDFDateField("ModDate")
-  public modDate!: PDFDate;
+  public ModDate!: PDFDate;
 
   @PDFNameField("Trapped", true, "Unknown")
-  public trapped!: string;
+  public Trapped!: string;
 }

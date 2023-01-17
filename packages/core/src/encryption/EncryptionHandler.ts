@@ -1,12 +1,22 @@
 import * as pkijs from "pkijs";
 import { BufferSource } from "pvtsutils";
-import { IPDFIndirect } from "../objects";
+import { PDFStream, PDFTextString } from "../objects";
+import type { PDFDocument } from "../structure";
 import { EncryptDictionary } from "../structure/dictionaries/Encrypt";
 
+export interface EncryptionHandlerCreateParams {
+  document: PDFDocument;
+  id?: string;
+}
+
 export abstract class EncryptionHandler {
+
+  /**
+   * Name of the encryption handler
+   */
   public abstract name: string;
 
-  public crypto: SubtleCrypto;
+  public crypto: pkijs.ICryptoEngine;
   public dictionary: EncryptDictionary;
 
   constructor(dictionary: EncryptDictionary) {
@@ -14,10 +24,12 @@ export abstract class EncryptionHandler {
     this.crypto = EncryptionHandler.getCrypto();
   }
 
-  public abstract encrypt(text: BufferSource, parent: IPDFIndirect): Promise<ArrayBuffer>;
-  public abstract decrypt(text: BufferSource, parent: IPDFIndirect): Promise<ArrayBuffer>;
+  public abstract authenticate(): Promise<void>;
 
-  public static getCrypto(): SubtleCrypto {
+  public abstract encrypt(text: BufferSource, target: PDFStream | PDFTextString): Promise<ArrayBuffer>;
+  public abstract decrypt(text: BufferSource, target: PDFStream | PDFTextString): Promise<ArrayBuffer>;
+
+  public static getCrypto(): pkijs.ICryptoEngine {
     const crypto = pkijs.getCrypto();
     if (!crypto) {
       throw new Error("Unable to create WebCrypto object");
