@@ -1,5 +1,4 @@
-import { BufferSourceConverter, Convert } from "pvtsutils";
-import { BufferSource } from "pvtsutils";
+import { BufferSource, BufferSourceConverter } from "pvtsutils";
 import * as pkijs from "pkijs";
 
 import { algorithms, staticData } from "./Constants";
@@ -9,24 +8,13 @@ import {
   CryptoFilterMethods, CryptoFilterDictionary, EncryptDictionary,
   StandardEncryptDictionary, TrailerDictionary, UserAccessPermissionFlags,
 } from "../structure";
-import { PDFTextString, PDFStream } from "../objects";
+import { PDFTextString, PDFStream, PDFHexString, PDFArray } from "../objects";
 
 const keyUsages: KeyUsage[] = ["encrypt", "decrypt"];
 
 export interface Key {
   keyType: number;
   key: ArrayBuffer | null;
-}
-
-interface UserValues {
-  /**
-   * Revision
-   */
-  r: number;
-  /**
-   * A 32-byte string, based on the user password
-   */
-  u: ArrayBuffer;
 }
 
 export interface StandardEncryptionHandlerCreateCommonParams {
@@ -131,23 +119,41 @@ export class StandardEncryptionHandler extends EncryptionHandler {
     const xref = doc.update.xref as unknown as TrailerDictionary;
 
     // If PDF has encryption it shall have the ID filed in XRef object
+    let id = crypto.getRandomValues(new Uint8Array(16));
     if (!xref.has("ID")) {
       // Create ID object
       xref.set("ID", doc.createArray(
-        doc.createHexString(crypto.getRandomValues(new Uint8Array(16))),
+        doc.createHexString(id),
         doc.createHexString(crypto.getRandomValues(new Uint8Array(16))),
       ));
+    } else {
+      id = xref.get("ID", PDFArray).get(0, PDFHexString).toUint8Array();
     }
 
     switch (params.algorithm) {
       case CryptoFilterMethods.AES128: {
         // compute O values and set them into the Encrypt dictionary
-        const o = await handler.computeOwnerValues(ownerPassword, userPassword);
+        const o = await StandardEncryptionAlgorithm.algorithm3({
+          crypto,
+          length: encrypt.Length,
+          revision: encrypt.R,
+          user: userPassword,
+          owner: ownerPassword,
+        });
         encrypt.set("O", doc.createHexString(o));
 
         // compute U values and set them into the Encrypt dictionary
-        const uVal = await handler.computeUserValues(userPassword);
-        encrypt.set("U", doc.createHexString(uVal.u));
+        const u = await StandardEncryptionAlgorithm.algorithm5({
+          id,
+          crypto,
+          o,
+          encryptMetadata: encrypt.EncryptMetadata,
+          length: encrypt.Length,
+          password: userPassword,
+          permissions: encrypt.P,
+          revision: encrypt.R,
+        });
+        encrypt.set("U", doc.createHexString(u));
         break;
       }
       case CryptoFilterMethods.AES256: {
@@ -188,6 +194,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
 
     return handler;
   }
+
   public name = StandardEncryptionHandler.NAME;
 
   /**
@@ -240,116 +247,60 @@ export class StandardEncryptionHandler extends EncryptionHandler {
   }
 
   public async checkUserPassword(password: Password = ""): Promise<boolean> {
-    if (this.revision === 6) {
-      return StandardEncryptionAlgorithm.algorithm11({
-        password,
-        u: this.dictionary.U.toUint8Array(),
-        crypto: this.crypto,
-      });
-    } else if (this.revision === 3 || this.revision === 4) {
-      const values = await this.computeUserValues(password);
-
-      return BufferSourceConverter.isEqual(
-        BufferSourceConverter.toUint8Array(values.u).subarray(0, 16), // encryption key is first 16 bytes
-        this.dictionary.U.toUint8Array().subarray(0, 16),
-      );
-    }
-
-    throw new Error("Cannot check user password, unsupported revision");
-  }
-
-  public async checkOwnerPassword(owner: Password = ""): Promise<boolean> {
-    const values = await this.computeOwnerValues(owner);
-
-    return BufferSourceConverter.isEqual(values, this.dictionary.O.toArrayBuffer());
-  }
-
-  protected async computeUserValues(password: Password): Promise<UserValues> {
-    switch (this.revision) {
-      case 2:
-      case 3:
-      case 4:
-        {
-          // Compute "U" value
-          if (this.revision < 3) {
-            throw new Error("Not implemented");
-            // return {
-            //   r: this.revision,
-            //   u: await StandardEncryptionAlgorithm.algorithm4(this.dictionary.O.toArrayBuffer(), this.id, this.dictionary.P, this.revision, this.dictionary.Length, this.dictionary.EncryptMetadata, passwordView),
-            // };
-          } else {
-            const encryptionKey = await StandardEncryptionAlgorithm.algorithm2({
-              id: this.id,
-              password,
-              revision: this.dictionary.R,
-              encryptMetadata: this.dictionary.EncryptMetadata,
-              permissions: this.dictionary.P,
-              ownerValue: this.dictionary.O.toUint8Array(),
-              length: this.length,
-              crypto: this.crypto,
-            });
-
-            return {
-              r: this.revision,
-              u: await StandardEncryptionAlgorithm.algorithm5({
-                revision: this.revision,
-                encryptionKey,
-                id: this.id,
-                crypto: this.crypto,
-              }),
-            };
-          }
-        }
-        break;
-      case 6:
-        {
-          throw new Error("Not implemented");
-          // // Compute "U" and "UE" values
-          // const [uValue, ueValue] = await this.algorithm8(key, userPasswordBuffer);
-          // //#endregion
-
-          // // Compute "O" and "OE" values
-          // const [oValue, oeValue] = await this.algorithm9(uValue, key, ownerPasswordBuffer);
-
-          // // Compute "Perms" value
-          // const permsValue = await this.algorithm10(pValueBuffer, key, encryptMetadata);
-        }
-        break;
-      default:
-        throw `Incorrect revision number: ${this.revision}`;
-    }
-  }
-
-  public async computeOwnerValues(owner: Password, user?: Password): Promise<ArrayBuffer> {
-    if (user === undefined) {
-      user = await this.#getUserPassword();
-    }
+    const dict = this.dictionary;
 
     switch (this.revision) {
       case 2:
       case 3:
       case 4:
-        {
-          // Compute "O" value
-          return await StandardEncryptionAlgorithm.algorithm3({
-            length: this.length,
-            owner: owner,
-            revision: this.revision,
-            user,
-            crypto: this.crypto,
-          });
-
-        }
-        break;
+        return StandardEncryptionAlgorithm.algorithm6({
+          crypto: this.crypto,
+          password,
+          length: dict.Length,
+          o: dict.O.toUint8Array(),
+          u: dict.U.toUint8Array(),
+          id: this.id,
+          revision: dict.R,
+          permissions: dict.P,
+          encryptMetadata: dict.EncryptMetadata,
+        });
       case 6:
-        {
-          throw new Error("Not implemented");
-        }
+        return StandardEncryptionAlgorithm.algorithm11({
+          crypto: this.crypto,
+          password,
+          u: dict.U.toUint8Array()
+        });
       default:
-        throw `Incorrect revision number: ${this.revision}`;
+        throw new Error("Cannot check the Owner password, unknown revision");
     }
   }
 
+  public async checkOwnerPassword(password: Password = ""): Promise<boolean> {
+    const dict = this.dictionary;
+
+    switch (this.revision) {
+      case 2:
+      case 3:
+      case 4:
+        return StandardEncryptionAlgorithm.algorithm7({
+          crypto: this.crypto,
+          revision: this.revision,
+          user: await this.#getUserPassword(),
+          owner: password,
+          length: dict.Length,
+          o: dict.O.toUint8Array(),
+        });
+      case 6:
+        return StandardEncryptionAlgorithm.algorithm12({
+          crypto: this.crypto,
+          password,
+          o: dict.O.toUint8Array(),
+          u: dict.U.toUint8Array()
+        });
+      default:
+        throw new Error("Cannot check the Owner password, unknown revision");
+    }
+  }
 
   /**
    * Returns the User cached password. 
@@ -454,7 +405,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
         revision: this.dictionary.R,
         encryptMetadata: this.dictionary.EncryptMetadata,
         permissions: this.dictionary.P,
-        ownerValue: this.dictionary.O.toUint8Array(),
+        o: this.dictionary.O.toUint8Array(),
         length,
         crypto: this.crypto,
       });

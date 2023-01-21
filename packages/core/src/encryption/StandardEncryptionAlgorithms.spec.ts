@@ -26,7 +26,7 @@ context("StandardEncryptionAlgorithm", () => {
           params: {
             id: Convert.FromHex("8D966A6EA9AE43E68A5B5E262C0AFEB5"),
             length: 128,
-            ownerValue: Convert.FromHex("DDBC87D3B71D554BB67A4B42C2FE9212A5C2BD37CAF1127469340E8425CD2FA0"),
+            o: Convert.FromHex("DDBC87D3B71D554BB67A4B42C2FE9212A5C2BD37CAF1127469340E8425CD2FA0"),
             permissions: -3392,
             password: "",
             encryptMetadata: true,
@@ -40,7 +40,7 @@ context("StandardEncryptionAlgorithm", () => {
           params: {
             id: Convert.FromHex("A204AB6AF65984019767B91004A5BE10"),
             length: 128,
-            ownerValue: Convert.FromHex("36451BD39D753B7C1D10922C28E6665AA4F3353FB0348B536893E3B1DB5C579B"),
+            o: Convert.FromHex("36451BD39D753B7C1D10922C28E6665AA4F3353FB0348B536893E3B1DB5C579B"),
             permissions: -4076,
             password: "",
             encryptMetadata: false,
@@ -71,9 +71,13 @@ context("StandardEncryptionAlgorithm", () => {
         {
           name: "default password",
           params: {
-            encryptionKey: Convert.FromHex("B64B049FB37F12FBA16F8C8E840AC68B"),
-            revision: 4,
             id: Convert.FromHex("8D966A6EA9AE43E68A5B5E262C0AFEB5"),
+            length: 128,
+            o: Convert.FromHex("DDBC87D3B71D554BB67A4B42C2FE9212A5C2BD37CAF1127469340E8425CD2FA0"),
+            permissions: -3392,
+            password: "",
+            encryptMetadata: true,
+            revision: 4,
             crypto,
           },
           want: {
