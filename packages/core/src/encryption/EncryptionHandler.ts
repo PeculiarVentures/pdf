@@ -1,12 +1,12 @@
 import * as pkijs from "pkijs";
 import { BufferSource } from "pvtsutils";
 import { PDFStream, PDFTextString } from "../objects";
-import type { PDFDocument } from "../structure";
-import { EncryptDictionary } from "../structure/dictionaries/Encrypt";
+import { type PDFDocument, EncryptDictionary } from "../structure";
 
 export interface EncryptionHandlerCreateParams {
   document: PDFDocument;
   id?: string;
+  crypto?: pkijs.ICryptoEngine;
 }
 
 export abstract class EncryptionHandler {
@@ -19,22 +19,29 @@ export abstract class EncryptionHandler {
   public crypto: pkijs.ICryptoEngine;
   public dictionary: EncryptDictionary;
 
-  constructor(dictionary: EncryptDictionary) {
+  constructor(dictionary: EncryptDictionary, crypto: pkijs.ICryptoEngine) {
     this.dictionary = dictionary;
-    this.crypto = EncryptionHandler.getCrypto();
+    this.crypto = crypto;
   }
 
+  /**
+   * Authenticates user
+   */
   public abstract authenticate(): Promise<void>;
 
-  public abstract encrypt(text: BufferSource, target: PDFStream | PDFTextString): Promise<ArrayBuffer>;
-  public abstract decrypt(text: BufferSource, target: PDFStream | PDFTextString): Promise<ArrayBuffer>;
+  /**
+   * Encrypts incoming data 
+   * @param data Data that should be encrypted
+   * @param target Target object which includes that data
+   * @returns Returns encrypted message
+   */
+  public abstract encrypt(data: BufferSource, target: PDFStream | PDFTextString): Promise<ArrayBuffer>;
+  /**
+   * Decrypts incoming data 
+   * @param data Data that should be decrypted
+   * @param target Target object which includes that data
+   * @returns Returns decrypted message
+   */
+  public abstract decrypt(data: BufferSource, target: PDFStream | PDFTextString): Promise<ArrayBuffer>;
 
-  public static getCrypto(): pkijs.ICryptoEngine {
-    const crypto = pkijs.getCrypto();
-    if (!crypto) {
-      throw new Error("Unable to create WebCrypto object");
-    }
-
-    return crypto;
-  }
 }

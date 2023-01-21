@@ -111,7 +111,7 @@ function passwordToView(password: Password): Uint8Array {
  * @param password Password
  * @returns 32-bytes buffer 
  */
-function padPassword(password: Password = new Uint8Array(0)): ArrayBuffer {
+export function padPassword(password: Password = new Uint8Array(0)): ArrayBuffer {
   // That is, if the password string is n bytes long, append the first 32 - n bytes of the padding string to
   // the end of the password string. If the password string is empty (zero-length), meaning there is no
   // user password, substitute the entire padding string in its place.
@@ -630,7 +630,6 @@ export class StandardEncryptionAlgorithm {
    * @param encryptMetadata Flag from "EncryptMetadata" PDF key
    */
   public static async algorithm10(params: StandardAlgorithm10Params): Promise<ArrayBuffer> {
-    console.log(params.encryptMetadata, params.key, params.permissions);
     // Fill a 16-byte block as follows:
     // a) Extend the permissions (contents of the P integer) to 64 bits by setting the upper 32 bits to all 1’s
     const constPart = new Uint8Array([

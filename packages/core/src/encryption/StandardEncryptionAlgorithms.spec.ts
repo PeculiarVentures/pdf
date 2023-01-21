@@ -1,8 +1,8 @@
 import * as assert from "node:assert";
 import { Crypto } from "@peculiar/webcrypto";
-import { StandardAlgorithm11Params, StandardAlgorithm12Params, StandardAlgorithm2AParams, StandardAlgorithm2Params, StandardAlgorithm5Params, StandardAlgorithm8Params, StandardAlgorithm9Params, StandardEncryptionAlgorithm } from "./StandardEncryptionAlgorithms";
+import { BufferSourceConverter, Convert } from "pvtsutils";
+import * as src from "./StandardEncryptionAlgorithms";
 import { PDFCryptoEngine } from "../CryptoEngine";
-import { Convert } from "pvtsutils";
 
 const U_R6 = "2c0d93dbc2af881b34939a8e8915c31f58da04e3c6cb6319855670d22fb5382b16565084e80fe283164672365d57c4da";
 const UE_R6 = "2bb64001afaa25e57cfd20ac139bad507fda8a5dce02b951bbd6c7a667672437";
@@ -18,7 +18,7 @@ context("StandardEncryptionAlgorithm", () => {
   context("algorithm2", () => {
     const tests: {
       name: string;
-      params: StandardAlgorithm2Params;
+      params: src.StandardAlgorithm2Params;
       want: string;
     }[] = [
         {
@@ -53,7 +53,7 @@ context("StandardEncryptionAlgorithm", () => {
 
     for (const t of tests) {
       it(`${t.name}, revision: ${t.params.revision}, encryptMetadata: ${t.params.encryptMetadata}, length: ${t.params.length}`, async () => {
-        const v = await StandardEncryptionAlgorithm.algorithm2(t.params);
+        const v = await src.StandardEncryptionAlgorithm.algorithm2(t.params);
         assert.equal(Convert.ToHex(v), t.want.toLocaleLowerCase());
       });
     }
@@ -62,7 +62,7 @@ context("StandardEncryptionAlgorithm", () => {
   context("algorithm4", () => {
     const tests: {
       name: string;
-      params: StandardAlgorithm5Params;
+      params: src.StandardAlgorithm5Params;
       want: {
         result: string;
         length: number;
@@ -85,7 +85,7 @@ context("StandardEncryptionAlgorithm", () => {
 
     for (const t of tests) {
       it(`${t.name}, revision: ${t.params.revision}`, async () => {
-        const v = await StandardEncryptionAlgorithm.algorithm5(t.params);
+        const v = await src.StandardEncryptionAlgorithm.algorithm5(t.params);
         const result = Convert.FromHex(t.want.result).slice(0, t.want.length);
         assert.equal(Convert.ToHex(v.slice(0, t.want.length)), Convert.ToHex(result));
       });
@@ -95,7 +95,7 @@ context("StandardEncryptionAlgorithm", () => {
   context("algorithm11", () => {
     const tests: {
       name: string,
-      params: StandardAlgorithm11Params,
+      params: src.StandardAlgorithm11Params,
       want: boolean,
     }[] = [
         {
@@ -111,7 +111,7 @@ context("StandardEncryptionAlgorithm", () => {
 
     for (const t of tests) {
       it(t.name, async () => {
-        const res = await StandardEncryptionAlgorithm.algorithm11(t.params);
+        const res = await src.StandardEncryptionAlgorithm.algorithm11(t.params);
         assert.equal(res, t.want);
       });
     }
@@ -120,7 +120,7 @@ context("StandardEncryptionAlgorithm", () => {
   context("algorithm8", () => {
     const tests: {
       name: string,
-      params: StandardAlgorithm8Params,
+      params: src.StandardAlgorithm8Params,
       want: {
         u: string;
         ue: string;
@@ -143,7 +143,7 @@ context("StandardEncryptionAlgorithm", () => {
 
     for (const t of tests) {
       it(t.name, async () => {
-        const res = await StandardEncryptionAlgorithm.algorithm8(t.params);
+        const res = await src.StandardEncryptionAlgorithm.algorithm8(t.params);
         assert.equal(Convert.ToHex(res.u), t.want.u);
         assert.equal(Convert.ToHex(res.ue), t.want.ue);
       });
@@ -153,7 +153,7 @@ context("StandardEncryptionAlgorithm", () => {
   context("algorithm9", () => {
     const tests: {
       name: string,
-      params: StandardAlgorithm9Params,
+      params: src.StandardAlgorithm9Params,
       want: {
         o: string;
         oe: string;
@@ -177,7 +177,7 @@ context("StandardEncryptionAlgorithm", () => {
 
     for (const t of tests) {
       it(t.name, async () => {
-        const res = await StandardEncryptionAlgorithm.algorithm9(t.params);
+        const res = await src.StandardEncryptionAlgorithm.algorithm9(t.params);
         assert.equal(Convert.ToHex(res.o), t.want.o);
         assert.equal(Convert.ToHex(res.oe), t.want.oe);
       });
@@ -187,7 +187,7 @@ context("StandardEncryptionAlgorithm", () => {
   context("algorithm12", () => {
     const tests: {
       name: string,
-      params: StandardAlgorithm12Params,
+      params: src.StandardAlgorithm12Params,
       want: boolean;
     }[] = [
         {
@@ -204,7 +204,7 @@ context("StandardEncryptionAlgorithm", () => {
 
     for (const t of tests) {
       it(t.name, async () => {
-        const res = await StandardEncryptionAlgorithm.algorithm12(t.params);
+        const res = await src.StandardEncryptionAlgorithm.algorithm12(t.params);
         assert.equal(res, t.want);
       });
     }
@@ -213,7 +213,7 @@ context("StandardEncryptionAlgorithm", () => {
   context("algorithm2A", () => {
     const tests: {
       name: string,
-      params: StandardAlgorithm2AParams,
+      params: src.StandardAlgorithm2AParams,
       want: string;
     }[] = [
         ...[
@@ -245,10 +245,46 @@ context("StandardEncryptionAlgorithm", () => {
 
     for (const t of tests) {
       it(t.name, async () => {
-        const eKey = await StandardEncryptionAlgorithm.algorithm2A(t.params);
+        const eKey = await src.StandardEncryptionAlgorithm.algorithm2A(t.params);
         assert.equal(Convert.ToHex(eKey), t.want);
       });
     }
+  });
+
+  context("padPassword", () => {
+
+    const tests: {
+      name: string;
+      args?: BufferSource;
+      want: ArrayBuffer;
+    }[] = [
+        {
+          name: "password is undefined",
+          want: Convert.FromHex("28bf4e5e4e758a4164004e56fffa01082e2e00b6d0683e802f0ca9fe6453697a"),
+        },
+        {
+          name: "password is shorter than 32-bytes",
+          args: new Uint8Array([1, 2, 3, 4, 5]),
+          want: Convert.FromHex("010203040528bf4e5e4e758a4164004e56fffa01082e2e00b6d0683e802f0ca9"),
+        },
+        {
+          name: "password is 32-bytes",
+          args: Convert.FromHex("0102030405010203040501020304050102030405010203040501020304050102"),
+          want: Convert.FromHex("0102030405010203040501020304050102030405010203040501020304050102"),
+        },
+        {
+          name: "password is longer than 32-bytes",
+          args: Convert.FromHex("0102030405010203040501020304050102030405010203040501020304050102030405"),
+          want: Convert.FromHex("0102030405010203040501020304050102030405010203040501020304050102"),
+        },
+      ];
+    for (const t of tests) {
+      it(t.name, () => {
+        const v = src.padPassword(t.args);
+        assert.ok(BufferSourceConverter.isEqual(v, t.want), "StandardEncryptionHandler.mixedPassword returns incorrect padded password");
+      });
+    }
+
   });
 
 });

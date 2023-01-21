@@ -1,86 +1,17 @@
 import * as assert from "node:assert";
 import * as fs from "node:fs";
-import { BufferSourceConverter, Convert } from "pvtsutils";
+import { Convert } from "pvtsutils";
 import * as pkijs from "pkijs";
 import { Crypto } from "@peculiar/webcrypto";
-import { CrossReferenceStream, CrossReferenceTable, CryptoFilterMethods, CryptoFilterDictionary, InformationDictionary, PageObjectDictionary, PDFDate, PDFDocument, StandardEncryptDictionary, TrailerDictionary, UserAccessPermissionFlags, XrefStructure } from "../structure";
+import { CryptoFilterMethods, CryptoFilterDictionary, PageObjectDictionary, PDFDate, PDFDocument, StandardEncryptDictionary, TrailerDictionary, UserAccessPermissionFlags, XrefStructure } from "../structure";
 import { PasswordReason, StandardEncryptionHandler } from "./StandardEncryptionHandler";
 import { PDFCryptoEngine } from "../CryptoEngine";
 import { ViewWriter } from "../ViewWriter";
 import { PDFContentStream } from "../content";
 import { ViewReader } from "../ViewReader";
-import { PDFStream } from "../objects";
+import { Password } from "./StandardEncryptionAlgorithms";
 
 context("StandardEncryptionHandler", () => {
-
-  context("padPassword", () => {
-
-    const tests: {
-      name: string;
-      args?: BufferSource;
-      want: ArrayBuffer;
-    }[] = [
-        {
-          name: "password is undefined",
-          want: Convert.FromHex("28bf4e5e4e758a4164004e56fffa01082e2e00b6d0683e802f0ca9fe6453697a"),
-        },
-        {
-          name: "password is shorter than 32-bytes",
-          args: new Uint8Array([1, 2, 3, 4, 5]),
-          want: Convert.FromHex("010203040528bf4e5e4e758a4164004e56fffa01082e2e00b6d0683e802f0ca9"),
-        },
-        {
-          name: "password is 32-bytes",
-          args: Convert.FromHex("0102030405010203040501020304050102030405010203040501020304050102"),
-          want: Convert.FromHex("0102030405010203040501020304050102030405010203040501020304050102"),
-        },
-        {
-          name: "password is longer than 32-bytes",
-          args: Convert.FromHex("0102030405010203040501020304050102030405010203040501020304050102030405"),
-          want: Convert.FromHex("0102030405010203040501020304050102030405010203040501020304050102"),
-        },
-      ];
-    for (const t of tests) {
-      it(t.name, () => {
-        const v = StandardEncryptionHandler.padPassword(t.args);
-        assert.ok(BufferSourceConverter.isEqual(v, t.want), "StandardEncryptionHandler.mixedPassword returns incorrect padded password");
-      });
-    }
-
-  });
-
-  it("checkUserPassword", async () => {
-    pkijs.setEngine("PDF", new PDFCryptoEngine({ name: "PDF", crypto: new Crypto() }));
-
-    const doc = new PDFDocument();
-    doc.update.addCatalog();
-    doc.update.xref!.set("ID", doc.createArray(
-      doc.createHexString(Convert.FromHex("2A33917C273E9BF438317F9D9B920F75")),
-      doc.createHexString(Convert.FromHex("6ED90B2C9CF31E40801AE26260FEC5E7")),
-    ));
-    const encrypt = StandardEncryptDictionary.create(doc).makeIndirect();
-    const filter = CryptoFilterDictionary.create(doc);
-    filter.AuthEvent = "DocOpen";
-    filter.CFM = CryptoFilterMethods.AES128;
-    encrypt.CF.get().setFilter("StdCF", filter);
-
-    encrypt.set("Filter", doc.createName("Standard"));
-    encrypt.set("Length", doc.createNumber(128));
-    encrypt.set("O", doc.createString(Convert.ToBinary(Convert.FromBase64("r0B2wtxC+oRIIBfzWQCQmsXSKNtrOhHoOh7lhGJ8qF4="))));
-    encrypt.set("P", doc.createNumber(-1084));
-    encrypt.set("R", doc.createNumber(4));
-    encrypt.set("StmF", doc.createName("StdCF"));
-    encrypt.set("StrF", doc.createName("StdCF"));
-    encrypt.set("U", doc.createString(Convert.ToBinary(Convert.FromBase64("tvoThLGlPWljQ/JUCtORWgAAAAAAAAAAAAAAAAAAAAA="))));
-    encrypt.set("V", doc.createNumber(4));
-
-    doc.update.xref!.Encrypt = encrypt;
-
-    assert.ok(doc.encryptHandler instanceof StandardEncryptionHandler);
-
-    const ok = await doc.encryptHandler.checkUserPassword();
-    assert.ok(ok, "Incorrect password");
-  });
 
   it("test checkUserPassword", async () => {
     pkijs.setEngine("PDF", new PDFCryptoEngine({ name: "PDF", crypto: new Crypto() }));
@@ -151,87 +82,138 @@ context("StandardEncryptionHandler", () => {
     // assert.ok(await doc.encryptHandler.checkOwnerPassword("12345"), "Incorrect Owner password");
   });
 
-  it("create encrypted PDF with revision 4 and AESV2", async () => {
+  context("create and encrypt document", () => {
     pkijs.setEngine("PDF", new PDFCryptoEngine({ name: "PDF", crypto: new Crypto() }));
 
-    const doc = new PDFDocument;
-    doc.version = 1.5;
-    // doc.options.disableAscii85Encoding = true;
-    // doc.options.disableCompressedStreams = true;
-    // doc.options.disableCompressedObjects = true;
-    // doc.options.xref = XrefStructure.Table;
-    doc.update.addCatalog();
+    const tests: {
+      name: string;
+      params: {
+        file?: string;
+        algorithm: CryptoFilterMethods;
+        userPassword?: Password;
+        ownerPassword?: Password;
+        useXRefTable?: boolean;
+        disableString?: boolean;
+        disableStream?: boolean;
+      },
+    }[] = [
+        {
+          name: "AES128 U:<empty>",
+          params: {
+            // file: "aes128_u",
+            algorithm: CryptoFilterMethods.AES128,
+          },
+        },
+        {
+          name: "AES128 U:12345 O:54321",
+          params: {
+            // file: "aes128_u12345_o54321",
+            algorithm: CryptoFilterMethods.AES128,
+            userPassword: "12345",
+            ownerPassword: "54321",
+          },
+        },
+        {
+          name: "AES256 U:<empty>",
+          params: {
+            // file: "aes256_u",
+            algorithm: CryptoFilterMethods.AES256,
+          },
+        },
+        {
+          name: "AES256 U:12345, O:54321",
+          params: {
+            // file: "aes256_u12345_o54321",
+            algorithm: CryptoFilterMethods.AES256,
+            userPassword: "12345",
+            ownerPassword: "54321",
+          },
+        },
+      ];
 
-    doc.encryptHandler = await StandardEncryptionHandler.create({
-      document: doc,
-      permission: UserAccessPermissionFlags.copy,
-      algorithm: CryptoFilterMethods.AES128,
-      // encryptMetadata: false,
-      userPassword: "12345",
-      disableString: true,
-      disableStream: true,
-    });
+    for (const t of tests) {
+      it(t.name, async () => {
+        const doc = new PDFDocument;
+        doc.version = 2.0;
+        doc.options.xref = t.params.useXRefTable ? XrefStructure.Table : XrefStructure.Stream;
+        doc.update.addCatalog();
 
-    // #region Add page
-    const page = PageObjectDictionary.create(doc);
-    page.mediaBox = page.createMediaBox(40, 40);
-    const stm = PDFContentStream.create(doc);
-    page.contents = stm;
-    stm.content
-      .setColor(0)
-      .drawRectangle(10, 10, 20, 20)
-      .fill();
+        doc.encryptHandler = await StandardEncryptionHandler.create({
+          document: doc,
+          permission: UserAccessPermissionFlags.copy,
+          algorithm: CryptoFilterMethods.AES256,
+          // encryptMetadata: false,
+          ownerPassword: t.params.ownerPassword,
+          userPassword: t.params.userPassword,
+          disableString: t.params.disableString,
+          disableStream: t.params.disableString,
+        });
+
+        // #region Add page
+        const page = PageObjectDictionary.create(doc);
+        page.mediaBox = page.createMediaBox(40, 40);
+        const stm = PDFContentStream.create(doc);
+        page.contents = stm;
+
+        // Draw the Black square in the center of the page
+        stm.content
+          .setColor(0)
+          .drawRectangle(10, 10, 20, 20)
+          .fill();
 
 
-    const xref = doc.update.xref as unknown as TrailerDictionary;
-    const info = xref.Info.get(false, false);
-    info.CreationDate = PDFDate.createDate(doc);
-    xref.Root.Pages.addPage(page);
-    // #endregion
+        let xref = doc.update.xref as unknown as TrailerDictionary;
+        xref.Root.Pages.addPage(page);
+        // #endregion
 
-    await doc.createUpdate();
+        // Create update section to test that encryption works correctly with updates
+        await doc.createUpdate();
 
-    const test = doc.createDictionary(
-      ["Boolean", doc.createBoolean(true)],
-      ["Number", doc.createNumber(1)],
-      ["Literal", doc.createString("привет")],
-      ["Hex", doc.createHexString(new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 0]))],
-      ["Array", doc.createArray(doc.createNumber(2), doc.createArray(doc.createString("hello")),)],
-      ["Dict", doc.createDictionary(
-        ["Key", doc.createNumber(-1.2345).makeIndirect()]
-      )],
-    ).makeIndirect();
-    xref.Root.set("Test", test);
+        // Create the Info dictionary with Date
+        xref = doc.update.xref as unknown as TrailerDictionary;
+        const info = xref.Info.get(false, false);
+        info.CreationDate = PDFDate.createDate(doc);
 
-    const writer = new ViewWriter();
-    await doc.writePDF(writer);
+        // Save document
+        const writer = new ViewWriter();
+        await doc.writePDF(writer);
 
-    // Save the document
-    const pdf = writer.toUint8Array();
-    fs.writeFileSync(`${__dirname}/../../../../tmp.pdf`, pdf, { flag: "w+" });
-
-    // Parse the saved document
-    const doc2 = new PDFDocument();
-    await doc2.fromPDF(new ViewReader(pdf));
-    if (doc2.encryptHandler) {
-      assert.ok(doc2.encryptHandler instanceof StandardEncryptionHandler);
-      doc2.encryptHandler.onUserPassword = async (reason) => {
-        if (reason === PasswordReason.incorrect) {
-          throw new Error("Incorrect password");
+        // Save the document
+        const pdf = writer.toUint8Array();
+        if (t.params.file) {
+          fs.writeFileSync(`${__dirname}/../../../../${t.params.file}.pdf`, pdf, { flag: "w+" }); // TODO move to test helpers
         }
 
-        return "12345";
-      };
 
-      await doc2.decrypt();
+        // Parse the saved document
+        const doc2 = new PDFDocument();
+        await doc2.fromPDF(new ViewReader(pdf));
+        if (doc2.encryptHandler) {
+          assert.ok(doc2.encryptHandler instanceof StandardEncryptionHandler);
+
+          // check the User password
+          const ok = await doc2.encryptHandler.checkUserPassword(t.params.userPassword);
+          assert.ok(ok, "User password is incorrect");
+
+          doc2.encryptHandler.onUserPassword = async (reason) => {
+            if (reason === PasswordReason.incorrect) {
+              throw new Error("Incorrect password");
+            }
+
+            return t.params.userPassword || "";
+          };
+
+          await doc2.decrypt();
+
+          if (t.params.ownerPassword) {
+            // TODO not implemented
+            // const ok = await doc2.encryptHandler.checkOwnerPassword(t.params.ownerPassword);
+            // assert.ok(ok, "Owner password is incorrect");
+          }
+        }
+      });
     }
 
-    doc2.getObject(1).value;
-
-    const r5 = doc2.getObject(5).value;
-    assert.ok(r5 instanceof PDFStream);
-    const textStream = Convert.ToBinary(r5.stream);
-    console.log(Convert.ToBinary(r5.stream));
   });
 
 });

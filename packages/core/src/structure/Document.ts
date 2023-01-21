@@ -1,8 +1,10 @@
 import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import * as pkijs from "pkijs";
 
 import type { clientSideParametersPublicKey } from "../encryption/Constants";
 import type { PageObjectDictionary } from "./dictionaries";
 import type { ViewReader } from "../ViewReader";
+import { EncryptionFactory, EncryptionHandler } from "../encryption";
 
 export interface FindIndexOptions {
   reversed?: boolean;
@@ -59,7 +61,7 @@ export class PDFDocument {
       const encrypt = this.update.Encrypt;
       if (encrypt) {
         const encryptHandlerConstructor = EncryptionFactory.get(encrypt.Filter);
-        this.#encryptHandler = new encryptHandlerConstructor(encrypt);
+        this.#encryptHandler = new encryptHandlerConstructor(encrypt, pkijs.getCrypto(true));
       } else {
         this.#encryptHandler = null;
       }
@@ -374,6 +376,6 @@ import { ParsingError } from "../ParsingError";
 import { ViewWriter } from "../ViewWriter";
 import { PDFDocumentUpdate } from "./DocumentUpdate";
 import { PDFRectangle } from "./common";
-import { CrossReferenceTable } from "./CrossReferenceTable"; import { CharSet } from "../CharSet";
-import { PDFDocumentObject, PDFDocumentObjectTypes } from "./DocumentObject";
-import { EncryptionFactory, EncryptionHandler } from "../encryption";
+import { CrossReferenceTable } from "./CrossReferenceTable";
+import { CharSet } from "../CharSet";
+import { PDFDocumentObject } from "./DocumentObject";
