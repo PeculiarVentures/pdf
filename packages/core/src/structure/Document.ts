@@ -203,9 +203,6 @@ export class PDFDocument {
 
   public async createUpdate(): Promise<PDFDocumentUpdate> {
     if (!this.update.view.length) {
-      if (this.encryptHandler) {
-        await this.update.encrypt();
-      }
       await this.toPDF();
     }
 

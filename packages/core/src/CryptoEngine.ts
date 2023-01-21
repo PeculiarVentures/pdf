@@ -169,58 +169,27 @@ function rc4(key: Uint8Array, data: Uint8Array): Promise<ArrayBuffer> {
 
 /**
  * Making decryption for non-padded data
- * @param {Object} crypto WebCrypto Subtle
- * @param {Object} algorithm Used algorithm description
- * @param {Object} key WebCrypto key. WARNING: in order to process correctly the key must be created with [encrypt, decrypt] usages
- * @param {ArrayBuffer} data Data to decrypt (non-padded)
- * @returns {Promise.<*>}
+ * @param crypto WebCrypto Subtle
+ * @param algorithm Used algorithm description
+ * @param key WebCrypto key. WARNING: in order to process correctly the key must be created with [encrypt, decrypt] usages
+ * @param data Data to decrypt (non-padded)
  */
-async function decryptWithPadding(crypto: SubtleCrypto, algorithm: AesCtrParams, key: CryptoKey, data: ArrayBuffer): Promise<ArrayBuffer> {
-	//#region Initial variables
-	const dataLength = data.byteLength;
-	const dataView = new Uint8Array(data);
+async function decryptWithPadding(crypto: SubtleCrypto, algorithm: AesCtrParams, key: CryptoKey, data: BufferSource): Promise<ArrayBuffer> {
+	const moduloBlock = 16 - (data.byteLength % 16);
 
-	const modulo = dataLength % 16;
-	const moduloBlock = (16 - modulo);
-	//#endregion
-
-	//#region Calculate absent tail for encrypted content
-	//#region Initial variables
-	const iv = data.slice(dataLength - 16, dataLength);
-	const paddedDataBuffer = new ArrayBuffer(moduloBlock);
-	const paddedDataView = new Uint8Array(paddedDataBuffer);
-	//#endregion
-
-	//#region Set correct initial data
-	for (let i = 0; i < moduloBlock; i++)
-		paddedDataView[i] = moduloBlock;
-	//#endregion
-
+	// Calculate absent tail for encrypted content
+	const iv = BufferSourceConverter.toUint8Array(data).subarray(data.byteLength - 16);
+	const pad = new Uint8Array(moduloBlock).fill(moduloBlock);
 	const result = await crypto.encrypt({
 		name: algorithm.name,
 		length: algorithm.length,
-		iv: iv
-	}, key, paddedDataBuffer);
-	//#endregion
+		iv,
+	}, key, pad);
 
-	//#region Append encrypted tail and decrypt iniital data
-	//#region Initial variables
-	// noinspection JSCheckFunctionSignatures
-	const resultView = new Uint8Array(result);
+	// Append encrypted tail and decrypt initial data
+	const dataWithPad = BufferSourceConverter.concat(data, result);
 
-	const dataWithPadBuffer = new ArrayBuffer(dataLength + moduloBlock);
-	const dataWithPadView = new Uint8Array(dataWithPadBuffer);
-	//#endregion
-
-	//#region Set correct data
-	dataWithPadView.set(dataView, 0);
-
-	for (let i = 0; i < moduloBlock; i++)
-		dataWithPadView[dataLength + i] = resultView[i];
-	//#endregion
-	//#endregion
-
-	return crypto.decrypt(algorithm, key, dataWithPadBuffer);
+	return crypto.decrypt(algorithm, key, dataWithPad);
 }
 
 export class PDFCryptoEngine extends pkijs.CryptoEngine {
@@ -468,6 +437,7 @@ export class PDFCryptoEngine extends pkijs.CryptoEngine {
 			case "rc4":
 				return rc4(args[1], args[2]);
 			case "aes-cbc":
+			case "aes-ecb":
 				{
 					if ("pad" in args[0])
 						return decryptWithPadding(this.subtle, args[0], args[1], args[2]);

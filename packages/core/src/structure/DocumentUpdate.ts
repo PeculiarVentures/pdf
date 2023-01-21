@@ -177,6 +177,11 @@ export class PDFDocumentUpdate {
       return;
     }
 
+    if (this.document.encryptHandler) {
+      // encrypt all objects before saving
+      await this.encrypt();
+    }
+
     const startOffset = writer.length;
 
     for (const object of this.xref.objects) {
@@ -585,8 +590,7 @@ export class PDFDocumentUpdate {
         const value = obj.value;
 
         // encrypt 
-        if ((value instanceof PDFDictionary && value.has("Type") && value.get("Type", PDFName).text === "XRef")
-          || (encryptRef && encryptRef.id === obj.id && encryptRef.generation === obj.generation)) {
+        if (encryptRef && encryptRef.id === obj.id && encryptRef.generation === obj.generation) {
           continue;
         }
 
@@ -619,6 +623,11 @@ export class PDFDocumentUpdate {
 
   protected async encryptObject(value: objects.PDFObject, skipIndirect = false): Promise<void> {
     try {
+      if (value instanceof Maybe && value.has()) {
+        // Receive value from Maybe
+        value = value.get();
+      }
+
       if (skipIndirect && value.isIndirect()) {
         return;
       }
@@ -627,8 +636,17 @@ export class PDFDocumentUpdate {
         || value instanceof objects.PDFTextString) {
         await value.encode();
       } else if (value instanceof objects.PDFDictionary) {
-        for (const [, item] of value.items) {
-          await this.encryptObject(item, true);
+        if (value instanceof PDFDictionary && value.has("Type") && value.get("Type", PDFName).text === "XRef") {
+          for (const [key, item] of value.items) {
+            if (key === "Encrypt" || key === "ID") {
+              continue;
+            }
+            await this.encryptObject(item, true);
+          }
+        } else {
+          for (const [, item] of value.items) {
+            await this.encryptObject(item, true);
+          }
         }
       } else if (value instanceof objects.PDFArray) {
         for (const item of value.items) {
@@ -649,5 +667,6 @@ import { CatalogDictionary } from "./dictionaries/Catalog";
 import { PDFDocument, XrefStructure } from "./Document";
 import { PDFDocumentObject, PDFDocumentObjectTypes } from "./DocumentObject";
 import { EncryptDictionary } from "./dictionaries";
-import { PDFDictionary, PDFName } from "../objects";
+import { Maybe, PDFDictionary, PDFIndirectReference, PDFName } from "../objects";
+import { PDFObject } from "pdf-lib";
 

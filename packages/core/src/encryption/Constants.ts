@@ -7,7 +7,7 @@ export const algorithms = {
   sha384: { name: "SHA-384" },
   sha512: { name: "SHA-512" },
   AesCBC: { name: "AES-CBC" },
-  aesecb: { name: "AES-ECB" }
+  AesECB: { name: "AES-ECB" }
 };
 
 export interface globalParametersCryptFilter {
