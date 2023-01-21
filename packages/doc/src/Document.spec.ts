@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as core from "@peculiarventures/pdf-core";
 import * as path from "path";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
-import { PDFDocument, PDFVersion } from "./Document";
+import { PDFDocument, PDFDocumentCreateParameters, PDFVersion } from "./Document";
 import { CheckBox, RadioButtonGroup, TextEditor } from "./Form";
 
 export function writeFile(data: BufferSource, name = "tmp"): void {
@@ -33,7 +33,7 @@ context("Document", () => {
   });
 
   context("Components", () => {
-    
+
     it("Get Checkbox by name", async () => {
       const doc = await PDFDocument.create({
         useXrefTable: true,
@@ -56,17 +56,17 @@ context("Document", () => {
       });
 
       let pdf = await doc.save();
-      
+
       const doc2 = await PDFDocument.load(pdf);
       const components = doc2.getComponents();
-      
+
       assert.strictEqual(components[0].name, checkBox1.name);
       assert.strictEqual(components[1].name, checkBox2.name);
 
       const checkBox = components[0];
       assert.ok(checkBox instanceof CheckBox);
       checkBox.checked = true;
-      
+
       const checkBoxByName = doc2.getComponentByName(checkBox1.name);
       assert.ok(checkBoxByName instanceof CheckBox);
 
@@ -96,20 +96,20 @@ context("Document", () => {
 
       let pdf = await doc.save();
       writeFile(pdf);
-      
+
       const doc2 = await PDFDocument.load(pdf);
       const components = doc2.getComponents();
-      
+
       assert.strictEqual(components[0].name, textBox.name);
 
       const textBoxByName = components[0];
       assert.ok(textBoxByName instanceof TextEditor);
       textBoxByName.left = "20mm";
-      
+
       pdf = await doc2.save();
       writeFile(pdf);
     });
-    
+
     it("Get RadioButtonGroup", async () => {
       const doc = await PDFDocument.create({
         useXrefTable: true,
@@ -134,25 +134,87 @@ context("Document", () => {
 
       let pdf = await doc.save();
       writeFile(pdf);
-      
+
       const doc2 = await PDFDocument.load(pdf);
       const components = doc2.getComponents();
-      
+
       assert.strictEqual(components[0].name, rb1.name);
 
       const rbGroupByName = doc2.getComponentByName(rb1.name);
       assert.ok(rbGroupByName instanceof RadioButtonGroup);
       assert.strictEqual(rbGroupByName.length, 2);
       assert.strictEqual(rbGroupByName.selected, rb1.value);
-      
+
       const item = rbGroupByName.get(1);
       item.checked = true;
 
       assert.strictEqual(rbGroupByName.selected, rb2.value);
-      
+
       pdf = await doc2.save();
       writeFile(pdf);
     });
+
+  });
+
+  context("encryption", () => {
+
+    const tests: {
+      name: string;
+      params: PDFDocumentCreateParameters;
+      save?: boolean;
+    }[] = [
+        {
+          name: "AES128",
+          params: {
+            algorithm: core.CryptoFilterMethods.AES128,
+            userPassword: "12345",
+          },
+        },
+        {
+          name: "AES256",
+          params: {
+            algorithm: core.CryptoFilterMethods.AES256,
+            userPassword: "12345",
+          },
+        },
+      ];
+
+    for (const t of tests) {
+      it(t.name, async () => {
+        const doc = await PDFDocument.create(t.params);
+
+        const page = doc.pages.create();
+        const checkBox = page.addCheckBox({
+          left: 10,
+          top: 10,
+        });
+
+        let pdf = await doc.save();
+        writeFile(pdf);
+
+        checkBox.checked = true;
+
+        pdf = await doc.save();
+        if (t.save) {
+          writeFile(pdf);
+        }
+
+        const doc2 = await PDFDocument.load(pdf, {
+          onUserPassword: async (reason) => {
+            if (reason === core.PasswordReason.incorrect) {
+              throw new Error("Incorrect password");
+            }
+            assert.ok("algorithm" in t.params);
+
+            return t.params.userPassword || "";
+          }
+        });
+        const checkBox2 = doc2.getComponentById(checkBox.id, 0, CheckBox);
+        assert.ok(checkBox2);
+        assert.strictEqual(checkBox2.checked, true);
+
+      });
+    }
 
   });
 
