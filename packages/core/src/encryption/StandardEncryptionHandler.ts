@@ -57,6 +57,8 @@ const STD_CF = "StdCF";
 
 export type StandardEncryptionHandlerCreateParams = StandardEncryptionHandlerCreateParamsV4 | StandardEncryptionHandlerCreateParamsV6;
 
+export type UserPasswordHandle = (reason: PasswordReason) => Promise<Password>;
+
 export class StandardEncryptionHandler extends EncryptionHandler {
   public static readonly NAME = "Standard";
 
@@ -213,7 +215,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
   /**
    * Handler which is used if User password is required
    */
-  public onUserPassword?: (reason: number) => Promise<Password>;
+  public onUserPassword?: UserPasswordHandle;
 
   /**
    * PDF Standard Encrypt dictionary 
