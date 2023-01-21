@@ -261,7 +261,7 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
   public async fetchRevocation(type: RevocationType, cert: X509Certificate): Promise<IResult<CRL | OCSP | null>> {
     if (this.parent) {
       const res = await this.parent.fetchRevocation(type, cert);
-      if (res && res.result) {
+      if (res.result || res.stopPropagation) {
         return res;
       }
     }

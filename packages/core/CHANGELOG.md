@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.2](https://github.com/PeculiarVentures/pdf/compare/v1.5.1...v1.5.2) (2023-01-17)
+
+
+### Bug Fixes
+
+* error on AP getting for TextEdit ([7e5575c](https://github.com/PeculiarVentures/pdf/commit/7e5575cc7895a53d44300541cba9eb7825a197a8))
+
+
+
+
+
+# [1.5.0](https://github.com/PeculiarVentures/pdf/compare/v1.4.0...v1.5.0) (2022-12-27)
+
+
+### Bug Fixes
+
+* error on null object getting [#14](https://github.com/PeculiarVentures/pdf/issues/14) ([a049632](https://github.com/PeculiarVentures/pdf/commit/a0496325ecf5808847bc849bf82b88c218579a03))
+
+
+
+
+
 # [1.4.0](https://github.com/PeculiarVentures/pdf/compare/v1.3.0...v1.4.0) (2022-12-05)
 
 

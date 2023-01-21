@@ -85,7 +85,7 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
   }
 
   public get left(): number {
-    return this.target.rect.urX;
+    return this.target.rect.llX;
   }
 
   public set left(v: core.TypographySize) {
@@ -827,10 +827,23 @@ export class TextEditor extends FormComponent {
             const ap = this.target.AP.get().N;
             if (ap instanceof core.PDFDictionary) {
               const formAP = new FormObject(ap.to(core.FormDictionary), this.document);
-              const font = formAP.resources.get(fontName);
+              // Try to get Font from Appearance.Resources
+              let font = formAP.resources.find(fontName);
 
-              if (!(font.target instanceof core.PDFDictionary)) {
-                throw new TypeError();
+              if (!font) {
+                // Try to get Font from AcroForm.Resources
+                const catalog = this.document.target.update.catalog;
+                if (catalog && catalog.AcroForm.has()) {
+                  const acroForm = catalog.AcroForm.get();
+                  if (acroForm.DR.has()) {
+                    const res = new ResourceManager(acroForm.DR.get(), this.document);
+                    font = res.find(fontName);
+                  }
+                }
+              }
+
+              if (!(font && font.target instanceof core.PDFDictionary)) {
+                throw new TypeError("Cannot get Font from Resources. Incorrect type.");
               }
               const fontDictionary = FontComponent.toFontDictionary(font.target);
 
@@ -944,7 +957,12 @@ export class TextEditor extends FormComponent {
   }
 
   public override paint(): void {
-    const ap = this.target.AP.get(true);
+    const ap = this.target.AP.get();
+    if (!ap.has("N")) {
+      // If AP created by get() function it doesn't have a required filed N
+      ap.N = core.FormDictionary.create(this.target.documentUpdate!);
+    }
+
     if (ap.N instanceof core.PDFStream) {
       const formDict = ap.N.to(core.FormDictionary, true);
       const form = new FormObject(formDict, this.document);
@@ -1044,10 +1062,10 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
     return group.sign(params);
   }
 
-  public async verify(checkDate?: Date): Promise<SignatureVerifyResult> {
+  public async verify(params?: SignatureBoxGroupVerifyParams): Promise<SignatureVerifyResult> {
     const group = this.getGroup();
 
-    return group.verify(checkDate);
+    return group.verify(params);
   }
 
   protected getAppearance(): FormObject {
@@ -1214,6 +1232,11 @@ export interface SignatureVerifyResult {
   states: SignatureStates[];
 }
 
+export interface SignatureBoxGroupVerifyParams {
+  preferCRL?: boolean;
+  checkDate?: Date;
+}
+
 export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, SignatureBox> {
 
   public static readonly CONTAINER_SIZE = 2 * 1024;
@@ -1350,9 +1373,9 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
     return this.target.V;
   }
 
-  public async verify(checkDate?: Date): Promise<SignatureVerifyResult> {
+  public async verify(params: SignatureBoxGroupVerifyParams = {}): Promise<SignatureVerifyResult> {
     const dateNow = new Date();
-    checkDate ||= dateNow;
+    const checkDate = params.checkDate || dateNow;
 
     // TODO Decrypt values on PDF reading
     await FormComponentFactory.getField(this.target as any).t.decode();
@@ -1437,14 +1460,14 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
           // if chain status is no revocation then verify chain with online revocations
           if (chainResult.resultCode === cms.CertificateChainStatusCode.revocationNotFound) {
             result.states.push(this.makeLtvState(false, chainResult.resultMessage));
-            chainResult = await chain.build(verificationResult.signerCertificate, { checkDate, revocationMode: "online" });
+            chainResult = await chain.build(verificationResult.signerCertificate, { checkDate, revocationMode: "online", preferCRL: params.preferCRL });
           } else {
             result.states.push(this.makeLtvState(true));
           }
         } else {
           // verify chain with online revocations
           result.states.push(this.makeLtvState(false, "PDF document doesn't have revocation items"));
-          chainResult = await chain.build(verificationResult.signerCertificate, { checkDate, revocationMode: "online" });
+          chainResult = await chain.build(verificationResult.signerCertificate, { checkDate, revocationMode: "online", preferCRL: params.preferCRL });
         }
 
         switch (chainResult.result) {

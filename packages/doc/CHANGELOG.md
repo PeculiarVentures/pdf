@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.2](https://github.com/PeculiarVentures/pdf/compare/v1.5.1...v1.5.2) (2023-01-17)
+
+
+### Bug Fixes
+
+* error on AP getting for TextEdit ([7e5575c](https://github.com/PeculiarVentures/pdf/commit/7e5575cc7895a53d44300541cba9eb7825a197a8))
+
+
+
+
+
+## [1.5.1](https://github.com/PeculiarVentures/pdf/compare/v1.5.0...v1.5.1) (2023-01-15)
+
+
+### Bug Fixes
+
+* incorrect result for FormComponent.left ([7efdca6](https://github.com/PeculiarVentures/pdf/commit/7efdca646b4cb31830def56b6a81fa198fd71210))
+
+
+
+
+
+# [1.5.0](https://github.com/PeculiarVentures/pdf/compare/v1.4.0...v1.5.0) (2022-12-27)
+
+
+### Features
+
+* add stopPropagation for CertificateStorage IResult ([bcdb90a](https://github.com/PeculiarVentures/pdf/commit/bcdb90a85a94696b6ef993f84bcc5851008b2006))
+* use params for verify ([faceb75](https://github.com/PeculiarVentures/pdf/commit/faceb754dd8782df89d5d10a0fe74b97fd4eda8a))
+
+
+
+
+
 # [1.4.0](https://github.com/PeculiarVentures/pdf/compare/v1.3.0...v1.4.0) (2022-12-05)
 
 

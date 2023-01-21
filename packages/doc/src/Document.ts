@@ -8,7 +8,7 @@ import { SignatureBoxHandler } from "./SignatureBoxHandler";
 import { PDFPages } from "./Pages";
 import { RadioButtonHandler } from "./RadioButtonHandler";
 import { TextEditorHandler } from "./TextEditorHandler";
-import { FormComponentFactory, IComponent, IComponentConstructor, SignatureBoxGroup, SignatureBoxSignParameters, SignatureVerifyResult, SignatureBox } from "./Form";
+import { FormComponentFactory, IComponent, IComponentConstructor, SignatureBoxGroup, SignatureBoxSignParameters, SignatureVerifyResult, SignatureBox, SignatureBoxGroupVerifyParams } from "./Form";
 import { InputImageBoxHandler } from "./InputImageBoxHandler";
 import { FontComponent } from "./Font";
 import { Watermark, WatermarkParams } from "./Watermark";
@@ -325,14 +325,14 @@ export class PDFDocument {
     return group.sign(params);
   }
 
-  public async verify(): Promise<DocumentHandlerVerifyResult> {
+  public async verify(params?: SignatureBoxGroupVerifyParams): Promise<DocumentHandlerVerifyResult> {
     const result: DocumentHandlerVerifyResult = {
       err: null,
       items: []
     };
 
     for (const signature of this.getSignatures()) {
-      const signatureResult = await signature.verify();
+      const signatureResult = await signature.verify(params);
       result.items.push(signatureResult);
     }
 

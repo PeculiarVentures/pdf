@@ -1,8 +1,9 @@
-import { PDFIndirectObject, PDFIndirectReference, PDFObject, PDFStream } from "../objects";
+import { PDFIndirectObject, PDFIndirectReference, PDFNull, PDFObject, PDFStream } from "../objects";
 import { CompressedObject } from "./CompressedObject";
 import type { PDFDocumentUpdate } from "./DocumentUpdate";
 
 export enum PDFDocumentObjectTypes {
+  null = "z",
   free = "f",
   inUse = "n",
   compressed = "c",
@@ -103,7 +104,14 @@ export class PDFDocumentObject implements PDFDocumentObjectParameters {
       if (!this.documentUpdate.document) {
         throw new Error("Required field 'document' is missing");
       }
-      if (this.type === PDFDocumentObjectTypes.compressed) {
+      if (this.type === PDFDocumentObjectTypes.null) {
+        const value = new PDFIndirectObject();
+        value.documentUpdate = this.documentUpdate;
+        value.value = new PDFNull();
+        value.value.documentUpdate = this.documentUpdate;
+
+        this.#value = value;
+      } else if (this.type === PDFDocumentObjectTypes.compressed) {
         // Get CompressedObject stream which
         const stream = this.documentUpdate.getObject(this.offset).value;
         if (!(stream instanceof PDFStream)) {

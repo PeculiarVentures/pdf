@@ -6,6 +6,10 @@ export interface IResult<T> {
   target: ICertificateStorageHandler;
   result: T;
   error?: Error;
+  /**
+   * Prevents further propagation of the current event
+   */
+  stopPropagation?: boolean;
 }
 
 export interface IsTrustedResult extends IResult<boolean> {

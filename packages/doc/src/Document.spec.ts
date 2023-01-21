@@ -1,8 +1,8 @@
 import * as assert from "assert";
 import * as fs from "fs";
-import * as core from "@peculiarventures/pdf-core";
 import * as path from "path";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
+import * as core from "@peculiarventures/pdf-core";
 import { PDFDocument, PDFDocumentCreateParameters, PDFVersion } from "./Document";
 import { CheckBox, RadioButtonGroup, TextEditor } from "./Form";
 
@@ -216,6 +216,25 @@ context("Document", () => {
       });
     }
 
+  });
+
+  it("XY coordinates for CheckBox", async () => {
+    const doc = await PDFDocument.create({
+      useXrefTable: true,
+      disableAscii85Encoding: true,
+      disableCompressedStreams: true,
+    });
+    const page = doc.pages.create();
+    const checkBox = page.addCheckBox({
+      left: 10,
+      top: 10,
+      width: 100,
+    });
+
+    assert.equal(checkBox.left, 10);
+    assert.equal(checkBox.top, 10);
+    assert.equal(checkBox.width, 100);
+    assert.equal(checkBox.height, 18, "Height shall be default 18");
   });
 
 });

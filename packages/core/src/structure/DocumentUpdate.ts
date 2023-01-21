@@ -271,7 +271,13 @@ export class PDFDocumentUpdate {
       return prev.getObject(param, generation);
     }
 
-    throw new Error(`IndirectObject '${param} ${generation}' does not exist`);
+    return new PDFDocumentObject({
+      id: 0,
+      generation: 0,
+      offset: 0,
+      type: PDFDocumentObjectTypes.null,
+      documentUpdate: this,
+    });
   }
 
   protected getCompressedObjectNumbers(): number[] {
