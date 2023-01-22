@@ -1,11 +1,11 @@
-import { ICryptoEngine } from "pkijs";
+import * as pkijs from "pkijs";
 import { BufferSourceConverter, Convert } from "pvtsutils";
 import { algorithms } from "./Constants";
 
 export type Password = string | BufferSource;
 
 export interface StandardAlgorithmParams {
-  crypto: ICryptoEngine;
+  crypto: pkijs.ICryptoEngine;
 }
 
 export interface StandardAlgorithm2Params extends StandardAlgorithmParams {

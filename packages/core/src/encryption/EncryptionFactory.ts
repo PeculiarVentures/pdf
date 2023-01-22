@@ -1,11 +1,11 @@
-import { ICryptoEngine } from "pkijs";
+import * as pkijs from "pkijs";
 import { EncryptDictionary } from "../structure";
 import { EncryptionHandler } from "./EncryptionHandler";
 import { PublicKeyEncryptionHandler } from "./PublicKeyEncryptionHandler";
 import { StandardEncryptionHandler } from "./StandardEncryptionHandler";
 
 export interface EncryptionHandlerConstructor {
-  new(dictionary: EncryptDictionary, crypot: ICryptoEngine): EncryptionHandler;
+  new(dictionary: EncryptDictionary, crypot: pkijs.ICryptoEngine): EncryptionHandler;
   NAME: string;
 }
 

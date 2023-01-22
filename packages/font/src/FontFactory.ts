@@ -1,5 +1,5 @@
 import { AsnConvert } from "@peculiar/asn1-schema";
-import * as bsjs from "bytestreamjs";
+import * as bs from "bytestreamjs";
 import * as fontjs from "fontjs";
 import * as pako from "pako";
 import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
@@ -40,7 +40,7 @@ export abstract class FontFactory {
 
   public static createFile(source: BufferSource): FontInfo {
     const buffer = BufferSourceConverter.toArrayBuffer(source);
-    const font = fontjs.Font.fromStream(new bsjs.SeqStream({ stream: new bsjs.ByteStream({ buffer }) }));
+    const font = fontjs.Font.fromStream(new bs.SeqStream({ stream: new bs.ByteStream({ buffer }) }));
 
     const fontInfo = new FontInfo();
 
@@ -113,7 +113,7 @@ export abstract class FontFactory {
 
   public static subsetFont(source: BufferSource, text: string): ArrayBuffer {
     const buffer = BufferSourceConverter.toArrayBuffer(source);
-    const font = fontjs.Font.fromStream(new bsjs.SeqStream({ stream: new bsjs.ByteStream({ buffer }) }));
+    const font = fontjs.Font.fromStream(new bs.SeqStream({ stream: new bs.ByteStream({ buffer }) }));
 
     const gids = this.getIndexes(font, text);
 
@@ -166,7 +166,7 @@ export abstract class FontFactory {
       cmapLanguage: 0
     });
 
-    const newFontStream = new bsjs.SeqStream();
+    const newFontStream = new bs.SeqStream();
     newFont.toStream(newFontStream);
 
     return newFontStream.buffer;

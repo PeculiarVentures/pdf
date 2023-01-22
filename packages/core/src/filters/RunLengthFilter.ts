@@ -1,4 +1,4 @@
-import * as bytestreamjs from "bytestreamjs";
+import * as bs from "bytestreamjs";
 import { Filter } from "./Filter";
 
 
@@ -23,13 +23,13 @@ export class RunLengthFilter extends Filter {
     let blockLength = 0;
     let count = 0;
 
-    const result = new bytestreamjs.SeqStream({
+    const result = new bs.SeqStream({
       appendBlock: stream.buffer.byteLength
     });
 
     while ((blockLength = stream[count++]) !== 0x80) {
       if (blockLength < 128) {
-        result.append(new bytestreamjs.ByteStream(stream.subarray(count, blockLength + 1)));
+        result.append(new bs.ByteStream(stream.subarray(count, blockLength + 1)));
         count += (blockLength + 1);
       } else {
         const buffer = new ArrayBuffer(257 - blockLength);
@@ -38,7 +38,7 @@ export class RunLengthFilter extends Filter {
         for (let i = 0; i < (257 - blockLength); i++)
           view[i] = stream[count];
 
-        result.append(new bytestreamjs.ByteStream({ buffer }));
+        result.append(new bs.ByteStream({ buffer }));
         count++;
       }
     }

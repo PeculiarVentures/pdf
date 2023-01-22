@@ -1,5 +1,5 @@
 import * as asn1js from "asn1js";
-import { ByteStream } from "bytestreamjs";
+import * as bs from "bytestreamjs";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
 import { utilConcatBuf } from "pvutils";
 import * as pkijs from "pkijs";
@@ -161,7 +161,7 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
 
     for (let i = 0; i < recipientsArray.items.length; i++) {
       // Get CMS Enveloped Data from LiteralString
-      const buffer = new ByteStream({
+      const buffer = new bs.ByteStream({
         string: recipientsArray.items[i]
       });
 

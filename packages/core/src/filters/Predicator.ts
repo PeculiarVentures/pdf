@@ -1,8 +1,8 @@
-import { ByteStream } from "bytestreamjs";
+import * as bs from "bytestreamjs";
 import { PDFDictionary, PDFNumeric } from "../objects";
 
 export interface PredictorParameters {
-  prevData?: ByteStream;
+  prevData?: bs.ByteStream;
   colors?: number;
   bitsPerComponent?: number;
   columns?: number;
@@ -11,13 +11,13 @@ export interface PredictorParameters {
 
 export abstract class Predictor {
 
-  public prevData: ByteStream;
+  public prevData: bs.ByteStream;
   public colors: number;
   public bitsPerComponent: number;
   public columns: number;
 
   constructor(parameters: PredictorParameters = {}) {
-    this.prevData = parameters.prevData ?? new ByteStream(); // Previous data, before action on "Stream"
+    this.prevData = parameters.prevData ?? new bs.ByteStream(); // Previous data, before action on "Stream"
 
     this.colors = parameters.colors ?? 1;
     this.bitsPerComponent = parameters.bitsPerComponent ?? 8;
@@ -40,8 +40,8 @@ export abstract class Predictor {
     }
   }
 
-  public abstract decode(stream: ByteStream): ByteStream;
+  public abstract decode(stream: bs.ByteStream): bs.ByteStream;
 
-  public abstract encode(stream: ByteStream): ByteStream;
+  public abstract encode(stream: bs.ByteStream): bs.ByteStream;
 
 }
