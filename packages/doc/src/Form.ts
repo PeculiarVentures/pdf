@@ -1377,9 +1377,6 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
     const dateNow = new Date();
     const checkDate = params.checkDate || dateNow;
 
-    // TODO Decrypt values on PDF reading
-    await FormComponentFactory.getField(this.target as any).t.decode();
-
     const result: SignatureVerifyResult = {
       verificationResult: false,
       signedData: null,
