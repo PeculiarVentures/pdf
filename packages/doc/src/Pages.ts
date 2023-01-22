@@ -70,7 +70,7 @@ export class PDFPages extends WrapObject<core.PageTreeNodesDictionary> {
   }: PDFPagesCreateParameters = {}): PDFPage {
     const page = core.PageObjectDictionary.create(this.target.documentUpdate!);
 
-    page.mediaBox = orientation === PDFPageOrientation.portrait
+    page.MediaBox = orientation === PDFPageOrientation.portrait
       ? page.createMediaBox(width, height)
       : page.createMediaBox(height, width);
 

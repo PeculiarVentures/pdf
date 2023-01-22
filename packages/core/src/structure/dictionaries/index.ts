@@ -19,6 +19,7 @@ export * from "./Information";
 export * from "./InteractiveForm";
 export * from "./MeasureDictionary";
 export * from "./OPIDictionary";
+export * from "./Page";
 export * from "./PageTreeNodes";
 export * from "./PageObject";
 export * from "./PointDataDictionary";

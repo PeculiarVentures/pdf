@@ -151,7 +151,7 @@ context("StandardEncryptionHandler", () => {
 
         // #region Add page
         const page = PageObjectDictionary.create(doc);
-        page.mediaBox = page.createMediaBox(40, 40);
+        page.MediaBox = page.createMediaBox(40, 40);
         const stm = PDFContentStream.create(doc);
         page.contents = stm;
 

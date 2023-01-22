@@ -1,11 +1,10 @@
 import * as objects from "../../objects";
 import { PDFContent } from "../../content";
-import { TypographyConverter, TypographySize } from "../../TypographyConverter";
-import { UUID } from "../../UUID";
 import { PDFDate, PDFRectangle } from "../common";
 import type { AnnotationDictionary } from "./Annotation";
 import { ResourceDictionary } from "./ResourceDictionary";
 import { PageTreeNodesDictionary } from "./PageTreeNodes";
+import { PageDictionary } from "./Page";
 
 export enum PageTabsOrders {
   /**
@@ -32,14 +31,7 @@ export enum PageTabsOrders {
   widget = "order",
 }
 
-export class PageObjectDictionary extends objects.PDFDictionary {
-
-  public createMediaBox(width: TypographySize, heigh: TypographySize): any {
-    const w = TypographyConverter.toPoint(width);
-    const h = TypographyConverter.toPoint(heigh);
-
-    return this.getDocument().createRectangle(0, 0, w, h);
-  }
+export class PageObjectDictionary extends PageDictionary {
 
   public static readonly TYPE = "Page";
 
@@ -66,40 +58,6 @@ export class PageObjectDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDateField("LastModified", true)
   public lastModified!: PDFDate | null;
-
-  /**
-   * A dictionary containing any resources required by the page contents.
-   * If the page requires no resources, the value of this entry shall be 
-   * an empty dictionary
-   */
-  @objects.PDFDictionaryField({
-    type: ResourceDictionary,
-    name: "Resources"
-  })
-  public resources!: ResourceDictionary;
-
-  /**
-   * A rectangle, expressed in default user space units, that shall define the boundaries 
-   * of the physical medium on which the page shall be displayed or printed
-   */
-  @objects.PDFDictionaryField({
-    type: PDFRectangle,
-    name: "MediaBox",
-  })
-  public mediaBox!: PDFRectangle;
-
-  /**
-   * A rectangle, expressed in default user space units, that shall define 
-   * the visible region of default user space. When the page is displayed 
-   * or printed, its contents shall be clipped (cropped) to this rectangle
-   */
-  @objects.PDFDictionaryField({
-    type: objects.PDFArray,
-    name: "CropBox",
-    optional: true,
-    get: o => new PDFRectangle(o),
-  })
-  public cropBox!: PDFRectangle | null;
 
   /**
    * A rectangle, expressed in default user space units, that shall define 
@@ -163,13 +121,6 @@ export class PageObjectDictionary extends objects.PDFDictionary {
     optional: true,
   })
   public contents!: objects.PDFStream | objects.PDFArray | null;
-
-  /**
-   * The number of degrees by which the page shall be rotated clockwise 
-   * when displayed or printed. The value shall be a multiple of 90
-   */
-  @objects.PDFNumberField("Rotate", true, 0)
-  public rotate!: number;
 
   /**
    * A group attributes dictionary that shall specify the attributes 
@@ -380,8 +331,8 @@ export class PageObjectDictionary extends objects.PDFDictionary {
     const update = this.getDocumentUpdate();
 
     this.type = PageObjectDictionary.TYPE;
-    this.resources = ResourceDictionary.create(update);
-    this.mediaBox = this.createMediaBox("210mm", "297mm"); // A4
+    this.Resources = ResourceDictionary.create(update);
+    this.MediaBox = this.createMediaBox("210mm", "297mm"); // A4
   }
 
   protected getOrCreateContents(): objects.PDFArray | objects.PDFStream {
@@ -419,22 +370,6 @@ export class PageObjectDictionary extends objects.PDFDictionary {
     } else {
       throw new Error("Stream is not supported yet");
     }
-  }
-
-  public addResource(resource: objects.PDFObject, preferredName: string): string {
-    if (resource instanceof objects.PDFDictionary) {
-      if (resource.has("Type")) {
-        const type = resource.get("Type", objects.PDFName).text;
-        if (type === "XObject") {
-          if (!this.resources.XObject) {
-            this.resources.XObject = this.getDocument().createDictionary();
-          }
-          this.resources.XObject.set(preferredName ?? UUID.generate(), resource.makeIndirect());
-        }
-      }
-    }
-
-    throw new TypeError("Cannot add the resource to the page. Unsupported type of the resource.");
   }
 
 }

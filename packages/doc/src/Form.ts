@@ -101,7 +101,7 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
     if (this.target.p) {
       const page = this.target.p.to(core.PageObjectDictionary);
 
-      return page.mediaBox.urY - this.target.rect.urY;
+      return page.MediaBox.urY - this.target.rect.urY;
     }
 
     return this.target.rect.urY;
@@ -112,7 +112,7 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
     const height = this.width;
 
     vPt = (this.target.p)
-      ? this.target.p.to(core.PageObjectDictionary).mediaBox.urY - vPt
+      ? this.target.p.to(core.PageObjectDictionary).MediaBox.urY - vPt
       : vPt;
 
     this.target.rect.modify();

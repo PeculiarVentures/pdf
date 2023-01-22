@@ -2,6 +2,7 @@ import * as objects from "../../objects";
 import { PDFDocument } from "../Document";
 import { PDFDocumentObject } from "../DocumentObject";
 import type { PDFDocumentUpdate } from "../DocumentUpdate";
+import { PageDictionary } from "./Page";
 
 function setCount(this: PageTreeNodesDictionary, value: number) {
   const oldValue = this.has("Count") ? this.Count : 0;
@@ -17,16 +18,16 @@ function getCount(this: PageTreeNodesDictionary, o: objects.PDFNumeric) {
   return o.value;
 }
 
-export class PageTreeNodesDictionary extends objects.PDFDictionary {
+export class PageTreeNodesDictionary extends PageDictionary {
 
   public static readonly TYPE = "Pages";
 
-  public static override create<T extends objects.PDFObject>(this: new () => T, target: PDFDocument | PDFDocumentUpdate, ...items: Array<PageTreeNodesDictionary | PageObjectDictionary>): T {
-    const res = super.create(target) as PageTreeNodesDictionary;
+  public static createWithData(target: PDFDocument | PDFDocumentUpdate, ...items: Array<PageTreeNodesDictionary | PageObjectDictionary>): PageTreeNodesDictionary {
+    const res = this.create(target);
 
     res.push(...items);
 
-    return res as unknown as T;
+    return res;
   }
 
   /**
