@@ -113,12 +113,22 @@ export class PDFDocumentObject implements PDFDocumentObjectParameters {
         this.#value = value;
       } else if (this.type === PDFDocumentObjectTypes.compressed) {
         // Get CompressedObject stream which
-        const stream = this.documentUpdate.getObject(this.offset).value;
-        if (!(stream instanceof PDFStream)) {
-          throw new TypeError("Received object is not type of Stream");
-        }
+        const obj = this.documentUpdate.getObject(this.offset);
+        const stream = obj.value;
 
-        const compressedObject = stream.to(CompressedObject);
+        let compressedObject: CompressedObject;
+        if (stream instanceof CompressedObject) {
+          compressedObject = stream;
+        } else {
+          if (!(stream instanceof PDFStream)) {
+            throw new TypeError("Received object is not type of Stream");
+          }
+
+          compressedObject = stream.to(CompressedObject);
+
+          // Replace obj value. It allows doesn't parse the same object multiple times
+          obj.value = compressedObject;
+        }
         compressedObject.decodeSync();
 
         const value = compressedObject.getValue(this.generation);
