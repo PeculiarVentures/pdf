@@ -1,4 +1,4 @@
-import { ByteStream } from "bytestreamjs";
+import * as bs from "bytestreamjs";
 import { Predictor } from "./Predicator";
 
 
@@ -8,11 +8,11 @@ export class TIFFPredictor extends Predictor {
 		return "TIFFPredictor";
 	}
 
-	public decode(stream: ByteStream): ByteStream {
+	public decode(stream: bs.ByteStream): bs.ByteStream {
 		return stream;
 	}
 
-	public encode(stream: ByteStream): ByteStream {
+	public encode(stream: bs.ByteStream): bs.ByteStream {
 		return stream;
 	}
 

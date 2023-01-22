@@ -1,6 +1,6 @@
 import { Filter } from "./Filter";
 import * as pako from "pako";
-import { ByteStream } from "bytestreamjs";
+import * as bs from "bytestreamjs";
 import { PDFNumeric } from "../objects";
 import { TIFFPredictor } from "./TIFFPredictor";
 import { PNGPredictor } from "./PNGPredictor";
@@ -65,13 +65,13 @@ export class FlateFilter extends Filter {
       if (predictor === 2) {
         result = new TIFFPredictor({
           columns,
-        }).decode(new ByteStream({ view: result })).view;
+        }).decode(new bs.ByteStream({ view: result })).view;
       } else {
         result = new PNGPredictor({
           columns,
           colors,
           bitsPerComponent,
-        }).decode(new ByteStream({ view: result })).view;
+        }).decode(new bs.ByteStream({ view: result })).view;
       }
     }
 

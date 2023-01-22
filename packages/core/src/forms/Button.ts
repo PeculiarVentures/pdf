@@ -29,7 +29,7 @@ export enum ButtonFlags {
 
 export class ButtonDictionary extends PDFField {
 
-  public override ff!: FieldFlags | ButtonFlags;
+  declare public ff: FieldFlags | ButtonFlags;
 
   @PDFArrayField("Opt", true)
   public opt!: PDFArray | null;
