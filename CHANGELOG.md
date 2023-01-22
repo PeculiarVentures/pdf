@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.3](https://github.com/PeculiarVentures/pdf/compare/v1.6.2...v1.6.3) (2023-01-22)
+
+
+### Bug Fixes
+
+* **core:** Page inheritance ([#26](https://github.com/PeculiarVentures/pdf/issues/26)) ([c2b4cfc](https://github.com/PeculiarVentures/pdf/commit/c2b4cfc14344731c2a6fa0d58d1e276a4b646885)), closes [#21](https://github.com/PeculiarVentures/pdf/issues/21)
+
+
+
+
+
 ## [1.6.2](https://github.com/PeculiarVentures/pdf/compare/v1.6.1...v1.6.2) (2023-01-22)
 
 **Note:** Version bump only for package pdf
