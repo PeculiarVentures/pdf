@@ -1,9 +1,10 @@
 import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import * as pkijs from "pkijs";
 
 import type { clientSideParametersPublicKey } from "../encryption/Constants";
 import type { PageObjectDictionary } from "./dictionaries";
 import type { ViewReader } from "../ViewReader";
-import type { PDFDocumentObject } from "./DocumentObject";
+import { EncryptionFactory, EncryptionHandler } from "../encryption";
 
 export interface FindIndexOptions {
   reversed?: boolean;
@@ -23,7 +24,7 @@ export interface DocumentOptions {
   };
   disableAscii85Encoding?: boolean;
   disableCompressedStreams?: boolean;
-  disableCompressedObjects?: boolean
+  disableCompressedObjects?: boolean;
   crypto?: clientSideParametersPublicKey;
 }
 
@@ -54,6 +55,26 @@ export class PDFDocument {
 
   public options: DocumentOptions = {};
 
+  #encryptHandler?: EncryptionHandler | null;
+  public get encryptHandler(): EncryptionHandler | null {
+    if (this.#encryptHandler === undefined) {
+      const encrypt = this.update.Encrypt;
+      if (encrypt) {
+        const encryptHandlerConstructor = EncryptionFactory.get(encrypt.Filter);
+        this.#encryptHandler = new encryptHandlerConstructor(encrypt, pkijs.getCrypto(true));
+      } else {
+        this.#encryptHandler = null;
+      }
+    }
+
+    return this.#encryptHandler;
+  }
+  public set encryptHandler(v: EncryptionHandler | null) {
+    if (v !== this.#encryptHandler) {
+      this.#encryptHandler = v;
+    }
+  }
+
   public async writePDF(writer: ViewWriter): Promise<void> {
     const startOffset = writer.length;
 
@@ -62,6 +83,7 @@ export class PDFDocument {
     } else {
       writer.write(headerChars);
       writer.writeString(`${this.version.toFixed(1)}\n`);
+      writer.writeStringLine("%\xff\xff\xff\xff");
     }
 
     const updates: PDFDocumentUpdate[] = [];
@@ -139,7 +161,7 @@ export class PDFDocument {
 
     this.view = reader.view; // view must be set before decompress
 
-    await this.update.decompress();
+    // await this.update.decompress();
     reader.end();
 
     this.options.xref = this.update.xref instanceof CrossReferenceTable
@@ -320,6 +342,33 @@ export class PDFDocument {
   public createRectangle(llX: number, llY: number, urX: number, urY: number): PDFRectangle {
     return PDFRectangle.createWithData(this.update, llX, llY, urX, urY);
   }
+
+  public async decrypt(): Promise<void> {
+    let update: PDFDocumentUpdate | null = this.update;
+
+    if (this.encryptHandler) {
+      await this.encryptHandler.authenticate();
+
+      const promises: Promise<void>[] = [];
+      while (update) {
+        promises.push(update.decrypt());
+
+        update = update.previous;
+      }
+
+      await Promise.all(promises);
+    }
+  }
+
+  public async encrypt(): Promise<void> {
+    const promises: Promise<void>[] = [];
+    if (this.update) {
+      promises.push(this.update.encrypt());
+    }
+
+    await Promise.all(promises);
+  }
+
 }
 
 import * as objects from "../objects";
@@ -327,5 +376,6 @@ import { ParsingError } from "../ParsingError";
 import { ViewWriter } from "../ViewWriter";
 import { PDFDocumentUpdate } from "./DocumentUpdate";
 import { PDFRectangle } from "./common";
-import { CrossReferenceTable } from "./CrossReferenceTable";import { CharSet } from "../CharSet";
-
+import { CrossReferenceTable } from "./CrossReferenceTable";
+import { CharSet } from "../CharSet";
+import { PDFDocumentObject } from "./DocumentObject";

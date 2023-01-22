@@ -1,4 +1,5 @@
 import * as assert from "assert";
+import { BufferSourceConverter, Convert } from "pvtsutils";
 
 import { ParsingError } from "../ParsingError";
 import { PDFLiteralString } from "./LiteralString";
@@ -8,14 +9,14 @@ context("LiteralString", () => {
   context("fromPDF", () => {
 
     it("Block without opening tag", () => {
-        const parsedItem = new PDFLiteralString();
-        assert.throws(() => parsedItem.fromPDF("Block without opening tag)"), ParsingError);
+      const parsedItem = new PDFLiteralString();
+      assert.throws(() => parsedItem.fromPDF("Block without opening tag)"), ParsingError);
     });
 
     it("Block without closing tag", () => {
 
-        const parsedItem = new PDFLiteralString();
-        assert.throws(() => parsedItem.fromPDF("(Block without closing tag"), ParsingError);
+      const parsedItem = new PDFLiteralString();
+      assert.throws(() => parsedItem.fromPDF("(Block without closing tag"), ParsingError);
     });
 
   });
@@ -89,12 +90,12 @@ context("LiteralString", () => {
     [
       [
         // empty string
-        "", 
+        "",
         "()",
       ],
       [
         // escape special chars
-        "All escaped chars \n\r\t\b\f()\\+", 
+        "All escaped chars \n\r\t\b\f()\\+",
         "(All escaped chars \\n\\r\\t\\b\\f\\(\\)\\\\+)",
       ],
       [
@@ -105,8 +106,8 @@ context("LiteralString", () => {
     ].forEach(([v, o]) => {
       it(JSON.stringify(v), () => {
         const view = new PDFLiteralString(v).toPDF();
-  
-        assert.strictEqual(Buffer.from(view).toString(), o);
+
+        assert.strictEqual(Buffer.from(view).toString("binary"), o);
       });
     });
 

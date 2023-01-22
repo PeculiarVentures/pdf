@@ -16,7 +16,7 @@ export interface CMapsParams {
   cidSystemInfo: {
     registry: string;
     ordering: string;
-  }
+  };
   glyphs: pdfFont.FontGlyph[];
 }
 export class FontComponent extends WrapObject<core.FontDictionary> {
@@ -355,8 +355,8 @@ export enum TextAlignment {
 
 export interface TextStyle {
   size: number;
-  color: core.Colors
-  bgColor?: core.Colors
+  color: core.Colors;
+  bgColor?: core.Colors;
   underline: boolean;
   strikeThrough: boolean;
 }
@@ -406,7 +406,7 @@ export class TextRowItem extends TextRectangle {
 export interface TextBlockParams {
   text: string;
   font: FontComponent;
-  style?: Partial<TextStyle>
+  style?: Partial<TextStyle>;
   link?: string;
 }
 

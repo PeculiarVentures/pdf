@@ -28,30 +28,16 @@ export class PDFDocumentUpdate {
   // public xrefTable: CrossReferenceTable | null = null;
   // public xrefStream: CrossReferenceStream | null = null;
   public startXref = 0;
-  #encryptHandler?: EncryptionHandler | null;
 
   constructor(document: PDFDocument) {
     this.document = document;
-  }
-
-  public get encryptHandler(): EncryptionHandler | null {
-    if (this.#encryptHandler === undefined) {
-      if (this.encrypt) {
-        const encryptHandlerConstructor = EncryptionFactory.get(this.encrypt.filter);
-        this.#encryptHandler = new encryptHandlerConstructor(this.encrypt);
-      } else {
-        this.#encryptHandler = null;
-      }
-    }
-
-    return this.#encryptHandler;
   }
 
   public get items(): ReadonlyArray<PDFDocumentObject> {
     return this.xref?.objects || [];
   }
 
-  public get encrypt(): EncryptDictionary | null {
+  public get Encrypt(): EncryptDictionary | null {
     return this.xref?.Encrypt || null;
   }
 
@@ -191,6 +177,11 @@ export class PDFDocumentUpdate {
       return;
     }
 
+    if (this.document.encryptHandler) {
+      // encrypt all objects before saving
+      await this.encrypt();
+    }
+
     const startOffset = writer.length;
 
     for (const object of this.xref.objects) {
@@ -207,9 +198,11 @@ export class PDFDocumentUpdate {
     if (this.xref instanceof CrossReferenceTable) {
       this.xref.writePDF(writer);
     } else if (this.xref instanceof CrossReferenceStream) {
+      const xref = this.createPDFDocumentObject(this.xref);
+
+      // Prepare should be called after xref was assigned into the document object
       await this.xref.prepare();
 
-      const xref = this.createPDFDocumentObject(this.xref);
       xref.indirect.writePDF(writer);
     }
 
@@ -320,7 +313,13 @@ export class PDFDocumentUpdate {
       .map(id => this.getObject(id, 0)); // get document objects
   }
 
+  #decompressed = false;
+
   public async decompress(): Promise<void> {
+    if (this.#decompressed) {
+      return;
+    }
+
     const compressedObjects = this.getCompressedObjects();
 
     for (const item of compressedObjects) {
@@ -334,6 +333,31 @@ export class PDFDocumentUpdate {
       const compressedObject = item.value = new CompressedObject(stream);
 
       await compressedObject.decode();
+    }
+  }
+
+  public decompressSync(): void {
+    if (this.#decompressed) {
+      return;
+    }
+
+    if (this.document.encryptHandler) {
+      throw new Error("Cannot decompress the update section, document is encrypted. Call decrypt() first.");
+    }
+
+    const compressedObjects = this.getCompressedObjects();
+
+    for (const item of compressedObjects) {
+      const stream = item.value;
+      if (!(stream instanceof objects.PDFStream)) {
+        throw new TypeError("Unexpected type of Compressed objects");
+      }
+      // Replace Stream to Compressed stream
+      // Otherwise item will keep PDF Stream without cashed and decoded data
+      // TODO replace item.value with item.getValue(type) for the case when we know which time must be in the indirect object
+      const compressedObject = item.value = new CompressedObject(stream);
+
+      compressedObject.decodeSync();
     }
   }
 
@@ -514,6 +538,132 @@ export class PDFDocumentUpdate {
     return root;
   }
 
+  protected getObjectReferences(obj: objects.PDFObject, refs: objects.PDFIndirect[] = []): objects.PDFIndirect[] {
+    if (obj instanceof objects.PDFDictionary) {
+      for (const [key, item] of obj.items) {
+        if (item.isIndirect()) {
+          const ref = item.getIndirect();
+          if (refs.find(o => o.id === ref.id && o.generation === ref.generation)) {
+            continue;
+          }
+
+          this.getObjectReferences(obj.get(key), refs);
+        }
+      }
+    }
+
+    return refs;
+  }
+
+  public async decrypt(): Promise<void> {
+    if (this.xref && this.xref.Encrypt) {
+
+      let encryptRef: objects.IPDFIndirect | null = null;
+      if (this.xref.Encrypt.isIndirect()) {
+        encryptRef = this.xref.Encrypt.getIndirect();
+      }
+
+      const promises: Promise<void>[] = [];
+      const items = this.xref.objects;
+      for (const obj of items) {
+        // decrypt 
+        if (obj.type !== PDFDocumentObjectTypes.inUse
+          || (encryptRef && encryptRef.id === obj.id && encryptRef.generation === obj.generation)) {
+          continue;
+        }
+
+        promises.push(this.decryptObject(obj.value));
+      }
+
+      await Promise.all(promises);
+    }
+  }
+
+  public async encrypt(): Promise<void> {
+    if (this.xref && this.xref.Encrypt) {
+      let encryptRef: objects.IPDFIndirect | null = null;
+      if (this.xref.Encrypt.isIndirect()) {
+        encryptRef = this.xref.Encrypt.getIndirect();
+      }
+
+      const promises: Promise<void>[] = [];
+      const items = this.xref.objects;
+      for (const obj of items) {
+        if (obj.type !== PDFDocumentObjectTypes.inUse) {
+          continue;
+        }
+
+        const value = obj.value;
+
+        // encrypt 
+        if (encryptRef && encryptRef.id === obj.id && encryptRef.generation === obj.generation) {
+          continue;
+        }
+
+        promises.push(this.encryptObject(value));
+      }
+
+      await Promise.all(promises);
+    }
+  }
+
+  protected async decryptObject(value: objects.PDFObject): Promise<void> {
+    try {
+      if (value instanceof objects.PDFStream
+        || value instanceof objects.PDFTextString) {
+        await value.decode();
+      } else if (value instanceof objects.PDFDictionary) {
+        for (const [, item] of value.items) {
+          await this.decryptObject(item);
+        }
+      } else if (value instanceof objects.PDFArray) {
+        for (const item of value.items) {
+          await this.decryptObject(item);
+        }
+      }
+    } catch {
+      const r = value.getIndirect(true).id;
+      console.warn(`R ${r}: Cannot decrypt`);
+    }
+  }
+
+  protected async encryptObject(value: objects.PDFObject, skipIndirect = false): Promise<void> {
+    try {
+      if (value instanceof Maybe && value.has()) {
+        // Receive value from Maybe
+        value = value.get();
+      }
+
+      if (skipIndirect && value.isIndirect()) {
+        return;
+      }
+
+      if (value instanceof objects.PDFStream
+        || value instanceof objects.PDFTextString) {
+        await value.encode();
+      } else if (value instanceof objects.PDFDictionary) {
+        if (value instanceof PDFDictionary && value.has("Type") && value.get("Type", PDFName).text === "XRef") {
+          for (const [key, item] of value.items) {
+            if (key === "Encrypt" || key === "ID") {
+              continue;
+            }
+            await this.encryptObject(item, true);
+          }
+        } else {
+          for (const [, item] of value.items) {
+            await this.encryptObject(item, true);
+          }
+        }
+      } else if (value instanceof objects.PDFArray) {
+        for (const item of value.items) {
+          await this.encryptObject(item, true);
+        }
+      }
+    } catch {
+      const r = value.getIndirect(true).id;
+      console.warn(`R ${r}: Cannot encrypt`);
+    }
+  }
 }
 
 import { CompressedObject } from "./CompressedObject";
@@ -523,4 +673,6 @@ import { CatalogDictionary } from "./dictionaries/Catalog";
 import { PDFDocument, XrefStructure } from "./Document";
 import { PDFDocumentObject, PDFDocumentObjectTypes } from "./DocumentObject";
 import { EncryptDictionary } from "./dictionaries";
-import { EncryptionFactory, EncryptionHandler } from "../encryption";
+import { Maybe, PDFDictionary, PDFIndirectReference, PDFName } from "../objects";
+import { PDFObject } from "pdf-lib";
+

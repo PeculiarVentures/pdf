@@ -1,4 +1,4 @@
-import { Convert } from "pvtsutils";
+import { BufferSourceConverter, Convert } from "pvtsutils";
 
 import type { EncryptionObject } from "./EncryptionObject";
 
@@ -12,27 +12,27 @@ export abstract class PDFTextString extends PDFString implements EncryptionObjec
     const parent = this.findIndirect(true);
 
     const textView = Convert.FromBinary(this.text);
-    if (!parent || !this.documentUpdate?.encryptHandler) {
+    if (!parent || !this.documentUpdate?.document.encryptHandler) {
       return textView;
     }
 
-    return this.documentUpdate.encryptHandler.encrypt(textView, parent);
+    return this.documentUpdate.document.encryptHandler.encrypt(textView, this);
   }
 
   public async decryptAsync(): Promise<ArrayBuffer> {
     const parent = this.findIndirect(true);
 
     const textView = Convert.FromBinary(this.text);
-    if (!parent || !this.documentUpdate?.encryptHandler) {
+    if (!parent || !this.documentUpdate?.document.encryptHandler) {
       return textView;
     }
 
-    return this.documentUpdate.encryptHandler.decrypt(textView, parent);
+    return this.documentUpdate.document.encryptHandler.decrypt(textView, this);
   }
 
   public async encode(): Promise<string> {
     if (this.encrypted === false) {
-      if (this.documentUpdate?.encryptHandler) {
+      if (this.documentUpdate?.document.encryptHandler) {
         const decryptedText = await this.encryptAsync();
         this.text = Convert.ToBinary(decryptedText);
         this.encrypted = true;
@@ -44,7 +44,7 @@ export abstract class PDFTextString extends PDFString implements EncryptionObjec
 
   public async decode(): Promise<string> {
     if (this.encrypted === undefined || this.encrypted) {
-      if (this.documentUpdate?.encryptHandler) {
+      if (this.documentUpdate?.document.encryptHandler) {
         const decryptedText = await this.decryptAsync();
         this.text = Convert.ToBinary(decryptedText);
       }
@@ -56,6 +56,10 @@ export abstract class PDFTextString extends PDFString implements EncryptionObjec
   }
 
   public abstract toArrayBuffer(): ArrayBuffer;
+
+  public toUint8Array(): Uint8Array {
+    return BufferSourceConverter.toUint8Array(this.toArrayBuffer());
+  }
 
   protected override onCopy(copy: PDFTextString): void {
     super.onCopy(copy);

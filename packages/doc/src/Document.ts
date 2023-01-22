@@ -33,7 +33,7 @@ export interface DocumentHandlerVerifyResult {
   items: SignatureVerifyResult[];
 }
 
-export interface PDFDocumentCreateParameters {
+export interface PDFDocumentCreateCommonParameters {
   /**
    * Version. Default is PDF 2.0
    */
@@ -53,8 +53,19 @@ export interface PDFDocumentCreateParameters {
   disableCompressedObjects?: boolean;
 }
 
+export interface StandardEncryptionParameters extends core.StandardEncryptionHandlerCreateCommonParams {
+  algorithm: keyof typeof core.CryptoFilterMethods;
+}
+
+export type PDFDocumentCreateParameters = PDFDocumentCreateCommonParameters |
+  (PDFDocumentCreateCommonParameters & StandardEncryptionParameters);
+
 export interface PDFDocumentSignParameters extends SignatureBoxSignParameters {
   groupName?: string;
+}
+
+export interface PDFDocumentLoadParameters {
+  onUserPassword?: core.UserPasswordHandle;
 }
 
 export class PDFDocument {
@@ -84,8 +95,18 @@ export class PDFDocument {
     disableAscii85Encoding = false,
     disableCompressedStreams = false,
     disableCompressedObjects = false,
+    ...others
   }: PDFDocumentCreateParameters = {}): Promise<PDFDocument> {
     const target = new core.PDFDocument();
+
+    if ("algorithm" in others) {
+      target.encryptHandler = await core.StandardEncryptionHandler.create({
+        document: target,
+        crypto: pkijs.getCrypto(true),
+        ...others,
+        algorithm: core.CryptoFilterMethods[others.algorithm] as core.CryptoFilterMethods.AES128,
+      });
+    }
 
     // Set options
     target.version = version;
@@ -102,12 +123,21 @@ export class PDFDocument {
     return new PDFDocument(target);
   }
 
-  public static async load(raw: string | BufferSource): Promise<PDFDocument> {
+  public static async load(raw: string | BufferSource, params: PDFDocumentLoadParameters = {}): Promise<PDFDocument> {
     if (typeof raw === "string") {
       raw = Convert.FromBinary(raw);
     }
 
     const target = await core.PDFDocument.fromPDF(raw);
+
+    if (target.encryptHandler) {
+      if (target.encryptHandler instanceof core.StandardEncryptionHandler && params.onUserPassword) {
+        target.encryptHandler.onUserPassword = params.onUserPassword;
+
+        await target.decrypt();
+      }
+    }
+
     await target.createUpdate();
 
     const doc = new PDFDocument(target);

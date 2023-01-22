@@ -2,8 +2,9 @@ import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
-import { PDFDocument, PDFVersion } from "./Document";
-import { CheckBox, FormComponentFactory, RadioButtonGroup, TextEditor } from "./Form";
+import * as core from "@peculiarventures/pdf-core";
+import { PDFDocument, PDFDocumentCreateParameters, PDFVersion } from "./Document";
+import { CheckBox, RadioButtonGroup, TextEditor } from "./Form";
 
 export function writeFile(data: BufferSource, name = "tmp"): void {
   const filePath = path.resolve(__dirname, `../../../${name}.pdf`);
@@ -152,6 +153,68 @@ context("Document", () => {
       pdf = await doc2.save();
       writeFile(pdf);
     });
+
+  });
+
+  context("encryption", () => {
+
+    const tests: {
+      name: string;
+      params: PDFDocumentCreateParameters;
+      save?: boolean;
+    }[] = [
+        {
+          name: "AES128",
+          params: {
+            algorithm: "AES128",
+            userPassword: "12345",
+          },
+        },
+        {
+          name: "AES256",
+          params: {
+            algorithm: "AES256",
+            userPassword: "12345",
+          },
+        },
+      ];
+
+    for (const t of tests) {
+      it(t.name, async () => {
+        const doc = await PDFDocument.create(t.params);
+
+        const page = doc.pages.create();
+        const checkBox = page.addCheckBox({
+          left: 10,
+          top: 10,
+        });
+
+        let pdf = await doc.save();
+        writeFile(pdf);
+
+        checkBox.checked = true;
+
+        pdf = await doc.save();
+        if (t.save) {
+          writeFile(pdf);
+        }
+
+        const doc2 = await PDFDocument.load(pdf, {
+          onUserPassword: async (reason) => {
+            if (reason === core.PasswordReason.incorrect) {
+              throw new Error("Incorrect password");
+            }
+            assert.ok("algorithm" in t.params);
+
+            return t.params.userPassword || "";
+          }
+        });
+        const checkBox2 = doc2.getComponentById(checkBox.id, 0, CheckBox);
+        assert.ok(checkBox2);
+        assert.strictEqual(checkBox2.checked, true);
+
+      });
+    }
 
   });
 

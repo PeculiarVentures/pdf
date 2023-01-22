@@ -1,4 +1,4 @@
-import { PDFIndirectObject, PDFIndirectReference, PDFNull, PDFObject } from "../objects";
+import { PDFIndirectObject, PDFIndirectReference, PDFNull, PDFObject, PDFStream } from "../objects";
 import { CompressedObject } from "./CompressedObject";
 import type { PDFDocumentUpdate } from "./DocumentUpdate";
 
@@ -113,10 +113,13 @@ export class PDFDocumentObject implements PDFDocumentObjectParameters {
         this.#value = value;
       } else if (this.type === PDFDocumentObjectTypes.compressed) {
         // Get CompressedObject stream which
-        const compressedObject = this.documentUpdate.getObject(this.offset).value;
-        if (!(compressedObject instanceof CompressedObject)) {
-          throw new TypeError("Received object is not type of CompressedObject");
+        const stream = this.documentUpdate.getObject(this.offset).value;
+        if (!(stream instanceof PDFStream)) {
+          throw new TypeError("Received object is not type of Stream");
         }
+
+        const compressedObject = stream.to(CompressedObject);
+        compressedObject.decodeSync();
 
         const value = compressedObject.getValue(this.generation);
 

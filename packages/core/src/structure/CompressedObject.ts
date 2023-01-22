@@ -1,3 +1,4 @@
+import { BufferSourceConverter } from "pvtsutils";
 import { PDFDictionaryField, PDFName, PDFNumeric, PDFObjectReader, PDFObjectTypes, PDFStream } from "../objects";
 import { ViewReader } from "../ViewReader";
 import { ViewWriter } from "../ViewWriter";
@@ -48,7 +49,7 @@ export class CompressedObject extends PDFStream {
     defaultValue: 0,
   })
   public n!: number;
-  
+
   /**
    * The byte offset in the decoded stream of the first compressed object
    */
@@ -76,21 +77,23 @@ export class CompressedObject extends PDFStream {
   #decodedValue?: Uint8Array;
   #refTable: CompressedObjectRef[] = [];
 
-  public override async decode(): Promise<ArrayBuffer> {
-    if (this.#decodedValue) {
-      return this.#decodedValue.buffer;
+  private get decodedValue(): Uint8Array {
+    this.decodeSync();
+
+    if (!this.#decodedValue) {
+      throw new Error("Compressed stream in not decoded call 'decode' method first");
     }
 
-    const buffer = await super.decode();
-    this.#decodedValue = new Uint8Array(buffer);
-
+    return this.#decodedValue;
+  }
+  private set decodedValue(v: Uint8Array) {
     /**
      * Data structure:
      * N[<id> <offset>] N[<objects>]
      */
 
     // parse decoded data
-    const reader = new ViewReader(this.#decodedValue);
+    const reader = new ViewReader(v);
 
     // Read number pairs with id and offset
     let counter = this.n;
@@ -102,7 +105,29 @@ export class CompressedObject extends PDFStream {
       reader.readByte(); // white space
     }
 
-    return this.#decodedValue.buffer;
+    this.#decodedValue = BufferSourceConverter.toUint8Array(v);
+  }
+
+  public override async decode(): Promise<ArrayBuffer> {
+    if (this.#decodedValue) {
+      return this.#decodedValue.buffer;
+    }
+
+    const buffer = await super.decode();
+    this.decodedValue = BufferSourceConverter.toUint8Array(buffer);
+
+    return buffer;
+  }
+
+  public override decodeSync(): ArrayBuffer {
+    if (this.#decodedValue) {
+      return this.#decodedValue.buffer;
+    }
+
+    const buffer = super.decodeSync();
+    this.decodedValue = BufferSourceConverter.toUint8Array(buffer);
+
+    return buffer;
   }
 
   public override async encode(): Promise<ArrayBuffer> {
@@ -140,10 +165,6 @@ export class CompressedObject extends PDFStream {
   }
 
   public getValue(index: number): PDFObjectTypes {
-    if (!this.#decodedValue) {
-      throw new Error("Compressed stream in not decoded call 'decode' method first");
-    }
-
     if (index >= this.#refTable.length) {
       throw new RangeError("Argument 'index' is greater than amount of indirect objects in the Compressed Object");
     }
@@ -151,7 +172,7 @@ export class CompressedObject extends PDFStream {
     const item = this.#refTable[index];
     const offset = item.offset + this.first;
 
-    return PDFObjectReader.read(new ViewReader(this.#decodedValue.subarray(offset)), this.documentUpdate);
+    return PDFObjectReader.read(new ViewReader(this.decodedValue.subarray(offset)), this.documentUpdate);
   }
 
 }

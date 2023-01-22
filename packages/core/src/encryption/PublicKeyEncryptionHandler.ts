@@ -5,7 +5,7 @@ import { utilConcatBuf } from "pvutils";
 import * as pkijs from "pkijs";
 
 import { PDFArray, PDFTextString } from "../objects";
-import { FilterDictionary } from "../structure/dictionaries/Filter";
+import { CryptoFilterDictionary } from "../structure/dictionaries/CryptoFilter";
 import { PublicKeyEncryptDictionary } from "../structure/dictionaries/PublicKeyEncrypt";
 import { algorithms, clientSideParametersPublicKey, staticDataFF } from "./Constants";
 import { EncryptionHandler } from "./EncryptionHandler";
@@ -25,6 +25,10 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
   public override dictionary!: PublicKeyEncryptDictionary;
   public clientSideParameters?: clientSideParametersPublicKey;
   public globalParameters?: globalParametersPublicKey;
+
+  public authenticate(): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
 
   public async encrypt(stream: BufferSource): Promise<ArrayBuffer> {
     const dataIV = new Uint8Array(16);
@@ -56,8 +60,8 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
   }
   public async decrypt(stream: BufferSource): Promise<ArrayBuffer> {
     const streamBuffer = BufferSourceConverter.toUint8Array(stream);
-    if (this.dictionary.v === 4) {
-      if (this.dictionary.stmF === "Identity" && this.dictionary.strF === "Identity") {
+    if (this.dictionary.V === 4) {
+      if (this.dictionary.StmF === "Identity" && this.dictionary.StrF === "Identity") {
         return streamBuffer;
       }
     }
@@ -94,16 +98,16 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
     if (!this.globalParameters) {
       let strKey: CryptoKey;
 
-      const getParametersResult = await this.getParametersByNamePublicKey(this.dictionary.stmF);
+      const getParametersResult = await this.getParametersByNamePublicKey(this.dictionary.StmF);
       if (!getParametersResult) {
         throw new Error("");
       }
 
       const stmKey = getParametersResult;
-      if (this.dictionary.stmF === this.dictionary.strF) {
+      if (this.dictionary.StmF === this.dictionary.StrF) {
         strKey = getParametersResult;
       } else {
-        const getParametersResultStr = await this.getParametersByNamePublicKey(this.dictionary.strF);
+        const getParametersResultStr = await this.getParametersByNamePublicKey(this.dictionary.StrF);
         if (!getParametersResultStr) {
           throw new Error("");
         }
@@ -128,13 +132,9 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
 
     const clientSideParameters = await this.getClientSideParameters();
 
-    if (!this.dictionary.cf) {
-      throw new Error("No parameter's dictionary for default filter for input type");
-    }
-
-    const streamFilterParameters = this.dictionary.cf.get(filterName, FilterDictionary);
+    const streamFilterParameters = this.dictionary.CF.get(true).get(filterName, CryptoFilterDictionary);
     // TODO change check
-    if (!(streamFilterParameters instanceof FilterDictionary)) {
+    if (!(streamFilterParameters instanceof CryptoFilterDictionary)) {
       throw new Error(`${filterName} is not Filter Dictionary`);
     }
 

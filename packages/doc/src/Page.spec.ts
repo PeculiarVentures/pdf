@@ -1,10 +1,11 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as assert from "assert";
-import { PDFDocument, PDFDocumentCreateParameters, PDFVersion } from "./Document";
 import * as core from "@peculiarventures/pdf-core";
 import * as x509 from "@peculiar/x509";
 import { Crypto } from "@peculiar/webcrypto";
+import * as pkijs from "pkijs";
+import { PDFDocument, PDFDocumentCreateParameters, PDFVersion } from "./Document";
 import { writeFile } from "./Document.spec";
 import { Convert } from "pvtsutils";
 import { FontFactory, DefaultFonts } from "@peculiarventures/pdf-font";
@@ -12,7 +13,6 @@ import { FormObject } from "./FormObject";
 import { RadioButton, SignatureBox, SignatureBoxGroup } from "./Form";
 import * as cms from "./cms";
 
-const pkijs = require("pkijs");
 
 const options: PDFDocumentCreateParameters = {
   version: PDFVersion.v1_6,
@@ -295,7 +295,7 @@ context("Page", () => {
 
       assert.strictEqual(rb21.readOnly, true, "rb21 field");
       assert.strictEqual(rb22.readOnly, true, "rb22 field");
-      
+
       assert.strictEqual(rb21.readOnlyAnnot, true, "rb21 annot");
       assert.strictEqual(rb22.readOnlyAnnot, false, "rb22 annot");
 

@@ -6,8 +6,8 @@ export const algorithms = {
   sha256: { name: "SHA-256" },
   sha384: { name: "SHA-384" },
   sha512: { name: "SHA-512" },
-  aescbc: { name: "AES-CBC" },
-  aesecb: { name: "AES-ECB" }
+  AesCBC: { name: "AES-CBC" },
+  AesECB: { name: "AES-ECB" }
 };
 
 export interface globalParametersCryptFilter {
@@ -28,5 +28,5 @@ export interface clientSideParametersPublicKey {
   encrypt?: {
     seed: ArrayBuffer;
     recipientsBuffer: ArrayBuffer;
-  }
+  };
 }

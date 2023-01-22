@@ -79,7 +79,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
 
   public static readonly DEFAULT_STREAM = new Uint8Array();
 
-  public static async createAsync(data: BufferSource, filters: Filter[] = [], parameters?: { [key: string]: PDFObjectTypes }): Promise<PDFStream> {
+  public static async createAsync(data: BufferSource, filters: Filter[] = [], parameters?: { [key: string]: PDFObjectTypes; }): Promise<PDFStream> {
     // Apply filters
     let filteredStream = BufferSourceConverter.toUint8Array(data);
     for (const filter of filters) {
@@ -131,6 +131,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
         this.items = stream.items;
         this._stream = stream._stream;
         this.documentUpdate = stream.documentUpdate;
+        this.encrypted = stream.encrypted;
       } else {
         this.stream = BufferSourceConverter.toUint8Array(stream);
         this.set("Length", new PDFNumeric(this.stream.length));
@@ -269,6 +270,10 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
       return this._stream.view.slice().buffer;
     }
 
+    if (this.documentUpdate?.Encrypt) {
+      throw new Error("PDF document is Encrypted. Sync method is deprecated.");
+    }
+
     const filters = this.getFilters();
 
     for (const filter of filters) {
@@ -302,7 +307,9 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
     }
 
     if (!this.encrypted) {
-      if (this.documentUpdate?.encryptHandler) {
+      if (this.documentUpdate?.document.encryptHandler && !(this.has("Type") && this.get("Type", PDFName).text === "XRef")) {
+        // The cross-reference stream shall not be encrypted and strings appearing in the cross-reference
+        // stream dictionary shall not be encrypted. It shall not have a Filter entry that specifies a Crypt filter 
         const encryptedText = await this.encryptAsync();
         this.stream = BufferSourceConverter.toUint8Array(encryptedText);
         this.length.value = this.stream.length;
@@ -323,9 +330,21 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
     if (!this.filter || !filters.find(f => f.name === "Crypt")) {
       if (this.encrypted === undefined || this.encrypted) {
         if (!(this.has("Type") && this.get("Type", PDFName).text === "XRef")) {
-          if (this.documentUpdate?.encryptHandler) {
-            const decryptedText = await this.decryptAsync();
-            this.stream = BufferSourceConverter.toUint8Array(decryptedText);
+          if (this.documentUpdate?.document.encryptHandler) {
+            try {
+              const decryptedText = await this.decryptAsync();
+              this.stream = BufferSourceConverter.toUint8Array(decryptedText);
+            } catch (e) {
+              if (e instanceof Error) {
+                let ref = "";
+                if (this.isIndirect()) {
+                  const indirect = this.getIndirect();
+                  ref = ` (${indirect.id} ${indirect.generation} R)`;
+                }
+                throw new Error(`Cannot decrypt PDF stream${ref}. ${e.message}`);
+              }
+
+            }
           }
         }
       }
@@ -345,22 +364,22 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
     const parent = this.findIndirect(true);
 
     const streamView = BufferSourceConverter.toArrayBuffer(this.stream);
-    if (!parent || !this.documentUpdate?.encryptHandler) {
+    if (!parent || !this.documentUpdate?.document.encryptHandler) {
       return streamView;
     }
 
-    return this.documentUpdate.encryptHandler.encrypt(streamView, parent);
+    return this.documentUpdate.document.encryptHandler.encrypt(streamView, this);
   }
 
   public async decryptAsync(): Promise<ArrayBuffer> {
     const parent = this.findIndirect(true);
 
     const streamView = BufferSourceConverter.toArrayBuffer(this.stream);
-    if (!parent || !this.documentUpdate?.encryptHandler) {
+    if (!parent || !this.documentUpdate?.document.encryptHandler) {
       return streamView;
     }
 
-    return this.documentUpdate.encryptHandler.decrypt(streamView, parent);
+    return this.documentUpdate.document.encryptHandler.decrypt(streamView, this);
   }
 
   protected override onCopy(copy: PDFStream): void {
