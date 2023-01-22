@@ -70,26 +70,26 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
 
   public get resources(): ResourceManager {
     if (!this.#resources) {
-      this.#resources = new ResourceManager(this.target.resources, this.document);
+      this.#resources = new ResourceManager(this.target.Resources, this.document);
     }
 
     return this.#resources;
   }
 
   public get width(): number {
-    return this.target.mediaBox.get(2, core.PDFNumeric).value;
+    return this.target.MediaBox.get(2, core.PDFNumeric).value;
   }
 
   public get height(): number {
-    return this.target.mediaBox.get(3, core.PDFNumeric).value;
+    return this.target.MediaBox.get(3, core.PDFNumeric).value;
   }
 
   public get left(): number {
-    return this.target.mediaBox.llX;
+    return this.target.MediaBox.llX;
   }
 
   public get bottom(): number {
-    return this.target.mediaBox.llY;
+    return this.target.MediaBox.llY;
   }
 
   public addCheckBox(params: ICheckBoxCreateParameters = {}): CheckBox {

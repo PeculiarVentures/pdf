@@ -673,6 +673,4 @@ import { CatalogDictionary } from "./dictionaries/Catalog";
 import { PDFDocument, XrefStructure } from "./Document";
 import { PDFDocumentObject, PDFDocumentObjectTypes } from "./DocumentObject";
 import { EncryptDictionary } from "./dictionaries";
-import { Maybe, PDFDictionary, PDFIndirectReference, PDFName } from "../objects";
-import { PDFObject } from "pdf-lib";
-
+import { Maybe, PDFDictionary, PDFName } from "../objects";

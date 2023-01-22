@@ -8,11 +8,11 @@ context("PageTreeNodes", () => {
   it("create/Count", () => {
 
     const doc = new PDFDocument();
-    const tree = PageTreeNodesDictionary.create(doc,
+    const tree = PageTreeNodesDictionary.createWithData(doc,
       PageObjectDictionary.create(doc),
-      PageTreeNodesDictionary.create(doc, PageObjectDictionary.create(doc), PageObjectDictionary.create(doc)),
-      PageTreeNodesDictionary.create(doc,
-        PageTreeNodesDictionary.create(doc, PageObjectDictionary.create(doc)),
+      PageTreeNodesDictionary.createWithData(doc, PageObjectDictionary.create(doc), PageObjectDictionary.create(doc)),
+      PageTreeNodesDictionary.createWithData(doc,
+        PageTreeNodesDictionary.createWithData(doc, PageObjectDictionary.create(doc)),
       ));
 
     assert.strictEqual(tree.Count, 4);
