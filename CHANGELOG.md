@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.4](https://github.com/PeculiarVentures/pdf/compare/v1.6.3...v1.6.4) (2023-01-22)
+
+
+### Bug Fixes
+
+* sign encrypted document ([#27](https://github.com/PeculiarVentures/pdf/issues/27)) ([1d7aa90](https://github.com/PeculiarVentures/pdf/commit/1d7aa9015af00ebc14700ee4352b82b49d36493d))
+
+
+
+
+
 ## [1.6.3](https://github.com/PeculiarVentures/pdf/compare/v1.6.2...v1.6.3) (2023-01-22)
 
 
