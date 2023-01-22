@@ -166,14 +166,14 @@ context("Document", () => {
         {
           name: "AES128",
           params: {
-            algorithm: core.CryptoFilterMethods.AES128,
+            algorithm: "AES128",
             userPassword: "12345",
           },
         },
         {
           name: "AES256",
           params: {
-            algorithm: core.CryptoFilterMethods.AES256,
+            algorithm: "AES256",
             userPassword: "12345",
           },
         },

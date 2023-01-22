@@ -54,7 +54,7 @@ export interface PDFDocumentCreateCommonParameters {
 }
 
 export interface StandardEncryptionParameters extends core.StandardEncryptionHandlerCreateCommonParams {
-  algorithm: core.CryptoFilterMethods;
+  algorithm: keyof typeof core.CryptoFilterMethods;
 }
 
 export type PDFDocumentCreateParameters = PDFDocumentCreateCommonParameters |
@@ -104,7 +104,7 @@ export class PDFDocument {
         document: target,
         crypto: pkijs.getCrypto(true),
         ...others,
-        algorithm: others.algorithm as core.CryptoFilterMethods.AES128,
+        algorithm: core.CryptoFilterMethods[others.algorithm] as core.CryptoFilterMethods.AES128,
       });
     }
 
