@@ -129,8 +129,8 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
         this.ownerElement = stream.ownerElement;
         this.view = stream.view;
         this.items = stream.items;
-        this._stream = stream._stream;
         this.documentUpdate = stream.documentUpdate;
+        this.stream = stream.stream.slice();
         this.encrypted = stream.encrypted;
       } else {
         this.stream = BufferSourceConverter.toUint8Array(stream);
@@ -265,9 +265,10 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
 
     return this.stream;
   }
+
   public decodeSync(): ArrayBuffer {
     if (this.encrypted === false) {
-      return this._stream.view.slice().buffer;
+      return this.stream.slice().buffer;
     }
 
     if (this.documentUpdate?.Encrypt) {
@@ -277,13 +278,13 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
     const filters = this.getFilters();
 
     for (const filter of filters) {
-      const view = filter.decodeSync(this._stream.view);
-      this._stream.view = new Uint8Array(view);
+      const view = filter.decodeSync(this.stream);
+      this.stream = new Uint8Array(view);
     }
 
     this.encrypted = false;
 
-    return this._stream.view.slice();
+    return this.stream.slice();
   }
 
   public async encode(): Promise<ArrayBuffer> {
