@@ -372,7 +372,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
     const filter = this.dictionary.CF.get(true).getItem(filterName);
 
     // Use parameters from the crypto filter if it's needed
-    let length = filter.Length || this.length;
+    let length = filter.Length ? filter.Length << 3 : this.length;
     switch (filter.Type) {
       // When CFM is AESV2, the Length key shall be ignored and a value of 128 bits used.
       case CryptoFilterMethods.AES128:

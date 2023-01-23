@@ -133,9 +133,9 @@ export class PDFDocument {
     if (target.encryptHandler) {
       if (target.encryptHandler instanceof core.StandardEncryptionHandler && params.onUserPassword) {
         target.encryptHandler.onUserPassword = params.onUserPassword;
-
-        await target.decrypt();
       }
+
+      await target.decrypt();
     }
 
     await target.createUpdate();

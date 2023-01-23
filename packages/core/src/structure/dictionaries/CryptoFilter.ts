@@ -58,6 +58,9 @@ export class CryptoFilterDictionary extends PDFDictionary {
   @PDFNameField("AuthEvent", true, "DocOpen")
   public AuthEvent!: string;
 
+  /**
+   * The standard security handler expresses the Length entry in bytes.
+   */
   @PDFNumberField("Length", true)
   public Length!: null | number;
 
