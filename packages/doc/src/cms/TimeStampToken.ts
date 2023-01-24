@@ -14,7 +14,7 @@ export class TimeStampToken extends CMSSignedData {
   protected override onFromSchema(schema: any): any {
     const result = super.onFromSchema(schema);
 
-    const info = this.signedData.encapContentInfo.eContent.valueBlock.valueHex;
+    const info = this.signedData.encapContentInfo.eContent!.valueBlock.valueHex;
     this.info = AsnConvert.parse(info, TSTInfo);
 
     return result;

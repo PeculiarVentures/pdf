@@ -1237,6 +1237,12 @@ export interface SignatureBoxGroupVerifyParams {
   checkDate?: Date;
 }
 
+interface VerifySigningTimeParams {
+  signedData?: cms.CMSSignedData;
+  signatureValue: core.SignatureDictionary;
+  checkDate: Date;
+}
+
 export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, SignatureBox> {
 
   public static readonly CONTAINER_SIZE = 2 * 1024;
@@ -1392,123 +1398,152 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
     };
 
     try {
+      result.name = this.name;
+
       const signatureValue = this.getSignatureValue();
-      const signedData = result.signedData = this.getSignedData(signatureValue);
-      const signer = this.getSigner(signedData);
-      const content = this.getContent();
+      result.reason = signatureValue.Reason.has() ? await signatureValue.Reason.get().decode() : null;
+      result.location = signatureValue.Location.has() ? await signatureValue.Location.get().decode() : null;
 
-      const subFilter = signatureValue.subFilter;
-      // Get signature type
-      let signatureType: SignatureType = (subFilter === "ETSI.RFC3161") ? "timestamp" : "signature";
+      let signedData: cms.CMSSignedData | null = null;
+      try {
+        signedData = result.signedData = this.getSignedData(signatureValue);
+      } catch (e) {
+        result.states.push(
+          {
+            type: "invalid",
+            code: "formatting",
+            text: "There are errors in the formatting or information contained in the signature",
+            data: {
+              error: e,
+            }
+          },
+          await this.verifySigningTime({ signatureValue, checkDate, }),
+          {
+            type: "invalid",
+            text: "The signer's identity has not been verified",
+            code: "identity_verification",
+            data: {
+              state: "not_verified"
+            }
+          },
+        );
 
-      if (signatureType === "signature") {
-        const references = signatureValue.reference;
+      }
 
-        if (references) {
-          for (const reference of references) {
-            if (reference.transformMethod) {
-              signatureType = "certified";
-              break;
+      if (signedData) {
+        const signer = this.getSigner(signedData);
+        const content = this.getContent();
+
+        const subFilter = signatureValue.subFilter;
+        // Get signature type
+        let signatureType: SignatureType = (subFilter === "ETSI.RFC3161") ? "timestamp" : "signature";
+
+        if (signatureType === "signature") {
+          const references = signatureValue.reference;
+
+          if (references) {
+            for (const reference of references) {
+              if (reference.transformMethod) {
+                signatureType = "certified";
+                break;
+              }
             }
           }
         }
-      }
 
-      const timeStamp = await this.getTimeStamp(signedData);
-      const signingTime = await this.getSigningTime(signedData instanceof cms.TimeStampToken ? signedData : timeStamp);
+        const timeStamp = await this.getTimeStamp(signedData);
+        const signingTime = await this.getSigningTime(signedData instanceof cms.TimeStampToken ? signedData : timeStamp);
 
-      result.name = this.name;
-      result.reason = signatureValue.Reason.has() ? await signatureValue.Reason.get().decode() : null;
-      result.location = signatureValue.Location.has() ? await signatureValue.Location.get().decode() : null;
-      result.signingTime = signingTime;
-      result.signatureType = signatureType;
+        result.signingTime = signingTime;
+        result.signatureType = signatureType;
 
-      const formattingState = this.verifyFormatting(signatureValue);
-      result.states.push(formattingState);
+        const formattingState = this.verifyFormatting(signatureValue);
+        result.states.push(formattingState);
 
-      const verificationResult = await signer.verify(content, checkDate);
+        const verificationResult = await signer.verify(content, checkDate);
 
-      const modificationState = await this.verifyModification(verificationResult);
-      result.states.push(modificationState);
+        const modificationState = await this.verifyModification(verificationResult);
+        result.states.push(modificationState);
 
-      //Check signature for "signature-time-stamp" attribute
-      const ltvState = await this.isLTV(signedData);
-      if (signatureType !== "timestamp") {
-        const signingTimeState = await this.verifySigningTime(signedData, signatureValue, dateNow);
-        result.states.push(signingTimeState);
-      }
+        //Check signature for "signature-time-stamp" attribute
+        const ltvState = await this.isLTV(signedData);
+        if (signatureType !== "timestamp") {
+          const signingTimeState = await this.verifySigningTime({ signedData, signatureValue, checkDate: dateNow });
+          result.states.push(signingTimeState);
+        }
 
-      //#region Certificate chain status
-      if (verificationResult.signerCertificate) {
-        result.signerCertificate = verificationResult.signerCertificate;
-        const chain = new cms.CertificateChain();
-        chain.certificateHandler.parent = signedData.certificateHandler;
+        //#region Certificate chain status
+        if (verificationResult.signerCertificate) {
+          result.signerCertificate = verificationResult.signerCertificate;
+          const chain = new cms.CertificateChain();
+          chain.certificateHandler.parent = signedData.certificateHandler;
 
-        // If PDF is LTV
-        let chainResult: cms.CertificateChainResult | undefined;
-        if (ltvState) {
-          // Try Chain validation with Revocations
-          // Get all revocations
-          chainResult = await chain.build(verificationResult.signerCertificate, {
-            checkDate: signingTime || checkDate,
-            revocationMode: "offline",
-          });
+          // If PDF is LTV
+          let chainResult: cms.CertificateChainResult | undefined;
+          if (ltvState) {
+            // Try Chain validation with Revocations
+            // Get all revocations
+            chainResult = await chain.build(verificationResult.signerCertificate, {
+              checkDate: signingTime || checkDate,
+              revocationMode: "offline",
+            });
 
-          // if chain status is no revocation then verify chain with online revocations
-          if (chainResult.resultCode === cms.CertificateChainStatusCode.revocationNotFound) {
-            result.states.push(this.makeLtvState(false, chainResult.resultMessage));
-            chainResult = await chain.build(verificationResult.signerCertificate, { checkDate, revocationMode: "online", preferCRL: params.preferCRL });
+            // if chain status is no revocation then verify chain with online revocations
+            if (chainResult.resultCode === cms.CertificateChainStatusCode.revocationNotFound) {
+              result.states.push(this.makeLtvState(false, chainResult.resultMessage));
+              chainResult = await chain.build(verificationResult.signerCertificate, { checkDate, revocationMode: "online", preferCRL: params.preferCRL });
+            } else {
+              result.states.push(this.makeLtvState(true));
+            }
           } else {
-            result.states.push(this.makeLtvState(true));
+            // verify chain with online revocations
+            result.states.push(this.makeLtvState(false, "PDF document doesn't have revocation items"));
+            chainResult = await chain.build(verificationResult.signerCertificate, { checkDate, revocationMode: "online", preferCRL: params.preferCRL });
           }
-        } else {
-          // verify chain with online revocations
-          result.states.push(this.makeLtvState(false, "PDF document doesn't have revocation items"));
-          chainResult = await chain.build(verificationResult.signerCertificate, { checkDate, revocationMode: "online", preferCRL: params.preferCRL });
-        }
 
-        switch (chainResult.result) {
-          case true:
-            result.states.push({
-              type: "valid",
-              text: "The signer's identity has been verified",
-              code: "identity_verification",
-              data: {
-                state: "verified",
-                ...chainResult,
-              }
-            });
-            break;
-          case false:
-            result.verificationResult = false;
-            result.reason = "The signer's identity has not been verified";
-            result.states.push({
-              type: "invalid",
-              text: result.reason,
-              code: "identity_verification",
-              data: {
-                state: "not_verified",
-                ...chainResult,
-              }
-            });
-            break;
-          default:
-            result.verificationResult = false;
-            result.reason = "Signer's identity has not yet been verified";
-            result.states.push({
-              type: "info",
-              text: result.reason,
-              code: "identity_verification",
-              data: {
-                state: "not_verified",
-                ...chainResult,
-              }
-            });
-        }
+          switch (chainResult.result) {
+            case true:
+              result.states.push({
+                type: "valid",
+                text: "The signer's identity has been verified",
+                code: "identity_verification",
+                data: {
+                  state: "verified",
+                  ...chainResult,
+                }
+              });
+              break;
+            case false:
+              result.verificationResult = false;
+              result.reason = "The signer's identity has not been verified";
+              result.states.push({
+                type: "invalid",
+                text: result.reason,
+                code: "identity_verification",
+                data: {
+                  state: "not_verified",
+                  ...chainResult,
+                }
+              });
+              break;
+            default:
+              result.verificationResult = false;
+              result.reason = "Signer's identity has not yet been verified";
+              result.states.push({
+                type: "info",
+                text: result.reason,
+                code: "identity_verification",
+                data: {
+                  state: "not_verified",
+                  ...chainResult,
+                }
+              });
+          }
 
-        result.verificationResult = !!verificationResult.signatureVerified;
+          result.verificationResult = !!verificationResult.signatureVerified;
+        }
+        //#endregion
       }
-      //#endregion
 
     } catch (error: any) {
       if (error instanceof Object) {
@@ -1631,7 +1666,6 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
             });
         }
       }
-
     }
 
     return result;
@@ -1724,49 +1758,53 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
     }
   }
 
-  protected async verifySigningTime(signedData: cms.CMSSignedData, signatureValue: core.SignatureDictionary, checkDate: Date): Promise<SigningTimeStates> {
-    const timeStamp = await this.getTimeStamp(signedData);
-    const signer = this.getSigner(signedData);
+  protected async verifySigningTime({ signedData, signatureValue, checkDate }: VerifySigningTimeParams): Promise<SigningTimeStates> {
+    if (signedData) {
+      const timeStamp = await this.getTimeStamp(signedData);
+      const signer = this.getSigner(signedData);
 
-    if (timeStamp) {
-      // Embedded timestamp
+      if (timeStamp) {
+        // Embedded timestamp
 
-      timeStamp.certificateHandler.parent = signedData.certificateHandler;
-      const tsaResult = await timeStamp.verify(signer.asn.signature.valueBlock.valueHex, checkDate);
-      const state: EmbeddedSigningTimeState = {
-        type: "valid",
-        text: "The signature includes an embedded timestamp",
-        code: "signing_time",
-        data: {
-          type: "embedded",
-          date: timeStamp.info.genTime,
-          signature: tsaResult,
-          info: tsaResult.info,
-        },
-      };
+        timeStamp.certificateHandler.parent = signedData.certificateHandler;
+        const tsaResult = await timeStamp.verify(signer.asn.signature.valueBlock.valueHex, checkDate);
+        const state: EmbeddedSigningTimeState = {
+          type: "valid",
+          text: "The signature includes an embedded timestamp",
+          code: "signing_time",
+          data: {
+            type: "embedded",
+            date: timeStamp.info.genTime,
+            signature: tsaResult,
+            info: tsaResult.info,
+          },
+        };
 
-      // Verify TSA signing certificate
-      const tsaSigner = tsaResult.signers[0];
-      if (tsaSigner && tsaSigner.signerCertificate) {
-        state.data.signer = tsaSigner.signerCertificate;
+        // Verify TSA signing certificate
+        const tsaSigner = tsaResult.signers[0];
+        if (tsaSigner && tsaSigner.signerCertificate) {
+          state.data.signer = tsaSigner.signerCertificate;
+        }
+
+        if (tsaResult.signatureVerified && tsaSigner && tsaSigner.signerCertificate) {
+          const tsaCertChain = new cms.CertificateChain();
+          tsaCertChain.certificateHandler.parent = timeStamp.certificateHandler;
+          state.data.signer = tsaSigner.signerCertificate;
+          state.data.chain = await tsaCertChain.build(tsaSigner.signerCertificate, { checkDate, revocationMode: "online" });
+        }
+
+        if (tsaResult.signatureVerified && state.data.chain && state.data.chain.resultCode === cms.CertificateChainStatusCode.badDate) {
+          state.text += " but it is expired";
+        } else if (!tsaResult.signatureVerified || !state.data.chain || !state.data.chain.result) {
+          state.type = "invalid";
+          state.text += " but it is invalid";
+        }
+
+        return state;
       }
+    }
 
-      if (tsaResult.signatureVerified && tsaSigner && tsaSigner.signerCertificate) {
-        const tsaCertChain = new cms.CertificateChain();
-        tsaCertChain.certificateHandler.parent = timeStamp.certificateHandler;
-        state.data.signer = tsaSigner.signerCertificate;
-        state.data.chain = await tsaCertChain.build(tsaSigner.signerCertificate, { checkDate, revocationMode: "online" });
-      }
-
-      if (tsaResult.signatureVerified && state.data.chain && state.data.chain.resultCode === cms.CertificateChainStatusCode.badDate) {
-        state.text += " but it is expired";
-      } else if (!tsaResult.signatureVerified || !state.data.chain || !state.data.chain.result) {
-        state.type = "invalid";
-        state.text += " but it is invalid";
-      }
-
-      return state;
-    } else if (signatureValue.signingTime) {
+    if (signatureValue.signingTime) {
       // Local time
       const state: LocalSigningTimeState = {
         type: "info",
