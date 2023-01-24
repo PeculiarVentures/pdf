@@ -1,12 +1,10 @@
 import * as asn1js from "asn1js";
 import * as bs from "bytestreamjs";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
-import { utilConcatBuf } from "pvutils";
 import * as pkijs from "pkijs";
 
 import { PDFArray, PDFTextString } from "../objects";
-import { CryptoFilterDictionary } from "../structure/dictionaries/CryptoFilter";
-import { PublicKeyEncryptDictionary } from "../structure/dictionaries/PublicKeyEncrypt";
+import { CryptoFilterDictionary, PublicKeyEncryptDictionary } from "../structure";
 import { algorithms, clientSideParametersPublicKey, staticDataFF } from "./Constants";
 import { EncryptionHandler } from "./EncryptionHandler";
 
@@ -56,7 +54,7 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
       key,
       streamBuffer);
 
-    return utilConcatBuf(dataIV, encryptionsKey);
+    return BufferSourceConverter.concat(dataIV, encryptionsKey);
   }
   public async decrypt(stream: BufferSource): Promise<ArrayBuffer> {
     const streamBuffer = BufferSourceConverter.toUint8Array(stream);
@@ -151,7 +149,7 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
       if (!(item instanceof PDFTextString)) {
         throw new Error("Item is not a string");
       }
-      recipientsBuffer = utilConcatBuf(recipientsBuffer, item.toArrayBuffer());
+      recipientsBuffer = BufferSourceConverter.concat(recipientsBuffer, item.toArrayBuffer());
     }
 
     // Compare each element of the "Recipients" array with each client-side certificate
@@ -228,9 +226,9 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
     }
 
     // Create combined buffer
-    let combinedBuffer = utilConcatBuf(seed, recipients);
+    let combinedBuffer = BufferSourceConverter.concat(seed, recipients);
     if (partiallyEncrypted) {
-      combinedBuffer = utilConcatBuf(combinedBuffer, staticDataFF);
+      combinedBuffer = BufferSourceConverter.concat(combinedBuffer, staticDataFF);
     }
 
     const digestResult = await this.crypto.digest(algorithms.sha256, combinedBuffer);
