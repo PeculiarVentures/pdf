@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.7](https://github.com/PeculiarVentures/pdf/compare/v1.6.6...v1.6.7) (2023-01-24)
+
+
+### Bug Fixes
+
+* verification reason ([#34](https://github.com/PeculiarVentures/pdf/issues/34)) ([e5eb8c9](https://github.com/PeculiarVentures/pdf/commit/e5eb8c93432372f499cebfc02e2bebac5e87fc97))
+
+
+
+
+
 ## [1.6.6](https://github.com/PeculiarVentures/pdf/compare/v1.6.5...v1.6.6) (2023-01-24)
 
 
