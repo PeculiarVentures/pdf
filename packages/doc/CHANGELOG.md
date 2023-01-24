@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.6](https://github.com/PeculiarVentures/pdf/compare/v1.6.5...v1.6.6) (2023-01-24)
+
+
+### Bug Fixes
+
+* add state for malformed CMS ([14fa460](https://github.com/PeculiarVentures/pdf/commit/14fa460dd6ac0d441249130f84e4a2daf96a13d6))
+
+
+
+
+
 ## [1.6.5](https://github.com/PeculiarVentures/pdf/compare/v1.6.4...v1.6.5) (2023-01-23)
 
 **Note:** Version bump only for package @peculiarventures/pdf-doc
