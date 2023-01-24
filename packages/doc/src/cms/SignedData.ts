@@ -31,7 +31,7 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
   public static readonly DIGEST_ALGORITHM = "SHA-1";
   public static readonly SIGNATURE_ALGORITHM: Algorithm = { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-1" } } as Algorithm;
 
-  protected signedData: any;
+  protected signedData: pkijs.SignedData;
 
   public certificateHandler: ICertificateStorageHandler = new CmsCertificateStorageHandler(this);
 
@@ -90,7 +90,7 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
     if (this.signedData.crls) {
       for (const crl of this.signedData.crls) {
         if ("thisUpdate" in crl) {
-          this.certificateHandler.crls.push(crl);
+          this.certificateHandler.crls.push(crl as any); // TODO remove any
           this.crls.push({
             type: "crl",
             value: crl,
@@ -100,7 +100,7 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
             this.certificateHandler.ocsps.push(OCSP.fromSchema(crl.otherRevInfo));
             this.crls.push({
               type: "ocsp",
-              value: crl,
+              value: crl as any, // TODO remove any
             });
           }
         }
@@ -170,7 +170,8 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
 
     if (signer) {
       const signerIndex = this.getSignerIndex(signer);
-      const params: any = {
+      const params: pkijs.SignedDataVerifyParams & { extendedMode: true; } = {
+        data: new ArrayBuffer(0),
         signer: signerIndex,
         checkChain: false,
         checkDate,
@@ -181,7 +182,7 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
         params.data = BufferSourceConverter.toArrayBuffer(data);
       } else {
         if (this.content) {
-          params.data = this.signedData.encapContentInfo.eContent.valueBlock.valueHex; // TODO constructed OCTET STRING
+          params.data = this.signedData.encapContentInfo.eContent!.valueBlock.valueHex; // TODO constructed OCTET STRING
         }
       }
 
@@ -211,12 +212,12 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
 
       if (!pkiResult) {
         try {
-          pkiResult = await this.signedData.verify(params);
+          pkiResult = await this.signedData.verify(params) as unknown as CMSSignerInfoVerifyResult;
         } catch (e) {
           if (typeof e === "string") {
             throw new Error(`Failed on PKI SignedData 'verify' method execution. ${e}`);
           }
-          if (e instanceof Error) {
+          if (e instanceof Error && !("certificatePath" in e)) {
             throw e;
           }
 
