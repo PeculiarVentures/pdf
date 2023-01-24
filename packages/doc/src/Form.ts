@@ -1515,10 +1515,9 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
               break;
             case false:
               result.verificationResult = false;
-              result.reason = "The signer's identity has not been verified";
               result.states.push({
                 type: "invalid",
-                text: result.reason,
+                text: "The signer's identity has not been verified",
                 code: "identity_verification",
                 data: {
                   state: "not_verified",
@@ -1528,10 +1527,9 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
               break;
             default:
               result.verificationResult = false;
-              result.reason = "Signer's identity has not yet been verified";
               result.states.push({
                 type: "info",
-                text: result.reason,
+                text: "Signer's identity has not yet been verified",
                 code: "identity_verification",
                 data: {
                   state: "not_verified",
