@@ -14,8 +14,6 @@ export interface StandardEncryptionHandlerCreateCommonParams {
   permission?: UserAccessPermissionFlags;
   ownerPassword?: Password;
   userPassword?: Password;
-  disableString?: boolean;
-  disableStream?: boolean;
   encryptMetadata?: boolean;
 }
 
