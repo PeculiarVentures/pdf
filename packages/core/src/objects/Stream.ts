@@ -196,7 +196,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
       }
     }
 
-    if (this.has("Filter") || this.documentUpdate?.document.encryptHandler) {
+    if (this.has("Filter") || !(this.has("Type") && this.get("Type", PDFName).text === "XRef") && this.documentUpdate?.document.encryptHandler) {
       this.encrypted = true;
     }
 
