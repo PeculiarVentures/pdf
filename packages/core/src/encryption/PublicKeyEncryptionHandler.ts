@@ -1,6 +1,6 @@
 import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 import * as pkijs from "pkijs";
-import { X509Certificate } from "@peculiar/x509";
+import { Name, X509Certificate } from "@peculiar/x509";
 
 import { PDFArray, PDFHexString, PDFStream, PDFTextString } from "../objects";
 import { CryptoFilterMethods, EncryptDictionary, PublicKeyCryptoFilterDictionary, PublicKeyEncryptDictionary, PublicKeyPermissionFlags, TrailerDictionary } from "../structure";
@@ -76,11 +76,13 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
     let encryptionKeys: EncryptionKeys | null = null;
     switch (params.algorithm) {
       case CryptoFilterMethods.AES128:
-        encrypt.SubFilter = "adbe.pkcs7.s4";
-        encrypt.Length = 128;
-        encrypt.V = 4; // CF, StmF, and StrF
+        throw new Error("Cannot create PublicKeyEncryptionHandler. AES128 crypto mechanism is not supported");
+        // encrypt.SubFilter = "adbe.pkcs7.s4";
+        // encrypt.Length = 128;
+        // encrypt.V = 4; // CF, StmF, and StrF
         break;
-      case CryptoFilterMethods.AES256:
+      case CryptoFilterMethods.AES256: {
+        let encryptionKey: EncryptionKey | null = null;
         // create StdCF Crypto Filter
         if (!params.disableStream || !params.disableString) {
           const filter = PublicKeyCryptoFilterDictionary.create(doc);
@@ -129,22 +131,39 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
             crypto,
           });
 
-          const encryptionKey = {
+          encryptionKey = {
             type: params.algorithm,
             raw: BufferSourceConverter.toUint8Array(key),
           };
-          encryptionKeys = {
-            stream: encryptionKey,
-            string: encryptionKey,
-          };
         }
-        encrypt.StmF = params.disableStream ? "Identity" : DefaultCryptFilter;
-        encrypt.StrF = params.disableString ? "Identity" : DefaultCryptFilter;
+
+        encryptionKeys = {
+          stream: {
+            type: CryptoFilterMethods.None,
+            raw: new Uint8Array(),
+          },
+          string: {
+            type: CryptoFilterMethods.None,
+            raw: new Uint8Array(),
+          },
+        };
+        encrypt.StmF = "Identity";
+        encrypt.StrF = "Identity";
+
+        if (encryptionKey && !params.disableStream) {
+          encryptionKeys.stream = encryptionKey;
+          encrypt.StmF = DefaultCryptFilter;
+        }
+        if (encryptionKey && !params.disableString) {
+          encryptionKeys.string = encryptionKey;
+          encrypt.StrF = DefaultCryptFilter;
+        }
 
         encrypt.SubFilter = "adbe.pkcs7.s5";
         encrypt.V = 5; // CF, StmF, and StrF
 
         break;
+      }
       default:
         throw new Error("Unknown crypto method.");
     }
@@ -182,7 +201,7 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
 
   public override dictionary!: PublicKeyEncryptDictionary;
 
-  public onCertificate?: (id?: { serialNumber: string; issuer: string; }) => Promise<{
+  public onCertificate?: (id?: { serialNumber: string; issuer: string; algorithm: Algorithm; }) => Promise<{
     key: CryptoKey | BufferSource;
     certificate: X509Certificate;
     crypto: Crypto;
@@ -326,12 +345,29 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
         throw new Error(`Incorrect value in "recipientInfos" for item #${i} of "Recipients" array.`);
       }
 
-
       if (!this.onCertificate) {
         throw new Error("Cannot get certificate private key, 'onCertificate' callback is empty.");
       }
 
-      const recipient = await this.onCertificate();
+      if (!(recipientInfo.value.rid instanceof pkijs.IssuerAndSerialNumber)) {
+        throw new Error("Cannot get the recipient ID. Unsupported type of the recipient ID");
+      }
+
+      // Convert the recipient ID to JSON compatible with @peculiar/x509
+      const issuerName = new Name(recipientInfo.value.rid.issuer.toSchema().toBER());
+      const serialNumber = Convert.ToHex(recipientInfo.value.rid.serialNumber.valueBlock.valueHexView);
+      const algorithm: Algorithm = this.crypto.getAlgorithmByOID(recipientInfo.value.keyEncryptionAlgorithm.algorithmId, true, "keyEncryptionAlgorithm");
+      if (algorithm.name === "RSA-OAEP") {
+        const schema = recipientInfo.value.keyEncryptionAlgorithm.algorithmParams;
+        const rsaOAEPParams = new pkijs.RSAESOAEPParams({ schema });
+
+        (algorithm as RsaHashedKeyAlgorithm).hash = this.crypto.getAlgorithmByOID(rsaOAEPParams.hashAlgorithm.algorithmId, true, "rsaOAEPParams.hashAlgorithm");
+      }
+      const recipient = await this.onCertificate({
+        issuer: issuerName.toString(),
+        serialNumber: serialNumber,
+        algorithm,
+      });
 
       if (recipient) {
         const decryptedKey = BufferSourceConverter.isBufferSource(recipient.key)
