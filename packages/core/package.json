@@ -32,11 +32,11 @@
   },
   "dependencies": {
     "@types/events": "^3.0.0",
+    "@peculiar/x509": "^1.9.3",
     "asn1js": "^3.0.5",
     "bytestreamjs": "2.0.1",
     "events": "3.3.0",
     "pako": "^2.0.3",
-    "pdf-lib": "^1.16.0",
     "pkijs": "^3.0.13",
     "pvtsutils": "^1.2.2",
     "pvutils": "^1.1.3",
