@@ -135,6 +135,8 @@ context("StandardEncryptionHandler", () => {
       it(t.name, async () => {
         const doc = new PDFDocument;
         doc.version = 2.0;
+        doc.options.disableAscii85Encoding = true;
+        doc.options.disableCompressedStreams = true;
         doc.options.xref = t.params.useXRefTable ? XrefStructure.Table : XrefStructure.Stream;
         doc.update.addCatalog();
 
@@ -146,7 +148,7 @@ context("StandardEncryptionHandler", () => {
           ownerPassword: t.params.ownerPassword,
           userPassword: t.params.userPassword,
           disableString: t.params.disableString,
-          disableStream: t.params.disableString,
+          disableStream: t.params.disableStream,
         });
 
         // #region Add page
