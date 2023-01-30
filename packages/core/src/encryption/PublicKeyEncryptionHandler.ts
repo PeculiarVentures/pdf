@@ -56,6 +56,18 @@ async function computeEncryptionKey(params: ComputeEncryptionKeyParams): Promise
 
 const DefaultCryptFilter = "DefaultCryptFilter";
 
+export interface Recipient {
+  key: CryptoKey | BufferSource;
+  certificate: X509Certificate;
+  crypto: Crypto;
+}
+
+export type CertificateHandle = (id?: {
+  serialNumber: string;
+  issuer: string;
+  algorithm: Algorithm;
+}) => Promise<Recipient | null>;
+
 export class PublicKeyEncryptionHandler extends EncryptionHandler {
   public static readonly NAME = "Adobe.PubSec";
 
@@ -201,11 +213,7 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
 
   public override dictionary!: PublicKeyEncryptDictionary;
 
-  public onCertificate?: (id?: { serialNumber: string; issuer: string; algorithm: Algorithm; }) => Promise<{
-    key: CryptoKey | BufferSource;
-    certificate: X509Certificate;
-    crypto: Crypto;
-  } | null>;
+  public onCertificate?: CertificateHandle;
 
   public async authenticate(): Promise<void> {
     await this.#getKeys();

@@ -16,6 +16,8 @@ import { FormObject } from "./FormObject";
 import { WrapObject } from "./WrapObject";
 import { Dss } from "./Dss";
 import { IPdfCertificateStorageHandler, PDFCertificateStorageHandler } from "./CertificateStorageHandler";
+import { PublicKeyPermissionFlags } from "@peculiarventures/pdf-core";
+import { X509Certificate } from "@peculiar/x509";
 
 export enum PDFVersion {
   v1_1 = 1.1,
@@ -57,8 +59,16 @@ export interface StandardEncryptionParameters extends core.StandardEncryptionHan
   algorithm: keyof typeof core.CryptoFilterMethods;
 }
 
+export interface PublicKeyEncryptionParameters {
+  permission?: PublicKeyPermissionFlags;
+  encryptMetadata?: boolean;
+  algorithm: keyof typeof core.CryptoFilterMethods;
+  recipients: X509Certificate[];
+}
+
 export type PDFDocumentCreateParameters = PDFDocumentCreateCommonParameters |
-  (PDFDocumentCreateCommonParameters & StandardEncryptionParameters);
+  (PDFDocumentCreateCommonParameters & StandardEncryptionParameters) |
+  (PDFDocumentCreateCommonParameters & PublicKeyEncryptionParameters);
 
 export interface PDFDocumentSignParameters extends SignatureBoxSignParameters {
   groupName?: string;
@@ -66,6 +76,7 @@ export interface PDFDocumentSignParameters extends SignatureBoxSignParameters {
 
 export interface PDFDocumentLoadParameters {
   onUserPassword?: core.UserPasswordHandle;
+  onCertificate?: core.CertificateHandle;
 }
 
 export class PDFDocument {
@@ -100,12 +111,21 @@ export class PDFDocument {
     const target = new core.PDFDocument();
 
     if ("algorithm" in others) {
-      target.encryptHandler = await core.StandardEncryptionHandler.create({
-        document: target,
-        crypto: pkijs.getCrypto(true),
-        ...others,
-        algorithm: core.CryptoFilterMethods[others.algorithm] as core.CryptoFilterMethods.AES128,
-      });
+      if ("recipients" in others) {
+        target.encryptHandler = await core.PublicKeyEncryptionHandler.create({
+          document: target,
+          crypto: pkijs.getCrypto(true),
+          ...others,
+          algorithm: core.CryptoFilterMethods[others.algorithm] as core.CryptoFilterMethods.AES128,
+        });
+      } else {
+        target.encryptHandler = await core.StandardEncryptionHandler.create({
+          document: target,
+          crypto: pkijs.getCrypto(true),
+          ...others,
+          algorithm: core.CryptoFilterMethods[others.algorithm] as core.CryptoFilterMethods.AES128,
+        });
+      }
     }
 
     // Set options
@@ -133,6 +153,9 @@ export class PDFDocument {
     if (target.encryptHandler) {
       if (target.encryptHandler instanceof core.StandardEncryptionHandler && params.onUserPassword) {
         target.encryptHandler.onUserPassword = params.onUserPassword;
+      }
+      if (target.encryptHandler instanceof core.PublicKeyEncryptionHandler && params.onCertificate) {
+        target.encryptHandler.onCertificate = params.onCertificate;
       }
 
       await target.decrypt();
