@@ -62,11 +62,13 @@ export interface Recipient {
   crypto: Crypto;
 }
 
-export type CertificateHandle = (id?: {
+export interface CertificateHandleParams {
   serialNumber: string;
   issuer: string;
   algorithm: Algorithm;
-}) => Promise<Recipient | null>;
+}
+
+export type CertificateHandle = (params: CertificateHandleParams) => Promise<Recipient | null>;
 
 export class PublicKeyEncryptionHandler extends EncryptionHandler {
   public static readonly NAME = "Adobe.PubSec";
