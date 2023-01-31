@@ -18,15 +18,7 @@ export interface StandardEncryptionHandlerCreateCommonParams {
 }
 
 export interface StandardEncryptionHandlerCreateParamsV4 extends EncryptionHandlerCreateParams, StandardEncryptionHandlerCreateCommonParams {
-  algorithm: CryptoFilterMethods.RC4 | CryptoFilterMethods.AES128;
-}
-
-export interface StandardEncryptionHandlerCreateParamsV6 extends EncryptionHandlerCreateParams, StandardEncryptionHandlerCreateCommonParams {
-  algorithm: CryptoFilterMethods.AES256;
-  /**
-   * Encryption key
-   */
-  key?: CryptoKey;
+  algorithm: CryptoFilterMethods;
 }
 
 export enum PasswordReason {
@@ -36,7 +28,9 @@ export enum PasswordReason {
 
 const STD_CF = "StdCF";
 
-export type StandardEncryptionHandlerCreateParams = StandardEncryptionHandlerCreateParamsV4 | StandardEncryptionHandlerCreateParamsV6;
+export interface StandardEncryptionHandlerCreateParams extends EncryptionHandlerCreateParams, StandardEncryptionHandlerCreateCommonParams {
+  algorithm: CryptoFilterMethods;
+}
 
 export type UserPasswordHandle = (reason: PasswordReason) => Promise<Password>;
 
@@ -73,6 +67,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
     }
 
     switch (params.algorithm) {
+      case CryptoFilterMethods.RC4:
       case CryptoFilterMethods.AES128:
         encrypt.R = 4;
         encrypt.Length = 128;
@@ -114,6 +109,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
     }
 
     switch (params.algorithm) {
+      case CryptoFilterMethods.RC4:
       case CryptoFilterMethods.AES128: {
         // compute O values and set them into the Encrypt dictionary
         const o = await StandardEncryptionAlgorithm.algorithm3({
@@ -231,12 +227,13 @@ export class StandardEncryptionHandler extends EncryptionHandler {
 
   public async checkUserPassword(password: Password = ""): Promise<boolean> {
     const dict = this.dictionary;
+    let res = false;
 
     switch (this.revision) {
       case 2:
       case 3:
       case 4:
-        return StandardEncryptionAlgorithm.algorithm6({
+        res = await StandardEncryptionAlgorithm.algorithm6({
           crypto: this.crypto,
           password,
           length: dict.Length,
@@ -247,25 +244,32 @@ export class StandardEncryptionHandler extends EncryptionHandler {
           permissions: dict.P,
           encryptMetadata: dict.EncryptMetadata,
         });
+        break;
       case 6:
-        return StandardEncryptionAlgorithm.algorithm11({
+        res = await StandardEncryptionAlgorithm.algorithm11({
           crypto: this.crypto,
           password,
           u: dict.U.toUint8Array()
         });
+        break;
       default:
         throw new Error("Cannot check the Owner password, unknown revision");
     }
+
+    this.#userPassword = password;
+
+    return res;
   }
 
   public async checkOwnerPassword(password: Password = ""): Promise<boolean> {
     const dict = this.dictionary;
+    let res = false;
 
     switch (this.revision) {
       case 2:
       case 3:
       case 4:
-        return StandardEncryptionAlgorithm.algorithm7({
+        res = await StandardEncryptionAlgorithm.algorithm7({
           crypto: this.crypto,
           revision: this.revision,
           user: await this.#getUserPassword(),
@@ -273,16 +277,22 @@ export class StandardEncryptionHandler extends EncryptionHandler {
           length: dict.Length,
           o: dict.O.toUint8Array(),
         });
+        break;
       case 6:
-        return StandardEncryptionAlgorithm.algorithm12({
+        res = await StandardEncryptionAlgorithm.algorithm12({
           crypto: this.crypto,
           password,
           o: dict.O.toUint8Array(),
-          u: dict.U.toUint8Array()
+          u: dict.U.toUint8Array(),
         });
+        break;
       default:
         throw new Error("Cannot check the Owner password, unknown revision");
     }
+
+    this.#ownerPassword = password;
+
+    return res;
   }
 
   /**
@@ -431,7 +441,25 @@ export class StandardEncryptionHandler extends EncryptionHandler {
         };
       }
     } else {
-      throw new Error("Crypto mechanisms with V less than 4 are not supported.");
+      const encKeyRaw = await StandardEncryptionAlgorithm.algorithm2({
+        id: this.id,
+        password,
+        revision: this.dictionary.R,
+        encryptMetadata: this.dictionary.EncryptMetadata,
+        permissions: this.dictionary.P,
+        o: this.dictionary.O.toUint8Array(),
+        length: this.dictionary.Length,
+        crypto: this.crypto,
+      });
+      const key: EncryptionKey = {
+        type: CryptoFilterMethods.RC4,
+        raw: BufferSourceConverter.toUint8Array(encKeyRaw),
+      };
+
+      this.#keys = {
+        stream: key,
+        string: key,
+      };
     }
 
     return this.#keys;

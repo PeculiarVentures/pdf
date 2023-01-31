@@ -344,7 +344,6 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
                 }
                 throw new Error(`Cannot decrypt PDF stream${ref}. ${e.message}`);
               }
-
             }
           }
         }
