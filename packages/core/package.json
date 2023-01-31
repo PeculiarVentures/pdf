@@ -1,6 +1,6 @@
 {
   "name": "@peculiarventures/pdf-core",
-  "version": "1.6.5",
+  "version": "1.7.0",
   "description": "Now I’m the model of a modern major general / The venerated Virginian veteran whose men are all / Lining up, to put me up on a pedestal / Writin’ letters to relatives / Embellishin’ my elegance and eloquence / But the elephant is in the room / The truth is in ya face when ya hear the British cannons go / BOOM",
   "keywords": [],
   "author": "microshine <microshine@mail.ru>",
@@ -31,8 +31,8 @@
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
   "dependencies": {
-    "@types/events": "^3.0.0",
     "@peculiar/x509": "^1.9.3",
+    "@types/events": "^3.0.0",
     "asn1js": "^3.0.5",
     "bytestreamjs": "2.0.1",
     "events": "3.3.0",

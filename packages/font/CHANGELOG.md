@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.7.0](https://github.com/PeculiarVentures/pdf/compare/v1.6.7...v1.7.0) (2023-01-31)
+
+
+### Features
+
+* Public Key encryption ([#35](https://github.com/PeculiarVentures/pdf/issues/35)) ([0763e20](https://github.com/PeculiarVentures/pdf/commit/0763e20dc9973d101c97e46a2b496b8ed09d2e06))
+
+
+
+
+
 ## [1.6.1](https://github.com/PeculiarVentures/pdf/compare/v1.6.0...v1.6.1) (2023-01-22)
 
 **Note:** Version bump only for package @peculiarventures/pdf-font
