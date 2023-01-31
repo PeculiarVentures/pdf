@@ -271,7 +271,7 @@ export class StandardEncryptionAlgorithm {
 
     // h) (Security handlers of revision 3 or greater) Do the following 50 times
     let counter = 50;
-    while (params.revision > 3 && counter--) {
+    while (params.revision >= 3 && counter--) {
       hash = await params.crypto.digest(algorithms.md5, hash);
     }
 

@@ -165,6 +165,13 @@ context("Document", () => {
       save?: boolean;
     }[] = [
         {
+          name: "RC4",
+          params: {
+            algorithm: "RC4",
+            userPassword: "12345",
+          },
+        },
+        {
           name: "AES128",
           params: {
             algorithm: "AES128",

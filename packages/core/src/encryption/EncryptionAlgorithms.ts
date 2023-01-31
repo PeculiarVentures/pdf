@@ -66,9 +66,12 @@ export abstract class EncryptionAlgorithms {
     if (encrypt) {
       iv = crypto.getRandomValues(new Uint8Array(16));
       cipherData = view;
-    } else {
+    } else if (key.type !== CryptoFilterMethods.RC4) {
       iv = view.slice(0, 16);
       cipherData = view.slice(16, view.byteLength);
+    } else {
+      iv = new Uint8Array();
+      cipherData = view;
     }
 
     // Create combined key
@@ -110,7 +113,8 @@ export abstract class EncryptionAlgorithms {
       }
       case CryptoFilterMethods.RC4:
       default: {
-        const cryptoKey = await this.getCutHashV2(combinedKey, key.raw.byteLength, crypto) as any;
+        const cutHash = await this.getCutHashV2(combinedKey, key.raw.length, crypto);
+        const cryptoKey = cutHash as unknown as CryptoKey;
 
         if (encrypt) {
           return await crypto.encrypt("RC4", cryptoKey, cipherData);

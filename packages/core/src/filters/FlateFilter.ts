@@ -55,7 +55,16 @@ export class FlateFilter extends Filter {
       }
     }
 
-    let result = pako.ungzip(stream);
+    let result: Uint8Array;
+    try {
+      result = pako.ungzip(stream);
+    } catch (e) {
+      if (e instanceof Error) {
+        throw e;
+      }
+
+      throw new Error(`Cannot decode the stream using the FlateDecode filter. ${e}`);
+    }
 
     if (!result) {
       return BufferSourceConverter.toArrayBuffer(stream);
