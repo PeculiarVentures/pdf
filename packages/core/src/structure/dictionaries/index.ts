@@ -24,6 +24,7 @@ export * from "./PageTreeNodes";
 export * from "./PageObject";
 export * from "./PointDataDictionary";
 export * from "./PublicKeyEncrypt";
+export * from "./PublicKeyCryptoFilter";
 export * from "./ResourceDictionary";
 export * from "./StandardEncrypt";
 export * from "./Trailer";

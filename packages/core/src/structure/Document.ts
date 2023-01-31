@@ -62,12 +62,10 @@ export class PDFDocument {
       if (encrypt) {
         const encryptHandlerConstructor = EncryptionFactory.get(encrypt.Filter);
         this.#encryptHandler = new encryptHandlerConstructor(encrypt, pkijs.getCrypto(true));
-      } else {
-        this.#encryptHandler = null;
       }
     }
 
-    return this.#encryptHandler;
+    return this.#encryptHandler || null;
   }
   public set encryptHandler(v: EncryptionHandler | null) {
     if (v !== this.#encryptHandler) {

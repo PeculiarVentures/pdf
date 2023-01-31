@@ -36,6 +36,6 @@
     "@peculiarventures/pdf-core": "^1.6.5",
     "@peculiarventures/pdf-doc": "^1.6.7",
     "commander": "^9.2.0",
-    "pkijs": "^3.0.9"
+    "pkijs": "^3.0.13"
   }
 }

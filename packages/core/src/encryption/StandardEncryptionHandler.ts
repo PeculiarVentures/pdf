@@ -1,28 +1,19 @@
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
 import * as pkijs from "pkijs";
 
-import { algorithms, staticData } from "./Constants";
-import { EncryptionHandler, EncryptionHandlerCreateParams } from "./EncryptionHandler";
-import { Password, StandardEncryptionAlgorithm } from "./StandardEncryptionAlgorithms";
 import {
   CryptoFilterMethods, CryptoFilterDictionary, EncryptDictionary,
   StandardEncryptDictionary, TrailerDictionary, UserAccessPermissionFlags,
 } from "../structure";
 import { PDFTextString, PDFStream, PDFHexString, PDFArray } from "../objects";
-
-const keyUsages: KeyUsage[] = ["encrypt", "decrypt"];
-
-export interface Key {
-  keyType: number;
-  key: ArrayBuffer | null;
-}
+import { EncryptionHandler, EncryptionHandlerCreateParams } from "./EncryptionHandler";
+import { EncryptionAlgorithms, EncryptionKey, EncryptionKeys } from "./EncryptionAlgorithms";
+import { Password, StandardEncryptionAlgorithm } from "./StandardEncryptionAlgorithms";
 
 export interface StandardEncryptionHandlerCreateCommonParams {
   permission?: UserAccessPermissionFlags;
   ownerPassword?: Password;
   userPassword?: Password;
-  disableString?: boolean;
-  disableStream?: boolean;
   encryptMetadata?: boolean;
 }
 
@@ -36,16 +27,6 @@ export interface StandardEncryptionHandlerCreateParamsV6 extends EncryptionHandl
    * Encryption key
    */
   key?: CryptoKey;
-}
-
-export interface EncryptionKey {
-  type: CryptoFilterMethods;
-  raw: Uint8Array;
-}
-
-export interface EncryptionKeys {
-  stream: EncryptionKey;
-  string: EncryptionKey;
 }
 
 export enum PasswordReason {
@@ -456,92 +437,18 @@ export class StandardEncryptionHandler extends EncryptionHandler {
     return this.#keys;
   }
 
-  private async getCutHashV2(combinedKey: BufferSource, stmKeyByteLength: number): Promise<ArrayBuffer> {
-    const md = await this.crypto.digest(algorithms.md5, combinedKey);
-    const initialKeyLength = stmKeyByteLength + 5;
-
-    return md.slice(0, ((initialKeyLength > 16) ? 16 : initialKeyLength));
-  }
-
   /**
-   * Encrypts/decrypts incoming data.
-   * @param encrypt If `true`, runs encryption, otherwise decryption.
-   * @param data Incoming data.
-   * @param target Target object. The cipher shall use different keys for Streams and Text encryption.
-   * @returns 
+   * Returns encryption key for specified object
+   * @param target PDF object
+   * @returns Encryption key
    */
-  protected async cipher(encrypt: boolean, data: BufferSource, target: PDFStream | PDFTextString): Promise<ArrayBuffer> {
-    const view = BufferSourceConverter.toUint8Array(data);
-
+  async #getKey(target: PDFStream | PDFTextString): Promise<EncryptionKey> {
     // Get crypto key for the target object
     const keys = await this.#getKeys();
-    const key = (target instanceof PDFStream)
+
+    return (target instanceof PDFStream)
       ? keys.stream // use StmF key for Stream
       : keys.string; // use StrF key for Literal and Hexadecimal strings
-
-    if (key.type === CryptoFilterMethods.None) {
-      return view;
-    }
-
-    let cipherData: Uint8Array;
-    let iv: Uint8Array;
-    if (encrypt) {
-      iv = this.crypto.getRandomValues(new Uint8Array(16));
-      cipherData = view;
-    } else {
-      iv = view.slice(0, 16);
-      cipherData = view.slice(16, view.byteLength);
-    }
-
-    // Create combined key
-    const parent = target.getIndirect(true);
-    const id = new Int32Array([parent.id]);
-    const generation = new Int32Array([parent.generation]);
-    const combinedKey = BufferSourceConverter.concat([
-      key.raw,
-      id.buffer.slice(0, 3),
-      generation.buffer.slice(0, 2)
-    ]);
-
-    switch (key.type) {
-      case CryptoFilterMethods.AES128: {
-        const cutHash = await this.getCutHashV2(BufferSourceConverter.concat(combinedKey, staticData), key.raw.length);
-        const cryptoKey = await this.crypto.importKey("raw", cutHash, algorithms.AesCBC, false, keyUsages);
-        const alg = { name: "AES-CBC", iv };
-
-        if (encrypt) {
-          return BufferSourceConverter.concat([
-            iv,
-            await this.crypto.encrypt(alg, cryptoKey, cipherData),
-          ]);
-        }
-
-        return await this.crypto.decrypt(alg, cryptoKey, cipherData);
-      }
-      case CryptoFilterMethods.AES256: {
-        const cryptoKey = await this.crypto.importKey("raw", key.raw, algorithms.AesCBC, false, keyUsages);
-        const alg = { name: "AES-CBC", iv };
-
-        if (encrypt) {
-          return BufferSourceConverter.concat([
-            iv,
-            await this.crypto.encrypt(alg, cryptoKey, cipherData),
-          ]);
-        }
-
-        return await this.crypto.decrypt(alg, cryptoKey, cipherData);
-      }
-      case CryptoFilterMethods.RC4:
-      default: {
-        const cryptoKey = await this.getCutHashV2(combinedKey, key.raw.byteLength) as any;
-
-        if (encrypt) {
-          return await this.crypto.encrypt(algorithms.rc4, cryptoKey, cipherData);
-        }
-
-        return await this.crypto.decrypt(algorithms.rc4, cryptoKey, cipherData);
-      }
-    }
   }
 
   public async authenticate(): Promise<void> {
@@ -549,11 +456,21 @@ export class StandardEncryptionHandler extends EncryptionHandler {
   }
 
   public async decrypt(stream: BufferSource, target: PDFStream | PDFTextString): Promise<ArrayBuffer> {
-    return this.cipher(false, stream, target);
+    return EncryptionAlgorithms.decrypt({
+      key: await this.#getKey(target),
+      data: stream,
+      target,
+      crypto: this.crypto,
+    });
   }
 
   public async encrypt(stream: BufferSource, target: PDFStream | PDFTextString): Promise<ArrayBuffer> {
-    return this.cipher(true, stream, target);
+    return EncryptionAlgorithms.encrypt({
+      key: await this.#getKey(target),
+      data: stream,
+      target,
+      crypto: this.crypto,
+    });
   }
 
 }

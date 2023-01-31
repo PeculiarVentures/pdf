@@ -8,9 +8,11 @@ export class CryptoFiltersDictionary extends PDFDictionary {
    * @param name name of the filter
    * @returns returns {@link CryptoFilterDictionary} if it exists, otherwise `null`
    */
-  public findItem(name: string): CryptoFilterDictionary | null {
+  public findItem(name: string): CryptoFilterDictionary | null;
+  public findItem<T extends CryptoFilterDictionary>(name: string, type: new () => T): T | null;
+  public findItem(name: string, type?: any): CryptoFilterDictionary | null {
     if (this.has(name)) {
-      return this.get(name, CryptoFilterDictionary, true);
+      return this.get(name, type || CryptoFilterDictionary, true) as CryptoFilterDictionary;
     }
 
     return null;
@@ -21,11 +23,13 @@ export class CryptoFiltersDictionary extends PDFDictionary {
    * @param name name of the filter
    * @returns returns {@link CryptoFilterDictionary}
    */
-  public getItem(name: string): CryptoFilterDictionary {
-    const res = this.findItem(name);
+  public getItem(name: string): CryptoFilterDictionary;
+  public getItem<T extends CryptoFilterDictionary>(name: string, type: new () => T): T;
+  public getItem(name: string, type?: any): CryptoFilterDictionary {
+    const res = this.findItem(name, type);
 
     if (!res) {
-      throw new Error(`CryptoFilter with name '${name}' no found.`);
+      throw new Error(`CryptoFilter with name '${name}' not found.`);
     }
 
     return res;

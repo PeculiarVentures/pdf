@@ -5,6 +5,8 @@ import { type PDFDocument, EncryptDictionary } from "../structure";
 
 export interface EncryptionHandlerCreateParams {
   document: PDFDocument;
+  disableString?: boolean;
+  disableStream?: boolean;
   id?: string;
   crypto?: pkijs.ICryptoEngine;
 }

@@ -621,9 +621,9 @@ export class PDFDocumentUpdate {
           await this.decryptObject(item);
         }
       }
-    } catch {
+    } catch (e) {
       const r = value.getIndirect(true).id;
-      console.warn(`R ${r}: Cannot decrypt`);
+      throw new Error(`Cannot decrypt PDF object (R ${r})`);
     }
   }
 
