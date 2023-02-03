@@ -1275,7 +1275,7 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
     byteRange.push(blockLength1);
     byteRange.push(blockOffset2);
     byteRange.push(blockLength2);
-    signValue.Contents.text = Convert.ToHex(new Uint8Array(params.containerSize || SignatureBoxGroup.CONTAINER_SIZE));
+    signValue.Contents.text = Convert.ToBinary(new Uint8Array(params.containerSize || SignatureBoxGroup.CONTAINER_SIZE));
 
     const dictUpdateCb = params.dictionaryUpdate || SignatureBoxGroup.dictionaryUpdate;
     await dictUpdateCb.call(this, signValue);
@@ -1326,10 +1326,10 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
 
     const signedData = await params.containerCreate.call(this, content);
 
-    if (signedData.byteLength > signValue.Contents.text.length / 2) {
+    if (signedData.byteLength > signValue.Contents.text.length) {
       throw new Error(`Received Contents value is greater than allocated buffer. Allocated buffer must be ${signedData.byteLength}.`);
     }
-    signValue.Contents.text = Convert.ToHex(signedData).padEnd(signValue.Contents.text.length, "0");
+    signValue.Contents.text = Convert.ToHex(signedData).padEnd(signValue.Contents.text.length * 2, "0");
     signValue.Contents.view.set(new Uint8Array(Convert.FromBinary(signValue.Contents.toString())));
 
     await this.document.save();

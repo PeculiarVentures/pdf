@@ -303,7 +303,7 @@ export class PDFDocument {
     const obj = objects.PDFHexString.create(this.update);
 
     if (data) {
-      obj.text = Convert.ToHex(data);
+      obj.text = Convert.ToBinary(data);
     }
 
     return obj;

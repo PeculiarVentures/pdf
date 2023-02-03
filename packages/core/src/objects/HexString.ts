@@ -3,16 +3,14 @@ import { BadCharError } from "../BadCharError";
 import { CharSet } from "../CharSet";
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
+import { TextEncoder } from "./TextEncoder";
 import { PDFTextString } from "./TextString";
 
 export class PDFHexString extends PDFTextString {
 
-  public toArrayBuffer(): ArrayBuffer {
-    return Convert.FromHex(this.text);
-  }
-
   protected onWritePDF(writer: ViewWriter): void {
-    writer.writeString(`<${this.text}>`);
+    const encText = TextEncoder.to(this.text);
+    writer.writeString(`<${Convert.ToHex(Convert.FromBinary(encText))}>`);
   }
 
   protected onFromPDF(reader: ViewReader): void {
@@ -36,7 +34,9 @@ export class PDFHexString extends PDFTextString {
     });
 
     // Set values
-    this.text = Convert.ToBinary(new Uint8Array(hexStrings));
+    const hexString = Convert.ToBinary(new Uint8Array(hexStrings));
+    const hexView = Convert.FromHex(hexString);
+    this.text = TextEncoder.from(Convert.ToBinary(hexView));
 
     reader.readByte(); // >
   }
@@ -46,7 +46,7 @@ export class PDFHexString extends PDFTextString {
   }
 
   public override toString(): string {
-    return `<${this.text}>`;
+    return `<${Convert.ToHex(this.toUint8Array())}>`;
   }
 
 }
