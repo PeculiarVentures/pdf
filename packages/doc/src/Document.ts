@@ -1,5 +1,8 @@
 import * as core from "@peculiarventures/pdf-core";
-import { DefaultFonts } from "@peculiarventures/pdf-font";
+import * as font from "@peculiarventures/pdf-font";
+import * as copy from "@peculiarventures/pdf-copy";
+import { PublicKeyPermissionFlags } from "@peculiarventures/pdf-core";
+import { X509Certificate } from "@peculiar/x509";
 import { BufferSource, Convert } from "pvtsutils";
 import * as pkijs from "pkijs";
 import { CheckBoxHandler } from "./CheckBoxHandler";
@@ -16,8 +19,6 @@ import { FormObject } from "./FormObject";
 import { WrapObject } from "./WrapObject";
 import { Dss } from "./Dss";
 import { IPdfCertificateStorageHandler, PDFCertificateStorageHandler } from "./CertificateStorageHandler";
-import { PublicKeyPermissionFlags } from "@peculiarventures/pdf-core";
-import { X509Certificate } from "@peculiar/x509";
 
 export enum PDFVersion {
   v1_1 = 1.1,
@@ -78,6 +79,8 @@ export interface PDFDocumentLoadParameters {
   onUserPassword?: core.UserPasswordHandle;
   onCertificate?: core.CertificateHandle;
 }
+
+export type PDFDocumentCloneParams = copy.PDFCopierCreateParams;
 
 export class PDFDocument {
 
@@ -194,7 +197,7 @@ export class PDFDocument {
     return this.#dss;
   }
 
-  public addFont(font?: DefaultFonts | BufferSource): FontComponent {
+  public addFont(font?: font.DefaultFonts | BufferSource): FontComponent {
     return FontComponent.addFont(this, font);
   }
 
@@ -360,6 +363,19 @@ export class PDFDocument {
     }
 
     return result;
+  }
+
+  /**
+   * Clones the current document
+   * @param params Parameters for the new document
+   * @returns 
+   */
+  public async clone(params: PDFDocumentCloneParams = {}): Promise<PDFDocument> {
+    const copier = await copy.PDFCopier.create(params);
+
+    copier.append(this.target);
+
+    return new PDFDocument(copier.document);
   }
 
 }
