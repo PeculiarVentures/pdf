@@ -1,13 +1,13 @@
 {
-  "name": "@peculiarventures/pdf-doc",
+  "name": "@peculiarventures/pdf-copy",
   "version": "1.7.1",
-  "description": "High level PDF module",
+  "description": "This module allows to recreate the PDF document using specified filters.",
   "keywords": [],
   "author": "microshine <microshine@mail.ru>",
-  "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/pdf-doc#readme",
+  "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/copy#readme",
   "license": "AGPL",
-  "main": "build/peculiar.pdf.doc.js",
-  "module": "build/peculiar.pdf.doc.es.js",
+  "main": "build/peculiar.pdf.copy.js",
+  "module": "build/peculiar.pdf.copy.es.js",
   "types": "build/index.d.ts",
   "files": [
     "build",
@@ -31,21 +31,7 @@
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
   "dependencies": {
-    "@peculiar/asn1-ocsp": "^2.1.4",
-    "@peculiar/asn1-schema": "^2.1.0",
-    "@peculiar/asn1-tsp": "^2.1.4",
-    "@peculiar/asn1-x509": "^2.1.4",
-    "@peculiar/x509": "^1.9.3",
-    "@peculiarventures/pdf-copy": "^1.7.1",
     "@peculiarventures/pdf-core": "^1.7.1",
-    "@peculiarventures/pdf-font": "^1.7.0",
-    "asn1js": "^3.0.5",
-    "bytestreamjs": "2.0.1",
-    "fast-png": "^6.1.0",
-    "pako": "^2.0.3",
-    "pkijs": "^3.0.13",
-    "pvtsutils": "^1.2.2",
-    "pvutils": "^1.1.3",
     "tslib": "^2.5.0"
   }
 }
