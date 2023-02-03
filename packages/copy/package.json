@@ -1,0 +1,37 @@
+{
+  "name": "@peculiarventures/pdf-copy",
+  "version": "1.7.1",
+  "description": "This module allows to recreate the PDF document using specified filters.",
+  "keywords": [],
+  "author": "microshine <microshine@mail.ru>",
+  "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/copy#readme",
+  "license": "AGPL",
+  "main": "build/peculiar.pdf.copy.js",
+  "module": "build/peculiar.pdf.copy.es.js",
+  "types": "build/index.d.ts",
+  "files": [
+    "build",
+    "README.md"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PeculiarVentures/pdf.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "clear": "rimraf build/*",
+    "build": "rollup -c",
+    "rebuild": "yarn run clear && yarn run build",
+    "prepack": "npm run rebuild"
+  },
+  "bugs": {
+    "url": "https://github.com/PeculiarVentures/pdf/issues"
+  },
+  "dependencies": {
+    "@peculiarventures/pdf-core": "^1.7.1",
+    "tslib": "^2.5.0"
+  }
+}

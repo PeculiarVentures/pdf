@@ -19,6 +19,9 @@
       "@peculiarventures/pdf-font": [
         "./packages/font/src"
       ],
+      "@peculiarventures/pdf-copy": [
+        "./packages/copy/src"
+      ],
     }
   },
   "exclude": [
