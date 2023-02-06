@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.1](https://github.com/PeculiarVentures/pdf/compare/v1.8.0...v1.8.1) (2023-02-06)
+
+
+### Bug Fixes
+
+* incorrect content on signing ([#38](https://github.com/PeculiarVentures/pdf/issues/38)) ([c3b1b3a](https://github.com/PeculiarVentures/pdf/commit/c3b1b3a5d7061640d943455285c5211bac67ccea))
+
+
+
+
+
 # [1.8.0](https://github.com/PeculiarVentures/pdf/compare/v1.7.1...v1.8.0) (2023-02-03)
 
 
