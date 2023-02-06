@@ -1329,7 +1329,7 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
     if (signedData.byteLength > signValue.Contents.text.length) {
       throw new Error(`Received Contents value is greater than allocated buffer. Allocated buffer must be ${signedData.byteLength}.`);
     }
-    signValue.Contents.text = Convert.ToHex(signedData).padEnd(signValue.Contents.text.length * 2, "0");
+    signValue.Contents.text = Convert.ToBinary(signedData).padEnd(signValue.Contents.text.length, "\x00");
     signValue.Contents.view.set(new Uint8Array(Convert.FromBinary(signValue.Contents.toString())));
 
     await this.document.save();
