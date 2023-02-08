@@ -113,24 +113,6 @@ export class PDFDocument {
   }: PDFDocumentCreateParameters = {}): Promise<PDFDocument> {
     const target = new core.PDFDocument();
 
-    if ("algorithm" in others) {
-      if ("recipients" in others) {
-        target.encryptHandler = await core.PublicKeyEncryptionHandler.create({
-          document: target,
-          crypto: pkijs.getCrypto(true),
-          ...others,
-          algorithm: core.CryptoFilterMethods[others.algorithm] as core.CryptoFilterMethods.AES128,
-        });
-      } else {
-        target.encryptHandler = await core.StandardEncryptionHandler.create({
-          document: target,
-          crypto: pkijs.getCrypto(true),
-          ...others,
-          algorithm: core.CryptoFilterMethods[others.algorithm] as core.CryptoFilterMethods.AES128,
-        });
-      }
-    }
-
     // Set options
     target.version = version;
     target.options.xref = useXrefTable ? core.XrefStructure.Table : core.XrefStructure.Stream;
@@ -139,6 +121,26 @@ export class PDFDocument {
     target.options.disableCompressedObjects = disableCompressedObjects;
     if (version < PDFVersion.v1_5) {
       target.options.xref = core.XrefStructure.Table;
+    }
+
+    if ("algorithm" in others) {
+      if ("recipients" in others) {
+        // Public Key Encryption
+        target.encryptHandler = await core.PublicKeyEncryptionHandler.create({
+          document: target,
+          crypto: pkijs.getCrypto(true),
+          ...others,
+          algorithm: core.CryptoFilterMethods[others.algorithm] as core.CryptoFilterMethods.AES128,
+        });
+      } else {
+        // Standard Encryption
+        target.encryptHandler = await core.StandardEncryptionHandler.create({
+          document: target,
+          crypto: pkijs.getCrypto(true),
+          ...others,
+          algorithm: core.CryptoFilterMethods[others.algorithm] as core.CryptoFilterMethods.AES128,
+        });
+      }
     }
 
     target.update.addCatalog();

@@ -162,6 +162,14 @@ export class PDFDictionary extends PDFObject {
       value.makeIndirect();
     }
 
+    if (!value.isIndirect()) {
+      value.ownerElement = this;
+    }
+
+    if (this.documentUpdate && !value.documentUpdate) {
+      value.documentUpdate = this.documentUpdate;
+    }
+
     this.items.set(PDFDictionary.getName(name), value);
 
     return this;

@@ -96,6 +96,13 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
       if (item instanceof PDFStream) {
         item.makeIndirect();
       }
+      if (!item.isIndirect()) {
+        item.ownerElement = this;
+      }
+
+      if (this.documentUpdate && !item.documentUpdate) {
+        item.documentUpdate = this.documentUpdate;
+      }
 
       this.items.push(item);
     }

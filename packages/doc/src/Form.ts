@@ -442,8 +442,8 @@ export class CheckBox extends FormComponent {
     if (this.checked !== v) {
       const stateName = v ? this.getYesStateName() : "Off";
       this.target.modify();
-      if (this.target.items.has("V")) {
-        this.target.items.set("V", this.document.target.createString(stateName));
+      if (this.target.has("V")) {
+        this.target.set("V", this.document.target.createString(stateName));
       }
       this.target.as = stateName;
     }
