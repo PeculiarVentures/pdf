@@ -1537,8 +1537,6 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
                 }
               });
           }
-
-          result.verificationResult = !!verificationResult.signatureVerified;
         }
         //#endregion
       }
@@ -1665,6 +1663,9 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, S
         }
       }
     }
+
+    // Update `verificationResult`
+    result.verificationResult = !result.states.some(o => o.type === "invalid");
 
     return result;
   }

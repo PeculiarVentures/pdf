@@ -213,7 +213,7 @@ export class PDFDocumentUpdate {
     writer.writeLine();
 
     writer.writeString("%%EOF\n");
-    this.view = writer.toUint8Array().subarray(startOffset);
+    this.view = writer.toUint8Array().subarray(startOffset, writer.length - 2); // exclude \n
   }
 
   public previous: PDFDocumentUpdate | null = null;

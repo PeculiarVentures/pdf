@@ -42,7 +42,7 @@ export class PDFHexString extends PDFTextString {
   }
 
   public get data(): Uint8Array {
-    return new Uint8Array(Convert.FromHex(this.text));
+    return new Uint8Array(Convert.FromBinary(this.text));
   }
 
   public override toString(): string {
