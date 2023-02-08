@@ -84,9 +84,6 @@ export function PDFDictionaryField<T extends PDFObjectTypes = PDFObjectTypes, TR
           if (parameters.indirect) {
             result.makeIndirect();
           }
-          if (!result.isIndirect()) {
-            result.ownerElement = this;
-          }
           this.modify();
           this.set(parameters.name, result as PDFObjectTypes);
         }

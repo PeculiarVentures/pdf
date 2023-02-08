@@ -613,7 +613,16 @@ export class PDFDocumentUpdate {
         || value instanceof objects.PDFTextString) {
         await value.decode();
       } else if (value instanceof objects.PDFDictionary) {
-        for (const [, item] of value.items) {
+        if (value.has("Contents") && value.has("Filter")) {
+          // Skip Signature dictionary
+          return;
+        }
+        for (const [key, item] of value.items) {
+          if (key === "Contents" && value.has("Filter")) {
+            // Skip Contents for Signature dictionary
+            continue;
+          }
+
           await this.decryptObject(item);
         }
       } else if (value instanceof objects.PDFArray) {
@@ -642,6 +651,10 @@ export class PDFDocumentUpdate {
         || value instanceof objects.PDFTextString) {
         await value.encode();
       } else if (value instanceof objects.PDFDictionary) {
+        if (value.has("Contents") && value.has("Filter")) {
+          // Skip Signature dictionary
+          return;
+        }
         if (value instanceof PDFDictionary && value.has("Type") && value.get("Type", PDFName).text === "XRef") {
           for (const [key, item] of value.items) {
             if (key === "Encrypt" || key === "ID") {

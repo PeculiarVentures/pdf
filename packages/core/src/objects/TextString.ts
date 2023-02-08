@@ -32,7 +32,7 @@ export abstract class PDFTextString extends PDFString implements EncryptionObjec
   }
 
   public async encode(): Promise<string> {
-    if (this.encrypted === false) {
+    if (!this.encrypted) {
       if (this.documentUpdate?.document.encryptHandler) {
         const decryptedText = await this.encryptAsync();
         this.text = Convert.ToBinary(decryptedText);
@@ -62,6 +62,10 @@ export abstract class PDFTextString extends PDFString implements EncryptionObjec
 
   public toUint8Array(): Uint8Array {
     return BufferSourceConverter.toUint8Array(this.toArrayBuffer());
+  }
+
+  protected override onCreate(): void {
+    this.encrypted = false;
   }
 
   protected override onCopy(copy: PDFTextString): void {
