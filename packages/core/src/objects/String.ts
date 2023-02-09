@@ -23,7 +23,7 @@ export abstract class PDFString extends PDFObject {
       // string
       this.text = param;
     } else if (BufferSourceConverter.isBufferSource(param)) {
-      this.text = Convert.ToHex(param);
+      this.text = Convert.ToBinary(param);
     }
 
   }
