@@ -56,7 +56,7 @@ export class PDFDocumentUpdate {
   public fromPDF(data: string | Uint8Array | ViewReader, offset?: number): Promise<number>;
   public async fromPDF(data: string | Uint8Array | ViewReader, offset?: number): Promise<number> {
     const reader = objects.PDFObject.getReader(data, offset);
-    this.startXref = reader.view.byteOffset + reader.position;
+    this.startXref = reader.position;
 
     let position = 0;
 
@@ -613,16 +613,11 @@ export class PDFDocumentUpdate {
         || value instanceof objects.PDFTextString) {
         await value.decode();
       } else if (value instanceof objects.PDFDictionary) {
-        if (value.has("Contents") && value.has("Filter")) {
-          // Skip Signature dictionary
-          return;
-        }
         for (const [key, item] of value.items) {
           if (key === "Contents" && value.has("Filter")) {
-            // Skip Contents for Signature dictionary
+            // Skip Contents in Signature dictionary
             continue;
           }
-
           await this.decryptObject(item);
         }
       } else if (value instanceof objects.PDFArray) {
@@ -651,10 +646,6 @@ export class PDFDocumentUpdate {
         || value instanceof objects.PDFTextString) {
         await value.encode();
       } else if (value instanceof objects.PDFDictionary) {
-        if (value.has("Contents") && value.has("Filter")) {
-          // Skip Signature dictionary
-          return;
-        }
         if (value instanceof PDFDictionary && value.has("Type") && value.get("Type", PDFName).text === "XRef") {
           for (const [key, item] of value.items) {
             if (key === "Encrypt" || key === "ID") {
@@ -663,7 +654,11 @@ export class PDFDocumentUpdate {
             await this.encryptObject(item, true);
           }
         } else {
-          for (const [, item] of value.items) {
+          for (const [key, item] of value.items) {
+            if (key === "Contents" && value.has("Filter")) {
+              // Skip Contents in Signature dictionary
+              continue;
+            }
             await this.encryptObject(item, true);
           }
         }

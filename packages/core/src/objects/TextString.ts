@@ -12,7 +12,7 @@ export abstract class PDFTextString extends PDFString implements EncryptionObjec
   public async encryptAsync(): Promise<ArrayBuffer> {
     const parent = this.findIndirect(true);
 
-    const textView = this.toUint8Array();
+    const textView = Convert.FromBinary(TextEncoder.to(this.text));
     if (!parent || !this.documentUpdate?.document.encryptHandler) {
       return textView;
     }
