@@ -131,6 +131,11 @@ export class CompressedObject extends PDFStream {
   }
 
   public override async encode(): Promise<ArrayBuffer> {
+    // Don't call encode for encrypted stream
+    if (this.encrypted) {
+      return this.stream.slice().buffer;
+    }
+
     const headerWriter = new ViewWriter();
     const dataWriter = new ViewWriter();
 
