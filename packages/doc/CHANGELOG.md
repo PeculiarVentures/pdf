@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.9.0](https://github.com/PeculiarVentures/pdf/compare/v1.8.5...v1.9.0) (2023-02-24)
+
+
+### Features
+
+* Page management ([#45](https://github.com/PeculiarVentures/pdf/issues/45)) ([d6140bc](https://github.com/PeculiarVentures/pdf/commit/d6140bc8f0d118592acce2af1740e1f0cc4a9534))
+
+
+
+
+
 ## [1.8.5](https://github.com/PeculiarVentures/pdf/compare/v1.8.4...v1.8.5) (2023-02-09)
 
 **Note:** Version bump only for package @peculiarventures/pdf-doc
