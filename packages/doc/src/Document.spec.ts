@@ -1,3 +1,4 @@
+/* eslint-disable no-sparse-arrays */
 import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
@@ -6,6 +7,7 @@ import * as core from "@peculiarventures/pdf-core";
 import { PDFDocument, PDFDocumentCreateParameters, PDFDocumentLoadParameters, PDFVersion } from "./Document";
 import { CheckBox, RadioButtonGroup, TextEditor } from "./Form";
 import { X509Certificate } from "@peculiar/x509";
+import { PageFilter } from "@peculiarventures/pdf-copy";
 
 export function writeFile(data: BufferSource, name = "tmp"): void {
   const filePath = path.resolve(__dirname, `../../../${name}.pdf`);
@@ -277,6 +279,66 @@ context("Document", () => {
     assert.equal(checkBox.top, 10);
     assert.equal(checkBox.width, 100);
     assert.equal(checkBox.height, 18, "Height shall be default 18");
+  });
+
+  context("clone", () => {
+
+    context("pages", () => {
+      let doc: PDFDocument;
+
+      before(async () => {
+        doc = await PDFDocument.create();
+
+        // Add 10 pages and set Test filed with order number
+        let counter = 0;
+        while (counter++ < 10) {
+          const page = doc.pages.create();
+          page.target.set("Test", doc.target.createNumber(counter));
+        }
+      });
+
+      const tests: {
+        name: string;
+        params?: PageFilter[];
+        want: number[];
+      }[] = [
+          {
+            name: "all pages",
+            want: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+          },
+          {
+            name: "custom numbers + odd pages",
+            params: [1, 3, 5, 7, 5, 3, 1, 1, 11, 100],
+            want: [1, 3, 5, 7, 5, 3, 1, 1],
+          },
+          {
+            name: "desc and asc ranges",
+            params: [[3, 7], [5, 1]],
+            want: [3, 4, 5, 6, 7, 5, 4, 3, 2, 1],
+          },
+          {
+            name: "range *-5",
+            params: [[, 5]],
+            want: [1, 2, 3, 4, 5],
+          },
+          {
+            name: "range 5-*",
+            params: [[5,]],
+            want: [5, 6, 7, 8, 9, 10],
+          },
+        ];
+
+      for (const t of tests) {
+        it(t.name, async () => {
+          const clone = await doc.clone({
+            pages: t.params,
+          });
+          const pages = [...clone.pages].map(o => o.target.get("Test", core.PDFNumeric).value);
+          assert.deepEqual(pages, t.want);
+        });
+      }
+    });
+
   });
 
 });

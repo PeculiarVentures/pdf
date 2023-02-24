@@ -1,5 +1,29 @@
 import * as core from "@peculiarventures/pdf-core";
 
+/**
+ * Array with two number values representing the first and last page of a range.
+ */
+type PageRange = [number, number];
+
+/**
+ * Array with two values representing the beginning of a range. 
+ * The first value is `undefined` as it indicates the first page.
+ * The second value represents the page at which the range ends.
+ */
+type PageRangeBegin = [undefined, number];
+
+/**
+ * Array with two values representing the end of a range. 
+ * The first value represents the starting page of the range.
+ * The second value is `undefined` as it indicates the end of the PDF document.
+*/
+type PageRangeEnd = [number, undefined] | [number];
+
+/**
+ * Represents a union of a single page number, a `PageRange` array, a `PageRangeBegin` array or a `PageRangeEnd` array.
+ */
+export type PageFilter = number | PageRange | PageRangeBegin | PageRangeEnd;
+
 export interface PDFCopierCreateParams {
   version?: number;
   disableAscii85Encoding?: boolean;
@@ -11,12 +35,14 @@ export interface PDFCopierCreateParams {
   userPassword?: core.Password;
   ownerPassword?: core.Password;
   skipForms?: boolean;
+  pages?: PageFilter[];
 }
 
 export type PDFObjectMap = Map<core.IPDFIndirect, core.PDFObjectTypes>;
 
 export class PDFCopier {
   public skipForms = false;
+  public pages?: PageFilter[];
 
   public static async create(params: PDFCopierCreateParams = {}): Promise<PDFCopier> {
     const doc = new core.PDFDocument();
@@ -40,6 +66,9 @@ export class PDFCopier {
     const res = new PDFCopier(doc);
 
     res.skipForms = !!params.skipForms;
+    if (params.pages) {
+      res.pages = params.pages;
+    }
 
     return res;
   }
@@ -268,7 +297,10 @@ export class PDFCopier {
 
     const map = new Map();
     const root = document.update.xref.Root;
-    const pages = root.Pages.getPages();
+    const pages = this.pages
+      ? this.filterPages(root.Pages.getPages(), this.pages)
+      : root.Pages.getPages();
+
     for (const page of pages) {
       this.appendPage(map, page);
     }
@@ -284,5 +316,52 @@ export class PDFCopier {
 
     return writer.toUint8Array();
   }
+
+  /**
+   * Filter a collection of pages based on a set of filters.
+   * @param pages The collection of pages to filter.
+   * @param filters The set of filters to apply to the pages.
+   * @returns The filtered collection of pages.
+   */
+  private filterPages(pages: core.PageObjectDictionary[], filters: PageFilter[]): core.PageObjectDictionary[] {
+    const filteredPages: core.PageObjectDictionary[] = [];
+
+    // Loop through each filter in the set of filters.
+    for (const filter of filters) {
+      if (typeof filter === "number") {
+        // If the filter is a single page number, add the corresponding page to the filtered pages array.
+        const page = pages[filter - 1];
+        if (page) {
+          filteredPages.push(page);
+        }
+      } else if (Array.isArray(filter)) {
+        // If the filter is an array representing a range of pages, add the corresponding pages to the filtered pages array.
+        const [begin, end] = filter;
+        const start = begin ?? 1;
+        const stop = end ?? pages.length;
+
+        // If the range is descending, loop backwards through the pages.
+        if (start > stop) {
+          for (let i = start; i >= stop; i--) {
+            const page = pages[i - 1];
+            if (page) {
+              filteredPages.push(page);
+            }
+          }
+        } else {
+          // If the range is ascending, loop forwards through the pages.
+          for (let i = start; i <= stop; i++) {
+            const page = pages[i - 1];
+            if (page) {
+              filteredPages.push(page);
+            }
+          }
+        }
+      }
+    }
+
+    return filteredPages;
+  }
+
 
 }
