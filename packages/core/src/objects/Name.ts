@@ -20,7 +20,7 @@ export class PDFName extends PDFString {
 
   protected onWritePDF(writer: ViewWriter): void {
     const escapedValue = this.text
-      .replace(/[^!-~[\]<>(){}%/]/gm, (substring) => // Encode irregular chars to '#dd'
+      .replace(/[^!-~]|[[\]<>(){}%#/]/gm, (substring) => // Encode irregular chars to '#dd'
         `#${substring.charCodeAt(0).toString(16).padStart(2, "0")}`
       );
 

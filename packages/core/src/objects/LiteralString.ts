@@ -95,7 +95,7 @@ export class PDFLiteralString extends PDFTextString {
 
     // Prepare text
     const text = Convert.ToBinary(data)
-      .replace(/\\([0-7][0-7][0-7]?|\r\n|\n|\r|.)/gm, (substring, group1: string) => {
+      .replace(/\\([0-7]{1,3}|\r\n|\n|\r|.)/gm, (substring, group1: string) => {
         switch (true) {
           case (substring === "\\n"):
             return "\n";
@@ -117,15 +117,8 @@ export class PDFLiteralString extends PDFTextString {
           case (substring === "\\\n"):
           case (substring === "\\\r"):
             return "";
-          case (/[0-7][0-7][0-7]?/.test(group1)): {
-            // encode unicode
-            let code = 0;
-            for (let i = 0; i < group1.length; i++) {
-              code <<= 3;
-              code += group1.charCodeAt(i) & 0x0f;
-            }
-
-            return globalThis.String.fromCharCode(code);
+          case (/[0-7]{1,3}/.test(group1)): {
+            return globalThis.String.fromCharCode(parseInt(group1, 8));
           }
           default:
             return group1;

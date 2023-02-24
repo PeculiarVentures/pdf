@@ -1,4 +1,6 @@
+import * as copy from "@peculiarventures/pdf-copy";
 import * as core from "@peculiarventures/pdf-core";
+import { PDFDocument } from "./Document";
 import { PDFPage } from "./Page";
 import { WrapObject } from "./WrapObject";
 
@@ -104,6 +106,24 @@ export class PDFPages extends WrapObject<core.PageTreeNodesDictionary> {
     return last
       ? new PDFPage(last, this.document)
       : null;
+  }
+
+  /**
+   * Appends the pages from the specified PDF document into this document.
+   *
+   * @remarks
+   * This method will add all pages from the specified document, or a subset of pages
+   * depending on the parameters provided. It adds the pages to the end of the
+   * document.
+   *
+   * @param doc The PDF document from which to copy the pages.
+   * @param params An object specifying options for the merge operation.
+   * @returns A Promise that resolves when the merge operation is complete.
+   */
+  public async append(doc: PDFDocument, params?: copy.PDFCopierAppendParams): Promise<void> {
+    const copier = await copy.PDFCopier.create(this.document.target);
+
+    copier.append(doc.target, params);
   }
 
 }
