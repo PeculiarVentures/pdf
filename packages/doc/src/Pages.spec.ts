@@ -98,7 +98,6 @@ context("Pages", () => {
     });
 
     assert.equal(doc1.pages.length, 4);
-    writeFile(await doc1.save());
   });
 
 });
