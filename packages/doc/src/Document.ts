@@ -80,7 +80,7 @@ export interface PDFDocumentLoadParameters {
   onCertificate?: core.CertificateHandle;
 }
 
-export type PDFDocumentCloneParams = copy.PDFCopierCreateParams;
+export type PDFDocumentCloneParams = copy.PDFCopierCreateParams & copy.PDFCopierAppendParams;
 
 export class PDFDocument {
 
@@ -375,7 +375,7 @@ export class PDFDocument {
   public async clone(params: PDFDocumentCloneParams = {}): Promise<PDFDocument> {
     const copier = await copy.PDFCopier.create(params);
 
-    copier.append(this.target);
+    copier.append(this.target, params);
 
     return new PDFDocument(copier.document);
   }

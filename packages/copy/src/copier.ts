@@ -24,6 +24,14 @@ type PageRangeEnd = [number, undefined] | [number];
  */
 export type PageFilter = number | PageRange | PageRangeBegin | PageRangeEnd;
 
+export interface PDFCopierAppendPageParams {
+  skipForms?: boolean;
+}
+
+export interface PDFCopierAppendParams extends PDFCopierAppendPageParams {
+  pages?: PageFilter[];
+}
+
 export interface PDFCopierCreateParams {
   version?: number;
   disableAscii85Encoding?: boolean;
@@ -34,41 +42,40 @@ export interface PDFCopierCreateParams {
   permission?: core.UserAccessPermissionFlags;
   userPassword?: core.Password;
   ownerPassword?: core.Password;
-  skipForms?: boolean;
-  pages?: PageFilter[];
 }
 
 export type PDFObjectMap = Map<core.IPDFIndirect, core.PDFObjectTypes>;
 
 export class PDFCopier {
-  public skipForms = false;
-  public pages?: PageFilter[];
 
-  public static async create(params: PDFCopierCreateParams = {}): Promise<PDFCopier> {
-    const doc = new core.PDFDocument();
+  public static async create(params?: PDFCopierCreateParams): Promise<PDFCopier>;
+  public static async create(doc: core.PDFDocument, params?: PDFCopierAppendParams): Promise<PDFCopier>;
+  public static async create(arg1: PDFCopierCreateParams | core.PDFDocument = {}): Promise<PDFCopier> {
+    let doc: core.PDFDocument;
 
-    doc.version = params.version || 2.0;
-    doc.options.disableAscii85Encoding = !!params.disableAscii85Encoding;
-    doc.options.disableCompressedObjects = !!params.disableCompressedObjects;
-    doc.options.disableCompressedStreams = !!params.disableCompressedStreams;
-    doc.options.xref = params.useXRefTable ? core.XrefStructure.Table : core.XrefStructure.Stream;
+    if (arg1 instanceof core.PDFDocument) {
+      doc = arg1;
+    } else {
+      doc = new core.PDFDocument();
 
-    if (params.algorithm) {
-      doc.encryptHandler = await core.StandardEncryptionHandler.create({
-        document: doc,
-        algorithm: core.CryptoFilterMethods[params.algorithm],
-        userPassword: params.userPassword,
-        ownerPassword: params.ownerPassword,
-        permission: params.permission,
-      });
+      doc.version = arg1.version || 2.0;
+      doc.options.disableAscii85Encoding = !!arg1.disableAscii85Encoding;
+      doc.options.disableCompressedObjects = !!arg1.disableCompressedObjects;
+      doc.options.disableCompressedStreams = !!arg1.disableCompressedStreams;
+      doc.options.xref = arg1.useXRefTable ? core.XrefStructure.Table : core.XrefStructure.Stream;
+
+      if (arg1.algorithm) {
+        doc.encryptHandler = await core.StandardEncryptionHandler.create({
+          document: doc,
+          algorithm: core.CryptoFilterMethods[arg1.algorithm],
+          userPassword: arg1.userPassword,
+          ownerPassword: arg1.ownerPassword,
+          permission: arg1.permission,
+        });
+      }
     }
 
     const res = new PDFCopier(doc);
-
-    res.skipForms = !!params.skipForms;
-    if (params.pages) {
-      res.pages = params.pages;
-    }
 
     return res;
   }
@@ -242,14 +249,14 @@ export class PDFCopier {
     return res;
   }
 
-  protected appendPage(map: PDFObjectMap, target: core.PageObjectDictionary): void {
+  protected appendPage(map: PDFObjectMap, target: core.PageObjectDictionary, parasm: PDFCopierAppendPageParams = {}): void {
     const page = this.copyDictionary(map, target, "Parent", "Annots")
       .to(core.PageObjectDictionary)
       .makeIndirect();
     map.set(target.getIndirect(), page);
 
     // Copy annotations
-    if (target.annots && !this.skipForms) {
+    if (target.annots && !parasm.skipForms) {
       for (const item of target.annots) {
         if (!(item instanceof core.PDFDictionary)) {
           continue;
@@ -290,19 +297,19 @@ export class PDFCopier {
     this.catalog.Pages.addPage(page);
   }
 
-  public append(document: core.PDFDocument): void {
+  public append(document: core.PDFDocument, params: PDFCopierAppendParams = {}): void {
     if (!document.update.xref) {
       return;
     }
 
     const map = new Map();
     const root = document.update.xref.Root;
-    const pages = this.pages
-      ? this.filterPages(root.Pages.getPages(), this.pages)
+    const pages = params.pages
+      ? this.filterPages(root.Pages.getPages(), params.pages)
       : root.Pages.getPages();
 
     for (const page of pages) {
-      this.appendPage(map, page);
+      this.appendPage(map, page, params);
     }
   }
 
