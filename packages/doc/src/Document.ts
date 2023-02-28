@@ -19,6 +19,7 @@ import { FormObject } from "./FormObject";
 import { WrapObject } from "./WrapObject";
 import { Dss } from "./Dss";
 import { IPdfCertificateStorageHandler, PDFCertificateStorageHandler } from "./CertificateStorageHandler";
+import { EmbeddedFileMap } from "./attachment";
 
 export enum PDFVersion {
   v1_1 = 1.1,
@@ -199,6 +200,15 @@ export class PDFDocument {
     return this.#dss;
   }
 
+  protected get catalog(): core.CatalogDictionary {
+    const catalog = this.target.update.catalog;
+    if (!catalog) {
+      throw new Error("Cannot get Catalog from the PDF document.");
+    }
+
+    return catalog;
+  }
+
   public addFont(font?: font.DefaultFonts | BufferSource): FontComponent {
     return FontComponent.addFont(this, font);
   }
@@ -370,7 +380,7 @@ export class PDFDocument {
   /**
    * Clones the current document
    * @param params Parameters for the new document
-   * @returns 
+   * @returns
    */
   public async clone(params: PDFDocumentCloneParams = {}): Promise<PDFDocument> {
     const copier = await copy.PDFCopier.create(params);
@@ -379,5 +389,19 @@ export class PDFDocument {
 
     return new PDFDocument(copier.document);
   }
+
+  #embeddedFiles?: EmbeddedFileMap;
+
+  /**
+   * Gets embedded files
+   */
+  public get embeddedFiles(): EmbeddedFileMap {
+    if (!this.#embeddedFiles) {
+      this.#embeddedFiles = new EmbeddedFileMap(this.catalog, this);
+    }
+
+    return this.#embeddedFiles;
+  }
+
 
 }

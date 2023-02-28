@@ -2,6 +2,7 @@ import { DocumentSecurityStoreDictionary } from "../../forms/DocumentSecuritySto
 import * as objects from "../../objects";
 import { ExtensionsDictionary } from "./ExtensionsDictionary";
 import { InteractiveFormDictionary } from "./InteractiveForm";
+import { NameDictionary } from "./Name";
 import { PageTreeNodesDictionary } from "./PageTreeNodes";
 
 /**
@@ -17,12 +18,12 @@ export enum PageLayout {
    */
   oneColumn = "OneColumn",
   /**
-   * Display the pages in two columns, 
+   * Display the pages in two columns,
    * with odd-numbered pages on the left
    */
   twoColumnLeft = "TwoColumnLeft",
   /**
-   * Display the pages in two columns, 
+   * Display the pages in two columns,
    * with odd-numbered pages on the right
    */
   twoColumnRight = "TwoColumnRight",
@@ -55,7 +56,7 @@ export enum PageMode {
    */
   useThumbs = "UseThumbs",
   /**
-   * Full-screen mode, with no menu bar, window controls, 
+   * Full-screen mode, with no menu bar, window controls,
    * or any other window visible
    */
   fullScreen = "FullScreen",
@@ -86,7 +87,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
   public Version!: string | null;
 
   /**
-   * An extensions dictionary containing developer prefix identification 
+   * An extensions dictionary containing developer prefix identification
    * and version numbers for developer extensions
    */
   @objects.PDFMaybeField("Extensions", ExtensionsDictionary, true)
@@ -117,12 +118,8 @@ export class CatalogDictionary extends objects.PDFDictionary {
    * The document’s name dictionary
    * @remarks PDF 1.2
    */
-  @objects.PDFDictionaryField({
-    name: "Names",
-    type: objects.PDFDictionary,
-    optional: true,
-  })
-  public Names!: objects.PDFDictionary | null;
+  @objects.PDFMaybeField("Names", NameDictionary)
+  public Names!: objects.Maybe<NameDictionary>;
 
   /**
    * A dictionary of names and corresponding destinations.
@@ -193,7 +190,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
     indirect: true,
   })
   public Threads!: objects.PDFArray | null;
-  
+
   /**
    * A value specifying a destination that shall be displayed or
    * an action that shall be performed when the document is opened
@@ -204,9 +201,9 @@ export class CatalogDictionary extends objects.PDFDictionary {
     optional: true,
   })
   public OpenAction!: objects.PDFDictionary | objects.PDFArray | null;
-  
+
   /**
-   * An additional-actions dictionary defining the actions 
+   * An additional-actions dictionary defining the actions
    * that shall be taken in response to various trigger events
    * affecting the document as a whole
    * @remarks PDF 1.4
@@ -217,7 +214,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
     optional: true,
   })
   public AA!: objects.PDFDictionary | null;
-  
+
   /**
    * A URI dictionary containing document-level information for URI
    * @remarks PDF 1.1
@@ -228,14 +225,14 @@ export class CatalogDictionary extends objects.PDFDictionary {
     optional: true,
   })
   public URI!: objects.PDFDictionary | null;
-  
+
   /**
    * The document’s interactive form (AcroForm) dictionary
    * @remarks PDF 1.2
    */
   @objects.PDFMaybeField("AcroForm", InteractiveFormDictionary, true)
   public AcroForm!: objects.Maybe<InteractiveFormDictionary>;
-  
+
   /**
    * A metadata stream that shall contain metadata for the document
    * @remarks PDF 1.4
@@ -247,7 +244,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
     indirect: true,
   })
   public Metadata!: objects.PDFStream | null;
-  
+
   /**
    * The document’s structure tree root dictionary
    * @remarks PDF 1.3
@@ -258,9 +255,9 @@ export class CatalogDictionary extends objects.PDFDictionary {
     optional: true,
   })
   public StructTreeRoot!: objects.PDFDictionary | null;
-  
+
   /**
-   * A mark information dictionary that shall contain information 
+   * A mark information dictionary that shall contain information
    * about the document’s usage of Tagged PDF conventions
    * @remarks PDF 1.4
    */
@@ -270,19 +267,19 @@ export class CatalogDictionary extends objects.PDFDictionary {
     optional: true,
   })
   public MarkInfo!: objects.PDFDictionary | null;
-  
+
   /**
-   * A language identifier that shall specify the natural language 
-   * for all text in the document except where overridden 
+   * A language identifier that shall specify the natural language
+   * for all text in the document except where overridden
    * by language specifications for structure elements or
    * marked content
    * @remarks PDF 1.4
    */
   @objects.PDFLiteralStringField("Lang", true)
   public Lang!: string | null;
-  
+
   /**
-   * A Web Capture information dictionary that shall contain 
+   * A Web Capture information dictionary that shall contain
    * state information used by any Web Capture extension
    * @remarks PDF 1.3
    */
@@ -292,7 +289,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
     optional: true,
   })
   public SpiderInfo!: objects.PDFDictionary | null;
-  
+
   /**
    * An array of output intent dictionaries that shall
    * specify the colour characteristics of output devices on which the
@@ -301,7 +298,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
    */
   @objects.PDFArrayField("OutputIntents", true)
   public OutputIntents!: objects.PDFArray | null;
-  
+
   /**
    * A page-piece dictionary associated with the document
    * @remarks PDF 1.4; Deprecated in PDF 2.0
@@ -312,7 +309,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
     optional: true,
   })
   public PieceInfo!: objects.PDFDictionary | null;
-  
+
   /**
    * The document’s optional content properties dictionary
    * @remarks PDF 1.5; required if a document contains optional content
@@ -323,7 +320,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
     optional: true,
   })
   public OCProperties!: objects.PDFDictionary | null;
-  
+
   /**
    * A permissions dictionary that shall specify user access permissions for the document
    * @remarks PDF 1.5
@@ -334,9 +331,9 @@ export class CatalogDictionary extends objects.PDFDictionary {
     optional: true,
   })
   public Perms!: objects.PDFDictionary | null;
-  
+
   /**
-   * A dictionary that shall contain attestations regarding the content 
+   * A dictionary that shall contain attestations regarding the content
    * of a PDF document, as it relates to the legality of digital signatures
    * @remarks PDF 1.5
    */
@@ -346,7 +343,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
     optional: true,
   })
   public Legal!: objects.PDFDictionary | null;
-  
+
   /**
    * An array of requirement dictionaries that shall
    * represent requirements for the document
@@ -354,7 +351,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
    */
   @objects.PDFArrayField("Requirements", true)
   public Requirements!: objects.PDFArray | null;
-  
+
   /**
    * A collection dictionary that a conforming
    * reader shall use to enhance the presentation of file attachments
@@ -367,7 +364,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
     optional: true,
   })
   public Collection!: objects.PDFDictionary | null;
-  
+
   /**
    * A flag used to expedite the display of PDF
    * documents containing XFA forms
@@ -375,7 +372,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
    */
   @objects.PDFBooleanField("NeedsRendering", true, false)
   public NeedsRendering!: boolean;
-  
+
   /**
    * A DSS dictionary containing document-wide security information
    * @remarks PDF 2.0

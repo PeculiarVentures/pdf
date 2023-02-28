@@ -1,7 +1,7 @@
 import { PDFContentStream } from "../../content";
 import * as objects from "../../objects";
 import { Metrics, PDFDate, PDFRectangle } from "../common";
-import { FileSpecificationDictionary } from "./FileSpecificationDictionary";
+import { FileSpecificationDictionary } from "./FileSpecification";
 import { MeasureDictionary, MeasureFactory } from "./MeasureDictionary";
 import { OPIDictionary } from "./OPIDictionary";
 import { PointDataDictionary } from "./PointDataDictionary";
@@ -13,7 +13,7 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
   public static readonly SUBTYPE = "Form";
 
   /**
-   * The type of PDF object that this dictionary describes. If present, shall be XObject for a form XObject. 
+   * The type of PDF object that this dictionary describes. If present, shall be XObject for a form XObject.
    */
   @objects.PDFNameField("Type", true, XOBJECT_TYPE)
   public Type!: typeof XOBJECT_TYPE;
@@ -26,10 +26,10 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
   public Subtype!: typeof FormDictionary.SUBTYPE;
 
   /**
-   * A code identifying the type of form XObject that this dictionary describes. 
-   * The only valid value is 1. 
-   * 
-   * Default value: 1. 
+   * A code identifying the type of form XObject that this dictionary describes.
+   * The only valid value is 1.
+   *
+   * Default value: 1.
    */
   @objects.PDFNumberField("FormType", true, 1)
   public formType!: number;
@@ -38,7 +38,7 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
    * An array of four numbers in the form coordinate system (see
    * above), giving the coordinates of the left, bottom, right, and top edges,
    * respectively, of the form XObject’s bounding box. These boundaries shall
-   * be used to clip the form XObject and to determine its size for caching. 
+   * be used to clip the form XObject and to determine its size for caching.
    */
   @objects.PDFDictionaryField({
     name: "BBox",
@@ -49,16 +49,16 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
   /**
    * An array of six numbers specifying the form matrix, which
    * maps form space into user space (see 8.3.4, "Transformation matrices").
-   * 
-   * Default value: the identity matrix [1 0 0 1 0 0]. 
+   *
+   * Default value: the identity matrix [1 0 0 1 0 0].
    */
   @objects.PDFMaybeField("Matrix", Metrics)
   public matrix!: objects.Maybe<Metrics>;
 
   /**
-   * A dictionary specifying any resources (such as fonts and images) required 
+   * A dictionary specifying any resources (such as fonts and images) required
    * by the form XObject (see 7.8, "Content streams and resources").
-   * 
+   *
    * In a PDF whose version is 1.1 and earlier, all named resources used in the
    * form XObject shall be included in the resource dictionary of each page
    * object on which the form XObject appears, regardless of whether they
@@ -67,15 +67,15 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
    * dictionary as well, to determine which resources are used inside the form
    * XObject. If a resource is included in both dictionaries, it shall have the
    * same name in both locations.
-   * 
+   *
    * In PDF 1.2 and later versions, form XObjects may be independent of the
    * content streams in which they appear, and this is strongly recommended
    * although not required. In an independent form XObject, the resource
    * dictionary of the form XObject is required and shall contain all named
    * resources used by the form XObject. These resources shall not be
    * promoted to the outer content stream’s resource dictionary, although
-   * that stream’s resource dictionary refers to the form XObject. 
-   * @remarks 
+   * that stream’s resource dictionary refers to the form XObject.
+   * @remarks
    * - Optional but strongly recommended
    * - PDF 1.2
    */
@@ -86,7 +86,7 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
    * A group attributes dictionary indicating that the
    * contents of the form XObject shall be treated as a group and specifying
    * the attributes of that group (see 8.10.3, "Group XObjects").
-   * 
+   *
    * If a Ref entry (see below) is present, the group attributes shall also apply
    * to the external page imported by that entry, which allows such an
    * imported page to be treated as a group without further modification.
@@ -102,7 +102,7 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
   /**
    * A reference dictionary identifying a page to be
    * imported from another PDF file, and for which the form XObject serves as
-   * a proxy (see 8.10.4, "Reference XObjects"). 
+   * a proxy (see 8.10.4, "Reference XObjects").
    * @remarks PDF 1.4
    */
   @objects.PDFDictionaryField({
@@ -111,10 +111,10 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
     optional: true,
   })
   public ref!: objects.PDFDictionary | null;
-  
+
   /**
    * A metadata stream containing metadata for the form
-   * XObject (see 14.3.2, "Metadata streams"). 
+   * XObject (see 14.3.2, "Metadata streams").
    * @remarks PDF 1.4
    */
   @objects.PDFDictionaryField({
@@ -150,7 +150,7 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
 
   /**
    * The integer key of the form XObject’s entry in the structural parent tree (see
-   * 14.7.5.4, "Finding structure elements from content items"). 
+   * 14.7.5.4, "Finding structure elements from content items").
    * @remarks
    * - Required if the form XObject is a structural content item
    * - PDF 1.3
@@ -163,11 +163,11 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
    * structural content items; PDF 1.3) The integer key of the form XObject’s
    * entry in the structural parent tree (see 14.7.5.4, "Finding structure
    * elements from content items").
-   * 
+   *
    * At most one of the entries StructParent or StructParents shall be
    * present. A form XObject shall be either a content item in its entirety or a
    * container for marked-content sequences that are content items, but not
-   * both. 
+   * both.
    * @remarks
    * - Required if the form XObject contains marked-content sequences that are
    * structural content items
@@ -177,8 +177,8 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
   public structParents!: number | null;
 
   /**
-   * An OPI version dictionary for the form XObject (see 14.11.7, "Open prepress interface (OPI)"). 
-   * @remarks 
+   * An OPI version dictionary for the form XObject (see 14.11.7, "Open prepress interface (OPI)").
+   * @remarks
    * - PDF 1.2
    * - Deprecated in PDF 2.0
    */
@@ -195,7 +195,7 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
    * optional content properties for the form XObject. Before the form is
    * processed, its visibility shall be determined based on this entry. If it is
    * determined to be invisible, the entire form shall be skipped, as if there
-   * were no Do operator to invoke it. 
+   * were no Do operator to invoke it.
    * @remarks PDF 1.5
    */
   @objects.PDFDictionaryField({
@@ -207,8 +207,8 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
 
   /**
    * The name by which this form XObject is referenced in the XObject subdictionary of
-   * the current resource dictionary (see 7.8.3, "Resource dictionaries"). 
-   * @remarks 
+   * the current resource dictionary (see 7.8.3, "Resource dictionaries").
+   * @remarks
    * - Required in PDF 1.0, optional otherwise
    * - Deprecated in PDF 2.0
    */
@@ -226,7 +226,7 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
 
   /**
    * A measure dictionary (see {@link MeasureDictionary}) that specifies the scale and units which shall apply
-   * to the image. 
+   * to the image.
    * @remarks PDF 2.0
    */
   @objects.PDFDictionaryField({
@@ -243,7 +243,7 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
 
   /**
    * A point data dictionary (see {@link PointDataDictionary}) that specifies the extended geospatial data that
-   * shall apply to the form. 
+   * shall apply to the form.
    * @remarks PDF 2.0
    */
   @objects.PDFDictionaryField({
