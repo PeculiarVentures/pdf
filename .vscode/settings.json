@@ -5,6 +5,7 @@
   "conventionalCommits.scopes": [],
   "typescript.format.semicolons": "insert",
   "editor.formatOnSave": true,
+  "files.trimTrailingWhitespace": true,
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,
