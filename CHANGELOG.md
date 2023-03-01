@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.10.0](https://github.com/PeculiarVentures/pdf/compare/v1.9.0...v1.10.0) (2023-03-01)
+
+
+### Features
+
+* file attachment ([#46](https://github.com/PeculiarVentures/pdf/issues/46)) ([7cd5df0](https://github.com/PeculiarVentures/pdf/commit/7cd5df0ab9a4c06eb8a77a7b99e8b7687f935b75))
+
+
+
+
+
 # [1.9.0](https://github.com/PeculiarVentures/pdf/compare/v1.8.5...v1.9.0) (2023-02-24)
 
 
