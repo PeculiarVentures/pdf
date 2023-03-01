@@ -16,3 +16,4 @@ export * from "./Font";
 export * from "./FontDescriptor";
 export * from "./Dss";
 export * from "./CertificateStorageHandler";
+export * from "./embedded_file";

@@ -184,6 +184,29 @@ export function PDFDateField(name: string, optional = false, defaultValue?: Date
   });
 }
 
+export function PDFTextField(name: string, prefer: typeof PDFLiteralString | typeof PDFHexString, optional = false): PropertyDecorator {
+  return PDFDictionaryField({
+    name,
+    type: PDFTextString,
+    optional,
+    get: (o: PDFTextString) => {
+      return o.text;
+    },
+    set: function (this: PDFDictionary, v: string): PDFTextString {
+      if (!this.has(name)) {
+        // If field doesn't exist, create new
+        this.set(name, new prefer(v));
+      }
+
+      // Get filed and set value
+      const res = this.get(name, PDFTextString);
+      res.text = v;
+
+      return res;
+    }
+  });
+}
+
 export function PDFTextStringField(name: string, optional = false): PropertyDecorator {
   return PDFDictionaryField({
     name,
