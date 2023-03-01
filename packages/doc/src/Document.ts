@@ -19,7 +19,7 @@ import { FormObject } from "./FormObject";
 import { WrapObject } from "./WrapObject";
 import { Dss } from "./Dss";
 import { IPdfCertificateStorageHandler, PDFCertificateStorageHandler } from "./CertificateStorageHandler";
-import { EmbeddedFileMap } from "./attachment";
+import { EmbeddedFileMap } from "./embedded_file";
 
 export enum PDFVersion {
   v1_1 = 1.1,

@@ -2,19 +2,11 @@ import * as objects from "../../objects";
 import { EmbeddedFileStream } from "./EmbeddedFile";
 
 export class FileSpecificationEntries extends objects.PDFDictionary {
-  @objects.PDFDictionaryField({
-    name: "F",
-    type: EmbeddedFileStream,
-    optional: true,
-  })
-  public F!: EmbeddedFileStream | null;
+  @objects.PDFMaybeField("F", EmbeddedFileStream)
+  public F!: objects.Maybe<EmbeddedFileStream>;
 
-  @objects.PDFDictionaryField({
-    name: "F",
-    type: EmbeddedFileStream,
-    optional: true,
-  })
-  public UF!: EmbeddedFileStream | null;
+  @objects.PDFMaybeField("UF", EmbeddedFileStream)
+  public UF!: objects.Maybe<EmbeddedFileStream>;
 }
 
 /**
@@ -65,7 +57,7 @@ export class FileSpecificationDictionary extends objects.PDFDictionary {
    * wrapper document") the F entry shall not contain or be derived from the encrypted payload’s
    * actual file name. This is to avoid potential disclosure of sensitive information in the original
    * filename. The value of F for encrypted payload documents should include the name of the cryptographic
-   *  filter needed to decrypt the document. See the example in 7.6.7,"Unencrypted wrapper document".
+   * filter needed to decrypt the document. See the example in 7.6.7,"Unencrypted wrapper document".
    */
   @objects.PDFTextField("F", objects.PDFLiteralString, true)
   public F!: string | null;
