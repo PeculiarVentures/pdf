@@ -1,7 +1,8 @@
 import * as asn from "@peculiar/asn1-schema";
+import { IFontGlyph } from "./IFontGlyph";
 
 @asn.AsnType({ type: asn.AsnTypeTypes.Sequence })
-export class FontGlyph {
+export class FontGlyph implements IFontGlyph {
 
   @asn.AsnProp({ type: asn.AsnPropTypes.Integer })
   public index = 0;
@@ -17,10 +18,10 @@ export class FontGlyph {
 
   // @asn.AsnProp({ type: asn.AsnPropTypes.Integer })
   // public yMax = 0;
-  
+
   @asn.AsnProp({ type: asn.AsnPropTypes.Integer })
   public advanceWidth = 0;
-  
+
   @asn.AsnProp({ type: asn.AsnPropTypes.Integer, repeated: "set" })
   public unicode: number[] = [];
 

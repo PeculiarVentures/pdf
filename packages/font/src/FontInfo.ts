@@ -4,9 +4,10 @@ import { FontHead } from "./FontHead";
 import { FontName } from "./FontName";
 import { FontOS2 } from "./FontOS2";
 import { FontPost } from "./FontPost";
+import { IFontInfo } from "./IFontInfo";
 
 @asn.AsnType({ type: asn.AsnTypeTypes.Sequence })
-export class FontInfo {
+export class FontInfo implements IFontInfo {
 
   @asn.AsnProp({ type: FontName })
   public name = new FontName();
@@ -16,7 +17,7 @@ export class FontInfo {
 
   @asn.AsnProp({ type: FontOS2 })
   public os2 = new FontOS2();
-  
+
   @asn.AsnProp({ type: FontPost })
   public post = new FontPost();
 
@@ -25,17 +26,17 @@ export class FontInfo {
 
   @asn.AsnProp({ type: asn.AsnPropTypes.Integer })
   public unitsPerEm = 0;
-  
+
   @asn.AsnProp({ type: asn.AsnPropTypes.Integer })
   public ascent = 0;
-  
+
   @asn.AsnProp({ type: asn.AsnPropTypes.Integer })
   public descent = 0;
 
   /**
    * Looks for the GLYPH by the unicode
    * @param code unicode
-   * @returns 
+   * @returns
    */
   public findGlyph(code: number): FontGlyph | null {
     for (const glyph of this.glyphs) {
@@ -50,7 +51,7 @@ export class FontInfo {
   /**
    * Returns the list of GLYPH for specified string
    * @param text string
-   * @returns 
+   * @returns
    */
   public getGlyphs(text: string): FontGlyph[] {
     const res: FontGlyph[] = [];
