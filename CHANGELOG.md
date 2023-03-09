@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.1](https://github.com/PeculiarVentures/pdf/compare/v1.10.0...v1.10.1) (2023-03-08)
+
+
+### Bug Fixes
+
+* Support TrueType font ([#48](https://github.com/PeculiarVentures/pdf/issues/48)) ([aa43a72](https://github.com/PeculiarVentures/pdf/commit/aa43a72c53da1f6dc25cb7106fb6219f6485594b)), closes [#47](https://github.com/PeculiarVentures/pdf/issues/47)
+
+
+
+
+
 # [1.10.0](https://github.com/PeculiarVentures/pdf/compare/v1.9.0...v1.10.0) (2023-03-01)
 
 

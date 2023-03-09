@@ -2,6 +2,7 @@ import * as core from "@peculiarventures/pdf-core";
 import * as pdfFont from "@peculiarventures/pdf-font";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
 import { PDFDocument } from "./Document";
+import { TextEncoding, TextEncodingEnum } from "./TextEncoding";
 import { WrapObject } from "./WrapObject";
 
 export interface FontComponentParams {
@@ -19,11 +20,48 @@ export interface CMapsParams {
   };
   glyphs: pdfFont.FontGlyph[];
 }
+
+function createFontInfo(dict: core.TrueTypeFontDictionary): pdfFont.IFontInfo {
+  return {
+    ascent: dict.FontDescriptor.ascent || 0,
+    descent: dict.FontDescriptor.descent || 0,
+    unitsPerEm: 1,
+    findGlyph: (code: number): pdfFont.IFontGlyph => {
+      if (!dict.Encoding) {
+        throw new Error("TrueTypeFontDictionary should have Encoding field.");
+      }
+      const encoding = TextEncodingEnum[dict.Encoding as keyof typeof TextEncodingEnum];
+      if (encoding === undefined) {
+        throw new Error(`Cannot get glyph index for specified unicode. Unsupported text encoding '${dict.Encoding}'`);
+      }
+
+      const index = TextEncoding.getIndex(code, encoding);
+      if (index != -1) {
+        const width = dict.Widths.find(index - dict.FirstChar);
+        const advanceWidth = (width instanceof core.PDFNumeric)
+          ? width.value : 0;
+
+        return {
+          index,
+          advanceWidth,
+          unicode: [code],
+        };
+      }
+
+      return {
+        index: 0,
+        advanceWidth: 0,
+        unicode: [code],
+      };
+    }
+  };
+}
+
 export class FontComponent extends WrapObject<core.FontDictionary> {
   public static readonly DEFAULT_FONT = pdfFont.DefaultFonts.Helvetica;
   public static readonly DEFAULT_SIZE = 12;
 
-  public fontInfo: pdfFont.FontInfo;
+  public fontInfo: pdfFont.IFontInfo;
   public name: string;
   public fontFile?: BufferSource;
 
@@ -40,9 +78,10 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
     switch (subtype.text) {
       case core.Type0FontDictionary.SUBTYPE:
         return dict.to(core.Type0FontDictionary, true);
-        break;
       case core.Type1FontDictionary.SUBTYPE:
         return dict.to(core.Type1FontDictionary, true);
+      case core.TrueTypeFontDictionary.SUBTYPE:
+        return dict.to(core.TrueTypeFontDictionary, true);
       default:
         throw new Error("Incorrect PDF Dictionary type.");
     }
@@ -64,9 +103,17 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
 
         const fontFile = cid.FontDescriptor.fontFile || cid.FontDescriptor.fontFile2 || cid.FontDescriptor.fontFile3;
         if (!fontFile) {
-          throw new Error(`Not found fontfile for '${params.name}'`);
+          throw new Error(`Not found fontFile for '${params.name}'`);
         }
         this.fontInfo = pdfFont.FontFactory.create(fontFile.decodeSync());
+      } else if (params.fontDictionary instanceof core.TrueTypeFontDictionary) {
+        const fontDescriptor = params.fontDictionary.FontDescriptor;
+        const fontFile = fontDescriptor.fontFile || fontDescriptor.fontFile2 || fontDescriptor.fontFile3;
+        if (!fontFile) {
+          this.fontInfo = createFontInfo(params.fontDictionary);
+        } else {
+          this.fontInfo = pdfFont.FontFactory.create(fontFile.decodeSync());
+        }
       } else {
         throw new Error("Not implemented condition");
       }
