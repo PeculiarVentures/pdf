@@ -10,3 +10,4 @@ export * from "./SignatureReference";
 export * from "./SignatureSeedValue";
 export * from "./ValidationRelatedInformation";
 export * from "./TextField";
+export * from "./Choice";
