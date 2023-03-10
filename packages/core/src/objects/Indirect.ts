@@ -14,6 +14,8 @@ export abstract class PDFIndirect extends PDFObject implements IPDFIndirect {
   }
 
   protected onFromPDF(reader: ViewReader): void {
+    PDFObjectReader.skip(reader);
+
     const objectNumber = PDFNumeric.fromPDF(reader);
     PDFNumeric.assertPositiveInteger(objectNumber);
 
@@ -47,4 +49,5 @@ export abstract class PDFIndirect extends PDFObject implements IPDFIndirect {
 
 }
 
-import { PDFNumeric } from "./Numeric";
+import { PDFNumeric } from "./Numeric"; import { PDFObjectReader } from "./ObjectReader";
+
