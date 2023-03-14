@@ -18,11 +18,11 @@ export class CCITTFaxFilter extends Filter {
   }
 
   public decodeSync(stream: Uint8Array): ArrayBuffer {
-    throw new Error("Method not implemented");
+    return stream;
   }
 
   public encodeSync(stream: Uint8Array): ArrayBuffer {
-    throw new Error("Method not implemented");
+    return stream;
   }
 
 }

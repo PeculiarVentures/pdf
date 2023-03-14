@@ -2,6 +2,7 @@ import { PDFDictionary } from "../objects/Dictionary";
 import { ASCII85Filter } from "./ASCII85Filter";
 import { ASCIIHexFilter } from "./ASCIIHexFilter";
 import { CCITTFaxFilter } from "./CCITTFaxFilter";
+import { CryptFilter } from "./CryptFilter";
 import { DCTFilter } from "./DCTFilter";
 import { Filter } from "./Filter";
 import { FlateFilter } from "./FlateFilter";
@@ -26,6 +27,7 @@ export class FilterFactory {
     [JPXFilter.NAME, JPXFilter],
     [LZWFilter.NAME, LZWFilter],
     [RunLengthFilter.NAME, RunLengthFilter],
+    [CryptFilter.NAME, CryptFilter]
   ]);
 
   public static register(filter: FilterConstructor): void {

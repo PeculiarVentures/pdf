@@ -285,19 +285,19 @@ export class PDFCryptoEngine extends pkijs.CryptoEngine {
 
     if (!alg || !alg.name) {
       switch (oid) {
-        case "1.3.36.3.3.2.8.1.1.7": // brainpoolP256r1 
+        case "1.3.36.3.3.2.8.1.1.7": // brainpoolP256r1
           return { name: "ECDSA", namedCurve: "brainpoolP256r1" } as Algorithm;
-        case "1.3.36.3.3.2.8.1.1.11": // brainpoolP384r1 
+        case "1.3.36.3.3.2.8.1.1.11": // brainpoolP384r1
           return { name: "ECDSA", namedCurve: "brainpoolP384r1" } as Algorithm;
-        case "1.3.36.3.3.2.8.1.1.13": // brainpoolP512r1 
+        case "1.3.36.3.3.2.8.1.1.13": // brainpoolP512r1
           return { name: "ECDSA", namedCurve: "brainpoolP512r1" } as Algorithm;
-        case "1.3.101.112": // curveEd25519 
+        case "1.3.101.112": // curveEd25519
           return { name: "EdDSA", namedCurve: "Ed25519" } as Algorithm;
-        case "1.3.101.113": // curveEd448 
+        case "1.3.101.113": // curveEd448
           return { name: "EdDSA", namedCurve: "Ed448" } as Algorithm;
-        case "2.16.840.1.101.3.4.2.11": // shake128 
+        case "2.16.840.1.101.3.4.2.11": // shake128
           return { name: "shake128" } as Algorithm;
-        case "2.16.840.1.101.3.4.2.12": // shake256 
+        case "2.16.840.1.101.3.4.2.12": // shake256
           return { name: "shake256" } as Algorithm;
         case id_SHA3_256:
           return { name: name_SHA3_256 };
@@ -438,13 +438,17 @@ export class PDFCryptoEngine extends pkijs.CryptoEngine {
     return super.encrypt(algorithm, key, data);
   }
 
-  public override decrypt(...args: any[]): Promise<ArrayBuffer> {
+  public override async decrypt(...args: any[]): Promise<ArrayBuffer> {
     // eslint-disable-next-line prefer-const
     let [alg, key, data] = args;
 
     if (typeof alg === "string") {
       // convert String algorithm to Algorithm
       alg = { name: alg };
+    }
+
+    if (BufferSourceConverter.isBufferSource(data) && data.byteLength === 0) {
+      return new ArrayBuffer(0);
     }
 
     switch (alg.name.toLowerCase()) {

@@ -1,9 +1,9 @@
 import { Filter } from "./Filter";
 
 export class LZWFilter extends Filter {
-  
+
   public static readonly NAME = "LZWDecode";
-	public name = LZWFilter.NAME;
+  public name = LZWFilter.NAME;
 
   public static get className(): string {
     return "LZWFilter";
@@ -18,11 +18,11 @@ export class LZWFilter extends Filter {
   }
 
   public decodeSync(stream: Uint8Array): ArrayBuffer {
-    throw new Error("Method not implemented");
+    return stream;
   }
 
   public encodeSync(stream: Uint8Array): ArrayBuffer {
-    throw new Error("Method not implemented");
+    return stream;
   }
 
 }

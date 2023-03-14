@@ -310,7 +310,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
     if (!this.encrypted) {
       if (this.documentUpdate?.document.encryptHandler && !(this.has("Type") && this.get("Type", PDFName).text === "XRef")) {
         // The cross-reference stream shall not be encrypted and strings appearing in the cross-reference
-        // stream dictionary shall not be encrypted. It shall not have a Filter entry that specifies a Crypt filter 
+        // stream dictionary shall not be encrypted. It shall not have a Filter entry that specifies a Crypt filter
         const encryptedText = await this.encryptAsync();
         this.stream = BufferSourceConverter.toUint8Array(encryptedText);
         this.length.value = this.stream.length;
@@ -340,7 +340,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
                 let ref = "";
                 if (this.isIndirect()) {
                   const indirect = this.getIndirect();
-                  ref = ` (${indirect.id} ${indirect.generation} R)`;
+                  ref = ` (R ${indirect.id} ${indirect.generation})`;
                 }
                 throw new Error(`Cannot decrypt PDF stream${ref}. ${e.message}`);
               }
@@ -424,7 +424,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
   /**
    * Adds the name of the filter to the Field entry
    * @param name The name of the filter
-   * @returns 
+   * @returns
    */
   public addFilter(name: string): void {
     if (this.filter instanceof PDFArray) {
