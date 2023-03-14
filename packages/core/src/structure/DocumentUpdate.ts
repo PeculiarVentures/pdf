@@ -682,7 +682,7 @@ import { CompressedObject } from "./CompressedObject";
 import { CrossReferenceStream } from "./CrossReferenceStream";
 import { CrossReferenceTable } from "./CrossReferenceTable";
 import { CatalogDictionary } from "./dictionaries/Catalog";
-import { PDFDocument, XrefStructure } from "./Document";
+import { type PDFDocument, XrefStructure } from "./Document";
 import { PDFDocumentObject, PDFDocumentObjectTypes } from "./DocumentObject";
 import { EncryptDictionary } from "./dictionaries";
 import { Maybe, PDFDictionary, PDFName } from "../objects";

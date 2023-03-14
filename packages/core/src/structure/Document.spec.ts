@@ -12,8 +12,6 @@ import { BufferSourceConverter, Convert } from "pvtsutils";
 import * as assert from "assert";
 import { PDFDocumentObjectTypes } from "./DocumentObject";
 import { CrossReferenceStream } from "./CrossReferenceStream";
-const fetch = require("node-fetch") as typeof globalThis.fetch;
-
 
 const filesDir = path.join(__dirname, "..", "..", "..", "..", "files");
 
