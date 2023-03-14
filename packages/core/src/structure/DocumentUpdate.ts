@@ -556,17 +556,20 @@ export class PDFDocumentUpdate {
   }
 
   public async decrypt(): Promise<void> {
-    if (this.xref && this.xref.Encrypt) {
-
+    // Some PDF documents may not have the "Encrypt" field added to all update sections.
+    // To address this issue, it's recommended to use the "Encrypt" field from the final
+    // update section to ensure that the entire document is properly encrypted.
+    const update = this.document.update;
+    if (this.xref && update.xref && update.xref.Encrypt) {
       let encryptRef: objects.IPDFIndirect | null = null;
-      if (this.xref.Encrypt.isIndirect()) {
-        encryptRef = this.xref.Encrypt.getIndirect();
+      if (update.xref.Encrypt.isIndirect()) {
+        encryptRef = update.xref.Encrypt.getIndirect();
       }
 
       const promises: Promise<void>[] = [];
       const items = this.xref.objects;
       for (const obj of items) {
-        // decrypt 
+        // decrypt
         if (obj.type !== PDFDocumentObjectTypes.inUse
           || (encryptRef && encryptRef.id === obj.id && encryptRef.generation === obj.generation)) {
           continue;
@@ -595,7 +598,7 @@ export class PDFDocumentUpdate {
 
         const value = obj.value;
 
-        // encrypt 
+        // encrypt
         if (encryptRef && encryptRef.id === obj.id && encryptRef.generation === obj.generation) {
           continue;
         }
@@ -626,8 +629,9 @@ export class PDFDocumentUpdate {
         }
       }
     } catch (e) {
+      const err = e instanceof Error ? e : new Error(`${e}`);
       const r = value.getIndirect(true).id;
-      throw new Error(`Cannot decrypt PDF object (R ${r})`);
+      throw new Error(`Cannot decrypt PDF object (R ${r}). ${err.message}`);
     }
   }
 
