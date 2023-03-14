@@ -32,7 +32,7 @@ export abstract class PDFObject {
   /**
    * Creates new instance of the class and assigns it to the document
    * @param target PDF document or update
-   * @returns 
+   * @returns
    */
   public static create<T extends PDFObject>(this: new () => T, target: PDFDocument | PDFDocumentUpdate): T {
     const obj = new this();
@@ -90,7 +90,7 @@ export abstract class PDFObject {
 
   /**
    * Returns indirect object of the object.
-   * 
+   *
    * If deep is false and the object is not directly in Indirect object it throws an error.
    * @param deep If `true`, then looks for the Indirect object through its parent.
    * @returns

@@ -1,4 +1,5 @@
 import { BadCharError } from "../BadCharError";
+import { CharSet } from "../CharSet";
 import type { ViewReader } from "../ViewReader";
 import { IPDFIndirect, PDFObject } from "./Object";
 
@@ -14,7 +15,19 @@ export abstract class PDFIndirect extends PDFObject implements IPDFIndirect {
   }
 
   protected onFromPDF(reader: ViewReader): void {
-    PDFObjectReader.skip(reader);
+    while (true) {
+      // skip white spaces
+      reader.findIndex(c => !CharSet.whiteSpaceChars.includes(c));
+      if (reader.isEOF) {
+        break;
+      }
+      // skip comment
+      if (reader.view[reader.position] === CharSet.percentChar) {
+        PDFComment.fromPDF(reader);
+        continue; // continue white spaces and comment skipping if comment found
+      }
+      break;
+    }
 
     const objectNumber = PDFNumeric.fromPDF(reader);
     PDFNumeric.assertPositiveInteger(objectNumber);
@@ -49,5 +62,6 @@ export abstract class PDFIndirect extends PDFObject implements IPDFIndirect {
 
 }
 
-import { PDFNumeric } from "./Numeric"; import { PDFObjectReader } from "./ObjectReader";
+import { PDFNumeric } from "./Numeric";
+import { PDFComment } from "./Comment";
 

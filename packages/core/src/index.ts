@@ -5,7 +5,6 @@ export * from "./filters";
 export * from "./forms";
 export * from "./structure";
 export * from "./CryptoEngine";
-export * from "./Mixin";
 export * from "./ParsingError";
 export * from "./PNG";
 export * from "./JPEG";
