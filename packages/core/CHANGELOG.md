@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.2](https://github.com/PeculiarVentures/pdf/compare/v1.10.1...v1.10.2) (2023-03-14)
+
+
+### Bug Fixes
+
+* Hancock files ([#49](https://github.com/PeculiarVentures/pdf/issues/49)) ([78d9180](https://github.com/PeculiarVentures/pdf/commit/78d91803ba016e7ee2cf650cf02019f5fc04cba5))
+
+
+
+
+
 # [1.10.0](https://github.com/PeculiarVentures/pdf/compare/v1.9.0...v1.10.0) (2023-03-01)
 
 
