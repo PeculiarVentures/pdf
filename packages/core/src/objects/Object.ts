@@ -11,6 +11,11 @@ function isPdfIndirect(data: unknown): data is IPDFIndirect {
 }
 
 export interface PDFObjectConstructor<T extends PDFObject> {
+
+  /**
+   * Name of the PDF Object. This name is required for ObjectReader.
+   */
+  NAME: string;
   fromPDF(this: new () => T, reader: ViewReader): T;
   fromPDF(this: new () => T, data: Uint8Array, offset?: number): T;
   fromPDF(this: new () => T, text: string): T;

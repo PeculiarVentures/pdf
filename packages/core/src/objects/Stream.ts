@@ -5,9 +5,9 @@ import type { ViewWriter } from "../ViewWriter";
 import type { EncryptionObject } from "./EncryptionObject";
 
 import { BadCharError, ParsingError } from "../errors";
+import { ObjectTypeEnum } from "./internal";
 import { PDFDictionary } from "./Dictionary";
 import { PDFDictionaryField } from "./DictionaryFieldDecorator";
-
 import { PDFName } from "./Name";
 import { PDFNull } from "./Null";
 import { PDFNumeric } from "./Numeric";
@@ -43,6 +43,8 @@ function getDecodeParamsHandler(this: PDFStream, obj: PDFObjectTypes): Array<PDF
 //#endregion
 
 export class PDFStream extends PDFDictionary implements EncryptionObject {
+
+  public static override readonly NAME = ObjectTypeEnum.Stream;
 
   protected static skipEndOfLine(reader: ViewReader): void {
     const view = reader.view.subarray(reader.position);
@@ -467,6 +469,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
 
 }
 
-import { PDFObjectReader, PDFObjectTypes } from "./ObjectReader";
+import { PDFObjectReader } from "./ObjectReader";
+import { PDFObjectTypes } from "./ObjectTypes";
 import { Filter, FilterFactory } from "../filters";
 import { PDFIndirectObject } from "./IndirectObject";

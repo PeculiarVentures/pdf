@@ -6,7 +6,7 @@ import { PDFDictionary } from "./Dictionary";
 import { PDFLiteralString } from "./LiteralString";
 import { PDFName } from "./Name";
 import { PDFNumeric } from "./Numeric";
-import { PDFObjectTypes } from "./ObjectReader";
+import { PDFObjectTypes } from "./ObjectTypes";
 
 context("PDFArray", () => {
   context("fromPDF", () => {
@@ -87,7 +87,7 @@ context("PDFArray", () => {
     });
 
     it("with extended type", () => {
-      class Test extends PDFDictionary {}
+      class Test extends PDFDictionary { }
 
       const array = new PDFArray(
         new Test(),

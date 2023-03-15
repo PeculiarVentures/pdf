@@ -19,3 +19,6 @@ export * from "./Stream";
 export * from "./TypeConverter";
 export * from "./ObjectReader";
 export * from "./EncryptionObject";
+export * from "./ObjectTypes";
+
+import "./register";

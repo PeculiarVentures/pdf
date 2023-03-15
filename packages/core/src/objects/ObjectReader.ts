@@ -1,43 +1,60 @@
 
-import { ParsingError } from "../errors";
 import type { PDFDocumentUpdate } from "../structure/DocumentUpdate";
 import type { ViewReader } from "../ViewReader";
-import type { PDFObject } from "./Object";
-import type { PDFTextString } from "./TextString";
+import type { PDFObject, PDFObjectConstructor } from "./Object";
 
+import { ParsingError, UnregisteredObjectTypeError } from "../errors";
 import { CharSet } from "../CharSet";
-
-export type PDFObjectTypes = PDFNull |
-  PDFBoolean | PDFNumeric | PDFLiteralString | PDFHexString | PDFName |
-  PDFDictionary | PDFArray | PDFIndirectReference | PDFTextString;
+import { isDigit, ObjectTypeEnum } from "./internal";
+import { PDFObjectTypes } from "./ObjectTypes";
 
 export abstract class PDFObjectReader {
 
-  public static read(reader: ViewReader, update: PDFDocumentUpdate | null = null, parent: PDFObject | null = null): PDFObjectTypes {
+  protected static items: Record<string, PDFObjectConstructor<PDFObject>> = {};
+
+  public static register<T extends PDFObject>(
+    type: PDFObjectConstructor<T>
+  ): void {
+    this.items[type.NAME] = type;
+  }
+
+  public static get<T extends PDFObject>(name: string): PDFObjectConstructor<T> {
+    const Constructor = this.items[name];
+    if (!Constructor) {
+      throw new UnregisteredObjectTypeError(name);
+    }
+
+    return Constructor as PDFObjectConstructor<T>;
+  }
+
+  public static read(reader: ViewReader, update?: PDFDocumentUpdate | null, parent?: PDFObject | null): PDFObjectTypes;
+  public static read(reader: ViewReader, update: PDFDocumentUpdate | null = null, parent: PDFObject | null = null): PDFObject {
     this.skip(reader);
 
     switch (true) {
       case (reader.view[reader.position] === 0x6e): // n
-        return PDFNull.fromPDF(reader);
+        return this.get(ObjectTypeEnum.Null).fromPDF(reader);
       case (reader.view[reader.position] === 0x74 // t
         || reader.view[reader.position] === 0x66): // f
-        return PDFBoolean.fromPDF(reader);
+        return this.get(ObjectTypeEnum.Boolean).fromPDF(reader);
       case (reader.view[reader.position] === 0x2f): // /
-        return PDFName.fromPDF(reader);
+        return this.get(ObjectTypeEnum.Name).fromPDF(reader);
       case (reader.view[reader.position] === 0x28): // (
-        return PDFLiteralString.fromPDF(reader);
+        return this.get(ObjectTypeEnum.LiteralString).fromPDF(reader);
       case (reader.view[reader.position] === 0x5b): { // [
-        const array = new PDFArray();
+        const Constructor = this.get(ObjectTypeEnum.Array);
+        const array = new Constructor();
         array.documentUpdate = update;
         array.ownerElement = parent;
         array.fromPDF(reader);
 
         return array;
       }
-      case (PDFNumeric.isDigit(reader.view[reader.position])): { // Number or Indirect Reference
+      case (isDigit(reader.view[reader.position])): { // Number or Indirect Reference
         const startPosition = reader.position;
         try {
-          const ref = new PDFIndirectReference();
+          const Constructor = this.get(ObjectTypeEnum.IndirectReference);
+          const ref = new Constructor();
           ref.documentUpdate = update;
           ref.ownerElement = parent;
           ref.fromPDF(reader);
@@ -46,13 +63,14 @@ export abstract class PDFObjectReader {
         } catch {
           reader.position = startPosition;
 
-          return PDFNumeric.fromPDF(reader);
+          return this.get(ObjectTypeEnum.Numeric).fromPDF(reader);
         }
       }
       case (reader.view[reader.position] === 0x3c): {// <
         if (reader.view[reader.position + 1] === 0x3c) { // Dictionary or Stream
           const dictionaryPosition = reader.position;
-          const dictionary = new PDFDictionary();
+          const DictionaryConstructor = this.get(ObjectTypeEnum.Dictionary);
+          const dictionary = new DictionaryConstructor();
           dictionary.documentUpdate = update;
           dictionary.ownerElement = parent;
           dictionary.fromPDF(reader);
@@ -63,14 +81,15 @@ export abstract class PDFObjectReader {
           }
           reader.position = dictionaryPosition;
 
-          const stream = new PDFStream();
+          const StreamConstructor = this.get(ObjectTypeEnum.Stream);
+          const stream = new StreamConstructor();
           stream.documentUpdate = update;
           stream.ownerElement = parent;
           stream.fromPDF(reader);
 
           return stream;
         } else {
-          return PDFHexString.fromPDF(reader);
+          return this.get(ObjectTypeEnum.HexString).fromPDF(reader);
         }
       }
     }
@@ -91,7 +110,7 @@ export abstract class PDFObjectReader {
       }
       // skip comment
       if (reader.view[reader.position] === CharSet.percentChar) {
-        PDFComment.fromPDF(reader);
+        this.get(ObjectTypeEnum.Comment).fromPDF(reader);
         continue; // continue white spaces and comment skipping if comment found
       }
       break;
@@ -99,15 +118,3 @@ export abstract class PDFObjectReader {
   }
 
 }
-
-import { PDFBoolean } from "./Boolean";
-import { PDFComment } from "./Comment";
-import { PDFHexString } from "./HexString";
-import { PDFIndirectReference } from "./IndirectReference";
-import { PDFNull } from "./Null";
-import { PDFNumeric } from "./Numeric";
-import { PDFArray } from "./Array";
-import { PDFName } from "./Name";
-import { PDFLiteralString } from "./LiteralString";
-import { PDFDictionary } from "./Dictionary";
-import { PDFStream } from "./Stream";

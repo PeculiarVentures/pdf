@@ -2,6 +2,7 @@ import { Convert } from "pvtsutils";
 import { BadCharError, ParsingError } from "../errors";
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
+import { ObjectTypeEnum } from "./internal";
 import { PDFTextString } from "./TextString";
 import { TextEncoder } from "./TextEncoder";
 
@@ -9,6 +10,8 @@ const leftParenthesisChar = 0x28;
 const rightParenthesisChar = 0x29;
 
 export class PDFLiteralString extends PDFTextString {
+
+  public static readonly NAME = ObjectTypeEnum.LiteralString;
 
   protected onWritePDF(writer: ViewWriter): void {
 

@@ -1,5 +1,5 @@
 import type { PDFDictionary } from "./Dictionary";
-import type { PDFObjectTypes } from "./ObjectReader";
+import { PDFObjectTypes } from "./ObjectTypes";
 import type { PDFObjectConstructor } from "./Object";
 
 export interface PDFDictionaryFieldParameters<T extends PDFObjectTypes, TReturn = any> {

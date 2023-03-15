@@ -1,12 +1,15 @@
 import { BadCharError } from "../errors";
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
+import { ObjectTypeEnum } from "./internal";
 import { PDFObject } from "./Object";
 
 const leftSquareBracketChar = 0x5b;
 const rightSquareBracketChar = 0x5d;
 
 export class PDFArray extends PDFObject implements Iterable<PDFObject> {
+
+  public static readonly NAME = ObjectTypeEnum.Array;
 
   [Symbol.iterator](): Iterator<PDFObject, unknown, undefined> {
     let pointer = 0;
@@ -213,5 +216,5 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
 import { PDFIndirectReference } from "./IndirectReference";
 import { PDFStream } from "./Stream";
 import { PDFTypeConverter } from "./TypeConverter";
-import { PDFObjectReader, PDFObjectTypes } from "./ObjectReader";
-
+import { PDFObjectReader } from "./ObjectReader";
+import { PDFObjectTypes } from "./ObjectTypes";

@@ -5,8 +5,11 @@ import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
 import { TextEncoder } from "./TextEncoder";
 import { PDFTextString } from "./TextString";
+import { ObjectTypeEnum } from "./internal";
 
 export class PDFHexString extends PDFTextString {
+
+  public static readonly NAME = ObjectTypeEnum.HexString;
 
   protected onWritePDF(writer: ViewWriter): void {
     const encText = TextEncoder.to(this.text);
