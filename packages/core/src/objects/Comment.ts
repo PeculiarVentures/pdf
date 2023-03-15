@@ -1,5 +1,5 @@
 import { Convert } from "pvtsutils";
-import { BadCharError } from "../BadCharError";
+import { BadCharError } from "../errors";
 import { CharSet } from "../CharSet";
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";

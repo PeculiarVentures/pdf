@@ -1,7 +1,7 @@
 import type { CrossReference } from "./CrossReference";
 
 import * as objects from "../objects";
-import { ParsingError } from "../ParsingError";
+import { ParsingError } from "../errors";
 import { ViewReader } from "../ViewReader";
 import { ViewWriter } from "../ViewWriter";
 

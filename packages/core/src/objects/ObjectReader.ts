@@ -1,17 +1,17 @@
 
+import { ParsingError } from "../errors";
 import type { PDFDocumentUpdate } from "../structure/DocumentUpdate";
 import type { ViewReader } from "../ViewReader";
 import type { PDFObject } from "./Object";
 import type { PDFTextString } from "./TextString";
 
 import { CharSet } from "../CharSet";
-import { ParsingError } from "../ParsingError";
 
 export type PDFObjectTypes = PDFNull |
   PDFBoolean | PDFNumeric | PDFLiteralString | PDFHexString | PDFName |
   PDFDictionary | PDFArray | PDFIndirectReference | PDFTextString;
 
-export class PDFObjectReader {
+export abstract class PDFObjectReader {
 
   public static read(reader: ViewReader, update: PDFDocumentUpdate | null = null, parent: PDFObject | null = null): PDFObjectTypes {
     this.skip(reader);

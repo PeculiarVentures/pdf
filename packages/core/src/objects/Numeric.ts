@@ -3,7 +3,7 @@ import { Convert } from "pvtsutils";
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
 
-import { ParsingError } from "../ParsingError";
+import { ParsingError } from "../errors";
 import { PDFObject } from "./Object";
 
 const zeroChar = 0x30;

@@ -1,5 +1,4 @@
-import { BadCharError } from "../BadCharError";
-import { ParsingError } from "../ParsingError";
+import { BadCharError, ParsingError } from "../errors";
 import { CharSet } from "../CharSet";
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
@@ -188,7 +187,7 @@ export class PDFDictionary extends PDFObject {
   public clear(): void {
     this.items.clear();
 
-    // Reinitialize fields 
+    // Reinitialize fields
     this.onCreate();
   }
 

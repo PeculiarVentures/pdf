@@ -1,6 +1,6 @@
 import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 
-import { ParsingError } from "../ParsingError";
+import { ParsingError } from "../errors";
 import { ViewReader } from "../ViewReader";
 import { ViewWriter } from "../ViewWriter";
 

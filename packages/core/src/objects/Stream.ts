@@ -4,8 +4,7 @@ import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
 import type { EncryptionObject } from "./EncryptionObject";
 
-import { BadCharError } from "../BadCharError";
-import { ParsingError } from "../ParsingError";
+import { BadCharError, ParsingError } from "../errors";
 import { PDFDictionary } from "./Dictionary";
 import { PDFDictionaryField } from "./DictionaryFieldDecorator";
 

@@ -1,4 +1,4 @@
-import { BadCharError } from "../BadCharError";
+import { BadCharError } from "../errors";
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
 import { PDFIndirect } from "./Indirect";

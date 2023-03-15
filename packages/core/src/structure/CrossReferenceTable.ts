@@ -1,8 +1,7 @@
 import { Convert } from "pvtsutils";
-import { BadCharError } from "../BadCharError";
+import { BadCharError, ParsingError } from "../errors";
 import { CharSet } from "../CharSet";
 import { PDFNumeric, PDFObjectReader } from "../objects";
-import { ParsingError } from "../ParsingError";
 import { ViewReader } from "../ViewReader";
 import { ViewWriter } from "../ViewWriter";
 import { CrossReference } from "./CrossReference";
@@ -73,9 +72,9 @@ export class CrossReferenceTable extends TrailerDictionary implements CrossRefer
         if (!CharSet.trailerChars.every(c => c === reader.readByte())) {
           throw new BadCharError(reader.position - 1);
         }
-    
+
         PDFObjectReader.skip(reader);
-    
+
         // Read trailer dictionary
         super.onFromPDF(reader);
         break;
@@ -86,12 +85,12 @@ export class CrossReferenceTable extends TrailerDictionary implements CrossRefer
 
   protected override onWritePDF(writer: ViewWriter): void {
     writer.writeLine(CharSet.xrefChars); // xref
-    
+
     const groups = PDFDocumentObjectGrouper.group(this.objects);
-    
+
     for (const group of groups) {
       const firstIndex = group[0].id;
-      
+
       writer.writeString(`${firstIndex} ${group.length}\n`);
       for (const item of group) {
         const offset = item.offset.toString().padStart(10, "0");
@@ -99,7 +98,7 @@ export class CrossReferenceTable extends TrailerDictionary implements CrossRefer
         writer.writeString(`${offset} ${generation} ${item.type}\r\n`);
       }
     }
-    
+
     writer.writeLine(CharSet.trailerChars); // trailer
     super.onWritePDF(writer);
     writer.writeLine();

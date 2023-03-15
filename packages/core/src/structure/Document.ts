@@ -370,7 +370,7 @@ export class PDFDocument {
 }
 
 import * as objects from "../objects";
-import { ParsingError } from "../ParsingError";
+import { ParsingError } from "../errors";
 import { ViewWriter } from "../ViewWriter";
 import { PDFDocumentUpdate } from "./DocumentUpdate";
 import { PDFRectangle } from "./common";

@@ -1,13 +1,13 @@
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
 
-import { BadCharError } from "../BadCharError";
+import { BadCharError } from "../errors";
 import { PDFObject } from "./Object";
 
-const nullChars = new Uint8Array([0x6e, 0x75, 0x6c, 0x6c]); // null 
+const nullChars = new Uint8Array([0x6e, 0x75, 0x6c, 0x6c]); // null
 
 export class PDFNull extends PDFObject {
-  
+
   protected onWritePDF(writer: ViewWriter): void {
     writer.write(nullChars);
   }

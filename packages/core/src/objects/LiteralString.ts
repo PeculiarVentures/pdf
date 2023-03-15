@@ -1,8 +1,7 @@
 import { Convert } from "pvtsutils";
+import { BadCharError, ParsingError } from "../errors";
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
-import { BadCharError } from "../BadCharError";
-import { ParsingError } from "../ParsingError";
 import { PDFTextString } from "./TextString";
 import { TextEncoder } from "./TextEncoder";
 
