@@ -5,13 +5,12 @@ import type { ViewWriter } from "../ViewWriter";
 import type { EncryptionObject } from "./EncryptionObject";
 
 import { BadCharError, ParsingError } from "../errors";
-import { ObjectTypeEnum } from "./internal";
+import { ObjectTypeEnum, typeOf } from "./internal";
 import { PDFDictionary } from "./Dictionary";
 import { PDFDictionaryField } from "./decorators/field";
 import { PDFName } from "./Name";
-import { PDFNull } from "./Null";
 import { PDFNumeric } from "./Numeric";
-import { PDFArray } from "./Array";
+import type { PDFArray } from "./Array";
 
 const streamChars = new Uint8Array([0x73, 0x74, 0x72, 0x65, 0x61, 0x6d]);
 const endStreamChars = new Uint8Array([0x65, 0x6e, 0x64, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d]);
@@ -19,15 +18,15 @@ const endStreamChars = new Uint8Array([0x65, 0x6e, 0x64, 0x73, 0x74, 0x72, 0x65,
 //#region Filed handlers
 
 function getDecodeParamsHandler(this: PDFStream, obj: PDFObjectTypes): Array<PDFDictionary | null> {
-  if (obj instanceof PDFDictionary) {
+  if (typeOf(obj, ObjectTypeEnum.Dictionary)) {
     return [obj];
-  } else if (obj instanceof PDFArray) {
+  } else if (typeOf(obj, ObjectTypeEnum.Array)) {
     const res: Array<PDFDictionary | null> = [];
 
     for (const item of obj.items) {
-      if (item instanceof PDFDictionary) {
+      if (typeOf(item, ObjectTypeEnum.Dictionary)) {
         res.push(item);
-      } else if (item instanceof PDFNull) {
+      } else if (typeOf(item, ObjectTypeEnum.Null)) {
         res.push(null);
       } else {
         throw new TypeError("Unsupported type of DecodeParms subitem in the PDF Stream");
@@ -95,7 +94,8 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
       if (filters.length === 1) {
         stream.filter = new PDFName(filters[0].name);
       } else {
-        stream.filter = new PDFArray(...filters.map(o => new PDFName(o.name)));
+        const ArrayConstructor = PDFObjectReader.get(ObjectTypeEnum.Array);
+        stream.filter = new ArrayConstructor(...filters.map(o => new PDFName(o.name)));
       }
     }
 
@@ -212,11 +212,11 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
 
     if (this.filter) {
       let filterNames: string[] = [];
-      if (this.filter instanceof PDFName) {
+      if (typeOf(this.filter, ObjectTypeEnum.Name)) {
         filterNames.push(this.filter.text);
-      } else if (this.filter instanceof PDFArray) {
+      } else if (typeOf(this.filter, ObjectTypeEnum.Array)) {
         filterNames = this.filter.items.map(o => {
-          if (o instanceof PDFName) {
+          if (typeOf(o, ObjectTypeEnum.Name)) {
             return o.text;
           }
           throw new TypeError("Unsupported type of Filter in the PDF Stream");
@@ -428,10 +428,10 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
    * @returns
    */
   public addFilter(name: string): void {
-    if (this.filter instanceof PDFArray) {
+    if (typeOf(this.filter, ObjectTypeEnum.Array)) {
       // Array
       for (const filter of this.filter) {
-        if (filter instanceof PDFName && filter.text === name) {
+        if (typeOf(filter, ObjectTypeEnum.Name) && filter.text === name) {
           return;
         }
       }

@@ -105,7 +105,7 @@ export class TypographyConverter {
       return Math.round(point * 100) / 100;
     } catch (e) {
       const message = "Cannot parse Typography point size.";
-      
+
       if (e instanceof Error) {
         e.message = `${message} ${e.message}`;
         throw e;
@@ -122,10 +122,10 @@ export class TypographyConverter {
    */
   public static toPDFNumeric(value: TypographySize): PDFNumeric {
     const valuePt = this.toPoint(value);
-    
+
     return new PDFNumeric(valuePt);
   }
 
 }
 
-import { PDFNumeric } from "./objects";
+import { PDFNumeric } from "./objects/Numeric";

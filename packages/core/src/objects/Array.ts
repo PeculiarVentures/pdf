@@ -1,7 +1,7 @@
 import { BadCharError } from "../errors";
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
-import { ObjectTypeEnum } from "./internal";
+import { ObjectTypeEnum, typeOf } from "./internal";
 import { PDFObject } from "./Object";
 
 const leftSquareBracketChar = 0x5b;
@@ -61,7 +61,7 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
     const item = this.items[index];
 
     if (item) {
-      const res = (item instanceof PDFIndirectReference)
+      const res = (typeOf(item, ObjectTypeEnum.IndirectReference))
         ? item.getValue()
         : item;
 
@@ -96,7 +96,7 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
     this.modify();
 
     for (const item of items) {
-      if (item instanceof PDFStream) {
+      if (typeOf(item, ObjectTypeEnum.Stream)) {
         item.makeIndirect();
       }
       if (!item.isIndirect()) {
@@ -115,7 +115,7 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
     for (let index = 0; index < this.items.length; index++) {
       const element = this.items[index];
       if (item.equal(element)
-        || (element instanceof PDFIndirectReference && item.ownerElement?.equal(element))) {
+        || (typeOf(element, ObjectTypeEnum.IndirectReference) && item.ownerElement?.equal(element))) {
         return index;
       }
     }
@@ -138,7 +138,8 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
     for (const item of this.items) {
       if (item.isIndirect()) {
         const indirect = item.getIndirect();
-        const indirectRef = new PDFIndirectReference(indirect.id, indirect.generation);
+        const PDFIndirectReferenceConstructor = PDFObjectReader.get(ObjectTypeEnum.IndirectReference);
+        const indirectRef = new PDFIndirectReferenceConstructor(indirect.id, indirect.generation);
         indirectRef.writePDF(writer);
       } else {
         item.writePDF(writer);
@@ -213,8 +214,6 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
 
 }
 
-import { PDFIndirectReference } from "./IndirectReference";
-import { PDFStream } from "./Stream";
 import { PDFTypeConverter } from "./TypeConverter";
 import { PDFObjectReader } from "./ObjectReader";
 import { PDFObjectTypes } from "./ObjectTypes";

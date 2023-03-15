@@ -8,6 +8,18 @@ import { CharSet } from "../CharSet";
 import { isDigit, ObjectTypeEnum } from "./internal";
 import { PDFObjectTypes } from "./ObjectTypes";
 
+import type { PDFArray } from "./Array";
+import type { PDFBoolean } from "./Boolean";
+import type { PDFComment } from "./Comment";
+import type { PDFDictionary } from "./Dictionary";
+import type { PDFHexString } from "./HexString";
+import type { PDFIndirectReference } from "./IndirectReference";
+import type { PDFLiteralString } from "./LiteralString";
+import type { PDFName } from "./Name";
+import type { PDFNull } from "./Null";
+import type { PDFNumeric } from "./Numeric";
+import type { PDFStream } from "./Stream";
+
 export abstract class PDFObjectReader {
 
   protected static items: Record<string, PDFObjectConstructor<PDFObject>> = {};
@@ -18,6 +30,18 @@ export abstract class PDFObjectReader {
     this.items[type.NAME] = type;
   }
 
+  public static get(name: ObjectTypeEnum.Null): typeof PDFNull;
+  public static get(name: ObjectTypeEnum.Boolean): typeof PDFBoolean;
+  public static get(name: ObjectTypeEnum.Numeric): typeof PDFNumeric;
+  public static get(name: ObjectTypeEnum.Name): typeof PDFName;
+  public static get(name: ObjectTypeEnum.LiteralString): typeof PDFLiteralString;
+  public static get(name: ObjectTypeEnum.HexString): typeof PDFHexString;
+  public static get(name: ObjectTypeEnum.IndirectReference): typeof PDFIndirectReference;
+  public static get(name: ObjectTypeEnum.Array): typeof PDFArray;
+  public static get(name: ObjectTypeEnum.Dictionary): typeof PDFDictionary;
+  public static get(name: ObjectTypeEnum.Stream): typeof PDFStream;
+  public static get(name: ObjectTypeEnum.Comment): typeof PDFComment;
+  public static get<T extends PDFObject>(name: string): PDFObjectConstructor<T>;
   public static get<T extends PDFObject>(name: string): PDFObjectConstructor<T> {
     const Constructor = this.items[name];
     if (!Constructor) {

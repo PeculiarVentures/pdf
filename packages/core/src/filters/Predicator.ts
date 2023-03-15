@@ -1,5 +1,6 @@
 import * as bs from "bytestreamjs";
-import { PDFDictionary, PDFNumeric } from "../objects";
+import { PDFNumeric } from "../objects/Numeric";
+import { PDFDictionary } from "../objects/Dictionary";
 
 export interface PredictorParameters {
   prevData?: bs.ByteStream;

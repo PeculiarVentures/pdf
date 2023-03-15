@@ -11,11 +11,6 @@ export interface FindIndexOptions {
   offset?: number;
 }
 
-export enum XrefStructure {
-  Stream,
-  Table,
-}
-
 export interface DocumentOptions {
   xref?: XrefStructure;
   password?: {
@@ -377,3 +372,4 @@ import { PDFRectangle } from "./common";
 import { CrossReferenceTable } from "./CrossReferenceTable";
 import { CharSet } from "../CharSet";
 import { PDFDocumentObject } from "./DocumentObject";
+import { XrefStructure } from "./XrefStructure";

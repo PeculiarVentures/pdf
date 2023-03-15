@@ -1,5 +1,6 @@
 import type { PDFDocumentUpdate } from "../DocumentUpdate";
-import { PDFArray, PDFNumeric } from "../../objects";
+import { PDFNumeric } from "../../objects/Numeric";
+import { PDFArray } from "../../objects/Array";
 
 export class PDFRectangle extends PDFArray {
 

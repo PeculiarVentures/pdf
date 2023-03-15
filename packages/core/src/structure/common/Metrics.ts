@@ -1,4 +1,5 @@
-import { PDFArray, PDFNumeric } from "../../objects";
+import { PDFNumeric } from "../../objects/Numeric";
+import { PDFArray } from "../../objects/Array";
 import { TypographyConverter, TypographySize } from "../../TypographyConverter";
 
 export type MetricsNumberArray = [number, number, number, number, number, number];
@@ -232,7 +233,7 @@ export class Metrics extends PDFArray {
    * Multiplies two matrixes
    * @param a The first matrix
    * @param b The second matrix
-   * @returns 
+   * @returns
    * Taken from https://www.tutorialspoint.com/algorithm-for-matrix-multiplication-in-javascript
    */
   protected multiply(a: number[][], b: number[][]): number[][] {
