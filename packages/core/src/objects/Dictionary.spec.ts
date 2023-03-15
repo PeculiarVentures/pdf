@@ -2,9 +2,9 @@ import * as assert from "assert";
 import { Convert } from "pvtsutils";
 
 import { PDFDictionary } from "./Dictionary";
-import { PDFDictionaryField, PDFNumberField } from "./DictionaryFieldDecorator";
+import { PDFDictionaryField, PDFNumberField } from "./decorators";
 import { PDFLiteralString } from "./LiteralString";
-import { Maybe } from "./Maybe";
+import { Maybe } from "./decorators";
 import { PDFName } from "./Name";
 import { PDFNumeric } from "./Numeric";
 import { PDFDocument } from "../structure/Document";

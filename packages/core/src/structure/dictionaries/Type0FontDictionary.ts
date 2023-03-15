@@ -1,5 +1,4 @@
-import { PDFArray, PDFStream } from "../../objects";
-import { PDFDictionaryField, PDFNameField } from "../../objects/DictionaryFieldDecorator";
+import { PDFArray, PDFDictionaryField, PDFNameField, PDFStream } from "../../objects";
 import { FontDictionary } from "./FontDictionary";
 
 export class Type0FontDictionary extends FontDictionary {
@@ -16,7 +15,7 @@ export class Type0FontDictionary extends FontDictionary {
    * this name should be the concatenation of the CIDFont’s BaseFont name,
    * a hyphen, and the CMap name given in the Encoding entry (or
    * the CMapName entry in the CMap). If the descendant is a Type 2
-   * CIDFont, this name should be the same as the CIDFont’s BaseFont name. 
+   * CIDFont, this name should be the same as the CIDFont’s BaseFont name.
    */
   @PDFNameField("BaseFont")
   public BaseFont!: string;
@@ -33,7 +32,7 @@ export class Type0FontDictionary extends FontDictionary {
 
   /**
     * (Required) A one-element array specifying the CIDFont dictionary that is
-    * the descendant of this Type 0 font. 
+    * the descendant of this Type 0 font.
     */
   @PDFDictionaryField({
     name: "DescendantFonts",

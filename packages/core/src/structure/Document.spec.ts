@@ -2,7 +2,8 @@ import * as fs from "fs";
 import * as path from "path";
 import { PDFArray, PDFDictionary, PDFNumeric, PDFStream } from "../objects";
 import { PDFTextString } from "../objects/TextString";
-import { PDFDocument, XrefStructure } from "./Document";
+import { PDFDocument } from "./Document";
+import { XrefStructure } from "./XrefStructure";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkijs = require("pkijs");
 import { Crypto } from "@peculiar/webcrypto";

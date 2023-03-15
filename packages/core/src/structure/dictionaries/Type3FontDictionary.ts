@@ -1,6 +1,4 @@
-import { PDFArray, PDFStream } from "../../objects";
-import { PDFDictionary } from "../../objects/Dictionary";
-import { PDFArrayField, PDFDictionaryField, PDFNumberField, PDFNameField } from "../../objects/DictionaryFieldDecorator";
+import { PDFArray, PDFArrayField, PDFDictionary, PDFDictionaryField, PDFNameField, PDFNumberField, PDFStream } from "../../objects";
 import { Metrics, PDFRectangle } from "../common";
 import { FontDictionary } from "./FontDictionary";
 
@@ -105,7 +103,7 @@ export class Type3FontDictionary extends FontDictionary {
 
   /**
    * (Optional; PDF 1.2) A stream containing a CMap file that maps character codes to
-   * Unicode values(see 9.10.3, "ToUnicode CMaps"). 
+   * Unicode values(see 9.10.3, "ToUnicode CMaps").
    */
   @PDFDictionaryField({
     name: "ToUnicode",

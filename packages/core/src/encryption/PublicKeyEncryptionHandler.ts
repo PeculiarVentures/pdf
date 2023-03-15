@@ -3,7 +3,7 @@ import * as pkijs from "pkijs";
 import { Name, X509Certificate } from "@peculiar/x509";
 
 import { PDFArray, PDFHexString, PDFStream, PDFTextString } from "../objects";
-import { CryptoFilterMethods, EncryptDictionary, PublicKeyCryptoFilterDictionary, PublicKeyEncryptDictionary, PublicKeyPermissionFlags, TrailerDictionary } from "../structure";
+import { CryptoFilterMethods, EncryptDictionary, PublicKeyCryptoFilterDictionary, PublicKeyEncryptDictionary, PublicKeyPermissionFlags, TrailerDictionary } from "../structure/dictionaries";
 import { staticDataFF } from "./Constants";
 import { EncryptionHandler, EncryptionHandlerCreateParams } from "./EncryptionHandler";
 import { EncryptionAlgorithms, EncryptionKey, EncryptionKeys } from "./EncryptionAlgorithms";
@@ -38,13 +38,13 @@ async function computeEncryptionKey(params: ComputeEncryptionKeyParams): Promise
   }
 
   // Create combined buffer
-  // a) The 20 bytes of seed. 
+  // a) The 20 bytes of seed.
   // b) The bytes of each item in the Recipients array of CMS objects in the order in which they appear in the
   //    array.
   // c) 4 bytes with the value 0xFF if the key being generated is intended for use in document-level encryption
   //    and the document metadata is being left as plaintext
   // d) The first n/8 bytes of the resulting digest shall be used as the file encryption key, where n is the bit length
-  //    of the file encryption key. 
+  //    of the file encryption key.
   const encryptMetadata = params.encryptMetadata ? new Uint8Array() : staticDataFF;
   const combinedBuffer = BufferSourceConverter.concat(seed, recipients, encryptMetadata);
   // const combinedBuffer = BufferSourceConverter.concat(seed, recipients);

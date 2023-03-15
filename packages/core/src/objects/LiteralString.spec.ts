@@ -1,7 +1,6 @@
 import * as assert from "assert";
-import { BufferSourceConverter, Convert } from "pvtsutils";
 
-import { ParsingError } from "../ParsingError";
+import { ParsingError } from "../errors";
 import { PDFLiteralString } from "./LiteralString";
 
 context("LiteralString", () => {

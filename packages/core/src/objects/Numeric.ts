@@ -3,28 +3,18 @@ import { Convert } from "pvtsutils";
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
 
-import { ParsingError } from "../ParsingError";
+import { ParsingError } from "../errors";
+import { isDigit, ObjectTypeEnum } from "./internal";
 import { PDFObject } from "./Object";
 
-const zeroChar = 0x30;
-const nineChar = 0x39;
-const plusChar = 0x2b;
-const minusChar = 0x2d;
-const pointChar = 0x2e;
-
 export class PDFNumeric extends PDFObject {
+
+  public static readonly NAME = ObjectTypeEnum.Numeric;
 
   public static assertPositiveInteger(number: PDFNumeric): asserts number is PDFNumeric {
     if (!(number.value >>> 0 === parseFloat(number.value.toString()))) {
       throw new Error("Number is not a positive integer");
     }
-  }
-
-  public static isDigit(char: number): boolean {
-    return (zeroChar <= char && char <= nineChar) // [0-9]
-      || char === plusChar // '+'
-      || char === minusChar // '-'
-      || char === pointChar; // '.'
   }
 
   public value;
@@ -41,7 +31,7 @@ export class PDFNumeric extends PDFObject {
   }
 
   protected onFromPDF(reader: ViewReader): void {
-    const view = reader.read(c => !PDFNumeric.isDigit(c));
+    const view = reader.read(c => !isDigit(c));
 
     if (!view.length) {
       throw new ParsingError(`Numeric sequence not found at position ${reader.position}`, reader.position);

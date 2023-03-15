@@ -11,11 +11,6 @@ export interface FindIndexOptions {
   offset?: number;
 }
 
-export enum XrefStructure {
-  Stream,
-  Table,
-}
-
 export interface DocumentOptions {
   xref?: XrefStructure;
   password?: {
@@ -370,10 +365,11 @@ export class PDFDocument {
 }
 
 import * as objects from "../objects";
-import { ParsingError } from "../ParsingError";
+import { ParsingError } from "../errors";
 import { ViewWriter } from "../ViewWriter";
 import { PDFDocumentUpdate } from "./DocumentUpdate";
 import { PDFRectangle } from "./common";
 import { CrossReferenceTable } from "./CrossReferenceTable";
 import { CharSet } from "../CharSet";
 import { PDFDocumentObject } from "./DocumentObject";
+import { XrefStructure } from "./XrefStructure";

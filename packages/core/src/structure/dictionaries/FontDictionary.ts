@@ -1,5 +1,4 @@
-import { PDFDictionary } from "../../objects/Dictionary";
-import { PDFDictionaryField, PDFNameField } from "../../objects/DictionaryFieldDecorator";
+import { PDFDictionary, PDFDictionaryField, PDFNameField } from "../../objects";
 import { FontDescriptorDictionary } from "./FontDescriptor";
 
 export class FontDictionary extends PDFDictionary {

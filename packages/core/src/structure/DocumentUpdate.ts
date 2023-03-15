@@ -1,7 +1,7 @@
 import type { CrossReference } from "./CrossReference";
 
 import * as objects from "../objects";
-import { ParsingError } from "../ParsingError";
+import { ParsingError } from "../errors";
 import { ViewReader } from "../ViewReader";
 import { ViewWriter } from "../ViewWriter";
 
@@ -682,7 +682,8 @@ import { CompressedObject } from "./CompressedObject";
 import { CrossReferenceStream } from "./CrossReferenceStream";
 import { CrossReferenceTable } from "./CrossReferenceTable";
 import { CatalogDictionary } from "./dictionaries/Catalog";
-import { type PDFDocument, XrefStructure } from "./Document";
+import { type PDFDocument } from "./Document";
+import { XrefStructure } from "./XrefStructure";
 import { PDFDocumentObject, PDFDocumentObjectTypes } from "./DocumentObject";
 import { EncryptDictionary } from "./dictionaries";
 import { Maybe, PDFDictionary, PDFName } from "../objects";

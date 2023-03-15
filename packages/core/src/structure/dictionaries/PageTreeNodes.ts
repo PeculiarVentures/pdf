@@ -53,7 +53,7 @@ export class PageTreeNodesDictionary extends PageDictionary {
   public Kids!: objects.PDFArray;
 
   /**
-   * The number of leaf nodes (page objects) that are descendants 
+   * The number of leaf nodes (page objects) that are descendants
    * of this node within the page tree
    */
   @objects.PDFDictionaryField({
@@ -74,7 +74,7 @@ export class PageTreeNodesDictionary extends PageDictionary {
 
   /**
    * Adds page to Kids
-   * @param page 
+   * @param page
    */
   public addPage(page: PageObjectDictionary): void {
     this.insertBefore(page);
@@ -123,8 +123,8 @@ export class PageTreeNodesDictionary extends PageDictionary {
 
   /**
    * TODO Remove this method
-   * @param page 
-   * @returns 
+   * @param page
+   * @returns
    * @deprecated
    */
   public async addPageOld(page?: PageObjectDictionary | PDFDocumentObject): Promise<PDFDocumentObject> {
@@ -188,11 +188,11 @@ export class PageTreeNodesDictionary extends PageDictionary {
 
   /**
    * Download all indirect references of object
-   * @param element 
-   * @param secondUpdate 
-   * @param references 
-   * @param key 
-   * @returns 
+   * @param element
+   * @param secondUpdate
+   * @param references
+   * @param key
+   * @returns
    */
   public async copyAllRef(element: PDFDocumentObject | objects.PDFObject, secondUpdate: PDFDocumentUpdate, references: Map<string, { id: number, generation: number; }> = new Map(), key?: string): Promise<void> {
     if (element instanceof PDFDocumentObject) {

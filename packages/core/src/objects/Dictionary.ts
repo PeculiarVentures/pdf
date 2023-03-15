@@ -1,9 +1,9 @@
-import { BadCharError } from "../BadCharError";
-import { ParsingError } from "../ParsingError";
+import { BadCharError, ParsingError } from "../errors";
 import { CharSet } from "../CharSet";
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
-import { PDFObject } from "./Object";
+import { ObjectTypeEnum } from "./internal";
+import { PDFObject, PDFObjectConstructor } from "./Object";
 
 const dictionaryLeftChars = new Uint8Array([CharSet.lessThanChar, CharSet.lessThanChar]);
 const dictionaryRightChars = new Uint8Array([CharSet.greaterThanChar, CharSet.greaterThanChar]);
@@ -12,6 +12,7 @@ export type PDFDictionaryKey = PDFName | string;
 
 export class PDFDictionary extends PDFObject {
 
+  public static readonly NAME: string = ObjectTypeEnum.Dictionary;
   public static readonly FORMAT_SPACE = "  ";
 
   public static getName(name: string | PDFName): string {
@@ -158,7 +159,8 @@ export class PDFDictionary extends PDFObject {
   public set(name: PDFDictionaryKey, value: PDFObjectTypes): this {
     this.modify();
 
-    if (value instanceof PDFStream) {
+    if (value instanceof PDFObject
+      && (value.constructor as PDFObjectConstructor<PDFObject>).NAME === ObjectTypeEnum.Stream) {
       value.makeIndirect();
     }
 
@@ -188,7 +190,7 @@ export class PDFDictionary extends PDFObject {
   public clear(): void {
     this.items.clear();
 
-    // Reinitialize fields 
+    // Reinitialize fields
     this.onCreate();
   }
 
@@ -250,7 +252,7 @@ export class PDFDictionary extends PDFObject {
 
 import { PDFName } from "./Name";
 import { PDFNull } from "./Null";
-import { PDFStream } from "./Stream";
 import { PDFIndirectReference } from "./IndirectReference";
 import { PDFTypeConverter } from "./TypeConverter";
-import { PDFObjectReader, PDFObjectTypes } from "./ObjectReader";
+import { PDFObjectReader } from "./ObjectReader";
+import { PDFObjectTypes } from "./ObjectTypes";

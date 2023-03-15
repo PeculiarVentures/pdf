@@ -1,6 +1,7 @@
 import * as assert from "assert";
 import { PDFDictionary, PDFNumeric } from "../objects";
-import { PDFDocument, XrefStructure } from "./Document";
+import { PDFDocument } from "./Document";
+import { XrefStructure } from "./XrefStructure";
 
 context("CrossReferenceTable", () => {
 
@@ -21,7 +22,7 @@ context("CrossReferenceTable", () => {
 
     const objDict1 = doc.append(dict1);
     doc.append(dict2);
-  
+
     const buf = await doc.toPDF();
 
     console.log(Buffer.from(buf).toString("binary"));

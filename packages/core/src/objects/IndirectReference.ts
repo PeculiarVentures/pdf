@@ -1,12 +1,15 @@
+import { BadCharError } from "../errors";
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
 import type { PDFObject } from "./Object";
-import type { PDFObjectTypes } from "./ObjectReader";
+import { PDFObjectTypes } from "./ObjectTypes";
 
-import { BadCharError } from "../BadCharError";
+import { ObjectTypeEnum } from "./internal";
 import { PDFIndirect } from "./Indirect";
 
 export class PDFIndirectReference extends PDFIndirect {
+
+  public static readonly NAME = ObjectTypeEnum.IndirectReference;
 
   protected onWritePDF(writer: ViewWriter): void {
     const objectNumber = new PDFNumeric(this.id).toString();
@@ -28,7 +31,7 @@ export class PDFIndirectReference extends PDFIndirect {
   public getValue(type?: any): any {
     if (this.documentUpdate) {
       const value = this.documentUpdate.document.getObject(this).value;
-      
+
       return PDFTypeConverter.convert(value, type);
     }
 

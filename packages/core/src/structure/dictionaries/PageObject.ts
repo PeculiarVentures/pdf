@@ -20,7 +20,7 @@ export enum PageTabsOrders {
    */
   structure = "S",
   /**
-   * Annotation array order. 
+   * Annotation array order.
    * @remarks PDF 2.0
    */
   annotationsArray = "A",
@@ -42,8 +42,8 @@ export class PageObjectDictionary extends PageDictionary {
   public type!: string;
 
   /**
-   * The page tree node (see {@link PageTreeNodesDictionary}) that is the immediate parent of this page object. 
-   * Objects of Type Template shall have no Parent key. 
+   * The page tree node (see {@link PageTreeNodesDictionary}) that is the immediate parent of this page object.
+   * Objects of Type Template shall have no Parent key.
    */
   @objects.PDFDictionaryField({
     name: "Parent",
@@ -53,15 +53,15 @@ export class PageObjectDictionary extends PageDictionary {
   public Parent!: PageTreeNodesDictionary;
 
   /**
-   * The date and time when the page’s contents were most recently modified. 
+   * The date and time when the page’s contents were most recently modified.
    * @remarks Required if PieceInfo is present; optional otherwise; PDF 1.3
    */
   @objects.PDFDateField("LastModified", true)
   public lastModified!: PDFDate | null;
 
   /**
-   * A rectangle, expressed in default user space units, that shall define 
-   * the region to which the contents of the page shall be clipped 
+   * A rectangle, expressed in default user space units, that shall define
+   * the region to which the contents of the page shall be clipped
    * when output in a production environment
    * @remarks PDF 1.3
    */
@@ -74,8 +74,8 @@ export class PageObjectDictionary extends PageDictionary {
   public bleedBox!: PDFRectangle | null;
 
   /**
-   * A rectangle, expressed in default user space units, that shall define 
-   * the intended dimensions of the finished page after trimming 
+   * A rectangle, expressed in default user space units, that shall define
+   * the intended dimensions of the finished page after trimming
    * @remarks PDF 1.3
    */
   @objects.PDFDictionaryField({
@@ -87,8 +87,8 @@ export class PageObjectDictionary extends PageDictionary {
   public trimBox!: PDFRectangle | null;
 
   /**
-   * A rectangle, expressed in default user space units, that shall define 
-   * the extent of the page’s meaningful content (including potential white-space) 
+   * A rectangle, expressed in default user space units, that shall define
+   * the extent of the page’s meaningful content (including potential white-space)
    * as intended by the page’s creator
    * @remarks PDF 1.3
    */
@@ -101,8 +101,8 @@ export class PageObjectDictionary extends PageDictionary {
   public artBox!: PDFRectangle | null;
 
   /**
-   * A box colour information dictionary that shall specify the colours 
-   * and other visual characteristics that should be used in displaying 
+   * A box colour information dictionary that shall specify the colours
+   * and other visual characteristics that should be used in displaying
    * guidelines on the screen for the various page boundaries
    * @remarks PDF 1.4
    */
@@ -123,7 +123,7 @@ export class PageObjectDictionary extends PageDictionary {
   public contents!: objects.PDFStream | objects.PDFArray | null;
 
   /**
-   * A group attributes dictionary that shall specify the attributes 
+   * A group attributes dictionary that shall specify the attributes
    * of the page’s page group for use in the transparent imaging model
    * @remarks PDF 1.4
    */
@@ -135,7 +135,7 @@ export class PageObjectDictionary extends PageDictionary {
   public group!: objects.PDFDictionary | null;
 
   /**
-   * A group attributes dictionary that shall specify the attributes 
+   * A group attributes dictionary that shall specify the attributes
    * of the page’s page group for use in the transparent imaging model
    */
   @objects.PDFDictionaryField({
@@ -146,8 +146,8 @@ export class PageObjectDictionary extends PageDictionary {
   public thumb!: objects.PDFStream | null;
 
   /**
-   * An array that shall contain indirect references to all article beads 
-   * appearing on the page 
+   * An array that shall contain indirect references to all article beads
+   * appearing on the page
    * @remarks PDF 1.1
    */
   @objects.PDFDictionaryField({
@@ -158,7 +158,7 @@ export class PageObjectDictionary extends PageDictionary {
   public b!: objects.PDFArray | null;
 
   /**
-   * The page’s display duration (also called its advance timing): 
+   * The page’s display duration (also called its advance timing):
    * the maximum length of time, in seconds, that the page shall be
    * displayed during presentations before the viewer application shall
    * automatically advance to the next page
@@ -168,7 +168,7 @@ export class PageObjectDictionary extends PageDictionary {
   public dur!: objects.PDFNumeric | null;
 
   /**
-   * A transition dictionary describing the transition effect 
+   * A transition dictionary describing the transition effect
    * that shall be used when displaying the page during presentations
    * @remarks PDF 1.1
    */
@@ -180,8 +180,8 @@ export class PageObjectDictionary extends PageDictionary {
   public trans!: objects.PDFDictionary | null;
 
   /**
-   * An array of annotation dictionaries that shall contain indirect references 
-   * to all annotations associated with the page 
+   * An array of annotation dictionaries that shall contain indirect references
+   * to all annotations associated with the page
    */
   @objects.PDFDictionaryField({
     name: "Annots",
@@ -191,7 +191,7 @@ export class PageObjectDictionary extends PageDictionary {
   public annots!: objects.PDFArray | null;
 
   /**
-   * An additional-actions dictionary that shall define actions to be performed 
+   * An additional-actions dictionary that shall define actions to be performed
    * when the page is opened or closed
    * @remarks PDF 1.2
    */
@@ -214,7 +214,7 @@ export class PageObjectDictionary extends PageDictionary {
   public metadata!: objects.PDFStream | null;
 
   /**
-   * A page-piece dictionary associated with the page 
+   * A page-piece dictionary associated with the page
    * @remarks PDF 1.3
    */
   @objects.PDFDictionaryField({
@@ -225,7 +225,7 @@ export class PageObjectDictionary extends PageDictionary {
   public pieceInfo!: objects.PDFDictionary | null;
 
   /**
-   * The integer key of the page’s entry in the structural parent tree 
+   * The integer key of the page’s entry in the structural parent tree
    * @remarks PDF 1.3
    */
   @objects.PDFNumberField("StructParents", true)
@@ -239,16 +239,16 @@ export class PageObjectDictionary extends PageDictionary {
   public id!: string | null;
 
   /**
-   * The page’s preferred zoom (magnification) factor: the factor by which 
-   * it shall be scaled to achieve the natural display magnification 
+   * The page’s preferred zoom (magnification) factor: the factor by which
+   * it shall be scaled to achieve the natural display magnification
    * @remarks PDF 1.3
    */
   @objects.PDFNumberField("PZ", true)
   public pz!: number | null;
 
   /**
-   * A separation dictionary that shall contain information needed 
-   * to generate colour separations for the page 
+   * A separation dictionary that shall contain information needed
+   * to generate colour separations for the page
    * @remarks PDF 1.3
    */
   @objects.PDFDictionaryField({
@@ -284,9 +284,9 @@ export class PageObjectDictionary extends PageDictionary {
   public presSteps!: objects.PDFDictionary | null;
 
   /**
-   * A positive number that shall give the size of default user space units, 
-   * in multiples of 1 ⁄ 72 inch. The range of supported values shall be 
-   * implementation-dependent. Default value: 1.0 
+   * A positive number that shall give the size of default user space units,
+   * in multiples of 1 ⁄ 72 inch. The range of supported values shall be
+   * implementation-dependent. Default value: 1.0
    * @remarks PDF 1.6
    */
   @objects.PDFNumberField("UserUnit", true, 1.0)
@@ -308,7 +308,7 @@ export class PageObjectDictionary extends PageDictionary {
   public af!: objects.PDFArray | null;
 
   /**
-   * An array of output intent dictionaries that shall specify the colour characteristics 
+   * An array of output intent dictionaries that shall specify the colour characteristics
    * of output devices on which this page might be rendered
    * @remarks PDF 2.0
    */
