@@ -11,14 +11,13 @@ export * from "./Null";
 export * from "./Numeric";
 export * from "./String";
 export * from "./TextString";
-export * from "./Maybe";
 export * from "./Array";
 export * from "./Dictionary";
-export * from "./DictionaryFieldDecorator";
 export * from "./Stream";
 export * from "./TypeConverter";
 export * from "./ObjectReader";
 export * from "./EncryptionObject";
 export * from "./ObjectTypes";
+export * from "./decorators";
 
 import "./register";

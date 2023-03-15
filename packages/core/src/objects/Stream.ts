@@ -7,7 +7,7 @@ import type { EncryptionObject } from "./EncryptionObject";
 import { BadCharError, ParsingError } from "../errors";
 import { ObjectTypeEnum } from "./internal";
 import { PDFDictionary } from "./Dictionary";
-import { PDFDictionaryField } from "./DictionaryFieldDecorator";
+import { PDFDictionaryField } from "./decorators/field";
 import { PDFName } from "./Name";
 import { PDFNull } from "./Null";
 import { PDFNumeric } from "./Numeric";
