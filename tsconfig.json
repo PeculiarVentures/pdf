@@ -4,7 +4,6 @@
     "incremental": true,
     "importHelpers": false,
     "allowJs": true,
-    "target": "ES2018",
     "baseUrl": ".",
     "paths": {
       "@peculiarventures/pdf-core": [
