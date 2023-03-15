@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.4](https://github.com/PeculiarVentures/pdf/compare/v1.10.3...v1.10.4) (2023-03-15)
+
+
+### Bug Fixes
+
+* circular dependencies ([#51](https://github.com/PeculiarVentures/pdf/issues/51)) ([b887268](https://github.com/PeculiarVentures/pdf/commit/b887268a2777da7fa5f30f0931a527a3a7415fa4))
+
+
+
+
+
 ## [1.10.3](https://github.com/PeculiarVentures/pdf/compare/v1.10.2...v1.10.3) (2023-03-14)
 
 
