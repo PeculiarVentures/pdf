@@ -1,4 +1,4 @@
-import { BufferSource } from "pvtsutils";
+import { BufferSource, BufferSourceConverter } from "pvtsutils";
 import { Filter } from "./Filter";
 
 export class CryptFilter extends Filter {
@@ -19,10 +19,10 @@ export class CryptFilter extends Filter {
   }
 
   public decodeSync(stream: BufferSource): ArrayBuffer {
-    throw new Error("Method not implemented");
+    return BufferSourceConverter.toArrayBuffer(stream);
   }
 
   public encodeSync(stream: Uint8Array): ArrayBuffer {
-    throw new Error("Method not implemented");
+    throw BufferSourceConverter.toArrayBuffer(stream);
   }
 }

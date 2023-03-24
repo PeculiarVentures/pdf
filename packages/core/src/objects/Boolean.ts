@@ -1,12 +1,15 @@
-import { BadCharError } from "../BadCharError";
+import { BadCharError } from "../errors";
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
+import { ObjectTypeEnum } from "./internal";
 import { PDFObject } from "./Object";
 
 const falseChars = new Uint8Array([0x66, 0x61, 0x6c, 0x73, 0x65]);
 const trueChars = new Uint8Array([0x74, 0x72, 0x75, 0x65]);
 
 export class PDFBoolean extends PDFObject {
+
+  public static readonly NAME = ObjectTypeEnum.Boolean;
 
   constructor();
   constructor(value: boolean);

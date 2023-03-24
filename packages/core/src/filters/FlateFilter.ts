@@ -1,7 +1,7 @@
 import { Filter } from "./Filter";
 import * as pako from "pako";
 import * as bs from "bytestreamjs";
-import { PDFNumeric } from "../objects";
+import { PDFNumeric } from "../objects/Numeric";
 import { TIFFPredictor } from "./TIFFPredictor";
 import { PNGPredictor } from "./PNGPredictor";
 import { BufferSourceConverter } from "pvtsutils";

@@ -1,5 +1,4 @@
-import { PDFArray, PDFStream } from "../../objects";
-import { PDFArrayField, PDFDictionaryField, PDFNumberField, PDFNameField } from "../../objects/DictionaryFieldDecorator";
+import { PDFArray, PDFArrayField, PDFDictionaryField, PDFNameField, PDFNumberField, PDFStream } from "../../objects";
 import { FontDictionary } from "./FontDictionary";
 
 export class TrueTypeFontDictionary extends FontDictionary {
@@ -66,7 +65,7 @@ export class TrueTypeFontDictionary extends FontDictionary {
 
   /**
    * (Optional; PDF 1.2) A stream containing a CMap file that maps character
-   * codes to Unicode values(see 9.10.3, "ToUnicode CMaps"). 
+   * codes to Unicode values(see 9.10.3, "ToUnicode CMaps").
    */
   @PDFDictionaryField({
     name: "ToUnicode",

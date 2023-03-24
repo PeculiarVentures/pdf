@@ -1,6 +1,6 @@
 import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 
-import { ParsingError } from "../ParsingError";
+import { ParsingError } from "../errors";
 import { ViewReader } from "../ViewReader";
 import { ViewWriter } from "../ViewWriter";
 
@@ -11,6 +11,11 @@ function isPdfIndirect(data: unknown): data is IPDFIndirect {
 }
 
 export interface PDFObjectConstructor<T extends PDFObject> {
+
+  /**
+   * Name of the PDF Object. This name is required for ObjectReader.
+   */
+  NAME: string;
   fromPDF(this: new () => T, reader: ViewReader): T;
   fromPDF(this: new () => T, data: Uint8Array, offset?: number): T;
   fromPDF(this: new () => T, text: string): T;
@@ -32,7 +37,7 @@ export abstract class PDFObject {
   /**
    * Creates new instance of the class and assigns it to the document
    * @param target PDF document or update
-   * @returns 
+   * @returns
    */
   public static create<T extends PDFObject>(this: new () => T, target: PDFDocument | PDFDocumentUpdate): T {
     const obj = new this();
@@ -90,7 +95,7 @@ export abstract class PDFObject {
 
   /**
    * Returns indirect object of the object.
-   * 
+   *
    * If deep is false and the object is not directly in Indirect object it throws an error.
    * @param deep If `true`, then looks for the Indirect object through its parent.
    * @returns

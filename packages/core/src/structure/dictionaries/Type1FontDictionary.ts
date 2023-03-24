@@ -1,6 +1,4 @@
-import { PDFArray, PDFStream } from "../../objects";
-import { PDFDictionary } from "../../objects/Dictionary";
-import { PDFArrayField, PDFDictionaryField, PDFNumberField, PDFNameField } from "../../objects/DictionaryFieldDecorator";
+import { PDFArray, PDFArrayField, PDFDictionary, PDFDictionaryField, PDFNameField, PDFNumberField, PDFStream } from "../../objects";
 import { FontDictionary } from "./FontDictionary";
 
 export class Type1FontDictionary extends FontDictionary {
@@ -33,7 +31,7 @@ export class Type1FontDictionary extends FontDictionary {
 
   /**
    * The last character code defined in the font’s Widths array.
-   * @remarks 
+   * @remarks
    * - Required
    * - Optional in PDF 1.0 - 1.7 for the standard 14 fonts
    */
@@ -73,7 +71,7 @@ export class Type1FontDictionary extends FontDictionary {
 
   /**
    * (Optional; PDF 1.2) A stream containing a CMap file that maps character
-   * codes to Unicode values(see 9.10.3, "ToUnicode CMaps"). 
+   * codes to Unicode values(see 9.10.3, "ToUnicode CMaps").
    */
   @PDFDictionaryField({
     name: "ToUnicode",

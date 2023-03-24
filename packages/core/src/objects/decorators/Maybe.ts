@@ -1,7 +1,10 @@
-import type { PDFDictionary } from "./Dictionary";
-import { PDFNull } from "./Null";
+import type { PDFDictionary } from "../Dictionary";
+import type { PDFObject, PDFObjectConstructor } from "../Object";
+import { PDFNull } from "../Null";
 
 export class Maybe<T extends PDFObject> {
+
+  public static readonly DEFAULT_VIEW = new Uint8Array(0);
 
   constructor(
     public parent: PDFDictionary,
@@ -33,7 +36,7 @@ export class Maybe<T extends PDFObject> {
       this.parent
         .modify()
         .set(this.name, value as any)
-        .view = PDFObject.DEFAULT_VIEW;
+        .view = Maybe.DEFAULT_VIEW;
 
       return value;
     }
@@ -47,7 +50,7 @@ export class Maybe<T extends PDFObject> {
 
   public set(value: T): void {
     const parent = this.parent.modify();
-    parent.view = PDFObject.DEFAULT_VIEW;
+    parent.view = Maybe.DEFAULT_VIEW;
     if (value === undefined || value === null) {
       parent.delete(this.name);
     } else {
@@ -59,5 +62,3 @@ export class Maybe<T extends PDFObject> {
   }
 
 }
-
-import { PDFObject, PDFObjectConstructor } from "./Object";

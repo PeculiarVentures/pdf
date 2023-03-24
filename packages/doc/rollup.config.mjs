@@ -1,11 +1,13 @@
-import path from "path";
+import path from "node:path";
+import url from "node:url";
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from "rollup-plugin-typescript2";
 import dts from "rollup-plugin-dts";
+import pkg from "./package.json" assert { type: "json" };
 
-const pkg = require("./package.json");
-
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const banner = [].join("\n");
 const input = "src/index.ts";
 

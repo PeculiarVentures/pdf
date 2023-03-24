@@ -8,3 +8,4 @@ export * from "./CrossReferenceTable";
 export * from "./Document";
 export * from "./DocumentObject";
 export * from "./DocumentUpdate";
+export * from "./XrefStructure";

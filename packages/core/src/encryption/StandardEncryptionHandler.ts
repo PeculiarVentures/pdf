@@ -4,7 +4,7 @@ import * as pkijs from "pkijs";
 import {
   CryptoFilterMethods, CryptoFilterDictionary, EncryptDictionary,
   StandardEncryptDictionary, TrailerDictionary, UserAccessPermissionFlags,
-} from "../structure";
+} from "../structure/dictionaries";
 import { PDFTextString, PDFStream, PDFHexString, PDFArray } from "../objects";
 import { EncryptionHandler, EncryptionHandlerCreateParams } from "./EncryptionHandler";
 import { EncryptionAlgorithms, EncryptionKey, EncryptionKeys } from "./EncryptionAlgorithms";
@@ -195,7 +195,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
   public onUserPassword?: UserPasswordHandle;
 
   /**
-   * PDF Standard Encrypt dictionary 
+   * PDF Standard Encrypt dictionary
    */
   public override dictionary!: StandardEncryptDictionary;
 
@@ -296,8 +296,8 @@ export class StandardEncryptionHandler extends EncryptionHandler {
   }
 
   /**
-   * Returns the User cached password. 
-   * 
+   * Returns the User cached password.
+   *
    * If cache is empty it requests the User password using {@link onUserPassword} handler.
    * @returns Password
    */
@@ -333,7 +333,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
 
   /**
    * Returns the Owner cached password.
-   * 
+   *
    * If cache is empty, throws an error.
    * @returns Password
    */

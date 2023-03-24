@@ -1,7 +1,7 @@
 import { ICryptoEngine } from "pkijs";
 import { BufferSourceConverter } from "pvtsutils";
 import { PDFStream, PDFTextString } from "../objects";
-import { CryptoFilterMethods } from "../structure";
+import { CryptoFilterMethods } from "../structure/dictionaries";
 import { staticData } from "./Constants";
 
 export interface EncryptionKey {
@@ -24,7 +24,7 @@ export interface EncryptionAlgorithmsParams {
    */
   data: BufferSource;
   /**
-   * Target object. 
+   * Target object.
    */
   target: PDFStream | PDFTextString;
   crypto: ICryptoEngine;
@@ -51,7 +51,7 @@ export abstract class EncryptionAlgorithms {
   /**
    * Encrypts/decrypts incoming data.
    * @param params Parameters
-   * @returns 
+   * @returns
    */
   private static async cipher(params: EncryptionAlgorithmsCipherParams): Promise<ArrayBuffer> {
     const { crypto, encrypt, key, target, data } = params;

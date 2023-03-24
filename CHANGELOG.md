@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.4](https://github.com/PeculiarVentures/pdf/compare/v1.10.3...v1.10.4) (2023-03-15)
+
+
+### Bug Fixes
+
+* circular dependencies ([#51](https://github.com/PeculiarVentures/pdf/issues/51)) ([b887268](https://github.com/PeculiarVentures/pdf/commit/b887268a2777da7fa5f30f0931a527a3a7415fa4))
+
+
+
+
+
+## [1.10.3](https://github.com/PeculiarVentures/pdf/compare/v1.10.2...v1.10.3) (2023-03-14)
+
+
+### Bug Fixes
+
+* rollup error and update project dependencies ([#50](https://github.com/PeculiarVentures/pdf/issues/50)) ([7111e61](https://github.com/PeculiarVentures/pdf/commit/7111e6152f07cffc485ec5bfce154b2800d360fe))
+
+
+
+
+
+## [1.10.2](https://github.com/PeculiarVentures/pdf/compare/v1.10.1...v1.10.2) (2023-03-14)
+
+
+### Bug Fixes
+
+* Hancock files ([#49](https://github.com/PeculiarVentures/pdf/issues/49)) ([78d9180](https://github.com/PeculiarVentures/pdf/commit/78d91803ba016e7ee2cf650cf02019f5fc04cba5))
+
+
+
+
+
 ## [1.10.1](https://github.com/PeculiarVentures/pdf/compare/v1.10.0...v1.10.1) (2023-03-08)
 
 

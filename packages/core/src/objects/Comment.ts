@@ -1,11 +1,14 @@
 import { Convert } from "pvtsutils";
-import { BadCharError } from "../BadCharError";
+import { BadCharError } from "../errors";
 import { CharSet } from "../CharSet";
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
+import { ObjectTypeEnum } from "./internal";
 import { PDFString } from "./String";
 
 export class PDFComment extends PDFString {
+
+  public static readonly NAME = ObjectTypeEnum.Comment;
 
   protected onWritePDF(writer: ViewWriter): void {
     writer.writeString(`% ${this.text}`);
