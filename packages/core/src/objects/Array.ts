@@ -208,6 +208,12 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
     return false;
   }
 
+  public clear(): this {
+    this.items = [];
+
+    return this.modify();
+  }
+
 }
 
 import { PDFIndirectReference } from "./IndirectReference";
