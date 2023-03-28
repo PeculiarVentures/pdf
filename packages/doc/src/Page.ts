@@ -1,4 +1,5 @@
 import * as core from "@peculiarventures/pdf-core";
+import * as fonts from "@peculiarventures/pdf-font";
 import { ICheckBoxCreateParameters } from "./CheckBoxHandler";
 import { CheckBox, SignatureBox, RadioButton, TextEditor, InputImageBox } from "./Form";
 import { ISignatureBoxCreateParameters } from "./SignatureBoxHandler";
@@ -9,6 +10,7 @@ import { InputImageBoxCreateParameters } from "./InputImageBoxHandler";
 import { FontComponent } from "./Font";
 import { Watermark } from "./Watermark";
 import { WrapContentObject } from "./WrapContentObject";
+import { ComboBox, ComboBoxCreateParameters } from "./forms";
 
 export interface ImageDrawParameters {
   left?: core.TypographySize;
@@ -151,7 +153,7 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
 
   /**
    * Gets actual content or creates the new.
-   * 
+   *
    * Actual is the content that was created in current update.
    * @returns Content stream
    */
@@ -232,6 +234,60 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
     this.target.addAnnot(watermark.target);
 
     return watermark;
+  }
+
+  public addComboBox(params: ComboBoxCreateParameters): ComboBox {
+    const paramsCopy = {
+      ...params,
+      top: this.height - core.TypographyConverter.toPoint(params.top || 0),
+    };
+
+    const widget = this.document.comboBoxHandler.create(paramsCopy);
+
+    this.target.addAnnot(widget);
+
+    const comboBox = new ComboBox(widget, this.document);
+
+    comboBox.top = params.top || 0;
+    comboBox.left = params.left || 0;
+    comboBox.width = params.width || 0;
+    comboBox.height = params.height || 0;
+
+    // /AP <<
+    //   /N 27 0 R
+    // >>
+    // /DA (/Helv 12 Tf 0 g)
+    // /F 4
+    // /FT /Ch
+    // /Ff 131072
+    // /MK <<
+    //   /BG [ 1 ]
+    // >>
+    // /P 15 0 R
+    // /Rect [ 25.033, 724.524, 97.033, 744.524 ]
+    // /Subtype /Widget
+    // /T (Dropdown2)
+    // /Type /Annot
+    const doc = this.document.target;
+
+    comboBox.print = true;
+    comboBox.combo = true;
+    if (params.options) {
+      comboBox.options = params.options;
+    }
+    if (params.selected) {
+      comboBox.selected = typeof params.selected === "string" ? [params.selected] : params.selected;
+    }
+
+    // AP
+    comboBox.target.MK.get().BG = this.document.target.createArray(doc.createNumber(1));
+    const helv = this.document.addFont(fonts.DefaultFonts.Helvetica);
+    comboBox.font = helv;
+    comboBox.fontSize = 12;
+    comboBox.textColor = 0;
+
+
+    return comboBox;
   }
 
 }

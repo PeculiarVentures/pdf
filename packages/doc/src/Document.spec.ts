@@ -29,7 +29,7 @@ context("Document", () => {
 
       const page = doc.pages.create();
 
-      // writeFile(await doc.save());
+      writeFile(await doc.save());
 
       assert.strictEqual(doc.pages.length, 1);
     });

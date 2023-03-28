@@ -57,9 +57,10 @@ function flag(f: core.AnnotationFlags, fieldFlag = false, repaint = false): Prop
   };
 }
 
-function fieldFlag(value: number, repaint = false) {
+export function fieldFlag(value: number, repaint = false) {
   return flag(value, true, repaint);
 }
+
 function annotFlag(value: number, repaint = false) {
   return flag(value, false, repaint);
 }
@@ -311,7 +312,7 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
    * @remarks In cases where screen space is limited, the ability to hide and show
    * annotations selectively can be used in combination with appearance
    * streams (see 12.5.5, "Appearance streams") to render auxiliary popup
-   * information similar in function to online help systems. 
+   * information similar in function to online help systems.
    * @remarks PDF 1.2
    */
   @annotFlag(core.AnnotationFlags.hidden)
@@ -322,7 +323,7 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
    * and for which no annotation handler is available. If set, do not render the unknown
    * annotation using an appearance stream specified by its appearance dictionary, if any (see
    * annotation and do not print it even if the Print flag is set. If clear, render such an unknown
-   * 12.5.5, "Appearance streams"). 
+   * 12.5.5, "Appearance streams").
    */
   @annotFlag(core.AnnotationFlags.invisible)
   public invisible!: boolean;
@@ -357,7 +358,7 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
   /**
    * If set, do not render the annotation on the screen or allow it to interact with the
    * user. The annotation may be printed (depending on the setting of the Print flag) but
-   * should be considered hidden for purposes of on-screen display and user interaction. 
+   * should be considered hidden for purposes of on-screen display and user interaction.
    * @remarks PDF 1.3
    */
   @annotFlag(core.AnnotationFlags.noView)
@@ -367,7 +368,7 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
    * If set, do not scale the annotation’s appearance to match the magnification of the
    * page. The location of the annotation on the page (defined by the upper-left corner of its
    * annotation rectangle) shall remain fixed, regardless of the page magnification. See further
-   * discussion following this table. 
+   * discussion following this table.
    * @remarks PDF 1.3
    */
   @annotFlag(core.AnnotationFlags.noZoom)
@@ -379,7 +380,7 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
    * screen. If the annotation does not contain any appearance streams this flag shall be
    * ignored.
    * @remarks This can be useful for annotations representing interactive push-buttons,
-   * which would serve no meaningful purpose on the printed page. 
+   * which would serve no meaningful purpose on the printed page.
    * @remarks PDF 1.2
    */
   @annotFlag(core.AnnotationFlags.print)
@@ -390,10 +391,10 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
    * be rendered or printed (depending on the settings of the NoView and Print flags) but
    * should not respond to mouse clicks or change its appearance in response to mouse
    * motions.
-   * 
+   *
    * This flag shall be ignored for widget annotations; its function is subsumed by the
    * ReadOnly flag of the associated form field (see "Table 226: Field flags common to all field
-   * types"). 
+   * types").
    * @remarks PDF 1.3
    */
   @annotFlag(core.AnnotationFlags.readOnly)
@@ -416,6 +417,17 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
 
   @fieldFlag(core.FieldFlags.noExport)
   public noExport!: boolean;
+
+  /**
+   * Returns parent Filed dictionary of the Widget dictionary
+   */
+  protected getField<T extends core.PDFField>(type: new () => T): T;
+  protected getField(): core.PDFField;
+  protected getField(type?: new () => core.PDFField): core.PDFField {
+    const field = new core.PDFField(this.target.Parent || this.target);
+
+    return type ? field.to(type) : field;
+  }
 
   public delete(): void {
     const parent = this.target.p;
@@ -508,7 +520,7 @@ export class CheckBox extends FormComponent {
           const handler = this.getHandler();
           form.clear();
           if (key === "Off") {
-            // TODO stream setting must refresh encoding and cached view 
+            // TODO stream setting must refresh encoding and cached view
             handler.drawOff(form, params);
           } else {
             handler.drawOn(form, params);
@@ -519,7 +531,7 @@ export class CheckBox extends FormComponent {
   }
 
   /**
-   * Gets name of the Yes state from Appearance dictionary 
+   * Gets name of the Yes state from Appearance dictionary
    */
   protected getYesStateName(): string {
     const ap = this.target.AP.get(true);
@@ -2140,6 +2152,8 @@ export class FormComponentFactory {
       return new CheckBox(widget, doc);
     } else if (filed.ft === "Sig") {
       return new SignatureBox(widget, doc);
+    } else if (filed.ft === "Ch") {
+      return new ComboBox(widget, doc);
     }
 
     return new FormComponent(widget, doc);
@@ -2176,3 +2190,5 @@ export class FormComponentFactory {
     throw new TypeError("Cannot create PDF Form Component. Wrong type of PDF Dictionary");
   }
 }
+
+import { ComboBox } from "./forms/ComboBox";

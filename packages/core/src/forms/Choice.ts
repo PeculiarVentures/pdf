@@ -93,4 +93,10 @@ export class ChoiceDictionary extends PDFField {
   @PDFArrayField("I", true)
   public I!: PDFArray | null;
 
+  protected override onCreate(): void {
+    super.onCreate();
+
+    this.ft = "Ch";
+  }
+
 }

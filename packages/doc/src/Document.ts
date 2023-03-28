@@ -20,6 +20,7 @@ import { WrapObject } from "./WrapObject";
 import { Dss } from "./Dss";
 import { IPdfCertificateStorageHandler, PDFCertificateStorageHandler } from "./CertificateStorageHandler";
 import { EmbeddedFileMap } from "./embedded_file";
+import { ComboBoxHandler, IComboBoxHandler } from "./forms";
 
 export enum PDFVersion {
   v1_1 = 1.1,
@@ -91,6 +92,7 @@ export class PDFDocument {
   public readonly pages: PDFPages;
   public readonly fonts: FontComponent[] = [];
 
+  public comboBoxHandler: IComboBoxHandler;
   public checkBoxHandler: CheckBoxHandler;
   public textEditorHandler: TextEditorHandler;
   public radioButtonHandler: RadioButtonHandler;
@@ -183,6 +185,7 @@ export class PDFDocument {
     this.version = target.version;
     this.pages = new PDFPages(target.update.catalog.Pages, this);
 
+    this.comboBoxHandler = new ComboBoxHandler(this);
     this.checkBoxHandler = new CheckBoxHandler(this);
     this.textEditorHandler = new TextEditorHandler(this);
     this.radioButtonHandler = new RadioButtonHandler(this);
