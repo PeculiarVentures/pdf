@@ -111,7 +111,7 @@ export class ComboBoxHandler implements IComboBoxHandler {
       .move(x, y);
 
     let text = "";
-    if (component.target.has("V") && component.target.has("V")) {
+    if (component.target.has("V")) {
       const v = component.target.get("V");
       if (v instanceof core.PDFArray) {
         text = component.options[v.get(0, core.PDFTextString).text];
@@ -120,6 +120,10 @@ export class ComboBoxHandler implements IComboBoxHandler {
       } else {
         throw new Error("Cannot get text value from the CheckBox. Unsupported type of V.");
       }
+    }
+
+    if (text === undefined) {
+      throw new Error("Cannot get text value from the ComboBox. 'text' property is undefined or null.");
     }
 
     const textShow = this.getSingleLineText(text);

@@ -2,6 +2,7 @@ export * from "./FormComponent";
 export * from "./FormComponent.Factory";
 export * from "./FormComponent.Handler";
 export * from "./FormComponent.Group";
+export * from "./FormComponent.Registry";
 export * from "./decorators";
 export * from "./CheckBox";
 export * from "./CheckBox.Handler";

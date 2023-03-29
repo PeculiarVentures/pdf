@@ -1,5 +1,6 @@
 import * as pdfDoc from "@peculiarventures/pdf-doc";
-import { IComponentConstructor, ComponentConverter } from "./index";
+import { ComponentConverter } from "../index";
+import { IComponentConstructor } from "../types";
 
 /**
  * A factory that creates ComponentConverter instances for IComponent types.
