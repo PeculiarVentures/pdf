@@ -32,16 +32,16 @@ export class FormComponentFactory {
   protected static createFromWidget(widget: core.WidgetDictionary, doc: PDFDocument): IComponent {
     const filed = this.getField(widget);
     if (filed.ft === "Tx") {
-      wrapWidget(FormComponentType.textEditor, widget, doc);
+      return wrapWidget(FormComponentType.textEditor, widget, doc);
     } else if (filed.ft === "Btn") {
       if (filed.ff & core.ButtonFlags.radio) {
-        wrapWidget(FormComponentType.radioButton, widget, doc);
+        return wrapWidget(FormComponentType.radioButton, widget, doc);
       } else if (filed.ff & core.ButtonFlags.pushbutton) {
         if (widget.A.has()) {
           const a = widget.A.get();
           if (a.s === "JavaScript" &&
             a.has("JS") && a.get("JS", core.PDFTextString).text.includes("buttonImportIcon")) {
-            wrapWidget(FormComponentType.inputImageBox, widget, doc);
+            return wrapWidget(FormComponentType.inputImageBox, widget, doc);
           }
         }
       }
