@@ -2,7 +2,9 @@ import * as pdfDoc from "@peculiarventures/pdf-doc";
 import { JsonTextEditorUpdate } from "../types";
 import { WidgetConverter } from "./WidgetConverter";
 
-
+/**
+ * A ComponentConverter for TextEditor form components.
+ */
 export class TextEditorConverter extends WidgetConverter<pdfDoc.TextEditor> {
 
   public typeJSON = pdfDoc.FormComponentType.textEditor as const;

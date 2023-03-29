@@ -2,7 +2,9 @@ import * as pdfDoc from "@peculiarventures/pdf-doc";
 import { JsonCheckBoxUpdate } from "../types";
 import { WidgetConverter } from "./WidgetConverter";
 
-
+/**
+ * A ComponentConverter for CheckBox form components.
+ */
 export class CheckBoxConverter extends WidgetConverter<pdfDoc.CheckBox> {
 
   public typeJSON = pdfDoc.FormComponentType.checkBox as const;

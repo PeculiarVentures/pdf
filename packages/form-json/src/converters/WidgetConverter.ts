@@ -2,7 +2,10 @@ import * as pdfDoc from "@peculiarventures/pdf-doc";
 import { JsonComponent } from "../types";
 import { ComponentConverter } from "./ComponentConverter";
 
-
+/**
+ * Abstract class representing a ComponentConverter for a FormComponent type.
+ * @typeparam T - The FormComponent type to convert.
+ */
 export abstract class WidgetConverter<T extends pdfDoc.FormComponent> extends ComponentConverter<T> {
 
   public export(component: T): JsonComponent {
@@ -38,6 +41,11 @@ export abstract class WidgetConverter<T extends pdfDoc.FormComponent> extends Co
     return json;
   }
 
+  /**
+   * Called to add additional data to the JSON object representing the form component.
+   * @param component - The form component to export.
+   * @param json - The JSON object representing the form component.
+   */
   protected abstract onExport(component: T, json: Record<string, unknown>): void;
 
 }

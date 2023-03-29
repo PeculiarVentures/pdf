@@ -2,7 +2,9 @@ import * as pdfDoc from "@peculiarventures/pdf-doc";
 import { JsonRadioButtonUpdate } from "../types";
 import { WidgetConverter } from "./WidgetConverter";
 
-
+/**
+ * A ComponentConverter for RadioButton form components.
+ */
 export class RadioButtonConverter extends WidgetConverter<pdfDoc.RadioButton> {
 
   public typeJSON = pdfDoc.FormComponentType.radioButton as const;

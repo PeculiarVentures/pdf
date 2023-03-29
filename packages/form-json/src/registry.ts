@@ -9,4 +9,8 @@ const registry = new converters.ComponentConverterFactory(
   new converters.ComboBoxConverter(),
   new converters.RadioButtonGroupConverter()
 );
+
+/**
+ * A global instance of FormConverter that uses the ComponentConverter registry.
+ */
 export const globalFormConverter = new FormConverter(registry);

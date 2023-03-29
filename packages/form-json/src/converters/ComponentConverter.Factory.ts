@@ -3,7 +3,11 @@ import { ComponentConverter } from "../index";
 import { IComponentConstructor } from "../types";
 
 /**
- * A factory that creates ComponentConverter instances for IComponent types.
+ * The ComponentConverterFactory is a factory that creates ComponentConverter instances for IComponent types.
+ * It contains a map of ComponentConverter instances, keyed by their associated IComponent type.
+ *
+ * @remarks
+ * To create a new ComponentConverter instance, call the register method with a new instance of the converter.
  */
 export class ComponentConverterFactory {
 

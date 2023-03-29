@@ -2,7 +2,9 @@ import * as pdfDoc from "@peculiarventures/pdf-doc";
 import { JsonComboBoxUpdate } from "../types";
 import { WidgetConverter } from "./WidgetConverter";
 
-
+/**
+ * A ComponentConverter for ComboBox form components.
+ */
 export class ComboBoxConverter extends WidgetConverter<pdfDoc.ComboBox> {
 
   public typeJSON = pdfDoc.FormComponentType.comboBox as const;
