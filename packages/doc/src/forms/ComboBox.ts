@@ -2,7 +2,9 @@ import * as core from "@peculiarventures/pdf-core";
 import { FormObject } from "../FormObject";
 import { ResourceManager } from "../ResourceManager";
 import { FontComponent } from "../Font";
-import { FormComponent, fieldFlag } from "../Form";
+import { FormComponent } from "./FormComponent";
+import { fieldFlag } from "./decorators";
+import { FormComponentRegistry, FormComponentType } from "./FormComponent.Registry";
 
 /**
  * Represents a ComboBox form component which allows users to select

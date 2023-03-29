@@ -1,10 +1,8 @@
 import * as core from "@peculiarventures/pdf-core";
-import { PDFDocument } from "./Document";
-import { FontComponent } from "./Font";
+import { type PDFDocument } from "./Document";
 import { FormObject } from "./FormObject";
 import { Image } from "./Image";
 import { ImageDrawParameters, TextDrawParams } from "./Page";
-import { ResourceManager } from "./ResourceManager";
 import { WrapObject } from "./WrapObject";
 
 export interface WatermarkParams {
@@ -13,7 +11,7 @@ export interface WatermarkParams {
    * percentage of the height of the target media.
    * 1.0 represents 100% and 0.0 represents 0%. Negative
    * values should not be used, since they may cause content to be drawn off the
-   * media. 
+   * media.
    * Default value 0.
    */
   v?: number;
@@ -22,7 +20,7 @@ export interface WatermarkParams {
    * percentage of the width of the target media.
    * 1.0 represents 100% and 0.0 represents 0%. Negative
    * values should not be used, since they may cause content to be drawn off the
-   * media. 
+   * media.
    * Default value 0.
    */
   h?: number;
@@ -30,7 +28,7 @@ export interface WatermarkParams {
   /**
    * The matrix used to transform the annotation’s rectangle before
    * rendering.
-   * Default value: the identity matrix [1 0 0 1 0 0]. 
+   * Default value: the identity matrix [1 0 0 1 0 0].
    */
   matrix?: core.Metrics;
 

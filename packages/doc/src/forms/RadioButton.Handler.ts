@@ -1,8 +1,8 @@
 import * as core from "@peculiarventures/pdf-core";
-import { RadioButtonGroup } from "./Form";
-import { CheckBoxHandler, ICheckBoxCreateParameters, ICheckBoxHandler, ICheckBoxParameters } from "./CheckBoxHandler";
-import { IFormComponentParameters } from "./FormComponentHandler";
-import { FormObject } from "./FormObject";
+import { RadioButtonGroup } from "./RadioButton.Group";
+import { CheckBoxHandler, ICheckBoxCreateParameters, ICheckBoxHandler, ICheckBoxParameters } from "./CheckBox.Handler";
+import { IFormComponentParameters } from "./FormComponent.Handler";
+import { FormObject } from "../FormObject";
 
 export interface IRadioButtonCreateParameters extends ICheckBoxCreateParameters {
   value: string;
@@ -15,7 +15,7 @@ export interface IRadioButtonParameters extends ICheckBoxParameters {
 }
 
 export interface IRadioButtonHandler extends ICheckBoxHandler {
-  create(params: IRadioButtonCreateParameters): core.WidgetDictionary
+  create(params: IRadioButtonCreateParameters): core.WidgetDictionary;
 }
 
 export class RadioButtonHandler extends CheckBoxHandler implements IRadioButtonHandler {
@@ -50,7 +50,7 @@ export class RadioButtonHandler extends CheckBoxHandler implements IRadioButtonH
       // Create new group
       group = this.createGroup(name);
     }
-    
+
     if (!(group instanceof RadioButtonGroup)) {
       throw new TypeError(`Cannot set RadioBaton to the group '${name}'. Group is not a RadioButtonGroup component.`);
     }

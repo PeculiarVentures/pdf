@@ -5,12 +5,15 @@ import * as core from "@peculiarventures/pdf-core";
 import * as x509 from "@peculiar/x509";
 import { Crypto } from "@peculiar/webcrypto";
 import * as pkijs from "pkijs";
-import { PDFDocument, PDFDocumentCreateParameters, PDFVersion } from "./Document";
+import { PDFDocument, PDFDocumentCreateParameters } from "./Document";
+import { PDFVersion } from "./Version";
 import { writeFile } from "./Document.spec";
 import { Convert } from "pvtsutils";
 import { FontFactory, DefaultFonts } from "@peculiarventures/pdf-font";
 import { FormObject } from "./FormObject";
-import { RadioButton, SignatureBox, SignatureBoxGroup } from "./Form";
+import { SignatureBoxGroup } from "./forms/SignatureBox.Group";
+import { SignatureBox } from "./forms/SignatureBox";
+import { RadioButton } from "./forms/RadioButton";
 import * as cms from "./cms";
 
 

@@ -1,6 +1,6 @@
 import type { X509Certificate, X509Certificates } from "@peculiar/x509";
-import type { CRL } from "./CRL";
-import type { OCSP } from "./OCSP";
+import { type CRL } from "./CRL";
+import { type OCSP } from "./OCSP";
 
 export interface IResult<T> {
   target: ICertificateStorageHandler;

@@ -1,18 +1,11 @@
 import * as core from "@peculiarventures/pdf-core";
 import * as font from "@peculiarventures/pdf-font";
 import * as copy from "@peculiarventures/pdf-copy";
-import { PublicKeyPermissionFlags } from "@peculiarventures/pdf-core";
 import { X509Certificate } from "@peculiar/x509";
 import { BufferSource, Convert } from "pvtsutils";
 import * as pkijs from "pkijs";
-import { CheckBoxHandler } from "./CheckBoxHandler";
 import { Image } from "./Image";
-import { SignatureBoxHandler } from "./SignatureBoxHandler";
 import { PDFPages } from "./Pages";
-import { RadioButtonHandler } from "./RadioButtonHandler";
-import { TextEditorHandler } from "./TextEditorHandler";
-import { FormComponentFactory, IComponent, IComponentConstructor, SignatureBoxGroup, SignatureBoxSignParameters, SignatureVerifyResult, SignatureBox, SignatureBoxGroupVerifyParams } from "./Form";
-import { InputImageBoxHandler } from "./InputImageBoxHandler";
 import { FontComponent } from "./Font";
 import { Watermark, WatermarkParams } from "./Watermark";
 import { FormObject } from "./FormObject";
@@ -20,22 +13,12 @@ import { WrapObject } from "./WrapObject";
 import { Dss } from "./Dss";
 import { IPdfCertificateStorageHandler, PDFCertificateStorageHandler } from "./CertificateStorageHandler";
 import { EmbeddedFileMap } from "./embedded_file";
-import { ComboBoxHandler, IComboBoxHandler } from "./forms";
-
-export enum PDFVersion {
-  v1_1 = 1.1,
-  v1_2 = 1.2,
-  v1_3 = 1.3,
-  v1_4 = 1.4,
-  v1_5 = 1.5,
-  v1_6 = 1.6,
-  v1_7 = 1.7,
-  v2_0 = 2.0,
-}
+import * as forms from "./forms";
+import { PDFVersion } from "./Version";
 
 export interface DocumentHandlerVerifyResult {
   err: null | Error;
-  items: SignatureVerifyResult[];
+  items: forms.SignatureVerifyResult[];
 }
 
 export interface PDFDocumentCreateCommonParameters {
@@ -63,7 +46,7 @@ export interface StandardEncryptionParameters extends core.StandardEncryptionHan
 }
 
 export interface PublicKeyEncryptionParameters {
-  permission?: PublicKeyPermissionFlags;
+  permission?: core.PublicKeyPermissionFlags;
   encryptMetadata?: boolean;
   algorithm: keyof typeof core.CryptoFilterMethods;
   recipients: X509Certificate[];
@@ -73,7 +56,7 @@ export type PDFDocumentCreateParameters = PDFDocumentCreateCommonParameters |
   (PDFDocumentCreateCommonParameters & StandardEncryptionParameters) |
   (PDFDocumentCreateCommonParameters & PublicKeyEncryptionParameters);
 
-export interface PDFDocumentSignParameters extends SignatureBoxSignParameters {
+export interface PDFDocumentSignParameters extends forms.SignatureBoxSignParameters {
   groupName?: string;
 }
 
@@ -92,12 +75,12 @@ export class PDFDocument {
   public readonly pages: PDFPages;
   public readonly fonts: FontComponent[] = [];
 
-  public comboBoxHandler: IComboBoxHandler;
-  public checkBoxHandler: CheckBoxHandler;
-  public textEditorHandler: TextEditorHandler;
-  public radioButtonHandler: RadioButtonHandler;
-  public signatureBoxHandler: SignatureBoxHandler;
-  public inputImageHandler: InputImageBoxHandler;
+  public comboBoxHandler: forms.IComboBoxHandler;
+  public checkBoxHandler: forms.CheckBoxHandler;
+  public textEditorHandler: forms.TextEditorHandler;
+  public radioButtonHandler: forms.RadioButtonHandler;
+  public signatureBoxHandler: forms.SignatureBoxHandler;
+  public inputImageHandler: forms.InputImageBoxHandler;
   public certificateHandler: IPdfCertificateStorageHandler;
   public crypto: Crypto;
 
@@ -185,12 +168,12 @@ export class PDFDocument {
     this.version = target.version;
     this.pages = new PDFPages(target.update.catalog.Pages, this);
 
-    this.comboBoxHandler = new ComboBoxHandler(this);
-    this.checkBoxHandler = new CheckBoxHandler(this);
-    this.textEditorHandler = new TextEditorHandler(this);
-    this.radioButtonHandler = new RadioButtonHandler(this);
-    this.signatureBoxHandler = new SignatureBoxHandler(this);
-    this.inputImageHandler = new InputImageBoxHandler(this);
+    this.comboBoxHandler = new forms.ComboBoxHandler(this);
+    this.checkBoxHandler = new forms.CheckBoxHandler(this);
+    this.textEditorHandler = new forms.TextEditorHandler(this);
+    this.radioButtonHandler = new forms.RadioButtonHandler(this);
+    this.signatureBoxHandler = new forms.SignatureBoxHandler(this);
+    this.inputImageHandler = new forms.InputImageBoxHandler(this);
     this.certificateHandler = new PDFCertificateStorageHandler(this);
     this.crypto = pkijs.getCrypto(true).crypto;
   }
@@ -231,19 +214,19 @@ export class PDFDocument {
     return Watermark.create(params, this);
   }
 
-  public getComponents(): ReadonlyArray<IComponent> {
-    const components: IComponent[] = [];
+  public getComponents(): ReadonlyArray<forms.IComponent> {
+    const components: forms.IComponent[] = [];
 
-    const forms = this.target.update.catalog?.AcroForm;
+    const acroForm = this.target.update.catalog?.AcroForm;
 
-    if (forms && forms.has()) {
-      const fields = forms.get().Fields;
+    if (acroForm && acroForm.has()) {
+      const fields = acroForm.get().Fields;
       for (const item of fields) {
         if (item instanceof core.PDFDictionary) {
           const field = item.to(core.PDFField);
 
           try {
-            const component = FormComponentFactory.create(field, this);
+            const component = forms.FormComponentFactory.create(field, this);
             components.push(component);
           } catch {
             // nothing
@@ -255,7 +238,7 @@ export class PDFDocument {
     return components;
   }
 
-  public filterComponents<T extends IComponent>(...types: IComponentConstructor<T>[]): T[] {
+  public filterComponents<T extends forms.IComponent>(...types: forms.IComponentConstructor<T>[]): T[] {
     const components = this.getComponents();
     const filteredComponents: T[] = [];
     for (const component of components) {
@@ -269,20 +252,20 @@ export class PDFDocument {
     return filteredComponents;
   }
 
-  public getComponentByName(name: string): IComponent | null;
+  public getComponentByName(name: string): forms.IComponent | null;
   public getComponentByName<T>(name: string, type: new (target: any, document: PDFDocument) => T): T | null;
-  public getComponentByName(name: string, type?: typeof WrapObject): IComponent | WrapObject<any> | null {
-    const forms = this.target.update.catalog?.AcroForm;
-    let component: IComponent | null = null;
+  public getComponentByName(name: string, type?: typeof WrapObject): forms.IComponent | WrapObject<any> | null {
+    const acroForm = this.target.update.catalog?.AcroForm;
+    let component: forms.IComponent | null = null;
 
-    if (forms && forms.has()) {
-      const fields = forms.get().Fields;
+    if (acroForm && acroForm.has()) {
+      const fields = acroForm.get().Fields;
       for (const item of fields) {
         if (item instanceof core.PDFDictionary) {
           const field = item.to(core.PDFField);
 
           try {
-            const component2 = FormComponentFactory.create(field, this);
+            const component2 = forms.FormComponentFactory.create(field, this);
             if (component2.name === name) {
               component = component2;
               break;
@@ -303,17 +286,17 @@ export class PDFDocument {
     return component;
   }
 
-  public getComponentById(id: number, generation?: number): IComponent | null;
+  public getComponentById(id: number, generation?: number): forms.IComponent | null;
   public getComponentById<T>(id: number, generation: number, type: new (target: any, document: PDFDocument) => T): T | null;
-  public getComponentById(id: number, generation?: number, type?: typeof WrapObject): IComponent | WrapObject<any> | null {
-    let component: IComponent | null = null;
+  public getComponentById(id: number, generation?: number, type?: typeof WrapObject): forms.IComponent | WrapObject<any> | null {
+    let component: forms.IComponent | null = null;
 
     try {
       const obj = this.target.update.getObject(id, generation);
       const field = obj.value;
 
       if (field instanceof core.PDFDictionary) {
-        component = FormComponentFactory.create(field, this);
+        component = forms.FormComponentFactory.create(field, this);
       }
     } catch {
       // nothing
@@ -338,17 +321,17 @@ export class PDFDocument {
     return !!(acroForm && acroForm.has() && acroForm.get().SigFlags);
   }
 
-  public getSignatures(): Array<SignatureBoxGroup | SignatureBox> {
-    const signatures = this.filterComponents<SignatureBoxGroup | SignatureBox>(SignatureBoxGroup, SignatureBox);
+  public getSignatures(): Array<forms.SignatureBoxGroup | forms.SignatureBox> {
+    const signatures = this.filterComponents<forms.SignatureBoxGroup | forms.SignatureBox>(forms.SignatureBoxGroup, forms.SignatureBox);
 
     return signatures;
   }
 
-  public async sign(params: PDFDocumentSignParameters): Promise<SignatureBoxGroup> {
-    let group: SignatureBoxGroup | null = null;
+  public async sign(params: PDFDocumentSignParameters): Promise<forms.SignatureBoxGroup> {
+    let group: forms.SignatureBoxGroup | null = null;
     if (params.groupName) {
       // get signature filed
-      group = this.getComponentByName(params.groupName, SignatureBoxGroup);
+      group = this.getComponentByName(params.groupName, forms.SignatureBoxGroup);
     }
     if (!group) {
       // create hidden signature box and add it to the first page
@@ -366,7 +349,7 @@ export class PDFDocument {
     return group.sign(params);
   }
 
-  public async verify(params?: SignatureBoxGroupVerifyParams): Promise<DocumentHandlerVerifyResult> {
+  public async verify(params?: forms.SignatureBoxGroupVerifyParams): Promise<DocumentHandlerVerifyResult> {
     const result: DocumentHandlerVerifyResult = {
       err: null,
       items: []

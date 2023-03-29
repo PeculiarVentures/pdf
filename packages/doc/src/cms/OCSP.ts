@@ -5,15 +5,7 @@ import * as pkijs from "pkijs";
 
 import { AsnEncoded } from "./AsnEncoded";
 
-export class OCSP extends AsnEncoded implements ICertificateStorage {
-
-  public certificateHandler: ICertificateStorageHandler;
-
-  constructor() {
-    super();
-
-    this.certificateHandler = new DefaultCertificateStorageHandler();
-  }
+export class OCSP extends AsnEncoded {
 
   public toOCSPResponse(): ArrayBuffer {
     const ocspRespSimpl = new pkijs.OCSPResponse();
@@ -84,7 +76,3 @@ export class OCSP extends AsnEncoded implements ICertificateStorage {
 
 import { AlgorithmFactory } from "./AlgorithmFactory";
 import { PKIUtils } from "./PKIUtils";
-import { DefaultCertificateStorageHandler } from "./DefaultCertificateStorageHandler";
-
-import type { ICertificateStorage, ICertificateStorageHandler } from "./ICertificateStorageHandler";
-

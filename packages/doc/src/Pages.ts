@@ -1,6 +1,6 @@
 import * as copy from "@peculiarventures/pdf-copy";
 import * as core from "@peculiarventures/pdf-core";
-import { PDFDocument } from "./Document";
+import { type PDFDocument } from "./Document";
 import { PDFPage } from "./Page";
 import { WrapObject } from "./WrapObject";
 

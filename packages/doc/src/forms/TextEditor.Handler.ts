@@ -1,8 +1,8 @@
 import * as core from "@peculiarventures/pdf-core";
-import { PDFDocument } from "./Document";
-import { FontComponent } from "./Font";
-import { FormObject } from "./FormObject";
-import { PDFPage } from "./Page";
+import { PDFDocument } from "../Document";
+import { FontComponent } from "../Font";
+import { FormObject } from "../FormObject";
+import { PDFPage } from "../Page";
 
 export interface BorderParameters {
   color?: core.Colors;

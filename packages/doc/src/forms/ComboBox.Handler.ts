@@ -1,5 +1,5 @@
 import * as core from "@peculiarventures/pdf-core";
-import { IFormComponentCreateParameters } from "../FormComponentHandler";
+import { IFormComponentCreateParameters } from "./FormComponent.Handler";
 import { PDFDocument } from "../Document";
 import { FontComponent } from "../Font";
 import { FormObject } from "../FormObject";
