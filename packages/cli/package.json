@@ -32,7 +32,7 @@
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
   "dependencies": {
-    "@peculiar/webcrypto": "^1.4.1",
+    "@peculiar/webcrypto": "^1.4.3",
     "@peculiarventures/pdf-core": "^1.10.4",
     "@peculiarventures/pdf-doc": "^1.10.4",
     "commander": "^10.0.0",

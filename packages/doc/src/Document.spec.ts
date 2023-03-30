@@ -4,8 +4,11 @@ import * as fs from "fs";
 import * as path from "path";
 import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 import * as core from "@peculiarventures/pdf-core";
-import { PDFDocument, PDFDocumentCreateParameters, PDFDocumentLoadParameters, PDFVersion } from "./Document";
-import { CheckBox, RadioButtonGroup, TextEditor } from "./Form";
+import { PDFDocument, PDFDocumentCreateParameters, PDFDocumentLoadParameters } from "./Document";
+import { PDFVersion } from "./Version";
+import { TextEditor } from "./forms/TextEditor";
+import { RadioButtonGroup } from "./forms/RadioButton.Group";
+import { CheckBox } from "./forms/CheckBox";
 import { X509Certificate } from "@peculiar/x509";
 import { PageFilter } from "@peculiarventures/pdf-copy";
 
@@ -29,7 +32,7 @@ context("Document", () => {
 
       const page = doc.pages.create();
 
-      // writeFile(await doc.save());
+      writeFile(await doc.save());
 
       assert.strictEqual(doc.pages.length, 1);
     });

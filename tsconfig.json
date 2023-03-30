@@ -21,6 +21,9 @@
       "@peculiarventures/pdf-copy": [
         "./packages/copy/src"
       ],
+      "@peculiarventures/pdf-form-json": [
+        "./packages/form-json/src"
+      ],
     }
   },
   "exclude": [

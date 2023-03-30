@@ -1,6 +1,6 @@
 import * as core from "@peculiarventures/pdf-core";
 import { CMSSignedData, DefaultCertificateStorageHandler, ICertificateStorageHandler } from "./cms";
-import { PDFDocument } from "./Document";
+import { type PDFDocument } from "./Document";
 import { X509Certificate, X509Certificates } from "@peculiar/x509";
 
 export interface IPdfCertificateStorageHandler extends ICertificateStorageHandler {

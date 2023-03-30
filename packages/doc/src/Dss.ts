@@ -3,7 +3,8 @@ import { X509Certificate } from "@peculiar/x509";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
 
 import * as cms from "./cms";
-import { PDFDocument, PDFVersion } from "./Document";
+import { type PDFDocument } from "./Document";
+import { PDFVersion } from "./Version";
 import { WrapObject } from "./WrapObject";
 
 export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {

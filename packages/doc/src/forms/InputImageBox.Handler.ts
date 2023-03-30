@@ -1,6 +1,6 @@
 import * as core from "@peculiarventures/pdf-core";
-import { PDFDocument } from "./Document";
-import { Image } from "./Image";
+import { PDFDocument } from "../Document";
+import { Image } from "../Image";
 
 export interface InputImageBoxCreateParameters {
   left?: core.TypographySize;
@@ -12,8 +12,8 @@ export interface InputImageBoxCreateParameters {
 }
 
 export interface IInputImageHandler {
-  document: PDFDocument
-  create(params: InputImageBoxCreateParameters): core.WidgetDictionary
+  document: PDFDocument;
+  create(params: InputImageBoxCreateParameters): core.WidgetDictionary;
 }
 
 export class InputImageBoxHandler implements IInputImageHandler {

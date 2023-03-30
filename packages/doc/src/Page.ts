@@ -1,14 +1,10 @@
 import * as core from "@peculiarventures/pdf-core";
-import { ICheckBoxCreateParameters } from "./CheckBoxHandler";
-import { CheckBox, SignatureBox, RadioButton, TextEditor, InputImageBox } from "./Form";
-import { ISignatureBoxCreateParameters } from "./SignatureBoxHandler";
-import { IRadioButtonCreateParameters } from "./RadioButtonHandler";
+import * as fonts from "@peculiarventures/pdf-font";
 import { ResourceManager } from "./ResourceManager";
-import { TextEditorCreateParameters } from "./TextEditorHandler";
-import { InputImageBoxCreateParameters } from "./InputImageBoxHandler";
 import { FontComponent } from "./Font";
 import { Watermark } from "./Watermark";
 import { WrapContentObject } from "./WrapContentObject";
+import * as forms from "./forms";
 
 export interface ImageDrawParameters {
   left?: core.TypographySize;
@@ -92,14 +88,14 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
     return this.target.MediaBox.llY;
   }
 
-  public addCheckBox(params: ICheckBoxCreateParameters = {}): CheckBox {
+  public addCheckBox(params: forms.ICheckBoxCreateParameters = {}): forms.CheckBox {
     params.top = this.height - core.TypographyConverter.toPoint(params.top || 0);
 
     const widget = this.document.checkBoxHandler.create(params);
 
     this.target.addAnnot(widget);
 
-    const res = new CheckBox(widget, this.document);
+    const res = new forms.CheckBox(widget, this.document);
 
     // Set default flags
     res.print = true;
@@ -111,7 +107,7 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
     return res;
   }
 
-  public addRadioButton(params: IRadioButtonCreateParameters): RadioButton {
+  public addRadioButton(params: forms.IRadioButtonCreateParameters): forms.RadioButton {
     params.top = this.height - core.TypographyConverter.toPoint(params.top || 0);
 
     const groupName = params.group || core.UUID.generate();
@@ -121,7 +117,7 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
 
     this.target.addAnnot(widget);
 
-    const res = new RadioButton(widget, this.document);
+    const res = new forms.RadioButton(widget, this.document);
 
     // Set default flags
     res.print = true;
@@ -134,14 +130,14 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
     return res;
   }
 
-  public addTextEditor(params: TextEditorCreateParameters): TextEditor {
+  public addTextEditor(params: forms.TextEditorCreateParameters): forms.TextEditor {
     params.top = this.height - core.TypographyConverter.toPoint(params.top || 0);
 
     const widget = this.document.textEditorHandler.create(params);
 
     this.target.addAnnot(widget);
 
-    const res = new TextEditor(widget, this.document);
+    const res = new forms.TextEditor(widget, this.document);
 
     // Set default flags
     res.print = true;
@@ -151,7 +147,7 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
 
   /**
    * Gets actual content or creates the new.
-   * 
+   *
    * Actual is the content that was created in current update.
    * @returns Content stream
    */
@@ -204,34 +200,73 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
     return contentStream;
   }
 
-  public addInputImageBox(params: InputImageBoxCreateParameters): InputImageBox {
+  public addInputImageBox(params: forms.InputImageBoxCreateParameters): forms.InputImageBox {
     params.top = this.height - core.TypographyConverter.toPoint(params.top || 0);
 
     const widget = this.document.inputImageHandler.create(params);
 
     this.target.addAnnot(widget);
 
-    const component = new InputImageBox(widget, this.document);
+    const component = new forms.InputImageBox(widget, this.document);
 
     component.image = params.image || null;
 
     return component;
   }
 
-  public addSignatureBox(params: ISignatureBoxCreateParameters = {}): SignatureBox {
+  public addSignatureBox(params: forms.ISignatureBoxCreateParameters = {}): forms.SignatureBox {
     params.top = this.height - core.TypographyConverter.toPoint(params.top || 0);
 
     const widget = this.document.signatureBoxHandler.create(params);
 
     this.target.addAnnot(widget);
 
-    return new SignatureBox(widget, this.document);
+    return new forms.SignatureBox(widget, this.document);
   }
 
   public addWatermark(watermark: Watermark): Watermark {
     this.target.addAnnot(watermark.target);
 
     return watermark;
+  }
+
+  public addComboBox(params: forms.ComboBoxCreateParameters): forms.ComboBox {
+    const paramsCopy = {
+      ...params,
+      top: this.height - core.TypographyConverter.toPoint(params.top || 0),
+    };
+
+    const widget = this.document.comboBoxHandler.create(paramsCopy);
+
+    this.target.addAnnot(widget);
+
+    const comboBox = new forms.ComboBox(widget, this.document);
+
+    comboBox.top = params.top || 0;
+    comboBox.left = params.left || 0;
+    comboBox.width = params.width || 0;
+    comboBox.height = params.height || 0;
+
+    const doc = this.document.target;
+
+    comboBox.print = true;
+    comboBox.combo = true;
+    if (params.options) {
+      comboBox.options = params.options;
+    }
+    if (params.selected) {
+      comboBox.selected = typeof params.selected === "string" ? [params.selected] : params.selected;
+    }
+
+    // AP
+    comboBox.target.MK.get().BG = this.document.target.createArray(doc.createNumber(1));
+    const helv = this.document.addFont(fonts.DefaultFonts.Helvetica);
+    comboBox.font = helv;
+    comboBox.fontSize = 12;
+    comboBox.textColor = 0;
+
+
+    return comboBox;
   }
 
 }

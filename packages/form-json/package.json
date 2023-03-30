@@ -1,0 +1,39 @@
+{
+  "name": "@peculiarventures/pdf-form-json",
+  "version": "1.10.0",
+  "description": "A PDF module enabling working with form elements through JSON.",
+  "keywords": [],
+  "author": "microshine <microshine@mail.ru>",
+  "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/form-json#readme",
+  "license": "AGPL",
+  "main": "build/peculiar.pdf.form.js",
+  "module": "build/peculiar.pdf.form.es.js",
+  "types": "build/index.d.ts",
+  "files": [
+    "build",
+    "README.md"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PeculiarVentures/pdf.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "clear": "rimraf build/*",
+    "build": "rollup -c",
+    "rebuild": "yarn run clear && yarn run build",
+    "prepack": "npm run rebuild"
+  },
+  "bugs": {
+    "url": "https://github.com/PeculiarVentures/pdf/issues"
+  },
+  "dependencies": {
+    "@peculiarventures/pdf-core": "^1.10.0",
+    "@peculiarventures/pdf-doc": "^1.10.0",
+    "pvtsutils": "^1.2.2",
+    "tslib": "^2.5.0"
+  }
+}

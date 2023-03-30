@@ -4,7 +4,8 @@ import * as core from "@peculiarventures/pdf-core";
 import { AnnotationDictionary } from "@peculiarventures/pdf-core";
 import { DefaultFonts } from "@peculiarventures/pdf-font";
 import { TextAlignment } from ".";
-import { PDFDocument, PDFDocumentCreateParameters, PDFVersion } from "./Document";
+import { PDFDocument, PDFDocumentCreateParameters } from "./Document";
+import { PDFVersion } from "./Version";
 import { writeFile } from "./Document.spec";
 import { FontComponent, TextBlockParams, TextRectangle, TextRow, TextSizeCounter } from "./Font";
 import { PDFPage, TextLine } from "./Page";
@@ -122,7 +123,7 @@ context("Examples", () => {
   //      * /Catalog /Resources /Font /Helv /Zd
   //      * /Page /Resources /Font /Helv
   //      * /Page /Resources /Font /Helv
-  //      * 
+  //      *
   //      * /Font
   //      */
 
@@ -574,7 +575,7 @@ context("Examples", () => {
     const padding = 43;
     const leftSide = padding;
     console.time("add fonts");
-    
+
     // const fontHelv = doc.addFont(fs.readFileSync(path.join(__dirname, "..", "..", "font", "fonts", "Helvetica.ttf")));
     // const fontHelvBold = doc.addFont(fs.readFileSync(path.join(__dirname, "..", "..", "font", "fonts", "HelveticaBold.ttf")));
     // const fontHelvBoldOblique = doc.addFont(fs.readFileSync(path.join(__dirname, "..", "..", "font", "fonts", "HelveticaBoldOblique.ttf")));

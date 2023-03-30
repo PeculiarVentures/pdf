@@ -1,6 +1,6 @@
 import * as core from "@peculiarventures/pdf-core";
-import { FormComponentHandler, IFormComponentCreateParameters, IFormComponentHandler, IFormComponentParameters } from "./FormComponentHandler";
-import { FormObject } from "./FormObject";
+import { FormComponentHandler, IFormComponentCreateParameters, IFormComponentHandler, IFormComponentParameters } from "./FormComponent.Handler";
+import { FormObject } from "../FormObject";
 
 export interface ICheckBoxCreateParameters extends IFormComponentCreateParameters {
   enabled?: boolean;
@@ -13,7 +13,7 @@ export interface ICheckBoxParameters extends IFormComponentParameters {
 }
 
 export interface ICheckBoxHandler extends IFormComponentHandler {
-  create(params: ICheckBoxCreateParameters): core.WidgetDictionary
+  create(params: ICheckBoxCreateParameters): core.WidgetDictionary;
   drawOn(content: FormObject, params: IFormComponentParameters): void;
   drawOff(content: FormObject, params: IFormComponentParameters): void;
 }

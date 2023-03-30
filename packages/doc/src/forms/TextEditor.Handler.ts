@@ -1,12 +1,12 @@
 import * as core from "@peculiarventures/pdf-core";
-import { PDFDocument } from "./Document";
-import { FontComponent, TextBlockParams } from "./Font";
-import { FormObject } from "./FormObject";
-import { PDFPage } from "./Page";
+import { PDFDocument } from "../Document";
+import { FontComponent } from "../Font";
+import { FormObject } from "../FormObject";
+import { PDFPage } from "../Page";
 
 export interface BorderParameters {
   color?: core.Colors;
-  width: core.TypographySize
+  width: core.TypographySize;
   length: number;
   height: number;
 }
@@ -49,8 +49,8 @@ export interface TextEditorDrawParameters {
 }
 
 export interface ITextEditorHandler {
-  document: PDFDocument
-  create(params: TextEditorCreateParameters, page: PDFPage): core.WidgetDictionary
+  document: PDFDocument;
+  create(params: TextEditorCreateParameters, page: PDFPage): core.WidgetDictionary;
 }
 
 export class TextEditorHandler implements ITextEditorHandler {

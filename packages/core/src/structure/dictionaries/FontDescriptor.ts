@@ -3,6 +3,7 @@ import { PDFDictionary } from "../../objects/Dictionary";
 import { PDFRectangle } from "../common";
 
 export enum FontDescriptorFlags {
+  none = 0,
   /**
    * All glyphs have the same width (as opposed to proportional or variable pitch fonts, which have different widths).
    */
@@ -56,7 +57,7 @@ export class FontDescriptorDictionary extends PDFDictionary {
 
   /**
    * (Required) The type of PDF object that this dictionary describes; shall be
-   * FontDescriptor for a font descriptor. 
+   * FontDescriptor for a font descriptor.
    */
   @PDFNameField("Type")
   public type!: typeof FontDescriptorDictionary.TYPE;
@@ -110,7 +111,7 @@ export class FontDescriptorDictionary extends PDFDictionary {
    * expressed in the glyph coordinate system, that shall specify the font bounding
    * box. This should be the smallest rectangle enclosing the shape that would
    * result if all of the glyphs of the font were placed with their origins coincident
-   * and then filled. 
+   * and then filled.
    */
   @PDFDictionaryField({
     name: "FontBBox",
@@ -143,13 +144,13 @@ export class FontDescriptorDictionary extends PDFDictionary {
 
   /**
    * The spacing between baselines of consecutive lines of text.
-   * Default value: 0. 
+   * Default value: 0.
    */
   @PDFNumberField("Leading", true, 0)
   public leading!: number;
 
   /**
-   * The vertical coordinate of the top of flat capital letters, measured from the baseline. 
+   * The vertical coordinate of the top of flat capital letters, measured from the baseline.
    */
   @PDFNumberField("CapHeight", true)
   public capHeight!: number | null;
@@ -157,7 +158,7 @@ export class FontDescriptorDictionary extends PDFDictionary {
   /**
    * The font’s x height: the vertical coordinate of the top of flat
    * nonascending lowercase letters (like the letter x), measured from the
-   * baseline, in fonts that have Latin characters. Default value: 0. 
+   * baseline, in fonts that have Latin characters. Default value: 0.
    */
   @PDFNumberField("XHeight", true, 0)
   public xHeight!: number;
@@ -171,7 +172,7 @@ export class FontDescriptorDictionary extends PDFDictionary {
 
   /**
    * The thickness measured vertically of the dominant horizontal
-   * stems of glyphs in the font. Default value: 0. 
+   * stems of glyphs in the font. Default value: 0.
    */
   @PDFNumberField("StemH", true, 0)
   public stemH!: number;
@@ -192,7 +193,7 @@ export class FontDescriptorDictionary extends PDFDictionary {
    * The width to use for character codes whose widths are not
    * specified in a font dictionary’s Widths array. This shall have a predictable
    * effect only if all such codes map to glyphs whose actual widths are the same as
-   * the value of the MissingWidth entry. Default value: 0. 
+   * the value of the MissingWidth entry. Default value: 0.
    */
   @PDFNumberField("MissingWidth", true, 0)
   public missingWidth!: number;
@@ -220,7 +221,7 @@ export class FontDescriptorDictionary extends PDFDictionary {
 
   /**
    * A stream containing a font program whose format is
-   * specified by the Subtype entry in the stream dictionary 
+   * specified by the Subtype entry in the stream dictionary
    * @remarks PDF 1.2
    */
   @PDFDictionaryField({

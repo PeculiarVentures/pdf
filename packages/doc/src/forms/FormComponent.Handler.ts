@@ -1,5 +1,5 @@
 import * as core from "@peculiarventures/pdf-core";
-import { PDFDocument } from "./Document";
+import { PDFDocument } from "../Document";
 
 export interface IFormComponentCreateParameters {
   /**
@@ -34,6 +34,10 @@ export interface IFormComponentCreateParameters {
    * Typography size of the component height
    */
   height?: core.TypographySize;
+  /**
+   * Unique name of the Form component. Default is UUID.
+   */
+  name?: string;
 }
 
 export interface IFormComponentParameters {
@@ -90,8 +94,8 @@ export abstract class FormComponentHandler implements IFormComponentHandler {
 
   /**
    * Set style annotations
-   * @param widget 
-   * @param params 
+   * @param widget
+   * @param params
    */
   protected setStyle(widget: core.WidgetDictionary, params: IFormComponentParameters): void {
     const mk = widget.MK.get();
