@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.11.0](https://github.com/PeculiarVentures/pdf/compare/v1.10.4...v1.11.0) (2023-03-30)
+
+
+### Features
+
+* add Choice dictionary ([fa41dce](https://github.com/PeculiarVentures/pdf/commit/fa41dce8f5f21cc037f10cd91cb7b65e38d5c660))
+* add clear method to Array ([62a02ab](https://github.com/PeculiarVentures/pdf/commit/62a02ab84baef0377a76d2dbd475f83cd41a4e21))
+* add ComboBox ([b7057bf](https://github.com/PeculiarVentures/pdf/commit/b7057bf68818787f7ac5b52b026a2b6baf377271))
+
+
+
+
+
 ## [1.10.4](https://github.com/PeculiarVentures/pdf/compare/v1.10.3...v1.10.4) (2023-03-15)
 
 
