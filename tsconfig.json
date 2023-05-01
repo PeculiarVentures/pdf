@@ -28,6 +28,7 @@
   },
   "exclude": [
     "packages/*/build",
-    "packages/**/*/*.js"
+    "packages/**/*/*.js",
+    "packages/**/*/*.mjs"
   ]
 }

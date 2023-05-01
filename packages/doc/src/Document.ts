@@ -221,16 +221,52 @@ export class PDFDocument {
 
     if (acroForm && acroForm.has()) {
       const fields = acroForm.get().Fields;
-      for (const item of fields) {
-        if (item instanceof core.PDFDictionary) {
-          const field = item.to(core.PDFField);
+
+      for (const field of fields) {
+        if (field instanceof core.PDFDictionary && field.has("T")) {
+          const pdfField = field.to(core.PDFField);
 
           try {
-            const component = forms.FormComponentFactory.create(field, this);
+            const component = forms.FormComponentFactory.create(pdfField, this);
             components.push(component);
           } catch {
-            // nothing
+            // component not found or error occurred, continue searching
           }
+
+          if (pdfField.has("Kids")) {
+            const childComponents = this.searchNestedComponents(pdfField);
+            components.push(...childComponents);
+          }
+        }
+      }
+    }
+
+    return components;
+  }
+
+  private searchNestedComponents(parent: core.PDFDictionary): forms.IComponent[] {
+    if (!parent.has("Kids")) {
+      return [];
+    }
+
+    const components: forms.IComponent[] = [];
+
+    const kids = parent.get("Kids", core.PDFArray);
+
+    for (const kid of kids) {
+      if (kid instanceof core.PDFDictionary && kid.has("T")) {
+        const pdfField = kid.to(core.PDFField);
+
+        try {
+          const component = forms.FormComponentFactory.create(pdfField, this);
+          components.push(component);
+        } catch {
+          // component not found or error occurred, continue searching
+        }
+
+        if (pdfField.has("Kids")) {
+          const childComponents = this.searchNestedComponents(pdfField);
+          components.push(...childComponents);
         }
       }
     }
@@ -263,27 +299,70 @@ export class PDFDocument {
       for (const item of fields) {
         if (item instanceof core.PDFDictionary) {
           const field = item.to(core.PDFField);
+          const fullName = field.getFullName();
 
-          try {
-            const component2 = forms.FormComponentFactory.create(field, this);
-            if (component2.name === name) {
-              component = component2;
-              break;
+          if (fullName === name) {
+            try {
+              component = forms.FormComponentFactory.create(field, this);
+            } catch {
+              // nothing
             }
-          } catch {
-            // nothing
+          } else if (field.has("Kids")) {
+            component = this.searchNestedComponent(field, name, type);
+          }
+
+          // if component was found, then break the loop
+          if (component) {
+            break;
           }
         }
       }
     }
 
-    if (type) {
-      if (!(component instanceof type)) {
-        throw new TypeError("Cannot get PDF Component from the Document. Component doesn't require to the requested type.");
-      }
+    if (type && !(component instanceof type)) {
+      throw new TypeError("Cannot get PDF Component from the Document. Component doesn't require to the requested type.");
     }
 
     return component;
+  }
+
+  private searchNestedComponent(
+    parent: core.PDFDictionary,
+    name: string,
+    type?: typeof WrapObject
+  ): forms.IComponent | null {
+    if (!parent.has("Kids")) {
+      return null;
+    }
+    const kids = parent.get("Kids", core.PDFArray);
+
+    for (const kid of kids) {
+      if (kid instanceof core.PDFDictionary) {
+        if (!kid.has("T")) {
+          // continue searching, because it's not a field
+          continue;
+        }
+        const pdfField = kid.to(core.PDFField);
+        const fullName = pdfField.getFullName();
+
+        if (fullName === name) {
+          try {
+            const component = forms.FormComponentFactory.create(pdfField, this);
+
+            return type ? (component instanceof type ? component : null) : component;
+          } catch {
+            // component not found or error occurred, continue searching
+          }
+        } else if (pdfField.has("Kids")) {
+          const childComponent = this.searchNestedComponent(pdfField, name, type);
+          if (childComponent) {
+            return childComponent;
+          }
+        }
+      }
+    }
+
+    return null;
   }
 
   public getComponentById(id: number, generation?: number): forms.IComponent | null;
