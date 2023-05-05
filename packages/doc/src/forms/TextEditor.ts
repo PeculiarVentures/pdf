@@ -215,7 +215,7 @@ export class TextEditor extends FormComponent {
 
       const handler = this.document.textEditorHandler;
       form.clear();
-      handler.drawText(form, params);
+      handler.drawText(form, params, this.target);
     }
   }
 }
