@@ -4,6 +4,7 @@ import { FontComponent } from "../Font";
 import { FormObject } from "../FormObject";
 import { PDFPage } from "../Page";
 import { FormComponentFactory } from "./FormComponent.Factory";
+import { TextEditorAlignment } from "./TextEditor";
 
 export interface BorderParameters {
   color?: core.Colors;
@@ -67,10 +68,17 @@ export class TextEditorHandler implements ITextEditorHandler {
   }
 
   public drawText(form: FormObject, params: TextEditorDrawParameters, target: core.WidgetDictionary): void {
+    if (params.text.length === 0) {
+      return;
+    }
+
     const padding = TextEditorHandler.PADDING;
     const field = FormComponentFactory.getField(target);
     const comb = field.ff & core.TextFieldFlags.comb;
     const fontSize = params.fontSize ?? FontComponent.DEFAULT_SIZE;
+    const alignment = target.has("Q")
+      ? target.get("Q", core.PDFNumeric).value as unknown as TextEditorAlignment
+      : TextEditorAlignment.left;
 
     const fontInfo = params.font.fontInfo;
     const scale = params.fontSize / fontInfo.unitsPerEm;
@@ -78,7 +86,7 @@ export class TextEditorHandler implements ITextEditorHandler {
     const descent = fontInfo.descent * scale;
 
     // Calculate the x and y coordinates.
-    const x = padding;
+    let x = padding;
     const y = params.multiline ?
       padding :
       (form.height - (ascent + descent)) / 2;
@@ -131,6 +139,18 @@ export class TextEditorHandler implements ITextEditorHandler {
         prevCharWidth = charWidth;
       }
     } else {
+      // recount x position for alignment
+      const textWidth = params.font.measureTextWidth(params.text, fontSize);
+      x = 0;
+
+      if (alignment === TextEditorAlignment.center) {
+        x += (form.width - textWidth) / 2;
+      } else if (alignment === TextEditorAlignment.right) {
+        x += form.width - textWidth - padding;
+      } else {
+        x += padding;
+      }
+
       textContent
         .color(params.color || TextEditorHandler.COLOR)
         .font(params.font, fontSize)
