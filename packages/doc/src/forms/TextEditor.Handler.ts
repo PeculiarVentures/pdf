@@ -3,6 +3,7 @@ import { PDFDocument } from "../Document";
 import { FontComponent } from "../Font";
 import { FormObject } from "../FormObject";
 import { PDFPage } from "../Page";
+import { FormComponentFactory } from "./FormComponent.Factory";
 
 export interface BorderParameters {
   color?: core.Colors;
@@ -65,21 +66,25 @@ export class TextEditorHandler implements ITextEditorHandler {
     return text.replace(/\n/g, " ");
   }
 
-  public drawText(form: FormObject, params: TextEditorDrawParameters): void {
-    params.fontSize ??= FontComponent.DEFAULT_SIZE;
+  public drawText(form: FormObject, params: TextEditorDrawParameters, target: core.WidgetDictionary): void {
+    const padding = TextEditorHandler.PADDING;
+    const field = FormComponentFactory.getField(target);
+    const comb = field.ff & core.TextFieldFlags.comb;
+    const fontSize = params.fontSize ?? FontComponent.DEFAULT_SIZE;
+
     const fontInfo = params.font.fontInfo;
     const scale = params.fontSize / fontInfo.unitsPerEm;
     const ascent = fontInfo.ascent * scale;
     const descent = fontInfo.descent * scale;
 
-    const padding = TextEditorHandler.PADDING;
+    // Calculate the x and y coordinates.
     const x = padding;
     const y = params.multiline ?
       padding :
-      (form.height - ascent + descent) / 2 + padding;
+      (form.height - (ascent + descent)) / 2;
 
     // draw content
-    const textContent = form
+    let textContent = form
       .text(true)
       .graphics()
       // Clip rec
@@ -100,16 +105,36 @@ export class TextEditorHandler implements ITextEditorHandler {
               font: params.font,
               style: {
                 color: params.color,
-                size: params.fontSize,
+                size: fontSize,
               }
             }
           ]
         }, x, y);
+    } else if (comb) {
+      const text = this.getSingleLineText(params.text);
+      const len = text.length;
+      const width = core.TypographyConverter.toPoint(params.width) / len;
+
+      textContent = textContent
+        .color(params.color || TextEditorHandler.COLOR)
+        .move(-(width / 2), y, true)
+        .font(params.font, fontSize);
+
+      let prevCharWidth = 0;
+      for (let i = 0; i < len; i++) {
+        const char = text[i];
+        const charWidth = params.font.measureTextWidth(char, fontSize);
+        textContent
+          .move(width + (prevCharWidth / 2) - (charWidth / 2), 0, true)
+          .show(char);
+
+        prevCharWidth = charWidth;
+      }
     } else {
       textContent
         .color(params.color || TextEditorHandler.COLOR)
-        .font(params.font, params.fontSize)
-        .move(x, y);
+        .font(params.font, fontSize)
+        .move(x, y, true);
 
       const text = this.getSingleLineText(params.text);
       textContent.show(text);
@@ -137,7 +162,7 @@ export class TextEditorHandler implements ITextEditorHandler {
       params.font = FontComponent.addFont(this.document);
     }
     params.font.addText(text);
-    params.fontSize ??= FontComponent.DEFAULT_SIZE;
+    const fontSize = params.fontSize ?? FontComponent.DEFAULT_SIZE;
 
     if (!params.color) {
       params.color = 0;
@@ -161,21 +186,21 @@ export class TextEditorHandler implements ITextEditorHandler {
     // Create Yes XObject
     const yes = FormObject.create(this.document, width, -height); // Use negative value here, because Adobe doesn't draw text if BBox is in negative coordinates
     const fontRes = yes.resources.set(params.font.target);
-    const da = new core.PDFContent().setFontAndSize({ font: fontRes.name, size: params.fontSize });
+    const da = new core.PDFContent().setFontAndSize({ font: fontRes.name, size: fontSize });
     da.setColor(params.color);
     widget.set("DA", this.document.target.createString(da.toString(true)));
 
     // Draw
     this.drawText(yes, {
       font: params.font,
-      fontSize: params.fontSize,
+      fontSize: fontSize,
       text,
       height: params.height,
       width: params.width,
       color: params.color,
       multiline: params.multiline,
       maxLen: params.maxLen,
-    });
+    }, widget);
 
     widget.AP.get().N = yes.target.makeIndirect();
 

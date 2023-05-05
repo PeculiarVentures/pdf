@@ -29,7 +29,7 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
   public get name(): string {
     const field = this.getField();
 
-    return field.t.text;
+    return field.getFullName();
   }
 
   public get left(): number {
@@ -371,7 +371,11 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
   protected getField<T extends core.PDFField>(type: new () => T): T;
   protected getField(): core.PDFField;
   protected getField(type?: new () => core.PDFField): core.PDFField {
-    const field = new core.PDFField(this.target.Parent || this.target);
+    const fieldDict = this.target.has("T") ? this.target : this.target.Parent;
+    if (!fieldDict) {
+      throw new Error("Field dictionary not found");
+    }
+    const field = new core.PDFField(fieldDict);
 
     return type ? field.to(type) : field;
   }

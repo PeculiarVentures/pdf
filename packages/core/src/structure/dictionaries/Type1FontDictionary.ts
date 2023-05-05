@@ -1,4 +1,4 @@
-import { PDFArray, PDFArrayField, PDFDictionary, PDFDictionaryField, PDFNameField, PDFNumberField, PDFStream } from "../../objects";
+import { PDFArray, PDFArrayField, PDFDictionary, PDFDictionaryField, PDFName, PDFNameField, PDFNumberField, PDFStream } from "../../objects";
 import { FontDictionary } from "./FontDictionary";
 
 export class Type1FontDictionary extends FontDictionary {
@@ -64,10 +64,9 @@ export class Type1FontDictionary extends FontDictionary {
    */
   @PDFDictionaryField({
     name: "Encoding",
-    type: PDFDictionary,
     optional: true,
   })
-  public Encoding!: PDFDictionary | null;
+  public Encoding!: PDFDictionary | PDFName | null;
 
   /**
    * (Optional; PDF 1.2) A stream containing a CMap file that maps character

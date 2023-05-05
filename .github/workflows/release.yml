@@ -20,7 +20,6 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-
       - name: Pull Request Merged
         if: github.event.pull_request.merged == false
         run: |
@@ -30,7 +29,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-        
+
       - name: Initialize the repository
         uses: ./.github/actions/repo-init
         with:
@@ -46,7 +45,7 @@ jobs:
           echo "::set-env name=PREV_VERSION::${PREV_VERSION}"
 
       - name: Bump versions and publish packages
-        run: | 
+        run: |
           npx lerna version --yes --conventional-commits --create-release github --message 'chore(release): publish'
           npx lerna publish from-package --yes
 

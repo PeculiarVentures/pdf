@@ -21,11 +21,11 @@ export interface CMapsParams {
   glyphs: pdfFont.FontGlyph[];
 }
 
-function createFontInfo(dict: core.TrueTypeFontDictionary): pdfFont.IFontInfo {
+function createFontInfoFromTrueType(dict: core.TrueTypeFontDictionary): pdfFont.IFontInfo {
   return {
     ascent: dict.FontDescriptor.ascent || 0,
     descent: dict.FontDescriptor.descent || 0,
-    unitsPerEm: 1,
+    unitsPerEm: 1000,
     findGlyph: (code: number): pdfFont.IFontGlyph => {
       if (!dict.Encoding) {
         throw new Error("TrueTypeFontDictionary should have Encoding field.");
@@ -33,6 +33,50 @@ function createFontInfo(dict: core.TrueTypeFontDictionary): pdfFont.IFontInfo {
       const encoding = TextEncodingEnum[dict.Encoding as keyof typeof TextEncodingEnum];
       if (encoding === undefined) {
         throw new Error(`Cannot get glyph index for specified unicode. Unsupported text encoding '${dict.Encoding}'`);
+      }
+
+      const index = TextEncoding.getIndex(code, encoding);
+      if (index != -1) {
+        const width = dict.Widths.find(index - dict.FirstChar);
+        const advanceWidth = (width instanceof core.PDFNumeric)
+          ? width.value : 0;
+
+        return {
+          index,
+          advanceWidth,
+          unicode: [code],
+        };
+      }
+
+      return {
+        index: 0,
+        advanceWidth: 0,
+        unicode: [code],
+      };
+    }
+  };
+}
+
+function createFontInfoFromType1(dict: core.Type1FontDictionary): pdfFont.IFontInfo {
+  return {
+    ascent: dict.FontDescriptor.ascent || 0,
+    descent: dict.FontDescriptor.descent || 0,
+    unitsPerEm: 1000,
+    findGlyph: (code: number): pdfFont.IFontGlyph => {
+      if (!(dict.Encoding instanceof core.PDFName)) {
+        throw new Error("Type1FontDictionary should have Encoding field of type PDFName.");
+      }
+      const encoding = TextEncodingEnum[dict.Encoding.text as keyof typeof TextEncodingEnum];
+      if (encoding === undefined) {
+        throw new Error(`Cannot get glyph index for specified unicode. Unsupported text encoding '${dict.Encoding}'`);
+      }
+
+      if (!dict.Widths) {
+        throw new Error("Type1FontDictionary should have Widths field.");
+      }
+
+      if (dict.FirstChar === null) {
+        throw new Error("Type1FontDictionary should have FirstChar field.");
       }
 
       const index = TextEncoding.getIndex(code, encoding);
@@ -96,7 +140,7 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
         if (Object.values<string>(pdfFont.DefaultFonts).includes(params.fontDictionary.BaseFont)) {
           this.fontInfo = pdfFont.FontFactory.createDefault(params.fontDictionary.BaseFont as pdfFont.DefaultFonts);
         } else {
-          throw new Error(`Cannot create fontInfo by ${params.fontDictionary.BaseFont}`);
+          this.fontInfo = createFontInfoFromType1(params.fontDictionary);
         }
       } else if (params.fontDictionary instanceof core.Type0FontDictionary) {
         const cid = params.fontDictionary.DescendantFonts.get(0, core.CIDFontDictionary);
@@ -110,7 +154,7 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
         const fontDescriptor = params.fontDictionary.FontDescriptor;
         const fontFile = fontDescriptor.fontFile || fontDescriptor.fontFile2 || fontDescriptor.fontFile3;
         if (!fontFile) {
-          this.fontInfo = createFontInfo(params.fontDictionary);
+          this.fontInfo = createFontInfoFromTrueType(params.fontDictionary);
         } else {
           this.fontInfo = pdfFont.FontFactory.create(fontFile.decodeSync());
         }
@@ -225,10 +269,18 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
     return width * size / 1000;
   }
 
-  public measureTextHeight(fontSize: number, descent = true): number {
+  /**
+   * Calculates the height of a text with the specified font size.
+   * @param fontSize - The size of the font in pixels.
+   * @param includeDescent - Whether to include the font's descent in the calculation.
+   * @returns The height of the text in pixels.
+   */
+  public measureTextHeight(fontSize: number, includeDescent = true): number {
     const scale = 1000 / this.fontInfo.unitsPerEm;
+    const ascent = this.fontInfo.ascent;
+    const descent = includeDescent ? this.fontInfo.descent : 0;
 
-    return (this.fontInfo.ascent - (descent ? this.fontInfo.descent : 0)) / 1000 * fontSize * scale;
+    return (ascent - descent) / 1000 * fontSize * scale;
   }
 
   private static addComposite(font: pdfFont.DefaultFonts | BufferSource, document: PDFDocument): FontComponent {

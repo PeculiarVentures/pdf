@@ -22,7 +22,7 @@ export class FormComponentFactory {
    * @param widget
    */
   public static getField(widget: core.WidgetDictionary): core.PDFField {
-    if (widget.Parent) {
+    if (!widget.has("T") && widget.Parent) {
       return new core.PDFField(widget.Parent);
     }
 
@@ -78,7 +78,7 @@ export class FormComponentFactory {
   }
 
   public static create(dict: core.PDFDictionary, doc: PDFDocument): IComponent {
-    if (dict.has("FT")) {
+    if (dict.has("T")) {
       return this.createFromField(new core.PDFField(dict), doc);
     } else if (dict.has("Subtype")) {
       return this.createFromWidget(new core.WidgetDictionary(dict), doc);
