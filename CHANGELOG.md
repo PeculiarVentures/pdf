@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.11.2](https://github.com/PeculiarVentures/pdf/compare/v1.11.1...v1.11.2) (2023-05-05)
+
+
+### Bug Fixes
+
+* app doesn't draw Appearance content for multiple updates ([810c44a](https://github.com/PeculiarVentures/pdf/commit/810c44a2a110a05739d0794c5056ab191b628f9a))
+* getComponentByName with argument type can't return null ([93f4f21](https://github.com/PeculiarVentures/pdf/commit/93f4f21fc1e7c9b45f4a3656f5daaa9e19e409c1))
+* Is not works content alignment for render ([5d017f2](https://github.com/PeculiarVentures/pdf/commit/5d017f2ada100356944eea2b7599de6f6fe41214)), closes [#62](https://github.com/PeculiarVentures/pdf/issues/62)
+* Unable to set value for Radio widget ([d156dbe](https://github.com/PeculiarVentures/pdf/commit/d156dbeb994d6ed666a2cf8fabf1eebb84f8ac1f)), closes [#61](https://github.com/PeculiarVentures/pdf/issues/61)
+
+
+
+
+
 ## [1.11.1](https://github.com/PeculiarVentures/pdf/compare/v1.11.0...v1.11.1) (2023-05-05)
 
 

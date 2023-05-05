@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.11.2](https://github.com/PeculiarVentures/pdf/compare/v1.11.1...v1.11.2) (2023-05-05)
+
+
+### Bug Fixes
+
+* app doesn't draw Appearance content for multiple updates ([810c44a](https://github.com/PeculiarVentures/pdf/commit/810c44a2a110a05739d0794c5056ab191b628f9a))
+
+
+
+
+
 ## [1.11.1](https://github.com/PeculiarVentures/pdf/compare/v1.11.0...v1.11.1) (2023-05-05)
 
 
