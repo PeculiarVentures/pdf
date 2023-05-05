@@ -6,8 +6,29 @@ import { FontComponent } from "../Font";
 import { fieldFlag } from "./decorators";
 import { FormComponent } from "./FormComponent";
 
+export enum TextEditorAlignment {
+  left = 0,
+  center = 1,
+  right = 2,
+}
+
 
 export class TextEditor extends FormComponent {
+
+  public get alignment(): TextEditorAlignment {
+    if (this.target.has("Q")) {
+      return this.target.get("Q", core.PDFNumeric).value as TextEditorAlignment;
+    }
+
+    return TextEditorAlignment.left;
+  }
+
+  public set alignment(v: TextEditorAlignment) {
+    if (this.alignment !== v) {
+      this.target.set("Q", this.document.target.createNumber(v));
+      this.paint();
+    }
+  }
 
   public get text(): string {
     if (this.target.has("V")) {

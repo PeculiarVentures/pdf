@@ -1,14 +1,9 @@
-import * as fs from "fs";
-import * as path from "path";
 import * as core from "@peculiarventures/pdf-core";
-import { AnnotationDictionary } from "@peculiarventures/pdf-core";
 import { DefaultFonts } from "@peculiarventures/pdf-font";
-import { TextAlignment } from ".";
 import { PDFDocument, PDFDocumentCreateParameters } from "./Document";
 import { PDFVersion } from "./Version";
 import { writeFile } from "./Document.spec";
-import { FontComponent, TextBlockParams, TextRectangle, TextRow, TextSizeCounter } from "./Font";
-import { PDFPage, TextLine } from "./Page";
+import { TextAlignment } from "./Font";
 
 const options: PDFDocumentCreateParameters = {
   version: PDFVersion.v1_6,
