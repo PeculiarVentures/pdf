@@ -23,7 +23,7 @@ export class PDFContentStream extends PDFStream {
 
       const clearCallback = this.clear.bind(this, true);
       content.once("push", clearCallback);
-      content.once("clear", clearCallback);
+      content.on("clear", clearCallback);
     }
 
     return this.#content;
