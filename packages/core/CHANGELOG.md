@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.11.1](https://github.com/PeculiarVentures/pdf/compare/v1.11.0...v1.11.1) (2023-05-05)
+
+
+### Bug Fixes
+
+* enable support for text widgets in nested Fields ([#56](https://github.com/PeculiarVentures/pdf/issues/56)) ([10fb372](https://github.com/PeculiarVentures/pdf/commit/10fb37268cc7262f0fddff9a476247ae30a515e1))
+
+
+
+
+
 # [1.11.0](https://github.com/PeculiarVentures/pdf/compare/v1.10.4...v1.11.0) (2023-03-30)
 
 

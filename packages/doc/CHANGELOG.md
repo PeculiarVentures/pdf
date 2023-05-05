@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.11.1](https://github.com/PeculiarVentures/pdf/compare/v1.11.0...v1.11.1) (2023-05-05)
+
+
+### Bug Fixes
+
+* enable support for text widgets in nested Fields ([#56](https://github.com/PeculiarVentures/pdf/issues/56)) ([10fb372](https://github.com/PeculiarVentures/pdf/commit/10fb37268cc7262f0fddff9a476247ae30a515e1))
+* Wrong appearance for Comb text fields ([abb65ec](https://github.com/PeculiarVentures/pdf/commit/abb65ecb64b0546dbb74fc59ae19e970e9d24d30)), closes [#60](https://github.com/PeculiarVentures/pdf/issues/60)
+
+
+
+
+
 # [1.11.0](https://github.com/PeculiarVentures/pdf/compare/v1.10.4...v1.11.0) (2023-03-30)
 
 
