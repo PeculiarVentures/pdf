@@ -23,8 +23,12 @@ export class RadioButton extends CheckBox implements IFormGroupedComponent {
       // Update filed
       if (group && group.selected && group.selected !== stateName) {
         // disable prev selected
-        const selected = group.get(group.selected);
-        selected.checked = false;
+        try {
+          const selected = group.get(group.selected);
+          selected.checked = false;
+        } catch {
+          // ignore: sometimes the selected value of the group does not correspond to a real element
+        }
       }
 
       if (group) {

@@ -366,7 +366,7 @@ export class PDFDocument {
   }
 
   public getComponentById(id: number, generation?: number): forms.IComponent | null;
-  public getComponentById<T>(id: number, generation: number, type: new (target: any, document: PDFDocument) => T): T | null;
+  public getComponentById<T>(id: number, generation: number, type: new (target: any, document: PDFDocument) => T): T;
   public getComponentById(id: number, generation?: number, type?: typeof WrapObject): forms.IComponent | WrapObject<any> | null {
     let component: forms.IComponent | null = null;
 

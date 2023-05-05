@@ -37,4 +37,23 @@ export class RadioButtonGroup extends FormComponentGroup<core.ButtonDictionary, 
     return null;
   }
 
+  public set selected(v: string | null) {
+    if (v !== this.selected) {
+      if (v === null) {
+        if (this.selected) {
+          try {
+            const selected = this.get(this.selected);
+            selected.checked = false;
+          } catch {
+            // ignore: sometimes the selected value of the group does not correspond to a real element
+          }
+        }
+        this.target.V = null;
+      } else {
+        const selected = this.get(v);
+        selected.checked = true;
+      }
+    }
+  }
+
 }
