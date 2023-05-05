@@ -25,7 +25,7 @@ function createFontInfo(dict: core.TrueTypeFontDictionary): pdfFont.IFontInfo {
   return {
     ascent: dict.FontDescriptor.ascent || 0,
     descent: dict.FontDescriptor.descent || 0,
-    unitsPerEm: 1,
+    unitsPerEm: 1000,
     findGlyph: (code: number): pdfFont.IFontGlyph => {
       if (!dict.Encoding) {
         throw new Error("TrueTypeFontDictionary should have Encoding field.");
@@ -225,10 +225,18 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
     return width * size / 1000;
   }
 
-  public measureTextHeight(fontSize: number, descent = true): number {
+  /**
+   * Calculates the height of a text with the specified font size.
+   * @param fontSize - The size of the font in pixels.
+   * @param includeDescent - Whether to include the font's descent in the calculation.
+   * @returns The height of the text in pixels.
+   */
+  public measureTextHeight(fontSize: number, includeDescent = true): number {
     const scale = 1000 / this.fontInfo.unitsPerEm;
+    const ascent = this.fontInfo.ascent;
+    const descent = includeDescent ? this.fontInfo.descent : 0;
 
-    return (this.fontInfo.ascent - (descent ? this.fontInfo.descent : 0)) / 1000 * fontSize * scale;
+    return (ascent - descent) / 1000 * fontSize * scale;
   }
 
   private static addComposite(font: pdfFont.DefaultFonts | BufferSource, document: PDFDocument): FontComponent {
