@@ -289,7 +289,7 @@ export class PDFDocument {
   }
 
   public getComponentByName(name: string): forms.IComponent | null;
-  public getComponentByName<T>(name: string, type: new (target: any, document: PDFDocument) => T): T | null;
+  public getComponentByName<T>(name: string, type: new (target: any, document: PDFDocument) => T): T;
   public getComponentByName(name: string, type?: typeof WrapObject): forms.IComponent | WrapObject<any> | null {
     const acroForm = this.target.update.catalog?.AcroForm;
     let component: forms.IComponent | null = null;
