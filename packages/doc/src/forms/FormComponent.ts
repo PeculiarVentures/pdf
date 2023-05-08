@@ -57,7 +57,7 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
 
   public set top(v: core.TypographySize) {
     let vPt = core.TypographyConverter.toPoint(v);
-    const height = this.width;
+    const height = this.height;
 
     vPt = (this.target.p)
       ? this.target.p.to(core.PageObjectDictionary).MediaBox.urY - vPt
@@ -96,7 +96,13 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
    * Gets component height
    */
   public get height(): number {
-    return this.target.rect.urY - this.target.rect.llY;
+    const rect = this.target.rect.toArray();
+    const y1 = Math.min(rect[1], rect[3]);
+    const y2 = Math.max(rect[1], rect[3]);
+
+    const height = Math.abs(y2 - y1);
+
+    return height;
   }
 
   /**

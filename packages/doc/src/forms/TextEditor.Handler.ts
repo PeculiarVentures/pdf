@@ -13,6 +13,10 @@ export interface BorderParameters {
   height: number;
 }
 export interface TextEditorCreateParameters {
+  /**
+   * Name of the field
+   */
+  name?: string;
   left?: core.TypographySize;
   top?: core.TypographySize;
   /**
@@ -98,7 +102,17 @@ export class TextEditorHandler implements ITextEditorHandler {
       // Clip rec
       .rect(padding, padding, form.width - padding * 2, form.height - padding * 2)
       .clip()
-      .pathEnd()
+
+      // draw background
+      // .rect(0, 0, form.width, form.height)
+      // .fillColor([0.5, 0.5, 0.5])
+      // .fill()
+
+      // draw clip rectangle
+      // .rect(padding, padding, form.width - padding * 2, form.height - padding * 2)
+      // .fillColor([0.8, 0.8, 0.8])
+      // .fill()
+
       .text();
 
     if (params.multiline) {
@@ -159,9 +173,12 @@ export class TextEditorHandler implements ITextEditorHandler {
       const text = this.getSingleLineText(params.text);
       textContent.show(text);
     }
+
+    // console.log(form.target.content.toString());
   }
 
   public create(params: TextEditorCreateParameters): core.WidgetDictionary {
+    const doc = this.document.target;
 
     let text = params.text;
     if (params.maxLen && params.maxLen > 0) {
@@ -196,8 +213,8 @@ export class TextEditorHandler implements ITextEditorHandler {
     }
 
     widget.set("MaxLen", new core.PDFNumeric(params.maxLen || TextEditorHandler.MAX_LEN));
-    widget.t = this.document.target.createString(core.UUID.generate());
-    widget.V = this.document.target.createString(text);
+    widget.t = params.name ? doc.createString(params.name) : doc.createString(core.UUID.generate());
+    widget.V = doc.createString(text);
     widget.rect.llX = positionX;
     widget.rect.llY = positionY;
     widget.rect.urX = positionX + width;
@@ -208,7 +225,7 @@ export class TextEditorHandler implements ITextEditorHandler {
     const fontRes = yes.resources.set(params.font.target);
     const da = new core.PDFContent().setFontAndSize({ font: fontRes.name, size: fontSize });
     da.setColor(params.color);
-    widget.set("DA", this.document.target.createString(da.toString(true)));
+    widget.set("DA", doc.createString(da.toString(true)));
 
     // Draw
     this.drawText(yes, {

@@ -59,7 +59,13 @@ export class PDFRectangle extends PDFArray {
     this.items = [new PDFNumeric(0), new PDFNumeric(0), new PDFNumeric(0), new PDFNumeric(0)];
   }
 
-  public getCoordinates(): Array<number> {
+  /**
+   * Returns the rectangle as an array of numbers.
+   * @returns An array of numbers in the form [llX, llY, urX, urY].
+   * @throws If the rectangle does not have 4 coordinates.
+   * @throws If any of the coordinates are not numbers.
+   */
+  public toArray(): Array<number> {
 
     if (this.items.length !== 4) {
       throw new Error("The rectangle must have 4 coordinates");

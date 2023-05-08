@@ -42,10 +42,12 @@ export class FormObject extends WrapContentObject<core.FormDictionary> {
   }
 
   public set height(v: core.TypographySize) {
-    if (this.target.bBox.urY < 0) {
-      this.target.bBox.urY -= core.TypographyConverter.toPoint(v) - this.height;
-    } else {
-      this.target.bBox.urY += core.TypographyConverter.toPoint(v) - this.height;
+    if (this.height !== v) {
+      if (this.target.bBox.urY < 0) {
+        this.target.bBox.urY -= core.TypographyConverter.toPoint(v) - this.height;
+      } else {
+        this.target.bBox.urY += core.TypographyConverter.toPoint(v) - this.height;
+      }
     }
   }
 
