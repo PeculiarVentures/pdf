@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.11.3](https://github.com/PeculiarVentures/pdf/compare/v1.11.2...v1.11.3) (2023-05-08)
+
+
+### Bug Fixes
+
+* incorrect BBox when changing Y coordinate ([9cb56a2](https://github.com/PeculiarVentures/pdf/commit/9cb56a21f0036ebd87e6f370267687d08e697ebc))
+
+
+
+
+
 ## [1.11.2](https://github.com/PeculiarVentures/pdf/compare/v1.11.1...v1.11.2) (2023-05-05)
 
 
