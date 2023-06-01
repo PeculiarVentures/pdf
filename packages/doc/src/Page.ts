@@ -88,6 +88,46 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
     return this.target.MediaBox.llY;
   }
 
+  public get leftPadding(): number {
+    return this.target.CropBox?.llX || 0;
+  }
+
+  public set leftPadding(value: core.TypographySize) {
+    this.getOrCreateCropBox().llX = core.TypographyConverter.toPoint(value);
+  }
+
+  public get rightPadding(): number {
+    return this.width - (this.target.CropBox?.urX || 0);
+  }
+
+  public set rightPadding(value: core.TypographySize) {
+    this.getOrCreateCropBox().urX = this.width - core.TypographyConverter.toPoint(value);
+  }
+
+  public get topPadding(): number {
+    return this.height - (this.target.CropBox?.urY || 0);
+  }
+
+  public set topPadding(value: core.TypographySize) {
+    this.getOrCreateCropBox().urY = this.height - core.TypographyConverter.toPoint(value);
+  }
+
+  public get bottomPadding(): number {
+    return this.target.CropBox?.llY || 0;
+  }
+
+  public set bottomPadding(value: core.TypographySize) {
+    this.getOrCreateCropBox().llY = core.TypographyConverter.toPoint(value);
+  }
+
+  protected getOrCreateCropBox(): core.PDFRectangle {
+    if (!this.target.CropBox) {
+      this.target.CropBox = this.document.target.createRectangle(0, 0, this.width, this.height);
+    }
+
+    return this.target.CropBox;
+  }
+
   public addCheckBox(params: forms.ICheckBoxCreateParameters = {}): forms.CheckBox {
     params.top = this.height - core.TypographyConverter.toPoint(params.top || 0);
 

@@ -1066,4 +1066,27 @@ context("Page", () => {
 
   });
 
+  it("Padding", async () => {
+    const doc = await PDFDocument.create(options);
+
+    const page = doc.pages.create({
+      width: 200,
+      height: 400,
+    });
+
+    page.leftPadding = 10;
+    page.topPadding = 15;
+    page.rightPadding = 20;
+    page.bottomPadding = 25;
+
+    assert.strictEqual(page.target.CropBox?.llX, 10);
+    assert.strictEqual(page.leftPadding, 10);
+    assert.strictEqual(page.target.CropBox?.llY, 25);
+    assert.strictEqual(page.bottomPadding, 25);
+    assert.strictEqual(page.target.CropBox?.urX, 180);
+    assert.strictEqual(page.rightPadding, 20);
+    assert.strictEqual(page.target.CropBox?.urY, 385);
+    assert.strictEqual(page.topPadding, 15);
+  });
+
 });
