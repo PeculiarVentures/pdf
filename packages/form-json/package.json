@@ -1,6 +1,6 @@
 {
   "name": "@peculiarventures/pdf-form-json",
-  "version": "1.11.3",
+  "version": "1.12.0",
   "description": "A PDF module enabling working with form elements through JSON.",
   "keywords": [],
   "author": "microshine <microshine@mail.ru>",
@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "@peculiarventures/pdf-core": "^1.11.3",
-    "@peculiarventures/pdf-doc": "^1.11.3",
+    "@peculiarventures/pdf-doc": "^1.12.0",
     "pvtsutils": "^1.2.2",
     "tslib": "^2.5.0"
   }

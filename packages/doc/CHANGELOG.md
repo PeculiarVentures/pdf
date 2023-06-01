@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.12.0](https://github.com/PeculiarVentures/pdf/compare/v1.11.3...v1.12.0) (2023-06-01)
+
+
+### Features
+
+* support page padding ([1f827da](https://github.com/PeculiarVentures/pdf/commit/1f827da4959708a8efa1b80d124f29b5ba935a9c))
+
+
+
+
+
 ## [1.11.3](https://github.com/PeculiarVentures/pdf/compare/v1.11.2...v1.11.3) (2023-05-08)
 
 
