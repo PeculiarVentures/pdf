@@ -14,15 +14,6 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
 
   }
 
-  protected getFiled(): core.PDFField {
-    const widget = this.target;
-    if (widget.Parent) {
-      return new core.PDFField(widget.Parent);
-    }
-
-    return new core.PDFField(widget);
-  }
-
   /**
    * Get the name of the component
    */
