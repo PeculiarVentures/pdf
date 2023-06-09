@@ -31,8 +31,9 @@ export class TextEditor extends FormComponent {
   }
 
   public get text(): string {
-    if (this.target.has("V")) {
-      return this.target.get("V", core.PDFTextString).text;
+    const field = this.getField();
+    if (field.has("V")) {
+      return field.get("V", core.PDFTextString).text;
     }
 
     return "";
@@ -40,14 +41,32 @@ export class TextEditor extends FormComponent {
 
   public set text(v: string) {
     if (this.text !== v) {
-      this.target.set("V", this.document.target.createString(v));
-      this.paint();
+      const field = this.getField();
+      // set field value
+      field.V = this.document.target.createString(v);
+
+      // if field has multiple kids, we need update their appearances too
+      if (field.has("Kids")) {
+        const kids = field.get("Kids", core.PDFArray);
+        for (const kid of kids) {
+          if (!(kid instanceof core.PDFDictionary)) {
+            continue;
+          }
+
+          const widget = kid.to(core.WidgetDictionary);
+          const editor = new TextEditor(widget, this.document);
+          editor.paint();
+        }
+      } else {
+        this.paint();
+      }
     }
   }
 
   public get maxLen(): number {
-    if (this.target.has("MaxLen")) {
-      return this.target.get("MaxLen", core.PDFNumeric).value;
+    const field = this.getField();
+    if (field.has("MaxLen")) {
+      return field.get("MaxLen", core.PDFNumeric).value;
     }
 
     return 0;
@@ -55,7 +74,8 @@ export class TextEditor extends FormComponent {
 
   public set maxLen(v: number) {
     if (this.maxLen !== v) {
-      this.target.set("MaxLen", this.document.target.createNumber(v));
+      const field = this.getField();
+      field.set("MaxLen", this.document.target.createNumber(v));
       if (this.text.length > v) {
         this.text = this.text.substr(0, v);
       }
