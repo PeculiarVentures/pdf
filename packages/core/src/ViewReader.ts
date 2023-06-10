@@ -16,8 +16,24 @@ export class ViewReader {
     this.view = BufferSourceConverter.toUint8Array(view);
   }
 
+
+  /**
+   * Finds index of the first element that satisfies the callback function. If not found, returns -1.
+   * @param param Callback function, view or text to find
+   * @returns Returns index of the first element that satisfies the callback function. If not found, returns -1.
+   */
   public findIndex(cb: ViewReaderFindCallback): number;
+  /**
+   * Finds index of the first element that satisfies the view. If not found, returns -1.
+   * @param view View to find
+   * @returns Returns index of the first element that satisfies the view. If not found, returns -1.
+   */
   public findIndex(view: Uint8Array): number;
+  /**
+   * Finds index of the first element that satisfies the text. If not found, returns -1.
+   * @param text Text to find
+   * @returns Returns index of the first element that satisfies the text. If not found, returns -1.
+   */
   public findIndex(text: string): number;
   public findIndex(param: ViewReaderFindCallback | Uint8Array | string): number;
   public findIndex(param: ViewReaderFindCallback | Uint8Array | string): number {
@@ -30,6 +46,11 @@ export class ViewReader {
     }
   }
 
+  /**
+   * Finds index of the first element that satisfies the callback function. If not found, returns -1.
+   * @param cb Callback function
+   * @returns Returns index of the first element that satisfies the callback function. If not found, returns -1.
+   */
   protected findIndexByCallback(cb: ViewReaderFindCallback): number {
     const step = this.backward ? -1 : 1;
 
@@ -46,6 +67,11 @@ export class ViewReader {
     return -1;
   }
 
+  /**
+   * Finds index of the first element that satisfies the callback function. If not found, returns -1.
+   * @param text Text to find
+   * @returns Returns index of the first element that satisfies the text. If not found, returns -1.
+   */
   protected findIndexByString(text: string): number {
     const buffer = Convert.FromUtf8String(text);
     const view = new Uint8Array(buffer);
@@ -53,6 +79,11 @@ export class ViewReader {
     return this.findIndexByView(view);
   }
 
+  /**
+   * Finds index of the first element that satisfies the callback function. If not found, returns -1.
+   * @param view View to find
+   * @returns Returns index of the first element that satisfies the view. If not found, returns -1.
+   */
   protected findIndexByView(view: Uint8Array): number {
     const viewCopy = view.slice();
     if (this.backward) {
