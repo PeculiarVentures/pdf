@@ -410,7 +410,12 @@ export class PDFDocument {
     let group: forms.SignatureBoxGroup | null = null;
     if (params.groupName) {
       // get signature filed
-      group = this.getComponentByName(params.groupName, forms.SignatureBoxGroup);
+      const component = this.getComponentByName(params.groupName);
+      if (component instanceof forms.SignatureBoxGroup) {
+        group = component;
+      } if (component instanceof forms.SignatureBox) {
+        group = component.findGroup();
+      }
     }
     if (!group) {
       // create hidden signature box and add it to the first page

@@ -82,10 +82,15 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
   }
 
   protected getAppearance(): FormObject {
-    const n = this.target.AP.get().N;
-    const formDict = (n instanceof core.PDFStream)
-      ? n.to(core.FormDictionary, true)
-      : core.FormDictionary.create(this.target.documentUpdate!).makeIndirect();
+    const update = this.target.documentUpdate!;
+    const ap = this.target.AP.get();
+    if (!ap.has("N")) {
+      // If AP created by get() function it doesn't have a required filed N
+      ap.N = core.FormDictionary.create(update);
+    }
+    const formDict = (ap.N instanceof core.PDFStream)
+      ? ap.N.to(core.FormDictionary, true)
+      : core.FormDictionary.create(update).makeIndirect();
 
     return new FormObject(formDict, this.document);
   }

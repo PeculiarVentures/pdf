@@ -13,12 +13,14 @@ export class CheckBox extends FormComponent {
   public set checked(v: boolean) {
     if (this.checked !== v) {
       const stateName = v ? this.getYesStateName() : "Off";
-      this.target.modify();
-      if (this.target.has("V")) {
-        this.target.set("V", this.document.target.createString(stateName));
+      const field = this.getField();
+      if (field.has("V")) {
+        field.set("V", this.document.target.createString(stateName));
       }
       this.target.as = stateName;
     }
+
+    this.paint();
   }
 
   public get value(): string {

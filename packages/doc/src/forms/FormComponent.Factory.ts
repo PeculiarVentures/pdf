@@ -71,6 +71,11 @@ export class FormComponentFactory {
         }
       } else if (field.ft === "Sig") {
         return wrapField(FormComponentType.signatureBoxGroup, field.to(core.SignatureFiled), doc);
+      } else if (field.ft === "Tx") {
+        // For text editor we should return the first widget
+        const widget = field.Kids.get(true).get(0, core.WidgetDictionary);
+
+        return this.createFromWidget(widget, doc);
       }
     }
 
