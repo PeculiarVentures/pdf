@@ -8,6 +8,7 @@ export * from "./Catalog";
 export * from "./Encrypt";
 export * from "./ExtGStateDictionary";
 export * from "./FileSpecification";
+export * from "./CharacterEncodingDictionary";
 export * from "./CollectionItemsDictionary";
 export * from "./CryptoFilter";
 export * from "./FontDescriptor";

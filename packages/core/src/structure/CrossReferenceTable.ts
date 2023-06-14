@@ -8,10 +8,12 @@ import { CrossReference } from "./CrossReference";
 import { TrailerDictionary } from "./dictionaries/Trailer";
 import { PDFDocumentObject, PDFDocumentObjectTypes } from "./DocumentObject";
 import { PDFDocumentObjectGrouper } from "./DocumentObjectGrouper";
+import type { CrossReferenceStream } from "./CrossReferenceStream";
 
 export class CrossReferenceTable extends TrailerDictionary implements CrossReference {
 
   public objects: PDFDocumentObject[] = [];
+  public xrefStream?: CrossReferenceStream;
 
   protected override onFromPDF(reader: ViewReader): void {
     reader.findIndex(c => !CharSet.whiteSpaceChars.includes(c));
@@ -93,6 +95,11 @@ export class CrossReferenceTable extends TrailerDictionary implements CrossRefer
 
       writer.writeString(`${firstIndex} ${group.length}\n`);
       for (const item of group) {
+        if (item.type === PDFDocumentObjectTypes.compressed) {
+          // For hybrid-reference files it's possible to have compressed objects
+          // change type to in-use, because we don't create compressed objects and don't use compressed streams
+          item.type = PDFDocumentObjectTypes.inUse;
+        }
         const offset = item.offset.toString().padStart(10, "0");
         const generation = item.generation.toString().padStart(5, "0");
         writer.writeString(`${offset} ${generation} ${item.type}\r\n`);

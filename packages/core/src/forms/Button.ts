@@ -3,8 +3,8 @@ import { FieldFlags, PDFField } from "./Field";
 
 export enum ButtonFlags {
   /**
-   * If set, exactly one radio button shall be selected at all times; 
-   * selecting the currently selected button has no effect. If clear, 
+   * If set, exactly one radio button shall be selected at all times;
+   * selecting the currently selected button has no effect. If clear,
    * clicking the selected button deselects it, leaving no button selected
    */
   noToggleToOff = 1 << 14,
@@ -21,7 +21,7 @@ export enum ButtonFlags {
    * If set, a group of radio buttons within a radio button field that
    * use the same value for the on state will turn on and off in unison; that
    * is if one is checked, they are all checked. If clear, the buttons are
-   * mutually exclusive (the same behavior as HTML radio buttons). 
+   * mutually exclusive (the same behavior as HTML radio buttons).
    * @remarks PDF 1.5
    */
   radiosInUnison = 1 << 25,

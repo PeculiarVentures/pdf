@@ -36,6 +36,11 @@ export class ColorConverter {
       }
     }
 
+    if (!res.length) {
+      // if array is empty, then it is grayscale with white color
+      return 1;
+    }
+
     return res as Colors;
   }
 
@@ -54,22 +59,22 @@ export class ColorConverter {
 }
 
 /**
- * Line cap styles 
+ * Line cap styles
  */
 export enum LineCapStyle {
   /**
    * Butt cap. The stroke shall be squared off at the endpoint of the path. There shall be
-   * no projection beyond the end of the path. 
+   * no projection beyond the end of the path.
    */
   buttCap = 0,
   /**
    * Round cap. A semicircular arc with a diameter equal to the line width shall be
-   * drawn around the endpoint and shall be filled in. 
+   * drawn around the endpoint and shall be filled in.
    */
   roundCap = 1,
   /**
    * Projecting square cap. The stroke shall continue beyond the endpoint of the path
-   * for a distance equal to half the line width and shall be squared off. 
+   * for a distance equal to half the line width and shall be squared off.
    */
   projectingSquareCap = 2,
 }
@@ -258,7 +263,7 @@ export class PDFContent extends EventEmitter {
 
   /**
    * Restore the graphics state by removing the most recently saved state from the
-   * stack and making it the current state 
+   * stack and making it the current state
    */
   public graphicsEnd(): this {
     return this.push(["Q"]);
@@ -271,14 +276,14 @@ export class PDFContent extends EventEmitter {
   /**
    * Modify the current transformation matrix (CTM) by concatenating the specified
    * matrix (see 8.3.2, "Coordinate spaces"). Although the operands specify a matrix,
-   * they shall be written as six separate numbers, not as an array. 
+   * they shall be written as six separate numbers, not as an array.
    * @param a Operand in matrix
    * @param b Operand in matrix
    * @param c Operand in matrix
    * @param d Operand in matrix
    * @param e Operand in matrix
    * @param f Operand in matrix
-   * @returns 
+   * @returns
    */
   public concatMatrix(a: TypographySize, b: TypographySize, c: TypographySize, d: TypographySize, e: TypographySize, f: TypographySize): this {
     this.push(["cm", TypographyConverter.toPDFNumeric(a), TypographyConverter.toPDFNumeric(b), TypographyConverter.toPDFNumeric(c), TypographyConverter.toPDFNumeric(d), TypographyConverter.toPDFNumeric(e), TypographyConverter.toPDFNumeric(f)]);
@@ -288,7 +293,7 @@ export class PDFContent extends EventEmitter {
 
   /**
    * Set the line width in the graphics state
-   * @param width 
+   * @param width
    */
   public setLineWidth(width: TypographySize): this {
     this.push(["w", TypographyConverter.toPDFNumeric(width)]);
@@ -307,7 +312,7 @@ export class PDFContent extends EventEmitter {
   }
 
   /**
-   * Set the line join style in the graphics state 
+   * Set the line join style in the graphics state
    * @param join Line join style
    */
   public setLineJoin(join: LineJoinStyle): this {
@@ -346,7 +351,7 @@ export class PDFContent extends EventEmitter {
   /**
    * Append a cubic Bézier curve to the current path. The curve shall extend from the current
    * point to the point (x3 , y3), using (x1, y1 ) and (x2, y2 ) as the Bézier control points (see 8.5.2.2,
-   * y3 "Cubic Bézier curves"). The new current point shall be (x3 , y3 ). 
+   * y3 "Cubic Bézier curves"). The new current point shall be (x3 , y3 ).
    */
   public curveTo(x1: TypographySize, y1: TypographySize, x2: TypographySize, y2: TypographySize, x3: TypographySize, y3: TypographySize): this {
     this.push(["c",
@@ -384,7 +389,7 @@ export class PDFContent extends EventEmitter {
   /**
    * End the path object without filling or stroking it. This operator shall be a path-painting no-op,
    * used primarily for the side effect of changing the current clipping path (see 8.5.4, "Clipping path
-   * operators").  
+   * operators").
    */
   public pathEnd(): this {
     this.push(["n"]);
@@ -409,7 +414,7 @@ export class PDFContent extends EventEmitter {
 
   /**
    * Modify the current clipping path by intersecting it with the current path, using the non-zero
-   * winding number rule to determine which regions lie inside the clipping path. 
+   * winding number rule to determine which regions lie inside the clipping path.
    */
   public clip(): this {
     this.push(["W"]);
@@ -419,7 +424,7 @@ export class PDFContent extends EventEmitter {
 
   /**
    * Modify the current clipping path by intersecting it with the current path, using the even-odd
-   * rule to determine which regions lie inside the clipping path. 
+   * rule to determine which regions lie inside the clipping path.
    */
   public clipEO(): this {
     this.push(["W*"]);
@@ -450,7 +455,7 @@ export class PDFContent extends EventEmitter {
   /**
    * Set the character spacing, Tc, to charSpace, which shall be a number expressed in
    * unscaled text space units. Character spacing shall be used by the Tj, TJ, and '
-   * operators. Initial value: 0. 
+   * operators. Initial value: 0.
    * @param charSpace Char space
    */
   public textCharacterSpacing(charSpace: TypographySize): this {
@@ -462,7 +467,7 @@ export class PDFContent extends EventEmitter {
   /**
    * Set the word spacing, Tw, to wordSpace, which shall be a number expressed in
    * unscaled text space units. Word spacing shall be used by the Tj, TJ, and ' operators.
-   * Initial value: 0. 
+   * Initial value: 0.
    * @param wordSpace Word space
    */
   public textWordSpacing(wordSpace: TypographySize): this {
@@ -473,9 +478,9 @@ export class PDFContent extends EventEmitter {
 
   /**
    * Set the horizontal scaling, Th , to (scale ÷ 100). scale shall be a number specifying
-   * the percentage of the normal width. Initial value: 100 (normal width). 
+   * the percentage of the normal width. Initial value: 100 (normal width).
    * @param scale Scale in the percentage of the normal width
-   * @returns 
+   * @returns
    */
   public textScale(scale: number): this {
     this.push(["Tz", TypographyConverter.toPDFNumeric(scale)]);
@@ -486,7 +491,7 @@ export class PDFContent extends EventEmitter {
   /**
    * Set the text leading, Tl , to leading, which shall be a number expressed in unscaled
    * text space units. Text leading shall be used only by the T*, ', and " operators. Initial
-   * value: 0. 
+   * value: 0.
    * @param leading Leading
    */
   public textLeading(leading: TypographySize): this {
@@ -501,7 +506,7 @@ export class PDFContent extends EventEmitter {
    * size shall be a number representing a scale factor. There is no initial value for
    * either font or size; they shall be specified explicitly by using Tf before any text is
    * shown. Zero sized text shall not mark or clip any pixels (depending on text render
-   * mode). 
+   * mode).
    * @param font Font name
    * @param size Font size
    */
@@ -514,7 +519,7 @@ export class PDFContent extends EventEmitter {
   /**
    * Set the text rendering mode, Tmode, to render, which shall be an integer.
    * Initial value: 0.
-   * @param render 
+   * @param render
    */
   public textRender(render: number): this {
     this.push(["Tr", new objects.PDFNumeric(render)]);
@@ -524,8 +529,8 @@ export class PDFContent extends EventEmitter {
 
   /**
    * Set the text rise, Trise , to rise, which shall be a number expressed in unscaled text
-   * space units. Initial value: 0. 
-   * @param rise 
+   * space units. Initial value: 0.
+   * @param rise
    */
   public textRise(rise: TypographySize): this {
     this.push(["Ts", TypographyConverter.toPDFNumeric(rise)]);
@@ -541,8 +546,8 @@ export class PDFContent extends EventEmitter {
    * Move to the start of the next line, offset from the start of the
    * current line by (tx , ty ). tx and ty shall denote numbers expressed in
    * unscaled text space units.
-   * @param x 
-   * @param y 
+   * @param x
+   * @param y
    */
   public textMove(x: TypographySize, y: TypographySize): this {
     this.push(["Td", TypographyConverter.toPDFNumeric(x), TypographyConverter.toPDFNumeric(y)]);
@@ -554,7 +559,7 @@ export class PDFContent extends EventEmitter {
    * Move to the start of the next line, offset from the start of the
    * current line by (tx , ty ). As a side effect, this operator shall set the
    * leading parameter in the text state
-   * @param x 
+   * @param x
    */
   public textMoveLeading(x: TypographySize, y: TypographySize): this {
     this.push(["TD", TypographyConverter.toPDFNumeric(x), TypographyConverter.toPDFNumeric(y)]);
@@ -564,12 +569,12 @@ export class PDFContent extends EventEmitter {
 
   /**
    * Set the text matrix, Tm , and the text line matrix, Tlm
-   * @param a 
-   * @param b 
-   * @param c 
-   * @param d 
-   * @param e 
-   * @param f 
+   * @param a
+   * @param b
+   * @param c
+   * @param d
+   * @param e
+   * @param f
    */
   public textMatrix(a: number, b: number, c: number, d: number, e: number, f: number): this;
   public textMatrix(matrix: Metrics): this;
@@ -600,7 +605,7 @@ export class PDFContent extends EventEmitter {
 
   /**
    * Move to the start of the next line. This operator has the same effect as the code
-   * @returns 
+   * @returns
    */
   public textNextLine(): this {
     this.push(["T*"]);
@@ -610,7 +615,7 @@ export class PDFContent extends EventEmitter {
 
   //#endregion
 
-  //#region Text showing 
+  //#region Text showing
 
   /**
    * Show a text string
@@ -638,17 +643,17 @@ export class PDFContent extends EventEmitter {
    * ```
    * content.setColor(0.5); // 0.5 g % grayscale filling
    * content.setColor(0.5, true); // 0.5 G % grayscale stroking
-   * 
+   *
    * content.setColor([0, 0, 1]); // 0 0 1 rg % RGB filling
    * content.setColor([0, 0, 1], true); // 0 0 1 RG % RGB stroking
-   * 
+   *
    * content.setColor([0, 0, 0, 1]); // 0 0 0 1 k % CMYK filling
    * content.setColor([0, 0, 0, 1], true); // 0 0 0 1 K % CMYK stroking
-   * 
+   *
    * ```
-   * @param color 
-   * @param stroking 
-   * @returns 
+   * @param color
+   * @param stroking
+   * @returns
    */
   public setColor(color: Colors, stroking = false): this {
     let operator: string;
@@ -697,8 +702,8 @@ export class PDFContent extends EventEmitter {
 
   /**
    * Begin a marked-content sequence
-   * @param tag 
-   * @param properties 
+   * @param tag
+   * @param properties
    */
   public markedContentBegin(tag: string, properties?: objects.PDFDictionary): this {
     if (properties) {
@@ -748,7 +753,7 @@ export class PDFContent extends EventEmitter {
    * @param y Y coordinate (left top corner)
    * @param width Width
    * @param height Height
-   * @returns 
+   * @returns
    */
   public drawRectangle(x: TypographySize, y: TypographySize, width: TypographySize, height: TypographySize): this {
     const xPt = TypographyConverter.toPoint(x);

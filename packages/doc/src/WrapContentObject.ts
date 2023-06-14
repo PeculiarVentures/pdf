@@ -386,7 +386,7 @@ export class Text extends WrapContentChild {
   public show(text: string): this {
     const fnt = this.lastFont;
 
-    if (fnt.target.subtype === "Type0") {
+    if (fnt.target.subtype === "Type0" && fnt.target.has("ToUnicode")) {
       // encoded text
       let buffer = "";
 

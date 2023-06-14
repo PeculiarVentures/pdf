@@ -8,7 +8,7 @@ import { StandardEncryptDictionary } from "./StandardEncrypt";
 export class TrailerDictionary extends objects.PDFDictionary {
 
   /**
-   * The total number of entries in the file’s cross-reference table, 
+   * The total number of entries in the file’s cross-reference table,
    * as defined by the combination of the original section and all update sections
    * @remarks Shall not be an indirect reference
    */
@@ -16,10 +16,10 @@ export class TrailerDictionary extends objects.PDFDictionary {
   public Size!: number;
 
   /**
-   * The byte offset in the decoded stream from the beginning of the file 
+   * The byte offset in the decoded stream from the beginning of the file
    * to the beginning of the previous cross-reference section
-   * @remarks 
-   * - present only if the file has more than one cross-reference section 
+   * @remarks
+   * - present only if the file has more than one cross-reference section
    * - shall be a direct object
    */
   @objects.PDFNumberField("Prev", true)
@@ -71,9 +71,9 @@ export class TrailerDictionary extends objects.PDFDictionary {
   public Info!: objects.Maybe<InformationDictionary>;
 
   /**
-   * An array of two byte-strings constituting a file identifier for the file. 
-   * The ID array shall (PDF 2.0) have a minimum length of 16 bytes. If there is an Encrypt entry, 
-   * this array and the two byte-strings shall be direct objects and shall be unencrypted. 
+   * An array of two byte-strings constituting a file identifier for the file.
+   * The ID array shall (PDF 2.0) have a minimum length of 16 bytes. If there is an Encrypt entry,
+   * this array and the two byte-strings shall be direct objects and shall be unencrypted.
    * @remarks
    * - required in PDF 2.0 or if an Encrypt entry is present
    * - PDF 1.1
@@ -97,7 +97,7 @@ export class TrailerDictionary extends objects.PDFDictionary {
       for (const [key, value] of (xref as any as objects.PDFDictionary).items) {
         // ! Don't copy Filters and DecodeParms
         // TODO Current implementation doesn't implement Predicator encoding
-        if (key === "Filters" || key === "DecodeParms") {
+        if (key === "Filters" || key === "DecodeParms" || key === "XRefStm") {
           continue;
         }
         this.items.set(key, value.copy());
@@ -108,7 +108,7 @@ export class TrailerDictionary extends objects.PDFDictionary {
 
       // TODO Simplify
       const root = CatalogDictionary.create(update);
-      // ! Catalog dictionary shall be in-use object otherwise Acrobat doesn't open protected document 
+      // ! Catalog dictionary shall be in-use object otherwise Acrobat doesn't open protected document
       const objRoot = update.append(root, false);
       this.set("Root", objRoot.createReference());
 

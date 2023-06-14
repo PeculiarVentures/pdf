@@ -61,10 +61,11 @@ export class CheckBoxHandler extends FormComponentHandler implements ICheckBoxHa
       : params.width - params.borderWidth * 2;
     const x = (params.width - size) / 2;
     const y = (params.height - size) / 2;
+    const lineWidth = params.borderWidth || 1;
 
     object.graphics()
       .strokeColor(params.foreColor)
-      .lineWidth(params.borderWidth)
+      .lineWidth(lineWidth)
       .pathTo(x + (size / 4), y + (size / 2))
       .pathLine(x + (size / 2), y + size * 0.8)
       .pathLine(x + (size / 1.3), y + size * 0.13)

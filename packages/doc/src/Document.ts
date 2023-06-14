@@ -196,7 +196,11 @@ export class PDFDocument {
   }
 
   public addFont(font?: font.DefaultFonts | BufferSource): FontComponent {
-    return FontComponent.addFont(this, font);
+    const fontComponent = FontComponent.addFont(this, font);
+
+    this.fonts.push(fontComponent);
+
+    return fontComponent;
   }
 
   public async save(): Promise<ArrayBuffer> {
@@ -397,7 +401,7 @@ export class PDFDocument {
   public get isSigned(): boolean {
     const acroForm = this.target.update.catalog?.AcroForm;
 
-    return !!(acroForm && acroForm.has() && acroForm.get().SigFlags);
+    return !!(acroForm && acroForm.has() && (acroForm.get().SigFlags & core.SignatureFlags.appendOnly));
   }
 
   public getSignatures(): Array<forms.SignatureBoxGroup | forms.SignatureBox> {
@@ -473,5 +477,26 @@ export class PDFDocument {
     return this.#embeddedFiles;
   }
 
+  /**
+   * Checks if the document has hybrid reference
+   * @returns True if the document has hybrid reference, otherwise false
+   */
+  hasHybridReference(): boolean {
+    let update: core.PDFDocumentUpdate | null = this.target.update;
+
+    while (update) {
+      if (!(update.xref instanceof core.CrossReferenceTable)) {
+        return false;
+      }
+
+      if (update.xref.xrefStream) {
+        return true;
+      }
+
+      update = update.previous;
+    }
+
+    return false;
+  }
 
 }

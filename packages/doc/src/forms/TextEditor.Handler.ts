@@ -85,7 +85,7 @@ export class TextEditorHandler implements ITextEditorHandler {
       : TextEditorAlignment.left;
 
     const fontInfo = params.font.fontInfo;
-    const scale = params.fontSize / fontInfo.unitsPerEm;
+    const scale = fontSize / fontInfo.unitsPerEm;
     const ascent = fontInfo.ascent * scale;
     const descent = fontInfo.descent * scale;
 

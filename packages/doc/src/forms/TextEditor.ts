@@ -1,7 +1,7 @@
 import * as core from "@peculiarventures/pdf-core";
 import { TextEditorDrawParameters } from "./TextEditor.Handler";
 import { FormObject } from "../FormObject";
-import { ResourceManager } from "../ResourceManager";
+import { Resource, ResourceManager } from "../ResourceManager";
 import { FontComponent } from "../Font";
 import { fieldFlag } from "./decorators";
 import { FormComponent } from "./FormComponent";
@@ -92,30 +92,9 @@ export class TextEditor extends FormComponent {
           if (operator.name === "Tf") {
             const fontName = (operator.parameters[0] as core.PDFName).text;
 
-            const ap = this.target.AP.get().N;
-            if (ap instanceof core.PDFDictionary) {
-              const formAP = new FormObject(ap.to(core.FormDictionary), this.document);
-              // Try to get Font from Appearance.Resources
-              let font = formAP.resources.find(fontName);
-
-              if (!font) {
-                // Try to get Font from AcroForm.Resources
-                const catalog = this.document.target.update.catalog;
-                if (catalog && catalog.AcroForm.has()) {
-                  const acroForm = catalog.AcroForm.get();
-                  if (acroForm.DR.has()) {
-                    const res = new ResourceManager(acroForm.DR.get(), this.document);
-                    font = res.find(fontName);
-                  }
-                }
-              }
-
-              if (!(font && font.target instanceof core.PDFDictionary)) {
-                throw new TypeError("Cannot get Font from Resources. Incorrect type.");
-              }
-              const fontDictionary = FontComponent.toFontDictionary(font.target);
-
-              return new FontComponent({ document: this.document, fontDictionary, name: fontName });
+            const font = this.findFont(fontName);
+            if (font) {
+              return font;
             }
 
             break;
@@ -124,6 +103,7 @@ export class TextEditor extends FormComponent {
       }
     }
 
+    // Otherwise, return the default font
     let resName = "";
     const defaultFont = this.document.addFont();
     const ap = this.target.AP.get().N;
@@ -136,18 +116,17 @@ export class TextEditor extends FormComponent {
   }
 
   public set font(v: FontComponent) {
-    if (!(this.target.has("DA") && this.font.name === v.name)) {
+    // TODO: check if font is already in resources
 
-      let resName = "";
-      const ap = this.target.AP.get().N;
-      if (ap instanceof core.PDFDictionary) {
-        const formAP = new FormObject(ap.to(core.FormDictionary), this.document);
-        resName = formAP.resources.set(v.target).name;
-      }
-      const resFontComponent = new FontComponent({ document: this.document, fontDictionary: v.target, name: resName });
-
-      this.setDA(resFontComponent, this.fontSize, this.textColor);
+    let resName = "";
+    const ap = this.target.AP.get().N;
+    if (ap instanceof core.PDFDictionary) {
+      const formAP = new FormObject(ap.to(core.FormDictionary), this.document);
+      resName = formAP.resources.set(v.target).name;
     }
+    const resFontComponent = new FontComponent({ document: this.document, fontDictionary: v.target, name: resName });
+
+    this.setDA(resFontComponent, this.fontSize, this.textColor);
   }
 
   public get fontSize(): number {
@@ -198,13 +177,16 @@ export class TextEditor extends FormComponent {
     }
   }
 
-  private setDA(font: FontComponent, size: core.TypographySize, color: core.Colors) {
+  private setDA(font: FontComponent, size: core.TypographySize, color: core.Colors, noPaint?: boolean) {
     const newContent = new core.PDFContent();
     newContent.setColor(color);
     newContent.setFontAndSize({ font: font.name, size: core.TypographyConverter.toPoint(size) });
 
     this.target.set("DA", this.document.target.createString(newContent.toString(true)));
-    this.paint();
+
+    if (!noPaint) {
+      this.paint();
+    }
   }
 
   @fieldFlag(core.TextFieldFlags.multiline, true)
@@ -224,6 +206,19 @@ export class TextEditor extends FormComponent {
     this.paint();
   }
 
+  /**
+   * Computes the font size of the text field.
+   * @returns The font size of the text field.
+   */
+  protected computeFontSize(): number {
+    // Compute the font size based on the height of the form.
+    const fontInfo = this.font.fontInfo;
+    const heightEm = this.height * fontInfo.unitsPerEm;
+    const fontSize = ((heightEm - 2) / (fontInfo.ascent - fontInfo.descent)) * 0.7;
+
+    return fontSize;
+  }
+
   public override paint(): void {
     const ap = this.target.AP.get();
     if (!ap.has("N")) {
@@ -234,6 +229,14 @@ export class TextEditor extends FormComponent {
     if (ap.N instanceof core.PDFStream) {
       const formDict = ap.N.to(core.FormDictionary, true);
       const form = new FormObject(formDict, this.document);
+      const font = this.font;
+      let fontSize = this.fontSize;
+      if (fontSize <= 0) {
+        fontSize = this.computeFontSize();
+
+        // set font size
+        this.setDA(font, fontSize, this.textColor, true);
+      }
 
       // change BBox
       form.width = this.width;
@@ -241,8 +244,8 @@ export class TextEditor extends FormComponent {
 
       // draw content
       const params: TextEditorDrawParameters = {
-        font: this.font,
-        fontSize: this.fontSize,
+        font,
+        fontSize,
 
         color: this.textColor,
         multiline: this.multiline,
@@ -258,5 +261,60 @@ export class TextEditor extends FormComponent {
       form.clear();
       handler.drawText(form, params, this.target);
     }
+  }
+
+  /**
+   * Looks for a font in the document resources.
+   * @param fontName Font name to find
+   * @param value Text value to check if font is suitable
+   * @returns FontComponent if font is found, null otherwise
+   */
+  protected findFont(fontName: string, value?: string): FontComponent | null {
+    let resource: Resource | null = null;
+
+    // Find in Appearance.Resources
+    if (this.target.AP.has()) {
+      const ap = this.target.AP.get();
+      if (ap.N instanceof core.PDFStream) {
+        const formAP = new FormObject(ap.N.to(core.FormDictionary), this.document);
+        resource = formAP.resources.find(fontName);
+      }
+    }
+
+    // Find in AcroForm.Resources
+    if (!resource) {
+      const catalog = this.document.target.update.catalog;
+      if (catalog && catalog.AcroForm.has()) {
+        const acroForm = catalog.AcroForm.get();
+        if (acroForm.DR.has()) {
+          const res = new ResourceManager(acroForm.DR.get(), this.document);
+          resource = res.find(fontName);
+        }
+      }
+    }
+
+    // Find in Page.Resources
+    if (!resource) {
+      const page = this.target.p;
+      if (page && page.Resources) {
+        const res = new ResourceManager(page.Resources, this.document);
+        resource = res.find(fontName);
+      }
+    }
+
+    // Find in Document.fonts
+    if (!resource) {
+      const font = this.document.fonts.find(o => o.name === fontName);
+
+      return font || null;
+    }
+
+    if (resource && resource.target instanceof core.PDFDictionary) {
+      const fontDictionary = FontComponent.toFontDictionary(resource.target);
+
+      return new FontComponent({ document: this.document, fontDictionary, name: fontName });
+    }
+
+    return null;
   }
 }

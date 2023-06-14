@@ -63,10 +63,16 @@ function createFontInfoFromType1(dict: core.Type1FontDictionary): pdfFont.IFontI
     descent: dict.FontDescriptor.descent || 0,
     unitsPerEm: 1000,
     findGlyph: (code: number): pdfFont.IFontGlyph => {
-      if (!(dict.Encoding instanceof core.PDFName)) {
-        throw new Error("Type1FontDictionary should have Encoding field of type PDFName.");
+      let encoding: TextEncodingEnum;
+      if (dict.Encoding instanceof core.PDFDictionary) {
+        const encodingDict = dict.Encoding.to(core.CharacterEncodingDictionary);
+        encoding = TextEncodingEnum[encodingDict.BaseEncoding as keyof typeof TextEncodingEnum];
+        // TODO: Handle differences between encoding and differences
+      } else if (dict.Encoding instanceof core.PDFName) {
+        encoding = TextEncodingEnum[dict.Encoding.text as keyof typeof TextEncodingEnum];
+      } else {
+        encoding = TextEncodingEnum.StandardEncoding;
       }
-      const encoding = TextEncodingEnum[dict.Encoding.text as keyof typeof TextEncodingEnum];
       if (encoding === undefined) {
         throw new Error(`Cannot get glyph index for specified unicode. Unsupported text encoding '${dict.Encoding}'`);
       }

@@ -1,5 +1,6 @@
 import { PDFIndirectObject, PDFIndirectReference, PDFNull, PDFObject, PDFStream } from "../objects";
 import { CompressedObject } from "./CompressedObject";
+import type { CrossReferenceTable } from "./CrossReferenceTable";
 import type { PDFDocumentUpdate } from "./DocumentUpdate";
 
 export enum PDFDocumentObjectTypes {
@@ -16,7 +17,7 @@ export interface PDFDocumentObjectParameters {
    */
   id: number;
   /**
-   * The byte offset of the object (for inUse and free objects) or the object number 
+   * The byte offset of the object (for inUse and free objects) or the object number
    * of the object stream in which this object is stored (for compressed objects)
    */
   offset: number;
@@ -137,12 +138,34 @@ export class PDFDocumentObject implements PDFDocumentObjectParameters {
         indirect.documentUpdate = this.documentUpdate;
         this.#value = indirect;
         value.ownerElement = indirect;
-      } else {
+      } else if (this.type === PDFDocumentObjectTypes.inUse) {
         const value = new PDFIndirectObject();
         value.documentUpdate = this.documentUpdate;
         value.fromPDF(this.documentUpdate.document.view, this.offset);
 
         this.#value = value;
+      } else if (this.type === PDFDocumentObjectTypes.free) {
+        if (this.documentUpdate.xref && "xrefStream" in this.documentUpdate.xref && this.documentUpdate.xref.xrefStream) {
+          const obj = (this.documentUpdate.xref.xrefStream as CrossReferenceTable).objects.find((obj) => obj.id === this.id);
+          if (obj) {
+            const value = new PDFIndirectObject();
+            value.documentUpdate = this.documentUpdate;
+            value.fromPDF(this.documentUpdate.document.view, obj.offset);
+
+            this.#value = value;
+          }
+        }
+
+        if (!this.#value) {
+          const value = new PDFIndirectObject();
+          value.documentUpdate = this.documentUpdate;
+          value.value = new PDFNull();
+          value.value.documentUpdate = this.documentUpdate;
+
+          this.#value = value;
+        }
+      } else {
+        throw new Error(`Unknown object type: ${this.type}`);
       }
 
     }

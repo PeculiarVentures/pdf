@@ -6,14 +6,14 @@ import * as core from "@peculiarventures/pdf-core";
 type PageRange = [number, number];
 
 /**
- * Array with two values representing the beginning of a range. 
+ * Array with two values representing the beginning of a range.
  * The first value is `undefined` as it indicates the first page.
  * The second value represents the page at which the range ends.
  */
 type PageRangeBegin = [undefined, number];
 
 /**
- * Array with two values representing the end of a range. 
+ * Array with two values representing the end of a range.
  * The first value represents the starting page of the range.
  * The second value is `undefined` as it indicates the end of the PDF document.
 */
@@ -137,7 +137,7 @@ export class PDFCopier {
       throw new Error("Cannot copy the object. Unsupported type of the object.");
     }
 
-    if (target.isIndirect()) {
+    if (target.isIndirect() && !res.isIndirect()) {
       res.makeIndirect();
       map.set(target.getIndirect(), res);
     }
@@ -197,6 +197,13 @@ export class PDFCopier {
     }
 
     const res = new core.PDFStream();
+
+    if (target.isIndirect()) {
+      // Make copied stream indirect if the source stream is indirect
+      res.makeIndirect();
+      map.set(target.getIndirect(), res);
+    }
+
     res.set("Length", this.document.createNumber(0));
     res.documentUpdate = this.document.update;
 
@@ -222,6 +229,11 @@ export class PDFCopier {
     }
 
     const res = this.document.createDictionary();
+    if (target.isIndirect()) {
+      // Make copied dictionary indirect if the original one is indirect
+      res.makeIndirect();
+      map.set(target.getIndirect(), res);
+    }
 
     for (const [key, value] of target.items) {
       if (skipFields.includes(key)) {
@@ -284,12 +296,16 @@ export class PDFCopier {
         page.addAnnot(annot);
 
 
-        if (field) {
-          const field2 = this.copyDictionary(map, field)
-            .to(core.PDFField)
-            .makeIndirect();
+        if (annot.has("Parent")) {
+          field = annot.get("Parent", core.PDFField);
+
           map.set(field.getIndirect(), item);
-          this.catalog.AcroForm.get().addField(field2);
+          this.catalog.AcroForm.get().addField(field);
+        } else if (annot.has("FT")) {
+          field = annot.to(core.PDFField);
+
+          map.set(field.getIndirect(), item);
+          this.catalog.AcroForm.get().addField(field);
         }
       }
     }
@@ -303,6 +319,16 @@ export class PDFCopier {
     }
 
     const map = new Map();
+
+    // Copy AcroForm (without fields)
+    if (document.update.catalog?.AcroForm.has()) {
+      const acroForm = document.update.catalog.AcroForm.get();
+      const acroFormCopy = this.copyDictionary(map, acroForm, "Fields")
+        .makeIndirect();
+      acroFormCopy.set("Fields", this.document.createArray());
+      this.catalog.set("AcroForm", acroFormCopy);
+    }
+
     const root = document.update.xref.Root;
     const pages = params.pages
       ? this.filterPages(root.Pages.getPages(), params.pages)
@@ -311,6 +337,7 @@ export class PDFCopier {
     for (const page of pages) {
       this.appendPage(map, page, params);
     }
+
   }
 
   /**
