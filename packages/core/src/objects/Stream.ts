@@ -272,10 +272,6 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
       return this.stream.slice().buffer;
     }
 
-    if (this.documentUpdate?.Encrypt) {
-      throw new Error("PDF document is Encrypted. Sync method is deprecated.");
-    }
-
     const filters = this.getFilters();
 
     for (const filter of filters) {
