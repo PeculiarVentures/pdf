@@ -28,8 +28,20 @@ export interface PDFCopierAppendPageParams {
   skipForms?: boolean;
 }
 
+export interface ProgressCallBackInfo {
+  /**
+   * Array of changed indexes.
+   */
+  changedIndexes: Record<number, number>;
+}
+
+
 export interface PDFCopierAppendParams extends PDFCopierAppendPageParams {
   pages?: PageFilter[];
+  /**
+   * Callback returns information about create PDF document and changes from source document.
+   */
+  progressCallback?: (info: ProgressCallBackInfo) => void;
 }
 
 export interface PDFCopierCreateParams {
@@ -318,7 +330,7 @@ export class PDFCopier {
       return;
     }
 
-    const map = new Map();
+    const map: PDFObjectMap = new Map();
 
     // Copy AcroForm (without fields)
     if (document.update.catalog?.AcroForm.has()) {
@@ -336,6 +348,19 @@ export class PDFCopier {
 
     for (const page of pages) {
       this.appendPage(map, page, params);
+    }
+
+    if (params.progressCallback) {
+      const indexes: Record<number, number> = {};
+
+      // map => indexes
+      for (const [key, value] of map) {
+        indexes[key.id] = value.getIndirect().id;
+      }
+
+      params.progressCallback({
+        changedIndexes: indexes,
+      });
     }
 
   }
