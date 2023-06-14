@@ -401,7 +401,7 @@ export class PDFDocument {
   public get isSigned(): boolean {
     const acroForm = this.target.update.catalog?.AcroForm;
 
-    return !!(acroForm && acroForm.has() && acroForm.get().SigFlags);
+    return !!(acroForm && acroForm.has() && (acroForm.get().SigFlags & core.SignatureFlags.appendOnly));
   }
 
   public getSignatures(): Array<forms.SignatureBoxGroup | forms.SignatureBox> {
