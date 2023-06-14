@@ -13,7 +13,7 @@ export class RadioButtonConverter extends WidgetConverter<pdfDoc.RadioButton> {
     super(pdfDoc.RadioButton);
   }
 
-  protected onExport(component: pdfDoc.CheckBox, json: Record<string, unknown>): void {
+  protected onExport(component: pdfDoc.RadioButton, json: Record<string, unknown>): void {
     json.checked = component.checked;
     json.value = component.value;
   }
