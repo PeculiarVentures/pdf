@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.13.0](https://github.com/PeculiarVentures/pdf/compare/v1.12.0...v1.13.0) (2023-06-14)
+
+
+### Bug Fixes
+
+* incorrect XRef decoding ([d3e2ec4](https://github.com/PeculiarVentures/pdf/commit/d3e2ec468f4c631e78aa80d69d602b9a8437ea2b))
+* minor issues ([462c2c4](https://github.com/PeculiarVentures/pdf/commit/462c2c42c76a3fc8f0e7dd00905bf3b30a7025e3))
+* return white color for empty arrays ([03ff8c5](https://github.com/PeculiarVentures/pdf/commit/03ff8c5cfc187c64d6d7b007d47f7ba19c420167))
+* use CharacterEncodingDictionary [#80](https://github.com/PeculiarVentures/pdf/issues/80) ([abb92cb](https://github.com/PeculiarVentures/pdf/commit/abb92cb1cd1a550c6d56cfe7278a3d7803b68dd8))
+
+
+### Features
+
+* support hybrid xref reading [#78](https://github.com/PeculiarVentures/pdf/issues/78) ([12aa11c](https://github.com/PeculiarVentures/pdf/commit/12aa11c28f1df0e69a1baba16409fcc9c45bff2b))
+
+
+
+
+
 ## [1.11.3](https://github.com/PeculiarVentures/pdf/compare/v1.11.2...v1.11.3) (2023-05-08)
 
 

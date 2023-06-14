@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.13.0](https://github.com/PeculiarVentures/pdf/compare/v1.12.0...v1.13.0) (2023-06-14)
+
+
+### Bug Fixes
+
+* minor issues ([462c2c4](https://github.com/PeculiarVentures/pdf/commit/462c2c42c76a3fc8f0e7dd00905bf3b30a7025e3))
+
+
+
+
+
 # [1.12.0](https://github.com/PeculiarVentures/pdf/compare/v1.11.3...v1.12.0) (2023-06-01)
 
 **Note:** Version bump only for package @peculiarventures/pdf-form-json

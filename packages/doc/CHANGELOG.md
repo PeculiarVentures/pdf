@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.13.0](https://github.com/PeculiarVentures/pdf/compare/v1.12.0...v1.13.0) (2023-06-14)
+
+
+### Bug Fixes
+
+* Can't sign document with visual annotation ([1d890dd](https://github.com/PeculiarVentures/pdf/commit/1d890dd5a68e926fc3d74f887def4accf84c513c)), closes [#75](https://github.com/PeculiarVentures/pdf/issues/75)
+* CheckBox sets V into Widget ([57dd535](https://github.com/PeculiarVentures/pdf/commit/57dd535c0e1ac96c29a96a1bf420c2610934217d))
+* isSigned returns incorrect result ([8b99611](https://github.com/PeculiarVentures/pdf/commit/8b99611a6397efa343f619bd6e357810ff3a8fbd))
+* minor issues ([462c2c4](https://github.com/PeculiarVentures/pdf/commit/462c2c42c76a3fc8f0e7dd00905bf3b30a7025e3))
+* text field with multiple widgets ([cbea2bf](https://github.com/PeculiarVentures/pdf/commit/cbea2bf6dd34e84d31c8cf690fcac03c4f5cc37c)), closes [#73](https://github.com/PeculiarVentures/pdf/issues/73)
+* unable to change width for widget ([c31a2ed](https://github.com/PeculiarVentures/pdf/commit/c31a2ed1cd463a41714a70c3451bccfd7a114e91)), closes [#76](https://github.com/PeculiarVentures/pdf/issues/76)
+* use CharacterEncodingDictionary [#80](https://github.com/PeculiarVentures/pdf/issues/80) ([abb92cb](https://github.com/PeculiarVentures/pdf/commit/abb92cb1cd1a550c6d56cfe7278a3d7803b68dd8))
+
+
+### Features
+
+* compute font size for TextEditor ([58da52d](https://github.com/PeculiarVentures/pdf/commit/58da52dc74b5e2af1789085a066983a279dbd967))
+* support hybrid xref reading [#78](https://github.com/PeculiarVentures/pdf/issues/78) ([12aa11c](https://github.com/PeculiarVentures/pdf/commit/12aa11c28f1df0e69a1baba16409fcc9c45bff2b))
+
+
+
+
+
 # [1.12.0](https://github.com/PeculiarVentures/pdf/compare/v1.11.3...v1.12.0) (2023-06-01)
 
 
