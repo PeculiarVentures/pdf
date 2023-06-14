@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.1](https://github.com/PeculiarVentures/pdf/compare/v1.13.0...v1.13.1) (2023-06-14)
+
+
+### Bug Fixes
+
+* return info about changed indexes after doc cloning ([bca6679](https://github.com/PeculiarVentures/pdf/commit/bca667985dd626b0f3ceb2872a77fd469d568c12))
+
+
+
+
+
 # [1.13.0](https://github.com/PeculiarVentures/pdf/compare/v1.12.0...v1.13.0) (2023-06-14)
 
 

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.1](https://github.com/PeculiarVentures/pdf/compare/v1.13.0...v1.13.1) (2023-06-14)
+
+**Note:** Version bump only for package @peculiarventures/pdf-doc
+
+
+
+
+
 # [1.13.0](https://github.com/PeculiarVentures/pdf/compare/v1.12.0...v1.13.0) (2023-06-14)
 
 
