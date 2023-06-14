@@ -1,22 +1,8 @@
 import type { CrossReference } from "./CrossReference";
 
 import * as objects from "../objects";
-import { ParsingError } from "../errors";
 import { ViewReader } from "../ViewReader";
 import { ViewWriter } from "../ViewWriter";
-
-function num(view: Uint8Array, defaultValue = 0) {
-  if (!view.length) {
-    return defaultValue;
-  }
-
-  let value = 0;
-  for (const byte of view) {
-    value = (value << 8) | byte;
-  }
-
-  return value;
-}
 
 export class PDFDocumentUpdate {
 
@@ -72,63 +58,38 @@ export class PDFDocumentUpdate {
       xref.documentUpdate = this;
       xref.fromPDF(obj.value.view);
 
-      const streamData = await xref.decode();
-      // console.log("streamData:", Buffer.from(streamData).toString("hex"));
-
-      const streamDataReader = new ViewReader(new Uint8Array(streamData));
-      const w = [...xref.W];
-      // console.log("W:", xref.w);
-
-      const indexes = xref.Index || [{ start: 0, size: xref.Size }];
-
-      let count = 0;
-      while (!streamDataReader.isEOF) {
-        const field1 = num(streamDataReader.read(w[0]), 1);
-        const field2 = num(streamDataReader.read(w[1]));
-        const field3 = num(streamDataReader.read(w[2]));
-
-        const index = CrossReferenceStream.getIdentifier(indexes, count);
-
-        let objStatus: PDFDocumentObjectTypes;
-        switch (field1) {
-          case 0: { // free
-            objStatus = PDFDocumentObjectTypes.free;
-            // console.log(`free       id:${index} next:${field2} gen:${field3}`);
-            break;
-          }
-          case 1: { // in-use
-            objStatus = PDFDocumentObjectTypes.inUse;
-            // console.log(`in-use     id:${index} offset:${field2} gen:${field3}`);
-            break;
-          }
-          case 2: { // compressed
-            objStatus = PDFDocumentObjectTypes.compressed;
-            // console.log(`compressed id:${index} stream:${field2} index:${field3}`);
-            break;
-          }
-          default:
-            throw new ParsingError("Unsupported type in PDF Cross-Reference stream");
-        }
-
-        const docObject = new PDFDocumentObject({
-          type: objStatus,
-          documentUpdate: this,
-          id: index,
-          offset: field2,
-          generation: field3,
-        });
-        this.xref.addObject(docObject);
-
-        count++;
-      }
-
       position = reader.position;
     } else {
       // cross-reference table
       const xref = this.xref = new CrossReferenceTable();
+      this.xref = xref;
       xref.documentUpdate = this;
 
       position = xref.fromPDF(reader);
+
+      // Read hybrid cross-reference table if exists
+      if (xref.has("XRefStm")) {
+        // Create reader for xref stream
+        const xRefStmReader = new ViewReader(reader.view.buffer);
+        xRefStmReader.position = xref.get("XRefStm", objects.PDFNumeric).value;
+
+        // Read xref stream
+        const xRefStmObj = objects.PDFIndirectObject.fromPDF(xRefStmReader);
+        const xRefStm = new CrossReferenceStream();
+        xRefStm.documentUpdate = this;
+        xRefStm.fromPDF(xRefStmObj.value.view);
+
+        // Add objects from xref stream to xref table
+        xref.xrefStream = xRefStm;
+        for (const obj of xRefStm.objects) {
+          const index = xref.objects.findIndex((o) => o.id === obj.id && o.generation === obj.generation);
+          if (index !== -1) {
+            xref.objects[index] = obj;
+          } else {
+            xref.objects.push(obj);
+          }
+        }
+      }
     }
 
     const prev = this.xref?.Prev ?? null;
@@ -483,7 +444,8 @@ export class PDFDocumentUpdate {
       docObject.value.documentUpdate = this;
     }
 
-    if (docObject.type === PDFDocumentObjectTypes.compressed || compressed) {
+    if (this.document.options.xref === XrefStructure.Stream &&
+      (docObject.type === PDFDocumentObjectTypes.compressed || compressed)) {
       const compressedObject = this.getOrCreateCompressedObject();
       // TODO Don't use objects with generation number greater than 0 !!!
       (compressedObject.value as CompressedObject).setValue(docObject.id);

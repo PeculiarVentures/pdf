@@ -243,7 +243,7 @@ export abstract class PDFObject {
       } else {
         const indirect = this.findIndirect(true);
         if (indirect) {
-          const obj = this.documentUpdate.getObject(indirect.id, indirect.generation);
+          const obj = this.documentUpdate.document.getObject(indirect.id, indirect.generation);
           if (obj.value.documentUpdate === lastUpdate) {
             this.documentUpdate = lastUpdate;
 

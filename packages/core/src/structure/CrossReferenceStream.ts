@@ -7,6 +7,21 @@ import { PDFTextString } from "../objects/TextString";
 import { ViewWriter } from "../ViewWriter";
 import { Convert } from "pvtsutils";
 import { PDFDocumentObjectGrouper } from "./DocumentObjectGrouper";
+import { ViewReader } from "../ViewReader";
+import { ParsingError } from "../errors";
+
+function num(view: Uint8Array, defaultValue = 0) {
+  if (!view.length) {
+    return defaultValue;
+  }
+
+  let value = 0;
+  for (const byte of view) {
+    value = (value << 8) | byte;
+  }
+
+  return value;
+}
 
 export interface CrossReferenceIndex {
   start: number;
@@ -20,8 +35,8 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
   /**
    * Returns object number from Index value
    * @param indexes Array of indexes from the Index field of the Compressed-Reference Stream
-   * @param position 
-   * @returns 
+   * @param position
+   * @returns
    */
   public static getIdentifier(indexes: CrossReferenceIndex[], position: number): number {
     let current = 0;
@@ -41,7 +56,7 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
   public Type!: string;
 
   /**
-   * The total number of entries in the file’s cross-reference table, 
+   * The total number of entries in the file’s cross-reference table,
    * as defined by the combination of the original section and all update sections
    * @remarks Shall not be an indirect reference
    */
@@ -49,10 +64,10 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
   public Size!: number;
 
   /**
-   * The byte offset in the decoded stream from the beginning of the file 
+   * The byte offset in the decoded stream from the beginning of the file
    * to the beginning of the previous cross-reference section
-   * @remarks 
-   * - present only if the file has more than one cross-reference section 
+   * @remarks
+   * - present only if the file has more than one cross-reference section
    * - shall be a direct object
    */
   @PDFNumberField("Prev", true)
@@ -104,9 +119,9 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
   public Info!: Maybe<InformationDictionary>;
 
   /**
-   * An array of two byte-strings constituting a file identifier for the file. 
-   * The ID array shall (PDF 2.0) have a minimum length of 16 bytes. If there is an Encrypt entry, 
-   * this array and the two byte-strings shall be direct objects and shall be unencrypted. 
+   * An array of two byte-strings constituting a file identifier for the file.
+   * The ID array shall (PDF 2.0) have a minimum length of 16 bytes. If there is an Encrypt entry,
+   * this array and the two byte-strings shall be direct objects and shall be unencrypted.
    * @remarks
    * - required in PDF 2.0 or if an Encrypt entry is present
    * - PDF 1.1
@@ -159,7 +174,7 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
   public Index!: null | CrossReferenceIndex[];
 
   /**
-   * An array of integers representing the size of the fields in a single 
+   * An array of integers representing the size of the fields in a single
    * cross-reference entry
    */
   @PDFDictionaryField({
@@ -300,5 +315,63 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
 
   public addObject(obj: PDFDocumentObject): void {
     this.objects.push(obj);
+  }
+
+  protected override onFromPDF(reader: ViewReader): void {
+    super.onFromPDF(reader);
+
+    const streamData = this.decodeSync();
+    // console.log("streamData:", Buffer.from(streamData).toString("hex"));
+
+    const streamDataReader = new ViewReader(new Uint8Array(streamData));
+    const w = [...this.W];
+    // console.log("W:", xref.w);
+
+    const indexes = this.Index || [{ start: 0, size: this.Size }];
+
+    let count = 0;
+    while (!streamDataReader.isEOF) {
+      const field1 = num(streamDataReader.read(w[0]), 1);
+      const field2 = num(streamDataReader.read(w[1]));
+      const field3 = num(streamDataReader.read(w[2]));
+
+      const index = CrossReferenceStream.getIdentifier(indexes, count);
+
+      let objStatus: PDFDocumentObjectTypes;
+      switch (field1) {
+        case 0: { // free
+          objStatus = PDFDocumentObjectTypes.free;
+          // console.log(`free       id:${index} next:${field2} gen:${field3}`);
+          break;
+        }
+        case 1: { // in-use
+          objStatus = PDFDocumentObjectTypes.inUse;
+          // console.log(`in-use     id:${index} offset:${field2} gen:${field3}`);
+          break;
+        }
+        case 2: { // compressed
+          objStatus = PDFDocumentObjectTypes.compressed;
+          // console.log(`compressed id:${index} stream:${field2} index:${field3}`);
+          break;
+        }
+        default:
+          throw new ParsingError("Unsupported type in PDF Cross-Reference stream");
+      }
+
+      if (!this.documentUpdate) {
+        throw new ParsingError("Cross-Reference stream does not have document update. Please set it before parsing.");
+      }
+
+      const docObject = new PDFDocumentObject({
+        type: objStatus,
+        documentUpdate: this.documentUpdate,
+        id: index,
+        offset: field2,
+        generation: field3,
+      });
+      this.addObject(docObject);
+
+      count++;
+    }
   }
 }
