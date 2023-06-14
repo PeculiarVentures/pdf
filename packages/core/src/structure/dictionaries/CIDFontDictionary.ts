@@ -16,7 +16,7 @@ export class CIDFontDictionary extends FontDictionary {
    * shall be the value of the CIDFontName entry in the CIDFont program.
    * For Type 2 CIDFonts, it shall be derived the same way as for a simple
    * TrueType font; see 9.6.3, "TrueType fonts". In either case, the name may
-   * have a subset prefix if appropriate; see 9.9.2, "Font subsets". 
+   * have a subset prefix if appropriate; see 9.9.2, "Font subsets".
    */
   @objects.PDFNameField("BaseFont")
   public BaseFont!: string;
@@ -34,7 +34,7 @@ export class CIDFontDictionary extends FontDictionary {
 
   /**
    * The default width for glyphs in the CIDFont (see 9.7.4.3,
-   * "Glyph metrics in CIDFonts"). Default value: 1000. 
+   * "Glyph metrics in CIDFonts"). Default value: 1000.
    */
   @objects.PDFNumberField("DW", true, 1000)
   public DW!: objects.PDFNumeric | null;
