@@ -18,6 +18,8 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
 
   public set groupName(v: string | null) {
     if (v && v !== this.groupName) {
+      this.split();
+
       const group = this.document.signatureBoxHandler.getOrCreateGroup(v);
       group.attach(this);
     }
@@ -105,6 +107,61 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
     const n = this.getAppearance();
     n.width = this.width;
     n.height = -this.height;
+  }
+
+  /**
+   * Check if the widget is single widget (Field + Widget)
+   * @returns true if the widget is single widget
+   */
+  public isSingleWidget(): boolean {
+    return this.target.has("FT");
+  }
+
+  /**
+   * Split single widget (Field + Widget) into Widget and Field with Kids
+   * @returns new group
+   * @remarks
+   * This function is used to split single widget (Field + Widget) into Widget and Field with Kids,
+   * if the widget is already a part of the group, it will return the group.
+   */
+  public split(): SignatureBoxGroup {
+    if (!this.isSingleWidget()) {
+      return this.getGroup();
+    }
+
+    const singleWidget = this.target.to(core.SingleWidgetDictionary);
+
+    // The group already exists, and it is Field + Widget
+    // Split it by creating new group and moving widget to it
+    const doc = this.document.target;
+    const newField = core.SignatureFiled.create(doc.update)
+      .makeIndirect();
+
+    // Move fields from old to new and remove from old
+    const fieldNames = [
+      "FT", "Parent", "Kids", "T", "TU", "TM", "Ff", "V", "DV", "AA", // Field
+      "V", "Lock", "SV", // SigField
+    ];
+    for (const [key, value] of singleWidget.items) {
+      if (fieldNames.includes(key)) {
+        newField.items.set(key, value);
+        singleWidget.delete(key);
+      }
+    }
+
+    // remove previous widget from Kids
+    let kids: core.PDFArray;
+    if (singleWidget.Parent) {
+      kids = singleWidget.Parent.Kids.get();
+    } else {
+      kids = doc.update.catalog!.AcroForm.get().Fields;
+    }
+    const index = kids.indexOf(singleWidget);
+    kids.splice(index, 1);
+    kids.push(newField);
+    newField.addKid(singleWidget);
+
+    return new SignatureBoxGroup(newField, this.document);
   }
 
 }

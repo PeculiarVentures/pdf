@@ -2,6 +2,7 @@ import * as core from "@peculiarventures/pdf-core";
 import { SignatureBoxGroup } from "./SignatureBox.Group";
 import { PDFDocument } from "../Document";
 import { FormComponentHandler, IFormComponentCreateParameters, IFormComponentHandler, IFormComponentParameters } from "./FormComponent.Handler";
+import { SignatureBox } from "./SignatureBox";
 
 export interface ISignatureBoxCreateParameters extends IFormComponentCreateParameters {
   groupName?: string;
@@ -30,11 +31,14 @@ export class SignatureBoxHandler extends FormComponentHandler implements ISignat
     return new SignatureBoxGroup(field, this.document);
   }
 
+
   public getOrCreateGroup(name: string): SignatureBoxGroup {
     let group = this.document.getComponentByName(name);
     if (!group) {
       // Create new group
       group = this.createGroup(name);
+    } else if (group instanceof SignatureBox) {
+      group = group.split();
     }
 
     if (!(group instanceof SignatureBoxGroup)) {
