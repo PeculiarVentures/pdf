@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.2](https://github.com/PeculiarVentures/pdf/compare/v1.13.1...v1.13.2) (2023-06-15)
+
+
+### Bug Fixes
+
+* don't run setter if value is the same for groupName ([d7bf4f1](https://github.com/PeculiarVentures/pdf/commit/d7bf4f1ed833cea27287ce78025bd9598cac4599))
+
+
+
+
+
 ## [1.13.1](https://github.com/PeculiarVentures/pdf/compare/v1.13.0...v1.13.1) (2023-06-14)
 
 **Note:** Version bump only for package @peculiarventures/pdf-doc
