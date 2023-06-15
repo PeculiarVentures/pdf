@@ -1,5 +1,6 @@
 import * as objects from "../objects";
 import { PDFDictionary } from "../objects";
+import type { WidgetDictionary } from "../structure/dictionaries/Widget";
 import { AdditionalActionsDictionary } from "../structure/dictionaries/AdditionalActionsDictionary";
 import { UUID } from "../UUID";
 
@@ -182,7 +183,7 @@ export class PDFField extends objects.PDFDictionary implements IFieldDictionary 
     this.t = document.createString(UUID.generate());
   }
 
-  public addKid(kid: IFieldDictionary): void {
+  public addKid(kid: IFieldDictionary | WidgetDictionary): void {
     this.modify().Kids.get().push(kid.makeIndirect());
     kid.Parent = this.makeIndirect();
   }
