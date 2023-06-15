@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.3](https://github.com/PeculiarVentures/pdf/compare/v1.13.2...v1.13.3) (2023-06-15)
+
+
+### Bug Fixes
+
+* split single widget for signature box ([364fd5d](https://github.com/PeculiarVentures/pdf/commit/364fd5d3e91eba76493051e625df516581504f21))
+
+
+
+
+
 # [1.13.0](https://github.com/PeculiarVentures/pdf/compare/v1.12.0...v1.13.0) (2023-06-14)
 
 
