@@ -17,7 +17,7 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
   }
 
   public set groupName(v: string | null) {
-    if (v) {
+    if (v && v !== this.groupName) {
       const group = this.document.signatureBoxHandler.getOrCreateGroup(v);
       group.attach(this);
     }
@@ -31,8 +31,6 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
       // Filed + Widget
       return new SignatureBoxGroup(this.target.to(core.SignatureFiled), this.document);
     }
-
-
 
     return null;
   }
