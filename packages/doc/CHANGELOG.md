@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.4](https://github.com/PeculiarVentures/pdf/compare/v1.13.3...v1.13.4) (2023-06-22)
+
+
+### Bug Fixes
+
+* sig doesn't draw an image for Widget + Field ([4ae6bee](https://github.com/PeculiarVentures/pdf/commit/4ae6bee6563bf4d97d2e7e662380dd618ce0b8c7))
+
+
+
+
+
 ## [1.13.3](https://github.com/PeculiarVentures/pdf/compare/v1.13.2...v1.13.3) (2023-06-15)
 
 

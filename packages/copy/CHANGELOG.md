@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.4](https://github.com/PeculiarVentures/pdf/compare/v1.13.3...v1.13.4) (2023-06-22)
+
+
+### Bug Fixes
+
+* error on null cloning ([1eb6339](https://github.com/PeculiarVentures/pdf/commit/1eb6339850c8def04e82571bb58b955fca269911)), closes [#88](https://github.com/PeculiarVentures/pdf/issues/88)
+
+
+
+
+
 ## [1.13.3](https://github.com/PeculiarVentures/pdf/compare/v1.13.2...v1.13.3) (2023-06-15)
 
 **Note:** Version bump only for package @peculiarventures/pdf-copy
