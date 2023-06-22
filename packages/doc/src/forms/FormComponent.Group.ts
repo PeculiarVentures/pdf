@@ -18,7 +18,7 @@ export class FormComponentGroup<TTarget extends core.PDFField = core.PDFField, T
     const _this = this;
     const items = this.target.Kids.has()
       ? this.target.Kids.get()
-      : [];
+      : this.target.documentUpdate!.document.createArray(this.target);
 
     return {
       next(): IteratorResult<TItem> {
@@ -57,6 +57,15 @@ export class FormComponentGroup<TTarget extends core.PDFField = core.PDFField, T
       const kids = this.target.Kids.get();
 
       const component = FormComponentFactory.create(kids.get(index, core.WidgetDictionary, true), this.document);
+      if (component instanceof FormComponent) {
+        return component as any as TItem;
+      }
+
+      throw new Error("Cannot load form component from PDF Widget.");
+    } else {
+      // convert this target to WidgetDictionary
+      const widget = this.target.to(core.WidgetDictionary);
+      const component = FormComponentFactory.create(widget, this.document);
       if (component instanceof FormComponent) {
         return component as any as TItem;
       }
