@@ -71,6 +71,12 @@ export class TextEditorHandler implements ITextEditorHandler {
     return text.replace(/\n/g, " ");
   }
 
+  /**
+   * Draws text in the text field.
+   * @param form XObject form
+   * @param params Parameters for drawing text
+   * @param target Widget dictionary
+   */
   public drawText(form: FormObject, params: TextEditorDrawParameters, target: core.WidgetDictionary): void {
     if (params.text.length === 0) {
       return;
