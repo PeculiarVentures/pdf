@@ -145,6 +145,8 @@ export class PDFCopier {
       res = this.copyDictionary(map, target);
     } else if (target instanceof core.PDFArray) {
       res = this.copyArray(map, target);
+    } else if (target instanceof core.PDFNull) {
+      res = this.copyNull(map, target);
     } else {
       throw new Error("Cannot copy the object. Unsupported type of the object.");
     }
@@ -271,6 +273,15 @@ export class PDFCopier {
     }
 
     return res;
+  }
+
+  protected copyNull(map: PDFObjectMap, target: core.PDFNull): core.PDFNull {
+    const ref = this.findRef(map, target);
+    if (ref) {
+      return ref;
+    }
+
+    return this.document.createNull();
   }
 
   protected appendPage(map: PDFObjectMap, target: core.PageObjectDictionary, parasm: PDFCopierAppendPageParams = {}): void {
