@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.5](https://github.com/PeculiarVentures/pdf/compare/v1.13.4...v1.13.5) (2023-06-29)
+
+
+### Bug Fixes
+
+* incorrect signature removing ([5c60716](https://github.com/PeculiarVentures/pdf/commit/5c60716223caa59bb6c9caddc7d4743e21a33352))
+
+
+
+
+
 ## [1.13.3](https://github.com/PeculiarVentures/pdf/compare/v1.13.2...v1.13.3) (2023-06-15)
 
 
