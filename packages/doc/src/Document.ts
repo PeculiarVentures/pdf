@@ -399,9 +399,15 @@ export class PDFDocument {
   }
 
   public get isSigned(): boolean {
-    const acroForm = this.target.update.catalog?.AcroForm;
+    const sig = this.getSignatures().find(o => {
+      if (o instanceof forms.SignatureBoxGroup) {
+        return o.isSigned;
+      }
 
-    return !!(acroForm && acroForm.has() && (acroForm.get().SigFlags & core.SignatureFlags.appendOnly));
+      return o.findGroup()?.isSigned ?? false;
+    });
+
+    return !!sig;
   }
 
   public getSignatures(): Array<forms.SignatureBoxGroup | forms.SignatureBox> {
