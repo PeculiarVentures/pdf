@@ -378,12 +378,33 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
   }
 
   public delete(): void {
-    const parent = this.target.p;
-    if (parent && parent.annots) {
-      const index = parent.annots.indexOf(this.target);
+    this.deleteFromPage();
+    this.deleteFromField();
+  }
+
+  /**
+   * Delete annotation from page
+   */
+  private deleteFromPage() {
+    const page = this.target.p;
+    if (page && page.annots) {
+      const index = page.annots.indexOf(this.target);
       if (index !== -1) {
-        parent.annots.splice(index, 1);
+        page.annots.splice(index, 1);
       }
+    }
+  }
+
+  private deleteFromField() {
+    const field = this.getField();
+    if (!field.Kids.has()) {
+      return;
+    }
+
+    const kids = field.Kids.get();
+    const index = kids.indexOf(this.target);
+    if (index !== -1) {
+      kids.splice(index, 1);
     }
   }
 

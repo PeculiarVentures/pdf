@@ -164,4 +164,24 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
     return new SignatureBoxGroup(newField, this.document);
   }
 
+  public override delete(): void {
+    super.delete();
+
+    // if field has no kids, delete it
+    const field = this.getField();
+    if (!field.Kids.has() || field.Kids.get().length === 0) {
+      field.remove();
+    }
+
+    // if document doesn't have any signature fields, remove remove SigFlags
+    const signatures = this.document.getSignatures();
+    if (signatures.length === 0) {
+      const maybeAcroForm = this.document.target.update.catalog!.AcroForm;
+      if (maybeAcroForm.has()) {
+        const acroForm = maybeAcroForm.get();
+        acroForm.delete("SigFlags");
+      }
+    }
+  }
+
 }

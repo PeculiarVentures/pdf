@@ -204,4 +204,16 @@ export class PDFField extends objects.PDFDictionary implements IFieldDictionary 
     return parts.join(".");
   }
 
+  public remove(): void {
+    const parent = this.Parent;
+    if (parent) {
+      parent.modify();
+      const kids = parent.Kids.get();
+      const index = kids.indexOf(this);
+      if (index >= 0) {
+        kids.splice(index, 1);
+      }
+    }
+  }
+
 }
