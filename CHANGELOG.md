@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.6](https://github.com/PeculiarVentures/pdf/compare/v1.13.5...v1.13.6) (2023-06-29)
+
+
+### Bug Fixes
+
+* use components to get isSigned ([0917550](https://github.com/PeculiarVentures/pdf/commit/091755068ef6b1cd2af842eff68cd2fec9d5eded))
+
+
+
+
+
 ## [1.13.5](https://github.com/PeculiarVentures/pdf/compare/v1.13.4...v1.13.5) (2023-06-29)
 
 
