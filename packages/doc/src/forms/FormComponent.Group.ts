@@ -38,17 +38,24 @@ export class FormComponentGroup<TTarget extends core.PDFField = core.PDFField, T
   }
 
   public delete(): void {
-    const acroForm = this.document.target.update.catalog?.AcroForm;
-    if (acroForm && acroForm.has()) {
-      const fields = acroForm.get().Fields;
+    // Remove this Field from Parent or AcroForm
+    const parent = this.target.Parent;
+    if (parent) {
+      // Remove from parent
+      if (parent.Kids.has()) {
+        const kids = parent.Kids.get();
+        const index = kids.indexOf(this.target);
+        if (index > -1) {
+          kids.splice(index, 1);
+        }
+      }
+    } else {
+      // Remove from AcroForm
+      const fields = this.target.documentUpdate!.catalog!.AcroForm.get().Fields;
       const index = fields.indexOf(this.target);
-      if (index !== -1) {
+      if (index > -1) {
         fields.splice(index, 1);
       }
-    }
-
-    for (const item of this) {
-      item.delete();
     }
   }
 
@@ -95,9 +102,12 @@ export class FormComponentGroup<TTarget extends core.PDFField = core.PDFField, T
     kids.push(item.target.makeIndirect());
     item.target.Parent = this.target;
 
-    const fields = this.document.target.update.catalog!.AcroForm.get().Fields;
-    if (fields.indexOf(this.target) === -1) {
-      fields.push(this.target.makeIndirect());
+    // Add to AcroForm if needed
+    if (!this.target.Parent) {
+      const fields = this.document.target.update.catalog!.AcroForm.get().Fields;
+      if (fields.indexOf(this.target) === -1) {
+        fields.push(this.target.makeIndirect());
+      }
     }
   }
 
@@ -150,11 +160,7 @@ export class FormComponentGroup<TTarget extends core.PDFField = core.PDFField, T
   }
 
   public get name(): string {
-    return this.target.t.text;
-  }
-
-  public set name(value: string) {
-    this.target.t.text = value;
+    return this.target.getFullName();
   }
 
 }

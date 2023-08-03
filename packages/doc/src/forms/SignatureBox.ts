@@ -9,11 +9,7 @@ import { SignatureBoxGroup } from "./SignatureBox.Group";
 export class SignatureBox extends FormComponent implements IFormGroupedComponent {
 
   public get groupName(): string | null {
-    const group = this.findGroup();
-
-    return group
-      ? group.name
-      : null;
+    return this.getField().getFullName();
   }
 
   public set groupName(v: string | null) {
@@ -26,15 +22,13 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
   }
 
   public findGroup(): SignatureBoxGroup | null {
-    const field = this.target.Parent as core.SignatureFiled;
-    if (field) {
-      return new SignatureBoxGroup(field, this.document);
-    } else if (this.target.has("FT")) {
-      // Filed + Widget
-      return new SignatureBoxGroup(this.target.to(core.SignatureFiled), this.document);
-    }
+    try {
+      const field = this.getField();
 
-    return null;
+      return new SignatureBoxGroup(field.to(core.SignatureFiled), this.document);
+    } catch (e) {
+      return null;
+    }
   }
 
   public getGroup(): SignatureBoxGroup {
@@ -86,7 +80,12 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
     const ap = this.target.AP.get();
     if (!ap.has("N")) {
       // If AP created by get() function it doesn't have a required filed N
-      ap.N = core.FormDictionary.create(update);
+      const formDict = core.FormDictionary.create(update);
+
+      // Update BBox to match widget size
+      formDict.bBox = core.PDFRectangle.createWithData(update, 0, 0, this.width, this.height);
+
+      ap.N = formDict.makeIndirect();
     }
     const formDict = (ap.N instanceof core.PDFStream)
       ? ap.N.to(core.FormDictionary, true)
@@ -137,6 +136,14 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
     const newField = core.SignatureFiled.create(doc.update)
       .makeIndirect();
 
+    // remove previous widget from Kids
+    if (!singleWidget.Parent) {
+      throw new Error("SingleWidgetDictionary.Parent should be defined");
+    }
+    const kids = singleWidget.Parent.Kids.get();
+    const index = kids.indexOf(singleWidget);
+    kids.splice(index, 1);
+
     // Move fields from old to new and remove from old
     const fieldNames = [
       "FT", "Parent", "Kids", "T", "TU", "TM", "Ff", "V", "DV", "AA", // Field
@@ -149,15 +156,6 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
       }
     }
 
-    // remove previous widget from Kids
-    let kids: core.PDFArray;
-    if (singleWidget.Parent) {
-      kids = singleWidget.Parent.Kids.get();
-    } else {
-      kids = doc.update.catalog!.AcroForm.get().Fields;
-    }
-    const index = kids.indexOf(singleWidget);
-    kids.splice(index, 1);
     kids.push(newField);
     newField.addKid(singleWidget);
 
