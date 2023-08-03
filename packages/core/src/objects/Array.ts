@@ -123,6 +123,10 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
     return -1;
   }
 
+  public includes(item: PDFObjectTypes): boolean {
+    return this.indexOf(item) !== -1;
+  }
+
   public splice(start: number, deleteCount?: number): PDFObjectTypes[] {
 
     const res = this.items.splice(start, deleteCount);

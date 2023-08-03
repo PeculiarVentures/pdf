@@ -320,8 +320,12 @@ export class PDFCopier {
 
 
         if (annot.has("Parent")) {
-          field = annot.get("Parent", core.PDFField);
-
+          // go to the top parent and add it to the AcroForm
+          let parent = annot.get("Parent", core.PDFDictionary);
+          while (parent.has("Parent")) {
+            parent = parent.get("Parent", core.PDFDictionary);
+          }
+          field = parent.to(core.PDFField);
           map.set(field.getIndirect(), item);
           this.catalog.AcroForm.get().addField(field);
         } else if (annot.has("FT")) {

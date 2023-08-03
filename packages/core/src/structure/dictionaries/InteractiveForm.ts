@@ -6,7 +6,7 @@ import { ResourceDictionary } from "./ResourceDictionary";
 export enum SignatureFlags {
   /**
    * If set, the document contains at least one signature field
-   * 
+   *
    * This flag allows a conforming reader to enable user interface items
    * (such as menu items or pushbuttons) related to signature processing
    * without having to scan the entire document for the presence of signature
@@ -16,7 +16,7 @@ export enum SignatureFlags {
   /**
    * If set, the document contains signatures that may be invalidated if
    * the file is saved (written) in a way that alters its previous contents,
-   * as opposed to an incremental update. Merely updating the file by 
+   * as opposed to an incremental update. Merely updating the file by
    * appending new information to the end of the previous version is safe
    */
   appendOnly = 2,
@@ -34,16 +34,16 @@ export class InteractiveFormDictionary extends objects.PDFDictionary {
   public Fields!: objects.PDFArray;
 
   /**
-   * A flag specifying whether to construct appearance streams 
+   * A flag specifying whether to construct appearance streams
    * and appearance dictionaries for all widget annotations in the document
    * @remarks Deprecated in PDF 2.0
-   * @note Appearance streams are required in PDF 2.0. 
+   * @note Appearance streams are required in PDF 2.0.
    */
   @objects.PDFBooleanField("NeedAppearances", true, false)
   public needAppearances!: boolean;
 
   /**
-   * A set of flags specifying various document-level characteristics related 
+   * A set of flags specifying various document-level characteristics related
    * to signature fields
    * @remarks PDF 1.3
    */
@@ -51,10 +51,10 @@ export class InteractiveFormDictionary extends objects.PDFDictionary {
   public SigFlags!: SignatureFlags;
 
   /**
-   * An array of indirect references to field dictionaries with calculation actions, 
+   * An array of indirect references to field dictionaries with calculation actions,
    * defining the calculation order in which their values will be recalculated
    * when the value of any field changes
-   * @remarks 
+   * @remarks
    * - Required if any fields in the document have additional-actions
    * dictionaries containing a C entry
    * - PDF 1.3
@@ -77,14 +77,14 @@ export class InteractiveFormDictionary extends objects.PDFDictionary {
   public da!: string | null;
 
   /**
-   * A document-wide default value for the Q attribute 
+   * A document-wide default value for the Q attribute
    * of variable text fields
    */
   @objects.PDFNumberField("Q", true)
   public q!: number | null;
 
   /**
-   * A stream or array containing an XFA resource, 
+   * A stream or array containing an XFA resource,
    * whose format shall be described by the Data Package
    * (XDP) Specification
    * @remarks Deprecated in PDF 2.0
@@ -117,7 +117,9 @@ export class InteractiveFormDictionary extends objects.PDFDictionary {
   }
 
   public addField(field: IFieldDictionary): void {
-    this.Fields.push(field.makeIndirect());
+    if (!this.Fields.includes(field.makeIndirect())) {
+      this.Fields.push(field.makeIndirect());
+    }
   }
 
 }
