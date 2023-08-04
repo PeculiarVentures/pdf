@@ -285,7 +285,7 @@ export class PDFCopier {
   }
 
   protected appendPage(map: PDFObjectMap, target: core.PageObjectDictionary, parasm: PDFCopierAppendPageParams = {}): void {
-    const page = this.copyDictionary(map, target, "Parent", "Annots")
+    const page = this.copyDictionary(map, target, "Parent", "Annots", "PageItemUIDToLocationDataMap")
       .to(core.PageObjectDictionary)
       .makeIndirect();
     map.set(target.getIndirect(), page);
@@ -350,7 +350,7 @@ export class PDFCopier {
     // Copy AcroForm (without fields)
     if (document.update.catalog?.AcroForm.has()) {
       const acroForm = document.update.catalog.AcroForm.get();
-      const acroFormCopy = this.copyDictionary(map, acroForm, "Fields")
+      const acroFormCopy = this.copyDictionary(map, acroForm, "Fields", "XFA")
         .makeIndirect();
       acroFormCopy.set("Fields", this.document.createArray());
       this.catalog.set("AcroForm", acroFormCopy);
