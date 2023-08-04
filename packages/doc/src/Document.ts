@@ -324,6 +324,10 @@ export class PDFDocument {
       const fields = acroForm.get().Fields;
       for (const item of fields) {
         if (item instanceof core.PDFDictionary) {
+          if (!item.has("FT")) {
+            // If item is not a field, then skip it
+            continue;
+          }
           const field = item.to(core.PDFField);
           const fullName = field.getFullName();
 
