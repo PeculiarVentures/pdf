@@ -136,13 +136,13 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
     const newField = core.SignatureFiled.create(doc.update)
       .makeIndirect();
 
-    // remove previous widget from Kids
-    if (!singleWidget.Parent) {
-      throw new Error("SingleWidgetDictionary.Parent should be defined");
+    // Remove previous field from Kids array if it exists
+    let kids: core.PDFArray | undefined;
+    if (singleWidget.Parent) {
+      const kids = singleWidget.Parent.Kids.get();
+      const index = kids.indexOf(singleWidget);
+      kids.splice(index, 1);
     }
-    const kids = singleWidget.Parent.Kids.get();
-    const index = kids.indexOf(singleWidget);
-    kids.splice(index, 1);
 
     // Move fields from old to new and remove from old
     const fieldNames = [
@@ -156,7 +156,10 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
       }
     }
 
-    kids.push(newField);
+    if (kids) {
+      // Add new field to Kids
+      kids.push(newField);
+    }
     newField.addKid(singleWidget);
 
     return new SignatureBoxGroup(newField, this.document);
