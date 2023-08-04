@@ -61,6 +61,28 @@ export interface PDFDocumentSignParameters extends forms.SignatureBoxSignParamet
 }
 
 export interface PDFDocumentLoadParameters {
+  /**
+   * An optional callback function that is invoked whenever the PDF document is password-protected.
+   * The application will keep invoking this callback until a correct password is provided or the password input is cancelled.
+   * This allows you to handle multiple password input attempts.
+   *
+   * The function receives a single argument, a `reason`, which can be either `PasswordReason.first` for the first password input
+   * attempt or `PasswordReason.incorrect` if the previously provided password was incorrect.
+   * Depending on the `reason`, you can decide to throw an error (or prompt for a new password).
+   *
+   * @example
+   * ```typescript
+   * const doc2 = await PDFDocument.load(pdf, {
+   *   onUserPassword: async (o) => {
+   *     if (o) {
+   *       throw new Error("Incorrect password");
+   *     }
+   *
+   *     return "12345";
+   *   },
+   * });
+   * ```
+   */
   onUserPassword?: core.UserPasswordHandle;
   onCertificate?: core.CertificateHandle;
 }
