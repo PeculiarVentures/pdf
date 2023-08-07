@@ -142,6 +142,14 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
       const kids = singleWidget.Parent.Kids.get();
       const index = kids.indexOf(singleWidget);
       kids.splice(index, 1);
+    } else {
+      // If widget doesn't have parent, it is a part of AcroForm
+      // Remove it from AcroForm
+      const acroForm = doc.update.catalog!.AcroForm.get();
+      const index = acroForm.Fields.indexOf(singleWidget);
+      if (index !== -1) {
+        acroForm.Fields.splice(index, 1);
+      }
     }
 
     // Move fields from old to new and remove from old
