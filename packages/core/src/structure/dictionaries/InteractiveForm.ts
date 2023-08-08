@@ -117,8 +117,12 @@ export class InteractiveFormDictionary extends objects.PDFDictionary {
   }
 
   public addField(field: IFieldDictionary): void {
-    if (!this.Fields.includes(field.makeIndirect())) {
-      this.Fields.push(field.makeIndirect());
+    // make sure the field is indirect
+    field.makeIndirect();
+
+    // add the field to the fields array if it's not already there
+    if (!this.Fields.includes(field)) {
+      this.Fields.push(field);
     }
   }
 
