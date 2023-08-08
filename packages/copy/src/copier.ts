@@ -297,21 +297,22 @@ export class PDFCopier {
           continue;
         }
 
+        // Check if the annotation is a signature object with signature value and skip it
         let field: core.PDFField | undefined;
         if (item.has("FT")) {
-          // Field
+          // Annotation combined with Field
           field = item.to(core.PDFField);
         } else if (item.has("Parent")) {
-          // Field
+          // Annotation is a child of a Field
           field = item.get("Parent", core.PDFField);
         }
-        if (field) {
-          if (field.ft === "Sig" && field.V) {
-            // Skip signature object with signature value
-            continue;
-          }
+
+        if (field && field.ft === "Sig" && field.V) {
+          // Skip signature object with signature value
+          continue;
         }
 
+        // Copy annotation
         const annot = this.copyDictionary(map, item)
           .to(core.AnnotationDictionary)
           .makeIndirect();
@@ -319,20 +320,24 @@ export class PDFCopier {
         page.addAnnot(annot);
 
 
+        let potentialField: core.PDFField | null = null;
+
+        // Find the topmost parent field of the annotation and add it to the AcroForm.
         if (annot.has("Parent")) {
-          // go to the top parent and add it to the AcroForm
+          // Check if the annotation has a parent and get the topmost parent if it exists.
           let parent = annot.get("Parent", core.PDFDictionary);
           while (parent.has("Parent")) {
             parent = parent.get("Parent", core.PDFDictionary);
           }
-          field = parent.to(core.PDFField);
-          map.set(field.getIndirect(), item);
-          this.catalog.AcroForm.get().addField(field);
+          potentialField = parent.to(core.PDFField);
         } else if (annot.has("FT")) {
-          field = annot.to(core.PDFField);
+          // If not, and if the annotation itself is a field type, get it directly.
+          potentialField = annot.to(core.PDFField);
+        }
 
-          map.set(field.getIndirect(), item);
-          this.catalog.AcroForm.get().addField(field);
+        if (potentialField) {
+          // If we've found a potential field, set it in the map and add to the AcroForm.
+          this.catalog.AcroForm.get().addField(potentialField);
         }
       }
     }
