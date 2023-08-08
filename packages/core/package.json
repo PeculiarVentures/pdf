@@ -37,9 +37,9 @@
     "bytestreamjs": "2.0.1",
     "events": "3.3.0",
     "pako": "^2.0.3",
-    "pkijs": "^3.0.14",
-    "pvtsutils": "^1.2.2",
+    "pkijs": "^3.0.15",
+    "pvtsutils": "^1.3.3",
     "pvutils": "^1.1.3",
-    "tslib": "^2.5.0"
+    "tslib": "^2.6.1"
   }
 }

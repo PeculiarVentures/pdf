@@ -35,7 +35,7 @@
     "@peculiar/webcrypto": "^1.4.3",
     "@peculiarventures/pdf-core": "^1.13.5",
     "@peculiarventures/pdf-doc": "^1.13.6",
-    "commander": "^10.0.0",
-    "pkijs": "^3.0.14"
+    "commander": "^11.0.0",
+    "pkijs": "^3.0.15"
   }
 }

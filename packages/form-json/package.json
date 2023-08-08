@@ -33,7 +33,7 @@
   "dependencies": {
     "@peculiarventures/pdf-core": "^1.13.5",
     "@peculiarventures/pdf-doc": "^1.13.6",
-    "pvtsutils": "^1.2.2",
-    "tslib": "^2.5.0"
+    "pvtsutils": "^1.3.3",
+    "tslib": "^2.6.1"
   }
 }
