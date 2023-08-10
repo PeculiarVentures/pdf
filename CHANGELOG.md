@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.7](https://github.com/PeculiarVentures/pdf/compare/v1.13.6...v1.13.7) (2023-08-10)
+
+
+### Bug Fixes
+
+* AcroFrom duplicates Fields on addField ([f9d5950](https://github.com/PeculiarVentures/pdf/commit/f9d595026e698a6b31f0753db9b4082da9dc346f))
+* error in component getting by name if Kid is not a field ([824492c](https://github.com/PeculiarVentures/pdf/commit/824492cbf7f62b2a10760d3c2f7729fa2a40263b))
+* error on Signature field splitting if it doesn't belong to parent field ([0197121](https://github.com/PeculiarVentures/pdf/commit/01971212900b4b6ab96cec957e43fa3f557161cc))
+* fix error with incorrect cache map ([bd96819](https://github.com/PeculiarVentures/pdf/commit/bd96819838f6ae561634145d59e3804918845cf0)), closes [#94](https://github.com/PeculiarVentures/pdf/issues/94)
+* improve Signature.groupName renaming and add tests ([8c82fd3](https://github.com/PeculiarVentures/pdf/commit/8c82fd3166703d10659c8fc9d3edf91513da9b83))
+* increase speed of serialization ([449bf26](https://github.com/PeculiarVentures/pdf/commit/449bf26e15c5e422c76221a45684452331ef0111))
+* problems with signature groups ([bab4d06](https://github.com/PeculiarVentures/pdf/commit/bab4d06d6c354ad235f0a592450f95972b3546cb))
+* remove Widget from AcroFrom on `split` ([071d28e](https://github.com/PeculiarVentures/pdf/commit/071d28ec8cd213165055a119b705c88fd210a9df))
+* remove XFA on copy ([33273ff](https://github.com/PeculiarVentures/pdf/commit/33273ff1484599bab98b7df9c44237cbba23dc46))
+
+
+
+
+
 ## [1.13.6](https://github.com/PeculiarVentures/pdf/compare/v1.13.5...v1.13.6) (2023-06-29)
 
 

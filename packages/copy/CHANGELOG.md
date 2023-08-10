@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.7](https://github.com/PeculiarVentures/pdf/compare/v1.13.6...v1.13.7) (2023-08-10)
+
+
+### Bug Fixes
+
+* AcroFrom duplicates Fields on addField ([f9d5950](https://github.com/PeculiarVentures/pdf/commit/f9d595026e698a6b31f0753db9b4082da9dc346f))
+* fix error with incorrect cache map ([bd96819](https://github.com/PeculiarVentures/pdf/commit/bd96819838f6ae561634145d59e3804918845cf0)), closes [#94](https://github.com/PeculiarVentures/pdf/issues/94)
+* remove XFA on copy ([33273ff](https://github.com/PeculiarVentures/pdf/commit/33273ff1484599bab98b7df9c44237cbba23dc46))
+
+
+
+
+
 ## [1.13.5](https://github.com/PeculiarVentures/pdf/compare/v1.13.4...v1.13.5) (2023-06-29)
 
 **Note:** Version bump only for package @peculiarventures/pdf-copy

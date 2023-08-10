@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.7](https://github.com/PeculiarVentures/pdf/compare/v1.13.6...v1.13.7) (2023-08-10)
+
+
+### Bug Fixes
+
+* error in component getting by name if Kid is not a field ([824492c](https://github.com/PeculiarVentures/pdf/commit/824492cbf7f62b2a10760d3c2f7729fa2a40263b))
+* error on Signature field splitting if it doesn't belong to parent field ([0197121](https://github.com/PeculiarVentures/pdf/commit/01971212900b4b6ab96cec957e43fa3f557161cc))
+* improve Signature.groupName renaming and add tests ([8c82fd3](https://github.com/PeculiarVentures/pdf/commit/8c82fd3166703d10659c8fc9d3edf91513da9b83))
+* problems with signature groups ([bab4d06](https://github.com/PeculiarVentures/pdf/commit/bab4d06d6c354ad235f0a592450f95972b3546cb))
+* remove Widget from AcroFrom on `split` ([071d28e](https://github.com/PeculiarVentures/pdf/commit/071d28ec8cd213165055a119b705c88fd210a9df))
+
+
+
+
+
 ## [1.13.6](https://github.com/PeculiarVentures/pdf/compare/v1.13.5...v1.13.6) (2023-06-29)
 
 

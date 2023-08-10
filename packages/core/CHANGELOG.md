@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.7](https://github.com/PeculiarVentures/pdf/compare/v1.13.6...v1.13.7) (2023-08-10)
+
+
+### Bug Fixes
+
+* AcroFrom duplicates Fields on addField ([f9d5950](https://github.com/PeculiarVentures/pdf/commit/f9d595026e698a6b31f0753db9b4082da9dc346f))
+* improve Signature.groupName renaming and add tests ([8c82fd3](https://github.com/PeculiarVentures/pdf/commit/8c82fd3166703d10659c8fc9d3edf91513da9b83))
+* increase speed of serialization ([449bf26](https://github.com/PeculiarVentures/pdf/commit/449bf26e15c5e422c76221a45684452331ef0111))
+
+
+
+
+
 ## [1.13.5](https://github.com/PeculiarVentures/pdf/compare/v1.13.4...v1.13.5) (2023-06-29)
 
 
