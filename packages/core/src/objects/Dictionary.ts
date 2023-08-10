@@ -44,7 +44,8 @@ export class PDFDictionary extends PDFObject {
   }
 
   protected onWritePDF(writer: ViewWriter): void {
-    writer.writeStringLine("<<");
+    writer.write(dictionaryLeftChars);
+    writer.writeLine();
 
     for (const [key, item] of this.items) {
       new PDFName(key).writePDF(writer);
@@ -60,7 +61,7 @@ export class PDFDictionary extends PDFObject {
       writer.writeLine();
     }
 
-    writer.writeString(">>");
+    writer.write(dictionaryRightChars);
   }
 
   protected onFromPDF(reader: ViewReader): void {

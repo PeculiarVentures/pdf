@@ -60,7 +60,7 @@ export class PDFCertificateStorageHandler extends DefaultCertificateStorageHandl
         for (const field of acroForm.Fields) {
           if (field instanceof core.PDFDictionary && field.has("FT")) {
             const fieldType = field.get("FT", core.PDFName).text;
-            if (fieldType === core.SignatureFiled.FIELD_TYPE) {
+            if (fieldType === core.SignatureField.FIELD_TYPE) {
               if (field.has("V")) {
                 const sigValue = field.get("V", core.SignatureDictionary);
                 if (sigValue.Contents.text) {

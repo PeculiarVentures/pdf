@@ -4,13 +4,16 @@ import * as fs from "fs";
 import * as path from "path";
 import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 import * as core from "@peculiarventures/pdf-core";
+import { PageFilter } from "@peculiarventures/pdf-copy";
+
 import { PDFDocument, PDFDocumentCreateParameters, PDFDocumentLoadParameters } from "./Document";
 import { PDFVersion } from "./Version";
 import { TextEditor } from "./forms/TextEditor";
 import { RadioButtonGroup } from "./forms/RadioButton.Group";
 import { CheckBox } from "./forms/CheckBox";
 import { X509Certificate } from "@peculiar/x509";
-import { PageFilter } from "@peculiarventures/pdf-copy";
+import { SignatureBox } from "./forms/SignatureBox";
+import { SignatureBoxGroup } from "./forms/SignatureBox.Group";
 
 export function writeFile(data: BufferSource, name = "tmp"): void {
   const filePath = path.resolve(__dirname, `../../../${name}.pdf`);
@@ -30,7 +33,7 @@ context("Document", () => {
     it("Create a PDF file with 1 page", async () => {
       const doc = await PDFDocument.create();
 
-      const page = doc.pages.create();
+      doc.pages.create();
 
       writeFile(await doc.save());
 
@@ -344,4 +347,258 @@ context("Document", () => {
 
   });
 
+  context("SignatureBox", () => {
+    context("groupName", () => {
+      it("split signature field to two fields, AcroForm.Fields has Field(sig1) only", async () => {
+        // create document
+        const doc = await PDFDocument.create();
+        const page = doc.pages.create();
+
+        // create signature box like Field(sig)/Widget
+        const context = doc.target;
+        const dict = doc.target.createDictionary(
+          // Field
+          ["FT", context.createName("Sig")],
+          ["T", context.createString("sig")],
+          // Widget
+          ["Subtype", context.createName("Widget")],
+          ["Rect", context.createRectangle(0, 0, 0, 0)],
+          ["P", page.target],
+          ["F", context.createNumber(4)],
+        ).makeIndirect();
+        page.target.set("Annots", context.createArray(dict));
+        const catalog = doc.target.update.catalog;
+        assert.ok(catalog);
+        catalog.set("AcroForm", context.createDictionary(
+          ["Fields", context.createArray(dict)],
+        ));
+
+        const sig = doc.getComponentByName("sig");
+        assert.ok(sig instanceof SignatureBox);
+
+        // rename signature box
+        sig.groupName = "sig1";
+
+        // check signature box
+        const sig1 = doc.getComponentByName("sig1");
+        assert.ok(sig1 instanceof SignatureBoxGroup);
+
+        // check AcroForm.Fields
+        const fields = catalog.get("AcroForm", core.PDFDictionary).get("Fields", core.PDFArray);
+        assert.equal(fields.length, 1);
+
+        // check AcroForm.Fields.Field
+        const field = fields.get(0, core.PDFDictionary);
+        assert.equal(field.get("FT", core.PDFName).text, "Sig");
+        assert.equal(field.get("T", core.PDFString).text, "sig1");
+
+        // check AcroForm.Fields.Field.Widget
+        const widget = field.get("Kids", core.PDFArray).get(0, core.PDFDictionary);
+        assert.equal(widget.get("Subtype", core.PDFName).text, "Widget");
+        assert.equal(widget.get("P").equal(page.target), true);
+        assert.equal(widget.get("F", core.PDFNumeric).value, 4);
+        assert.equal(widget.get("Parent").equal(field), true);
+      });
+
+      it("split signature field to two fields, AcroForm.Fields has Field(form)::Field(sig1) only", async () => {
+        // create document
+        const doc = await PDFDocument.create();
+        const page = doc.pages.create();
+
+        const context = doc.target;
+        const catalog = context.update.catalog;
+
+        // create signature box like Field(form)::Field(sig)/Widget
+        const formDict = doc.target.createDictionary(
+          ["T", context.createString("form")],
+        ).makeIndirect();
+
+        const sigDict = doc.target.createDictionary(
+          // Field
+          ["FT", context.createName("Sig")],
+          ["T", context.createString("sig")],
+          // Widget
+          ["Subtype", context.createName("Widget")],
+          ["Rect", context.createRectangle(0, 0, 0, 0)],
+          ["P", page.target],
+          ["Parent", formDict],
+          ["F", context.createNumber(4)],
+        ).makeIndirect();
+
+        // add signature box to page
+        page.target.set("Annots", context.createArray(formDict));
+        assert.ok(catalog);
+
+        // add sig to form
+        formDict.set("Kids", context.createArray(sigDict));
+
+        // add form to catalog
+        catalog.set("AcroForm", context.createDictionary(
+          ["Fields", context.createArray(formDict)],
+        ));
+
+        // check signature box
+        const sig = doc.getComponentByName("form.sig");
+        assert.ok(sig instanceof SignatureBox);
+
+        // rename signature box
+        // sig.get(0).groupName = "form.sig1";
+        sig.groupName = "form.sig1";
+
+        // check signature box
+        const sig1 = doc.getComponentByName("form.sig1");
+        assert.ok(sig1 instanceof SignatureBoxGroup);
+
+        // check AcroForm.Fields
+        const fields = catalog.get("AcroForm", core.PDFDictionary).get("Fields", core.PDFArray);
+        assert.equal(fields.length, 1);
+
+        // check form
+        const form = fields.get(0, core.PDFDictionary);
+        assert.equal(form.get("Kids", core.PDFArray).length, 1);
+
+        // check sig1
+        const sig1Dict = form.get("Kids", core.PDFArray).get(0, core.PDFDictionary);
+        assert.equal(sig1Dict.get("FT", core.PDFName).text, "Sig");
+        assert.equal(sig1Dict.get("T", core.PDFString).text, "sig1");
+
+        // check sig1 widget
+        const sig1Widget = sig1Dict.get("Kids", core.PDFArray).get(0, core.PDFDictionary);
+        assert.equal(sig1Widget.get("Subtype", core.PDFName).text, "Widget");
+        assert.equal(sig1Widget.get("P").equal(page.target), true);
+        assert.equal(sig1Widget.get("F", core.PDFNumeric).value, 4);
+        assert.equal(sig1Widget.get("Parent").equal(sig1Dict), true);
+      });
+
+      it("move signature box to another non-existing field", async () => {
+        // create document
+        const doc = await PDFDocument.create();
+        const page = doc.pages.create();
+        const catalog = doc.target.update.catalog;
+        assert.ok(catalog);
+
+        // create signature box like Field(form)::Field(sig)/Widget
+        const context = doc.target;
+        const fieldDict = doc.target.createDictionary(
+          ["FT", context.createName("Sig")],
+          ["T", context.createString("sig")],
+          ["Kids", context.createArray()],
+        ).makeIndirect();
+
+        // create signature widget
+        const widgetDict = doc.target.createDictionary(
+          ["Type", context.createName("Annot")],
+          ["Subtype", context.createName("Widget")],
+          ["Rect", context.createRectangle(0, 0, 0, 0)],
+          ["P", page.target],
+          ["Parent", fieldDict],
+          ["F", context.createNumber(4)],
+        ).makeIndirect();
+        fieldDict.get("Kids", core.PDFArray).push(widgetDict);
+
+        // add signature widget to page
+        page.target.set("Annots", context.createArray(widgetDict));
+        catalog.set("AcroForm", context.createDictionary(
+          ["Fields", context.createArray(fieldDict)],
+        ));
+
+        // get signature box by name
+        const sig = doc.getComponentByName("sig");
+        assert.ok(sig instanceof SignatureBoxGroup);
+
+        // rename signature box
+        sig.get(0).groupName = "sig1";
+
+        // check signature box
+        const sig1 = doc.getComponentByName("sig1");
+        assert.ok(sig1 instanceof SignatureBoxGroup);
+
+        // check AcroForm.Fields
+        const fields = catalog.get("AcroForm", core.PDFDictionary).get("Fields", core.PDFArray);
+        assert.equal(fields.length, 1);
+
+        // check AcroForm.Fields.Field
+        const field = fields.get(0, core.PDFDictionary);
+        assert.equal(field.get("FT", core.PDFName).text, "Sig");
+        assert.equal(field.get("T", core.PDFString).text, "sig1");
+
+        // check AcroForm.Fields.Field.Widget
+        const widget = field.get("Kids", core.PDFArray).get(0, core.PDFDictionary);
+        assert.equal(widget.get("Subtype", core.PDFName).text, "Widget");
+        assert.equal(widget.get("P").equal(page.target), true);
+        assert.equal(widget.get("F", core.PDFNumeric).value, 4);
+        assert.equal(widget.get("Parent").equal(field), true);
+      });
+
+      it("move FieldWidget signature box to another existing FieldWidget signature box", async () => {
+        // create document
+        const doc = await PDFDocument.create();
+        const page = doc.pages.create();
+        const catalog = doc.target.update.catalog;
+        assert.ok(catalog);
+        const acroForm = catalog.AcroForm.get();
+
+        // create signature box
+        const context = doc.target;
+        const sigDict1 = doc.target.createDictionary(
+          // Field
+          ["FT", context.createName("Sig")],
+          ["T", context.createString("sig")],
+          // Widget
+          ["Type", context.createName("Annot")],
+          ["Subtype", context.createName("Widget")],
+          ["Rect", context.createRectangle(0, 0, 0, 0)],
+          ["P", page.target],
+          ["F", context.createNumber(4)],
+        ).makeIndirect();
+
+        // create another signature box
+        const sigDict2 = doc.target.createDictionary(
+          // Field
+          ["FT", context.createName("Sig")],
+          ["T", context.createString("sig1")],
+          // Widget
+          ["Type", context.createName("Annot")],
+          ["Subtype", context.createName("Widget")],
+          ["Rect", context.createRectangle(0, 0, 0, 0)],
+          ["P", page.target],
+          ["F", context.createNumber(4)],
+        ).makeIndirect();
+
+        // add signatures to page
+        page.target.set("Annots", context.createArray(sigDict1, sigDict2));
+
+        // add signatures to AcroForm
+        acroForm.addField(sigDict1.to(core.PDFField));
+        acroForm.addField(sigDict2.to(core.PDFField));
+
+        // get signature box by name
+        const sig = doc.getComponentByName("sig");
+        assert.ok(sig instanceof SignatureBox);
+
+        // rename signature box
+        sig.groupName = "sig1";
+
+        // check signature box
+        const sig1 = doc.getComponentByName("sig1");
+        assert.ok(sig1 instanceof SignatureBoxGroup);
+
+        // check AcroForm.Fields
+        const fields = acroForm.Fields;
+        assert.equal(fields.length, 1);
+
+        // check AcroForm.Fields.Field
+        const field = fields.get(0, core.PDFDictionary);
+        assert.equal(field.get("FT", core.PDFName).text, "Sig");
+        assert.equal(field.get("T", core.PDFString).text, "sig1");
+        assert.equal(field.get("Kids", core.PDFArray).length, 2);
+
+        // check page has 2 widgets
+        const annots = page.target.get("Annots", core.PDFArray);
+        assert.equal(annots.length, 2);
+        assert.ok(annots.get(0).equal(field.get("Kids", core.PDFArray).get(1)));
+        assert.ok(annots.get(1).equal(field.get("Kids", core.PDFArray).get(0)));
+      });
+    });
+  });
 });

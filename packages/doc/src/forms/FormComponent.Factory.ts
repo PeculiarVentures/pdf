@@ -70,7 +70,7 @@ export class FormComponentFactory {
           return wrapField(FormComponentType.radioButtonGroup, field.to(core.ButtonDictionary), doc);
         }
       } else if (field.ft === "Sig") {
-        return wrapField(FormComponentType.signatureBoxGroup, field.to(core.SignatureFiled), doc);
+        return wrapField(FormComponentType.signatureBoxGroup, field.to(core.SignatureField), doc);
       } else if (field.ft === "Tx") {
         // For text editor we should return the first widget
         const widget = field.Kids.get(true).get(0, core.WidgetDictionary);

@@ -4,13 +4,13 @@ import { BadCharError } from "../errors";
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
 import { ObjectTypeEnum } from "./internal";
-
 import { PDFString } from "./String";
 
 const exclamationMarkChar = 0x21;
 const tildeChar = 0x7e;
 const solidusChar = 0x2f;
 const deprecatedChars = [0x2f, 0x28, 0x29, 0x5b, 0x5d, 0x3c, 0x3e, 0x7b, 0x7d, 0x25];
+const ESCAPE_REGEX = /[^!-~]|[[\]<>(){}%#/]/gm;
 
 export class PDFName extends PDFString {
 
@@ -23,7 +23,7 @@ export class PDFName extends PDFString {
 
   protected onWritePDF(writer: ViewWriter): void {
     const escapedValue = this.text
-      .replace(/[^!-~]|[[\]<>(){}%#/]/gm, (substring) => // Encode irregular chars to '#dd'
+      .replace(ESCAPE_REGEX, (substring) => // Encode irregular chars to '#dd'
         `#${substring.charCodeAt(0).toString(16).padStart(2, "0")}`
       );
 

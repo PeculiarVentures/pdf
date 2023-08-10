@@ -5,18 +5,20 @@ export type ViewWriterCallback = (subarray: Uint8Array) => void;
 export class ViewWriter {
 
   private buffer: [Uint8Array, ViewWriterCallback?][] = [];
+  private totalLength = 0;
 
   public get length(): number {
-    let length = 0;
-    for (const [item,] of this.buffer) {
-      length += item.length;
-    }
+    return this.totalLength;
+  }
 
-    return length;
+  private addToLength(length: number): void {
+    this.totalLength += length;
   }
 
   public write(data: BufferSource, cb?: ViewWriterCallback): void {
-    this.buffer.push([BufferSourceConverter.toUint8Array(data), cb]);
+    const uint8Data = BufferSourceConverter.toUint8Array(data);
+    this.addToLength(uint8Data.length);
+    this.buffer.push([uint8Data, cb]);
   }
   public writeLine(data?: BufferSource): void {
     if (data) {
@@ -26,15 +28,19 @@ export class ViewWriter {
   }
 
   public writeByte(char: number): void {
+    this.addToLength(1);
     this.buffer.push([new Uint8Array([char])]);
   }
 
   public writeByteLine(char: number): void {
+    this.addToLength(2);
     this.buffer.push([new Uint8Array([char, CharSet.newLineChar])]);
   }
 
   public writeString(text: string): void {
-    this.buffer.push([new Uint8Array(Convert.FromBinary(text))]);
+    const uint8Text = new Uint8Array(Convert.FromBinary(text));
+    this.addToLength(uint8Text.length);
+    this.buffer.push([uint8Text]);
   }
 
   public writeStringLine(text: string): void {
@@ -47,16 +53,9 @@ export class ViewWriter {
   }
 
   public toUint8Array(): Uint8Array {
-    let length = 0;
-    this.buffer
-      .map(o => o[0])
-      .map(o => o.length)
-      .forEach(o => {
-        length += o;
-      });
-
-    const res = new Uint8Array(length);
+    const res = new Uint8Array(this.totalLength);
     let offset = 0;
+
     for (const [item, cb] of this.buffer) {
       res.set(item, offset);
 
