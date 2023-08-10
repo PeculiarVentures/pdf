@@ -183,9 +183,59 @@ export class PDFField extends objects.PDFDictionary implements IFieldDictionary 
     this.t = document.createString(UUID.generate());
   }
 
-  public addKid(kid: IFieldDictionary | WidgetDictionary): void {
-    this.modify().Kids.get().push(kid.makeIndirect());
+  /**
+   * Adds a new kid to this field. This operation can only be performed if this
+   * field is a non-terminal node in the field hierarchy (e.g. a non-terminal
+   * widget annotation).
+   * @param kid
+   */
+  public addKid(kid: IFieldDictionary | WidgetDictionary): boolean {
+    // check if kid is already a kid of this field
+    if (this.Kids.has() && this.Kids.get().includes(kid)) {
+      return false;
+    }
+
+    // kid must be indirect
+    kid.makeIndirect();
+
+    // check if kid already has a parent
+    if (kid.Parent) {
+      // if kid already has a parent, remove it from that parent
+      kid.Parent.to(PDFField).removeKid(kid);
+    } else {
+      const acroForm = this.getDocumentUpdate().catalog!.AcroForm.get();
+      const index = acroForm.Fields.indexOf(kid);
+      if (index >= 0) {
+        // if kid is already part of AcroForm.Fields, remove it
+        acroForm.Fields.splice(index, 1);
+      }
+    }
+
+    // add kid to Kids array
+    this.Kids.get().push(kid);
+
+    // set kid's Parent to this field
     kid.Parent = this.makeIndirect();
+
+    return true;
+  }
+
+  public removeKid(kid: IFieldDictionary | WidgetDictionary): boolean {
+    if (!this.Kids.has()) return false;
+
+    const kids = this.Kids.get();
+    const index = kids.indexOf(kid);
+    if (index >= 0) {
+      // remove kid from Kids array
+      kids.splice(index, 1);
+
+      // remove kid's Parent
+      kid.delete("Parent");
+
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -204,7 +254,11 @@ export class PDFField extends objects.PDFDictionary implements IFieldDictionary 
     return parts.join(".");
   }
 
-  public remove(): void {
+  /**
+   * Remove this field from its parent. This operation can only be performed if
+   * this field has a parent.
+   */
+  public removeFromParent(): boolean {
     const parent = this.Parent;
     if (parent) {
       parent.modify();
@@ -212,8 +266,21 @@ export class PDFField extends objects.PDFDictionary implements IFieldDictionary 
       const index = kids.indexOf(this);
       if (index >= 0) {
         kids.splice(index, 1);
+        this.delete("Parent");
+
+        return true;
+      }
+    } else {
+      const acroForm = this.getDocumentUpdate().catalog!.AcroForm.get();
+      const index = acroForm.Fields.indexOf(this);
+      if (index >= 0) {
+        acroForm.Fields.splice(index, 1);
+
+        return true;
       }
     }
+
+    return false;
   }
 
 }

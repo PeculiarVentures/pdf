@@ -117,4 +117,23 @@ export abstract class FormComponentHandler implements IFormComponentHandler {
     widget.set("DA", this.document.target.createString(content.toString()));
   }
 
+  /**
+   * Get AcroForm dictionary from the document.
+   * @returns AcroForm dictionary.
+   * @throws Error if AcroForm is not defined.
+   * @throws Error if Catalog is not defined.
+   */
+  protected getAcroForm(): core.InteractiveFormDictionary {
+    const catalog = this.document.target.update.catalog;
+    if (!catalog) {
+      throw new Error("Catalog is not defined");
+    }
+
+    if (!catalog.AcroForm.has()) {
+      throw new Error("AcroForm is not defined");
+    }
+
+    return catalog.AcroForm.get();
+  }
+
 }

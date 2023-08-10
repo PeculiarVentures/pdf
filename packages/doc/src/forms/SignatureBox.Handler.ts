@@ -12,7 +12,11 @@ export interface ISignatureBoxParameters extends IFormComponentParameters { }
 
 export interface ISignatureBoxHandler extends IFormComponentHandler {
   document: PDFDocument;
-  createGroup(name: string): SignatureBoxGroup;
+  /**
+   * Gets or creates a signature box group.
+   * @param name - The name of the group.
+   * @returns The group.
+   */
   getOrCreateGroup(name: string): SignatureBoxGroup;
   create(params: ISignatureBoxCreateParameters): core.WidgetDictionary;
 }
@@ -22,15 +26,20 @@ export class SignatureBoxHandler extends FormComponentHandler implements ISignat
   public override DEFAULT_WIDTH = 0;
   public override DEFAULT_HEIGHT = 0;
 
-  public createGroup(name: string): SignatureBoxGroup {
-    const field = core.SignatureFiled.create(this.document.target.update);
-    field.t = this.document.target.createString(name);
+  private createGroup(name: string): SignatureBoxGroup {
+    const field = this.getAcroForm().findOrCreateField(name);
 
-    this.document.target.update.catalog!.AcroForm.get().Fields.push(field.makeIndirect());
+    if (field.has("FT")) {
+      if (field.t.text !== "Sig") {
+        throw new TypeError(`Field '${name}' already exists and it's not a signature field.`);
+      }
+    } else {
+      // Create signature field
+      field.set("FT", this.document.target.createName("Sig"));
+    }
 
-    return new SignatureBoxGroup(field, this.document);
+    return new SignatureBoxGroup(field.to(core.SignatureField), this.document);
   }
-
 
   public getOrCreateGroup(name: string): SignatureBoxGroup {
     let group = this.document.getComponentByName(name);

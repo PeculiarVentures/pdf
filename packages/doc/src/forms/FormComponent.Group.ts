@@ -12,13 +12,22 @@ export interface IFormGroupedComponent extends IComponent {
 
 export class FormComponentGroup<TTarget extends core.PDFField = core.PDFField, TItem extends IFormGroupedComponent = any> extends WrapObject<TTarget> implements IComponent, Iterable<TItem> {
 
+  private get acroFormFields(): core.PDFArray {
+    const fields = this.target.documentUpdate?.catalog?.AcroForm.get().Fields;
+    if (!fields) {
+      throw new Error("Cannot find AcroForm.Fields");
+    }
+
+    return fields;
+  }
+
   [Symbol.iterator](): Iterator<TItem, any, undefined> {
     let pointer = 0;
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const _this = this;
     const items = this.target.Kids.has()
       ? this.target.Kids.get()
-      : this.target.documentUpdate!.document.createArray(this.target);
+      : this.document.target.createArray(this.target);
 
     return {
       next(): IteratorResult<TItem> {
@@ -51,7 +60,7 @@ export class FormComponentGroup<TTarget extends core.PDFField = core.PDFField, T
       }
     } else {
       // Remove from AcroForm
-      const fields = this.target.documentUpdate!.catalog!.AcroForm.get().Fields;
+      const fields = this.acroFormFields;
       const index = fields.indexOf(this.target);
       if (index > -1) {
         fields.splice(index, 1);
@@ -79,8 +88,6 @@ export class FormComponentGroup<TTarget extends core.PDFField = core.PDFField, T
 
       throw new Error("Cannot load form component from PDF Widget.");
     }
-
-    throw new RangeError("PDF Array is empty");
   }
 
   public attach(item: TItem): void {
@@ -104,7 +111,7 @@ export class FormComponentGroup<TTarget extends core.PDFField = core.PDFField, T
 
     // Add to AcroForm if needed
     if (!this.target.Parent) {
-      const fields = this.document.target.update.catalog!.AcroForm.get().Fields;
+      const fields = this.acroFormFields;
       if (fields.indexOf(this.target) === -1) {
         fields.push(this.target.makeIndirect());
       }

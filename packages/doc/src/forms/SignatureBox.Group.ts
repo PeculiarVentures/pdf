@@ -9,7 +9,7 @@ import { type SignatureBox } from "./SignatureBox";
 import * as types from "./SignatureBox.Types";
 
 
-export class SignatureBoxGroup extends FormComponentGroup<core.SignatureFiled, SignatureBox> {
+export class SignatureBoxGroup extends FormComponentGroup<core.SignatureField, SignatureBox> {
 
   public static readonly CONTAINER_SIZE = 2 * 1024;
   public static readonly SUB_FILTER = "ETSI.CAdES.detached";

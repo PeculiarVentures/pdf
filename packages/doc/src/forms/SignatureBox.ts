@@ -25,7 +25,7 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
     try {
       const field = this.getField();
 
-      return new SignatureBoxGroup(field.to(core.SignatureFiled), this.document);
+      return new SignatureBoxGroup(field.to(core.SignatureField), this.document);
     } catch (e) {
       return null;
     }
@@ -133,24 +133,12 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
     // The group already exists, and it is Field + Widget
     // Split it by creating new group and moving widget to it
     const doc = this.document.target;
-    const newField = core.SignatureFiled.create(doc.update)
+    const newField = core.SignatureField.create(doc.update)
       .makeIndirect();
 
     // Remove previous field from Kids array if it exists
-    let kids: core.PDFArray | undefined;
-    if (singleWidget.Parent) {
-      const kids = singleWidget.Parent.Kids.get();
-      const index = kids.indexOf(singleWidget);
-      kids.splice(index, 1);
-    } else {
-      // If widget doesn't have parent, it is a part of AcroForm
-      // Remove it from AcroForm
-      const acroForm = doc.update.catalog!.AcroForm.get();
-      const index = acroForm.Fields.indexOf(singleWidget);
-      if (index !== -1) {
-        acroForm.Fields.splice(index, 1);
-      }
-    }
+    const parent = singleWidget.Parent;
+    singleWidget.to(core.PDFField).removeFromParent();
 
     // Move fields from old to new and remove from old
     const fieldNames = [
@@ -164,10 +152,14 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
       }
     }
 
-    if (kids) {
-      // Add new field to Kids
-      kids.push(newField);
+    // add new field to parent or AcroForm
+    if (parent) {
+      parent.addKid(newField);
+    } else {
+      this.getAcroForm().addField(newField);
     }
+
+    // add widget to new field
     newField.addKid(singleWidget);
 
     return new SignatureBoxGroup(newField, this.document);
@@ -179,7 +171,7 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
     // if field has no kids, delete it
     const field = this.getField();
     if (!field.Kids.has() || field.Kids.get().length === 0) {
-      field.remove();
+      field.removeFromParent();
     }
 
     // if document doesn't have any signature fields, remove remove SigFlags
