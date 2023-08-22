@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.8](https://github.com/PeculiarVentures/pdf/compare/v1.13.7...v1.13.8) (2023-08-22)
+
+
+### Bug Fixes
+
+* error on AcroForm getting ([9cf0890](https://github.com/PeculiarVentures/pdf/commit/9cf0890852689a1eb5a838d2cf80acc74e57d70e))
+
+
+
+
+
 ## [1.13.7](https://github.com/PeculiarVentures/pdf/compare/v1.13.6...v1.13.7) (2023-08-10)
 
 
