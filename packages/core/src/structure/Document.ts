@@ -329,7 +329,7 @@ export class PDFDocument {
       obj.stream = BufferSourceConverter.toUint8Array(view);
     }
 
-    return obj;
+    return obj.makeIndirect();
   }
 
   public createRectangle(llX: number, llY: number, urX: number, urY: number): PDFRectangle {
