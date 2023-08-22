@@ -210,13 +210,8 @@ export class PDFCopier {
       return ref;
     }
 
-    const res = new core.PDFStream();
-
-    if (target.isIndirect()) {
-      // Make copied stream indirect if the source stream is indirect
-      res.makeIndirect();
-      map.set(target.getIndirect(), res);
-    }
+    const res = this.document.createStream();
+    map.set(target.getIndirect(), res);
 
     res.set("Length", this.document.createNumber(0));
     res.documentUpdate = this.document.update;
@@ -316,7 +311,9 @@ export class PDFCopier {
         const annot = this.copyDictionary(map, item)
           .to(core.AnnotationDictionary)
           .makeIndirect();
-        map.set(annot.getIndirect(), item);
+        if (item.isIndirect()) {
+          map.set(item.getIndirect(), annot);
+        }
         page.addAnnot(annot);
 
 
