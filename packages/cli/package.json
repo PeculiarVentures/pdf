@@ -1,6 +1,6 @@
 {
   "name": "@peculiarventures/pdf-cli",
-  "version": "1.13.8",
+  "version": "1.13.9",
   "description": "> TODO: description",
   "author": "microshine <microshine@mail.ru>",
   "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/pdf-cli#readme",
@@ -34,7 +34,7 @@
   "dependencies": {
     "@peculiar/webcrypto": "^1.4.3",
     "@peculiarventures/pdf-core": "^1.13.8",
-    "@peculiarventures/pdf-doc": "^1.13.8",
+    "@peculiarventures/pdf-doc": "^1.13.9",
     "commander": "^11.0.0",
     "pkijs": "^3.0.15"
   }

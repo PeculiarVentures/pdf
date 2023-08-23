@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.9](https://github.com/PeculiarVentures/pdf/compare/v1.13.8...v1.13.9) (2023-08-23)
+
+
+### Bug Fixes
+
+* incorrect stream cloning ([e3d1531](https://github.com/PeculiarVentures/pdf/commit/e3d15310098cd840f3099154c730159b9695928f))
+
+
+
+
+
 ## [1.13.8](https://github.com/PeculiarVentures/pdf/compare/v1.13.7...v1.13.8) (2023-08-22)
 
 

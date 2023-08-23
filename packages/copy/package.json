@@ -1,6 +1,6 @@
 {
   "name": "@peculiarventures/pdf-copy",
-  "version": "1.13.8",
+  "version": "1.13.9",
   "description": "This module allows to recreate the PDF document using specified filters.",
   "keywords": [],
   "author": "microshine <microshine@mail.ru>",
