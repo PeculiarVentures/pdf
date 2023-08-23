@@ -210,7 +210,9 @@ export class PDFCopier {
       return ref;
     }
 
-    const res = this.document.createStream();
+    const res = new core.PDFStream();
+    res.documentUpdate = this.document.update;
+    res.makeIndirect();
     map.set(target.getIndirect(), res);
 
     res.set("Length", this.document.createNumber(0));
