@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.10](https://github.com/PeculiarVentures/pdf/compare/v1.13.9...v1.13.10) (2023-08-28)
+
+
+### Bug Fixes
+
+* use User password for Owner if Owner is empty ([6d6f692](https://github.com/PeculiarVentures/pdf/commit/6d6f692f028f769bc68109ac731096cb293c13ab))
+
+
+
+
+
 ## [1.13.8](https://github.com/PeculiarVentures/pdf/compare/v1.13.7...v1.13.8) (2023-08-22)
 
 
