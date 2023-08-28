@@ -137,6 +137,14 @@ context("StandardEncryptionHandler", () => {
           },
         },
         {
+          name: "AES256 U:1235",
+          params: {
+            file: "aes256_u1235",
+            algorithm: CryptoFilterMethods.AES256,
+            userPassword: "12345",
+          },
+        },
+        {
           name: "AES256 U:12345, O:54321",
           params: {
             file: "aes256_u12345_o54321",

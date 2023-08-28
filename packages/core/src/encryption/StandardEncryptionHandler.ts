@@ -43,7 +43,9 @@ export class StandardEncryptionHandler extends EncryptionHandler {
 
     // params
     const userPassword = params.userPassword || "";
-    const ownerPassword = params.ownerPassword || crypto.getRandomValues(new Uint8Array(16));
+    // YOLO: Mirroring the Acrobat behavior here. If the owner password is not
+    // provided, the user password is used instead.
+    const ownerPassword = params.ownerPassword || userPassword;
     const permissions = params.permission || 0;
 
     // create Encrypt dictionary
