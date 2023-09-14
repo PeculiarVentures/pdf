@@ -15,6 +15,12 @@ export class PDFDocumentUpdate {
   // public xrefStream: CrossReferenceStream | null = null;
   public startXref = 0;
 
+  /**
+   * Indicates whether the "Size" field in the Trailer object of a PDF file
+   * is set according to the PDF specification.
+   */
+  private sizeChecked = false;
+
   constructor(document: PDFDocument) {
     this.document = document;
   }
@@ -358,6 +364,31 @@ export class PDFDocumentUpdate {
     return this.xref;
   }
 
+  /**
+   * Identifies and corrects the incorrect "Size" value in such non-compliant PDFs.
+   *
+   * Issue: https://github.com/PeculiarVentures/pdf/issues/102
+   *
+   * This function addresses an issue where the "Size" field in the Trailer object
+   * of a PDF file may not be set according to the PDF specification.
+   *
+   *
+   * @param pdfData - The PDF data to be modified.
+   * @returns Corrected PDF data.
+   */
+  private correctSize(xref: CrossReference): void {
+    while (!this.sizeChecked) {
+      const obj = this.getObject(xref.Size, 0);
+      if (obj.type === PDFDocumentObjectTypes.null) {
+        // The "Size" value is incorrect. Correct it.
+        this.sizeChecked = true;
+      } else {
+        xref.Size++;
+      }
+    }
+
+  }
+
   public createPDFDocumentObject(element: objects.PDFObject): PDFDocumentObject {
     const xref = this.getOrCreateXref();
 
@@ -374,7 +405,11 @@ export class PDFDocumentUpdate {
       size++;
 
       this.append(objZero);
+    } else {
+      this.correctSize(xref);
+      size = xref.Size;
     }
+
 
     const obj = new objects.PDFIndirectObject(size, 0, element);
     xref.Size = size + 1;
