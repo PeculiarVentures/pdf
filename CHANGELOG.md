@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.12](https://github.com/PeculiarVentures/pdf/compare/v1.13.11...v1.13.12) (2023-09-14)
+
+
+### Bug Fixes
+
+* begin update with end of line if needed ([5aa651b](https://github.com/PeculiarVentures/pdf/commit/5aa651b67b33e988eae7d5b5dd86b1c70570157a))
+* enable cache to reduce value conversion ([3e7a8ac](https://github.com/PeculiarVentures/pdf/commit/3e7a8ac3c75d85647c51528d6300c0de14004872))
+* incorrect trailer size ([72eb6af](https://github.com/PeculiarVentures/pdf/commit/72eb6af6986dd9c2e7832169d2339e76391b562e)), closes [#102](https://github.com/PeculiarVentures/pdf/issues/102)
+
+
+
+
+
 ## [1.13.11](https://github.com/PeculiarVentures/pdf/compare/v1.13.10...v1.13.11) (2023-09-14)
 
 
