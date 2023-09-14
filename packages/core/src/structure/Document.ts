@@ -286,10 +286,20 @@ export class PDFDocument {
     return obj;
   }
 
-  public createString(text: string): objects.PDFLiteralString {
+  /**
+   * Creates a PDFLiteralString object from the given text or binary data.
+   *
+   * @param text - The text to create the PDFLiteralString from.
+   * @returns A PDFLiteralString object.
+   */
+  public createString(text: string | BufferSource): objects.PDFLiteralString {
     const obj = objects.PDFLiteralString.create(this.update);
 
-    obj.text = text;
+    if (BufferSourceConverter.isBufferSource(text)) {
+      obj.text = Convert.ToBinary(text);
+    } else {
+      obj.text = text;
+    }
 
     return obj;
   }
