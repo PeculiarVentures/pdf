@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.11](https://github.com/PeculiarVentures/pdf/compare/v1.13.10...v1.13.11) (2023-09-14)
+
+
+### Bug Fixes
+
+* macos Viewer doesn't show aes256 encrypted document ([d7b952f](https://github.com/PeculiarVentures/pdf/commit/d7b952f0adf9c2f0d6270a534439e97c8218417d)), closes [#99](https://github.com/PeculiarVentures/pdf/issues/99)
+
+
+
+
+
 ## [1.13.10](https://github.com/PeculiarVentures/pdf/compare/v1.13.9...v1.13.10) (2023-08-28)
 
 
