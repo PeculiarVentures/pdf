@@ -46,6 +46,7 @@ export class TrailerDictionary extends objects.PDFDictionary {
     name: "Encrypt",
     type: objects.PDFDictionary,
     optional: true,
+    cache: true,
     get: o => {
       const filter = o.get("Filter");
       // TODO Add EncryptDictionaryFactory
@@ -58,7 +59,6 @@ export class TrailerDictionary extends objects.PDFDictionary {
         }
       }
       throw new Error("Wrong type for 'Filter'");
-
     },
   })
   public Encrypt!: null | EncryptDictionary;
