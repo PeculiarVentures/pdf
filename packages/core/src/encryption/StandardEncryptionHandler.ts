@@ -52,8 +52,9 @@ export class StandardEncryptionHandler extends EncryptionHandler {
     const encrypt = StandardEncryptDictionary.create(doc).makeIndirect(false);
 
     // create StdCF Crypto Filter
+    let filter: CryptoFilterDictionary | undefined;
     if (!params.disableStream || !params.disableString) {
-      const filter = CryptoFilterDictionary.create(doc);
+      filter = CryptoFilterDictionary.create(doc);
       filter.CFM = params.algorithm;
       filter.AuthEvent = "DocOpen";
       encrypt.CF.get().set(STD_CF, filter);
@@ -79,6 +80,13 @@ export class StandardEncryptionHandler extends EncryptionHandler {
         encrypt.R = 6;
         encrypt.Length = 256;
         encrypt.V = 5; // CF, StmF, and StrF
+        // Adding the 'Length' field to the filter for compatibility with MacOS Viewer.
+        // This field is technically optional and deprecated according to the PDF standard,
+        // but MacOS Viewer requires it for AES256 encryption.
+        // See issue https://github.com/PeculiarVentures/pdf/issues/99 for more details.
+        if (filter) {
+          filter.Length = 32;
+        }
         break;
       default:
         throw new Error("Unknown crypto method.");

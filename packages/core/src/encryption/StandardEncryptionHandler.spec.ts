@@ -137,11 +137,12 @@ context("StandardEncryptionHandler", () => {
           },
         },
         {
-          name: "AES256 U:1235",
+          name: "AES256 U:12345",
           params: {
-            file: "aes256_u1235",
+            file: "aes256_u12345",
             algorithm: CryptoFilterMethods.AES256,
             userPassword: "12345",
+            useXRefTable: true,
           },
         },
         {
