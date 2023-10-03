@@ -24,6 +24,9 @@
       "@peculiarventures/pdf-form-json": [
         "./packages/form-json/src"
       ],
+      "@peculiarventures/pdf-repair": [
+        "./packages/repair/src"
+      ],
     }
   },
   "exclude": [
