@@ -1,6 +1,6 @@
 {
   "name": "@peculiarventures/pdf-repair",
-  "version": "1.13.12",
+  "version": "1.13.13",
   "description": "A comprehensive PDF repair module for Node.js, providing automated diagnosis and correction of PDF documents.",
   "keywords": [],
   "author": "microshine <microshine@mail.ru>",
