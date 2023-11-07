@@ -17,7 +17,7 @@ npm install @peculiarventures/pdf-repair
 
 ## Usage
 
-Example usage of `@peculiarventures/pdf-repair``:
+Example usage of `@peculiarventures/pdf-repair`:
 
 ```javascript
 const fs = require('fs');
@@ -28,7 +28,8 @@ const data = fs.readFileSync("file.pdf");
 const doc = PDFDocument.load(data);
 
 const repair = new PDFRepair();
-repair.repairDocument(doc);
+const repairNotes = await repair.repairDocument(doc);
+console.log(repairNotes);
 
 const raw = doc.save();
 fs.writeFileSync("newFile.pdf", raw, { flag: "w+" });
