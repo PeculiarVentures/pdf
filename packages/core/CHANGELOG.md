@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.14](https://github.com/PeculiarVentures/pdf/compare/v1.13.13...v1.13.14) (2023-11-07)
+
+
+### Bug Fixes
+
+* cross-reference stream index count ([a5867b4](https://github.com/PeculiarVentures/pdf/commit/a5867b487e1eb8b4e291567e3e841769ef5a7b4a))
+
+
+
+
+
 ## [1.13.12](https://github.com/PeculiarVentures/pdf/compare/v1.13.11...v1.13.12) (2023-09-14)
 
 
