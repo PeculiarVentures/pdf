@@ -329,8 +329,16 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
 
     const indexes = this.Index || [{ start: 0, size: this.Size }];
 
+    // Some documents may have more indexes in the cross-reference stream than represented in the Index,
+    // which can lead to errors. To avoid this, we pre-determine the number of objects (totalCount) and
+    // exit the loop if we reach this count.
+    let totalCount = 0;
+    for (const index of indexes) {
+      totalCount += index.size;
+    }
+
     let count = 0;
-    while (!streamDataReader.isEOF) {
+    while (!streamDataReader.isEOF && count < totalCount) {
       const field1 = num(streamDataReader.read(w[0]), 1);
       const field2 = num(streamDataReader.read(w[1]));
       const field3 = num(streamDataReader.read(w[2]));
