@@ -167,6 +167,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
     }
 
     PDFStream.skipEndOfLine(reader);
+    const startPosition = reader.position;
 
     let endStreamPosition = reader.findIndex("endstream");
     if (endStreamPosition === -1) {
@@ -179,7 +180,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
     } else {
       throw new Error("Wrong end of line (must be \\r\\n or \\n)");
     }
-    this.stream = reader.view.subarray(reader.position, endStreamPosition);
+    this.stream = reader.view.subarray(startPosition, endStreamPosition);
     reader.position = endStreamPosition;
 
     if (this.has("Filter") || !(this.has("Type") && this.get("Type", PDFName).text === "XRef") && this.documentUpdate?.document.encryptHandler) {
