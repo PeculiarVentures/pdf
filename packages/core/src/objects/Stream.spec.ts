@@ -57,7 +57,9 @@ endstream`,
     const vector: [Uint8Array, string][] = [
       [
         Buffer.from("sd"),
-        `<< /Length 2 >>
+        `<<
+/Length 2
+>>
 stream
 sd
 endstream`,
