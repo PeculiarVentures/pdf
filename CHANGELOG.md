@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.15](https://github.com/PeculiarVentures/pdf/compare/v1.13.14...v1.13.15) (2023-12-07)
+
+
+### Bug Fixes
+
+* paint for TextEditor ([6c698ee](https://github.com/PeculiarVentures/pdf/commit/6c698ee959cc0a06d6fd0e29d54b739167b6af76))
+* read CrossReferenceTable ([72e4d55](https://github.com/PeculiarVentures/pdf/commit/72e4d5567bf5739d3d7fcd0f03eaaf2a2bc0fb31))
+* read stream value ([10eaab0](https://github.com/PeculiarVentures/pdf/commit/10eaab0f86024978184ba916ec0fa88338f3af08))
+
+
+
+
+
 ## [1.13.14](https://github.com/PeculiarVentures/pdf/compare/v1.13.13...v1.13.14) (2023-11-07)
 
 

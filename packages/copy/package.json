@@ -1,6 +1,6 @@
 {
   "name": "@peculiarventures/pdf-copy",
-  "version": "1.13.14",
+  "version": "1.13.15",
   "description": "This module allows to recreate the PDF document using specified filters.",
   "keywords": [],
   "author": "microshine <microshine@mail.ru>",
@@ -31,7 +31,7 @@
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
   "dependencies": {
-    "@peculiarventures/pdf-core": "^1.13.14",
+    "@peculiarventures/pdf-core": "^1.13.15",
     "tslib": "^2.6.2"
   }
 }
