@@ -166,36 +166,22 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
       throw new Error("Required filed 'Length' is missing");
     }
 
-    if (length.isIndirect()) {
-      if (length.documentUpdate) {
-        PDFNumeric.assertPositiveInteger(length);
-        PDFStream.skipEndOfLine(reader);
+    PDFStream.skipEndOfLine(reader);
+    const startPosition = reader.position;
 
-        this.stream = reader.read(length.value);
-      } else {
-        PDFStream.skipEndOfLine(reader);
-
-        let endStreamPosition = reader.findIndex("endstream");
-        if (endStreamPosition === -1) {
-          throw new ParsingError("Cannot find 'endstream' keyword");
-        }
-        if (reader.view[endStreamPosition - 1] === 0x0D && reader.view[endStreamPosition - 2] === 0x0A) {
-          endStreamPosition -= 2;
-        } else if (reader.view[endStreamPosition - 1] === 0x0A || reader.view[endStreamPosition - 1] === 0x0D) {
-          endStreamPosition -= 1;
-        } else {
-          throw new Error("Wrong end of line (must be \\r\\n or \\n)");
-        }
-        this.stream = reader.view.subarray(reader.position, endStreamPosition);
-        reader.position = endStreamPosition;
-      }
-    } else {
-      if (length.value) {
-        PDFStream.skipEndOfLine(reader);
-
-        this.stream = reader.read(length.value);
-      }
+    let endStreamPosition = reader.findIndex("endstream");
+    if (endStreamPosition === -1) {
+      throw new ParsingError("Cannot find 'endstream' keyword");
     }
+    if (reader.view[endStreamPosition - 1] === 0x0D && reader.view[endStreamPosition - 2] === 0x0A) {
+      endStreamPosition -= 2;
+    } else if (reader.view[endStreamPosition - 1] === 0x0A || reader.view[endStreamPosition - 1] === 0x0D) {
+      endStreamPosition -= 1;
+    } else {
+      throw new Error("Wrong end of line (must be \\r\\n or \\n)");
+    }
+    this.stream = reader.view.subarray(startPosition, endStreamPosition);
+    reader.position = endStreamPosition;
 
     if (this.has("Filter") || !(this.has("Type") && this.get("Type", PDFName).text === "XRef") && this.documentUpdate?.document.encryptHandler) {
       this.encrypted = true;

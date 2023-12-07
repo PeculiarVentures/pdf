@@ -37,7 +37,16 @@ export class CrossReferenceTable extends TrailerDictionary implements CrossRefer
       while (counter--) {
         id++;
         const entityPosition = reader.position;
-        const line = Convert.ToUtf8String(reader.read(20));
+        const line = Convert.ToUtf8String(reader.read(18));
+
+        const view = reader.view.subarray(reader.position);
+        if (view[0] === 0x0D && view[1] === 0x0A) {
+          reader.read(2);
+        } else if (view[0] === 0x0A || view[0] === 0x0D) {
+          reader.read(1);
+        } else {
+          throw new Error("Wrong end of line (must be \\r\\n or \\n)");
+        }
 
         const matches = /([0-9]{10}) ([0-9]{5}) ([fn])/.exec(line);
         if (!matches) {

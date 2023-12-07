@@ -221,7 +221,7 @@ export class TextEditor extends FormComponent {
 
   public override paint(): void {
     const ap = this.target.AP.get();
-    if (!ap.has("N")) {
+    if (!ap.has("N") || ap.N instanceof core.PDFNull) {
       // If AP created by get() function it doesn't have a required filed N
       ap.N = core.FormDictionary.create(this.target.documentUpdate!);
     }

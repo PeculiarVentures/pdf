@@ -30,6 +30,20 @@ stream
 endstream`,
         5,
       ],
+      [
+        `<</Length 10>>
+stream
+12345
+endstream`,
+        5,
+      ],
+      [
+        `<</Length 1>>
+stream
+12345
+endstream`,
+        5,
+      ],
     ];
     vector.forEach(([i, o]) => {
       it(JSON.stringify(i), () => {
@@ -43,7 +57,9 @@ endstream`,
     const vector: [Uint8Array, string][] = [
       [
         Buffer.from("sd"),
-        `<< /Length 2 >>
+        `<<
+/Length 2
+>>
 stream
 sd
 endstream`,
@@ -68,7 +84,7 @@ endstream`,
 
   //     const outStream = new ByteStream();
   //     stream.toPDF(outStream);
-      
+
   //     const parsedStream = new pdf.Stream();
   //     parsedStream.fromPDF(outStream);
   //     const decodedStream = await parsedStream.decode();
