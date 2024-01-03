@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.16](https://github.com/PeculiarVentures/pdf/compare/v1.13.15...v1.13.16) (2024-01-03)
+
+**Note:** Version bump only for package @peculiarventures/pdf-font
+
+
+
+
+
 ## [1.13.11](https://github.com/PeculiarVentures/pdf/compare/v1.13.10...v1.13.11) (2023-09-14)
 
 **Note:** Version bump only for package @peculiarventures/pdf-font

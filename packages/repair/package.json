@@ -1,6 +1,6 @@
 {
   "name": "@peculiarventures/pdf-repair",
-  "version": "1.13.15",
+  "version": "1.13.16",
   "description": "A comprehensive PDF repair module for Node.js, providing automated diagnosis and correction of PDF documents.",
   "keywords": [],
   "author": "microshine <microshine@mail.ru>",
@@ -31,8 +31,8 @@
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
   "dependencies": {
-    "@peculiarventures/pdf-core": "^1.13.15",
-    "@peculiarventures/pdf-doc": "^1.13.15",
+    "@peculiarventures/pdf-core": "^1.13.16",
+    "@peculiarventures/pdf-doc": "^1.13.16",
     "tslib": "^2.6.2"
   }
 }

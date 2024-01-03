@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.16](https://github.com/PeculiarVentures/pdf/compare/v1.13.15...v1.13.16) (2024-01-03)
+
+
+### Bug Fixes
+
+* improve BadCharError message ([15c5136](https://github.com/PeculiarVentures/pdf/commit/15c513678de9ff0aef971f60c9c0db8fa7ff910e))
+* improve PDF Dictionary value conversion error ([f08bd8f](https://github.com/PeculiarVentures/pdf/commit/f08bd8facf4f535bd0a3726d1ce2d17f7db497e5))
+* incorrect type for ID field of Page Object ([5d49348](https://github.com/PeculiarVentures/pdf/commit/5d49348d5bc8ac622d0cb87199eb5295c2e3e310))
+
+
+
+
+
 ## [1.13.15](https://github.com/PeculiarVentures/pdf/compare/v1.13.14...v1.13.15) (2023-12-07)
 
 
