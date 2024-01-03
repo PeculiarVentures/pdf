@@ -235,8 +235,8 @@ export class PageObjectDictionary extends PageDictionary {
    * The digital identifier of the page’s parent Web Capture content set
    * @remarks PDF 1.3
    */
-  @objects.PDFHexStringField("ID", true)
-  public id!: string | null;
+  @objects.PDFTextField("ID", objects.PDFHexString, true)
+  public ID!: objects.PDFTextString | null;
 
   /**
    * The page’s preferred zoom (magnification) factor: the factor by which
