@@ -189,7 +189,8 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
 
     PDFObjectReader.skip(reader);
     if (!endStreamChars.every(c => c === reader.readByte())) {
-      throw new BadCharError(reader.position - 1);
+      const position = reader.view.byteOffset + reader.position - 1;
+      throw new BadCharError("Wrong end of stream", position);
     }
   }
 

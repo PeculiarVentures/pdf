@@ -140,7 +140,12 @@ export class PDFDictionary extends PDFObject {
       this.set(name, res);
     }
 
-    const resType = PDFTypeConverter.convert(res, type, replace);
+    let resType: PDFObject;
+    try {
+      resType = PDFTypeConverter.convert(res, type, replace);
+    } catch (e) {
+      throw new Error(`Cannot convert PDF Dictionary value by name '${pdfName.toString()}' to type '${type.name}'`);
+    }
     if (replace && !resType.isIndirect) {
       this.set(name, resType as PDFObjectTypes);
     }
