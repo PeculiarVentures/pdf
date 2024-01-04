@@ -35,22 +35,24 @@ export class CrossReferenceTable extends TrailerDictionary implements CrossRefer
       const items: PDFDocumentObject[] = [];
       let id = firstItem.value - 1;
       while (counter--) {
+        // nnnnnnnnnn ggggg n eol
         id++;
-        const entityPosition = reader.position;
         const line = Convert.ToUtf8String(reader.read(18));
 
         const view = reader.view.subarray(reader.position);
-        if (view[0] === 0x0D && view[1] === 0x0A) {
+        const charCode = view[1];
+        if (charCode === 0x0D || charCode === 0x0A || charCode === 0x20) {
+          // In some cases eol can include odd characters, so we need to skip them
           reader.read(2);
-        } else if (view[0] === 0x0A || view[0] === 0x0D) {
-          reader.read(1);
         } else {
-          throw new Error("Wrong end of line (must be \\r\\n or \\n)");
+          // In some cases, the line has 19 characters
+          reader.read(1);
         }
 
         const matches = /([0-9]{10}) ([0-9]{5}) ([fn])/.exec(line);
         if (!matches) {
-          throw new ParsingError("Cross-reference entity doesn't match to required structure", entityPosition);
+          const offset = reader.view.byteOffset + reader.position;
+          throw new ParsingError("Cross-reference entity doesn't match to required structure", offset);
         }
 
         if (!this.documentUpdate) {
