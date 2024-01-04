@@ -52,7 +52,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
     } else if (view[0] === 0x0A || view[0] === 0x0D) {
       reader.read(1);
     } else {
-      throw new Error("Wrong end of line (must be \\r\\n or \\n)");
+      throw new ParsingError("Wrong end of line (must be \\r\\n or \\n)");
     }
   }
 
@@ -178,7 +178,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
     } else if (reader.view[endStreamPosition - 1] === 0x0A || reader.view[endStreamPosition - 1] === 0x0D) {
       endStreamPosition -= 1;
     } else {
-      throw new Error("Wrong end of line (must be \\r\\n or \\n)");
+      throw new ParsingError("Wrong end of line (must be \\r\\n or \\n)");
     }
     this.stream = reader.view.subarray(startPosition, endStreamPosition);
     reader.position = endStreamPosition;
