@@ -7,6 +7,7 @@ export class ParsingError extends PDFError {
   public position: number;
 
   constructor(message: string, position = -1, cause?: Error) {
+    message = `${message} at position ${position}`;
     super(message, cause);
 
     this.message = message;
