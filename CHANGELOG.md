@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.17](https://github.com/PeculiarVentures/pdf/compare/v1.13.16...v1.13.17) (2024-01-04)
+
+
+### Bug Fixes
+
+* error if xref table eol includes the SPACE char ([4942598](https://github.com/PeculiarVentures/pdf/commit/4942598b28bb12ba48206baf314c6b7d80b9cd43))
+* improve error message for ParsingError ([1fb04c8](https://github.com/PeculiarVentures/pdf/commit/1fb04c89118538750dfc1fe2f620c1c82a3708d2))
+
+
+
+
+
 ## [1.13.16](https://github.com/PeculiarVentures/pdf/compare/v1.13.15...v1.13.16) (2024-01-03)
 
 
