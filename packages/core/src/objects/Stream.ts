@@ -173,7 +173,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
     if (endStreamPosition === -1) {
       throw new ParsingError("Cannot find 'endstream' keyword");
     }
-    if (reader.view[endStreamPosition - 1] === 0x0D && reader.view[endStreamPosition - 2] === 0x0A) {
+    if (reader.view[endStreamPosition - 2] === 0x0D && reader.view[endStreamPosition - 1] === 0x0A) {
       endStreamPosition -= 2;
     } else if (reader.view[endStreamPosition - 1] === 0x0A || reader.view[endStreamPosition - 1] === 0x0D) {
       endStreamPosition -= 1;
