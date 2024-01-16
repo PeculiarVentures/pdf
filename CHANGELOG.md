@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.18](https://github.com/PeculiarVentures/pdf/compare/v1.13.17...v1.13.18) (2024-01-16)
+
+
+### Bug Fixes
+
+* issue [#115](https://github.com/PeculiarVentures/pdf/issues/115) ([91c238b](https://github.com/PeculiarVentures/pdf/commit/91c238b78ad9f710bae42fbd28229e70162ccca7))
+
+
+
+
+
 ## [1.13.17](https://github.com/PeculiarVentures/pdf/compare/v1.13.16...v1.13.17) (2024-01-04)
 
 

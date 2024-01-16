@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.18](https://github.com/PeculiarVentures/pdf/compare/v1.13.17...v1.13.18) (2024-01-16)
+
+**Note:** Version bump only for package @peculiarventures/pdf-cli
+
+
+
+
+
 ## [1.13.17](https://github.com/PeculiarVentures/pdf/compare/v1.13.16...v1.13.17) (2024-01-04)
 
 **Note:** Version bump only for package @peculiarventures/pdf-cli
