@@ -114,12 +114,17 @@ export class PDFDocumentUpdate {
 
     // Check file structure
     if (!this.document.wrongStructure) {
+      // check if update sections are in the right order
       if (this.previous && this.previous.startXref > this.startXref) {
+        // if not, then the file structure is wrong
         this.document.wrongStructure = true;
       } else {
+        // check if xref table/stream is before any of objects in the update section
         for (const obj of this.getObjects()) {
-          if (obj.offset > this.startXref) {
+          if (obj.offset > this.xref.view.byteOffset) {
+            // if not, then the file structure is wrong
             this.document.wrongStructure = true;
+            break;
           }
         }
       }
