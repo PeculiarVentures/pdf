@@ -109,8 +109,16 @@ export class PDFDocumentUpdate {
     const eofReader = new ViewReader(reader.view.buffer);
     eofReader.position = reader.position + reader.view.byteOffset;
     eofReader.read("%%EOF");
+    // read eol
+    let eofOffset = eofReader.position + 5;
+    if (eofReader.view[eofOffset] === 0x0D) {
+      eofOffset++;
+    }
+    if (eofReader.view[eofOffset] === 0x0A) {
+      eofOffset++;
+    }
 
-    this.view = eofReader.view.subarray(0, eofReader.position + 5);
+    this.view = eofReader.view.subarray(0, eofOffset);
 
     // Check file structure
     if (!this.document.wrongStructure) {
