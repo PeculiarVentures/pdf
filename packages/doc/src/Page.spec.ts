@@ -592,7 +592,7 @@ context("Page", () => {
       });
 
       const page2 = doc.pages.create();
-      const img3 = page2.addSignatureBox({
+      page2.addSignatureBox({
         left: "5mm",
         top: "5mm",
         width: "3cm",
@@ -600,7 +600,7 @@ context("Page", () => {
         groupName: "stepan",
       });
 
-      const img4 = page2.addSignatureBox({
+      page2.addSignatureBox({
         left: "40mm",
         top: "5mm",
         width: "3cm",
@@ -634,72 +634,84 @@ context("Page", () => {
       page.addSignatureBox({
         groupName: "box1",
       });
+      page.addSignatureBox({
+        groupName: "box2",
+      });
 
       await doc.save();
 
-      const box = doc.getComponentByName("box1");
-      assert.ok(box instanceof SignatureBoxGroup);
+      const box1 = doc.getComponentByName("box1");
+      assert.ok(box1 instanceof SignatureBoxGroup);
+      const box2 = doc.getComponentByName("box2");
+      assert.ok(box2 instanceof SignatureBoxGroup);
 
-      await box.sign({
-        dictionaryUpdate: async (dict) => {
-          dict.subFilter = "ETSI.CAdES.detached";
-          dict.Reason.get().text = "Описание причины";
-          dict.Location.get().text = "56.632N 47.928E";
-        },
-        containerCreate: async (data) => {
+      const boxes = [
+        box1,
+        // box2,
+      ];
+      for (const box of boxes) {
+        const cn = `CN=${box.name}`;
+        await box.sign({
+          dictionaryUpdate: async (dict) => {
+            dict.subFilter = "adbe.pkcs7.detached";
+            dict.Reason.get().text = "Описание причины";
+            dict.Location.get().text = "56.632N 47.928E";
+          },
+          containerCreate: async (data) => {
 
-          //#region Create certificate
-          const alg: RsaHashedKeyGenParams = {
-            name: "RSASSA-PKCS1-v1_5",
-            hash: "SHA-256",
-            publicExponent: new Uint8Array([1, 0, 1]),
-            modulusLength: 2048,
-          };
-          const keys = await crypto.subtle.generateKey(alg, false, ["sign", "verify"]);
-          const cert = await x509.X509CertificateGenerator.createSelfSigned({
-            serialNumber: "0102030405",
-            notBefore: new Date("2021-06-29"),
-            notAfter: new Date("2022-06-29"),
-            name: "CN=Test",
-            keys,
-            signingAlgorithm: alg,
-            extensions: [
-              new x509.KeyUsagesExtension(
-                x509.KeyUsageFlags.digitalSignature |
-                x509.KeyUsageFlags.nonRepudiation |
-                x509.KeyUsageFlags.keyCertSign
-              ),
-              new x509.BasicConstraintsExtension(false),
-              await x509.AuthorityKeyIdentifierExtension.create(keys.publicKey!, false, crypto),
-              await x509.SubjectKeyIdentifierExtension.create(keys.publicKey!, false, crypto),
-              new x509.ExtendedKeyUsageExtension([
-                "1.3.6.1.4.1.311.10.3.12", // documentSigning
-                "1.2.840.113583.1.1.5", // pdfAuthenticDocumentsTrust
-              ]),
-            ]
-          }, crypto);
-          //#endregion
+            //#region Create certificate
+            const alg: RsaHashedKeyGenParams = {
+              name: "RSASSA-PKCS1-v1_5",
+              hash: "SHA-256",
+              publicExponent: new Uint8Array([1, 0, 1]),
+              modulusLength: 2048,
+            };
+            const keys = await crypto.subtle.generateKey(alg, false, ["sign", "verify"]);
+            const cert = await x509.X509CertificateGenerator.createSelfSigned({
+              serialNumber: "0102030405",
+              notBefore: new Date("2021-06-29"),
+              notAfter: new Date("2022-06-29"),
+              name: cn,
+              keys,
+              signingAlgorithm: alg,
+              extensions: [
+                new x509.KeyUsagesExtension(
+                  x509.KeyUsageFlags.digitalSignature |
+                  x509.KeyUsageFlags.nonRepudiation |
+                  x509.KeyUsageFlags.keyCertSign
+                ),
+                new x509.BasicConstraintsExtension(false),
+                await x509.AuthorityKeyIdentifierExtension.create(keys.publicKey!, false, crypto),
+                await x509.SubjectKeyIdentifierExtension.create(keys.publicKey!, false, crypto),
+                new x509.ExtendedKeyUsageExtension([
+                  "1.3.6.1.4.1.311.10.3.12", // documentSigning
+                  "1.2.840.113583.1.1.5", // pdfAuthenticDocumentsTrust
+                ]),
+              ]
+            }, crypto);
+            //#endregion
 
-          //#region Create CMS
-          const messageDigest = await crypto.subtle.digest(alg.hash, data);
-          const signedData = new cms.CMSSignedData();
-          const signer = signedData.createSigner(cert, {
-            digestAlgorithm: alg.hash,
-            signedAttributes: [
-              new cms.ContentTypeAttribute(cms.CMSContentType.data),
-              new cms.SigningTimeAttribute(new Date()),
-              new cms.MessageDigestAttribute(messageDigest),
-            ]
-          });
+            //#region Create CMS
+            const messageDigest = await crypto.subtle.digest(alg.hash, data);
+            const signedData = new cms.CMSSignedData();
+            const signer = signedData.createSigner(cert, {
+              digestAlgorithm: alg.hash,
+              signedAttributes: [
+                new cms.ContentTypeAttribute(cms.CMSContentType.data),
+                new cms.SigningTimeAttribute(new Date()),
+                new cms.MessageDigestAttribute(messageDigest),
+              ]
+            });
 
-          signedData.certificates.push(cert);
+            signedData.certificates.push(cert);
 
-          await signedData.sign(keys.privateKey!, signer);
-          //#endregion
+            await signedData.sign(keys.privateKey!, signer);
+            //#endregion
 
-          return signedData.toBER();
-        }
-      });
+            return signedData.toBER();
+          }
+        });
+      }
 
       const pdf = await doc.save();
       writeFile(pdf);
