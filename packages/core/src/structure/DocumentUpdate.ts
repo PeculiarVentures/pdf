@@ -169,8 +169,6 @@ export class PDFDocumentUpdate {
       await this.encrypt();
     }
 
-    const startOffset = writer.length;
-
     // check if the last char in the document is not a new line
     // then add a new line before the update section
     if (this.document.view.length && this.document.view[this.document.view.length - 1] !== 0x0A) {
