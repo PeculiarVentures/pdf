@@ -6,6 +6,13 @@ import { ViewWriter } from "../ViewWriter";
 
 export class PDFDocumentUpdate {
 
+  /**
+   * @internal
+   * %%EOF end-of-line characters.
+   * This parameter is more suitable for test cases and should not be used in production.
+   */
+  public static EOF_EOL = "\n";
+
   public static readonly DEFAULT_VIEW = new Uint8Array();
 
   public view = PDFDocumentUpdate.DEFAULT_VIEW;
@@ -198,8 +205,8 @@ export class PDFDocumentUpdate {
     new objects.PDFNumeric(offset).writePDF(writer);
     writer.writeLine();
 
-    writer.writeString("%%EOF\n");
-    this.view = writer.toUint8Array().subarray(startOffset, writer.length - 2); // exclude \n
+    writer.writeString(`%%EOF${PDFDocumentUpdate.EOF_EOL}`);
+    this.view = writer.toUint8Array();
   }
 
   public previous: PDFDocumentUpdate | null = null;
