@@ -6,6 +6,13 @@ import { ViewWriter } from "../ViewWriter";
 
 export class PDFDocumentUpdate {
 
+  /**
+   * @internal
+   * %%EOF end-of-line characters.
+   * This parameter is more suitable for test cases and should not be used in production.
+   */
+  public static EOF_EOL = "\n";
+
   public static readonly DEFAULT_VIEW = new Uint8Array();
 
   public view = PDFDocumentUpdate.DEFAULT_VIEW;
@@ -109,17 +116,30 @@ export class PDFDocumentUpdate {
     const eofReader = new ViewReader(reader.view.buffer);
     eofReader.position = reader.position + reader.view.byteOffset;
     eofReader.read("%%EOF");
+    // read eol
+    let eofOffset = eofReader.position + 5;
+    if (eofReader.view[eofOffset] === 0x0D) {
+      eofOffset++;
+    }
+    if (eofReader.view[eofOffset] === 0x0A) {
+      eofOffset++;
+    }
 
-    this.view = eofReader.view.subarray(0, eofReader.position + 5);
+    this.view = eofReader.view.subarray(0, eofOffset);
 
     // Check file structure
     if (!this.document.wrongStructure) {
+      // check if update sections are in the right order
       if (this.previous && this.previous.startXref > this.startXref) {
+        // if not, then the file structure is wrong
         this.document.wrongStructure = true;
       } else {
+        // check if xref table/stream is before any of objects in the update section
         for (const obj of this.getObjects()) {
-          if (obj.offset > this.startXref) {
+          if (obj.offset > this.xref.view.byteOffset) {
+            // if not, then the file structure is wrong
             this.document.wrongStructure = true;
+            break;
           }
         }
       }
@@ -148,8 +168,6 @@ export class PDFDocumentUpdate {
       // encrypt all objects before saving
       await this.encrypt();
     }
-
-    const startOffset = writer.length;
 
     // check if the last char in the document is not a new line
     // then add a new line before the update section
@@ -185,8 +203,8 @@ export class PDFDocumentUpdate {
     new objects.PDFNumeric(offset).writePDF(writer);
     writer.writeLine();
 
-    writer.writeString("%%EOF\n");
-    this.view = writer.toUint8Array().subarray(startOffset, writer.length - 2); // exclude \n
+    writer.writeString(`%%EOF${PDFDocumentUpdate.EOF_EOL}`);
+    this.view = writer.toUint8Array();
   }
 
   public previous: PDFDocumentUpdate | null = null;

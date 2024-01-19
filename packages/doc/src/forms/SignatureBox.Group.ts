@@ -8,6 +8,7 @@ import { FormComponentGroup } from "./FormComponent.Group";
 import { type SignatureBox } from "./SignatureBox";
 import * as types from "./SignatureBox.Types";
 
+const ERR_INCORRECT_BYTE_RANGE = "The range of bytes points to an incorrect data";
 
 export class SignatureBoxGroup extends FormComponentGroup<core.SignatureField, SignatureBox> {
 
@@ -74,7 +75,7 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureField, S
     blockLength1.view.set(new Uint8Array(Convert.FromBinary(blockLength1.toString())));
     blockOffset2.value = signValue.Contents.view.byteOffset + signValue.Contents.view.length;
     blockOffset2.view.set(new Uint8Array(Convert.FromBinary(blockOffset2.toString())));
-    blockLength2.value = document.view.length - 1 - blockOffset2.value;
+    blockLength2.value = document.view.length - blockOffset2.value;
     blockLength2.view.set(new Uint8Array(Convert.FromBinary(blockLength2.toString())));
 
     // Get signing content
@@ -648,8 +649,16 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureField, S
   }
 
   protected verifyFormatting(signatureValue: core.SignatureDictionary): types.FormattingState {
+    const state: types.FormattingState = {
+      type: "valid",
+      code: "formatting",
+      text: "There are not errors in formatting",
+      data: {},
+    };
+
     try {
-      if (this.document.target.wrongStructure) {
+      const doc = this.document.target;
+      if (doc.wrongStructure) {
         return {
           type: "warn",
           code: "formatting",
@@ -663,24 +672,55 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureField, S
         throw new Error("Cannot get the document update object.");
       }
       const updateView = signatureValue.documentUpdate.view;
-      const check1 = byteRange.get(0, core.PDFNumeric).value === 0;
-      const check2 = byteRange.get(1, core.PDFNumeric).value === (contentView.byteOffset);
-      const begin2 = byteRange.get(2, core.PDFNumeric).value;
+      const byteRange1 = byteRange.get(0, core.PDFNumeric).value;
+      const byteRange2 = byteRange.get(1, core.PDFNumeric).value;
+      const byteRange3 = byteRange.get(2, core.PDFNumeric).value;
+      const byteRange4 = byteRange.get(3, core.PDFNumeric).value;
+      const check1 = byteRange1 === 0;
+      const check2 = byteRange2 === (contentView.byteOffset);
+      const begin2 = byteRange3;
       const check3 = begin2 === (contentView.byteOffset + contentView.length);
-      const lastBlockLength = (updateView.byteOffset + updateView.length) - (contentView.byteOffset + contentView.length);
-      const byteRangeLastBlockLength = byteRange.get(3, core.PDFNumeric).value;
-      let check4 = false;
-      if (byteRangeLastBlockLength === lastBlockLength) {
-        check4 = true;
-      } else if (byteRangeLastBlockLength > lastBlockLength) {
-        const documentView = signatureValue.documentUpdate.document.view;
-        const view = documentView.slice(begin2 + lastBlockLength, begin2 + byteRangeLastBlockLength);
-        const reader = new core.ViewReader(view);
-        const spaces = reader.read((octet) => !core.CharSet.whiteSpaceChars.includes(octet));
-        check4 = spaces.length === view.length;
+
+      if (!(check1 && check2 && check3)) {
+        const index = !check1 ? 0 : !check2 ? 1 : 2;
+        throw new Error(`${ERR_INCORRECT_BYTE_RANGE}. ByteRange[${index}] points to an incorrect data.`);
       }
-      if (!(check1 && check2 && check3 && check4)) {
-        throw new Error("The range of bytes points to an incorrect data.");
+
+      const lastOffset = byteRange3 + byteRange4;
+
+      const updateViewReader = new core.ViewReader(updateView);
+      updateViewReader.end();
+      updateViewReader.backward = true;
+      const updateEofIndex = updateViewReader.findIndex("%%EOF");
+
+      const documentViewReader = new core.ViewReader(doc.view);
+      documentViewReader.position = lastOffset - 1;
+      documentViewReader.backward = true;
+      let eofIndex = documentViewReader.findIndex("%%EOF");
+
+      // Check that Update section ends with %%EOF marker with EOL characters
+      if (eofIndex === -1 || updateEofIndex !== eofIndex) {
+        throw new Error(`${ERR_INCORRECT_BYTE_RANGE}. The %%EOF marker is not found.`);
+      }
+      eofIndex += 1; // index points to F, but we need to point to the next character
+      if (eofIndex !== lastOffset) {
+        if (lastOffset - eofIndex > 3) { // Acrobat allows up to 3 bytes after %%EOF marker
+          throw new Error(`${ERR_INCORRECT_BYTE_RANGE}. Too many bytes after %%EOF marker.`);
+        }
+        const eolText = Convert.ToBinary(doc.view.subarray(eofIndex, lastOffset));
+        if (/^(?:\r|\n)*$/.test(eolText) === false) {
+          throw new Error(`${ERR_INCORRECT_BYTE_RANGE}. EOL contains invalid characters.`);
+        }
+      }
+
+      // Check if the Update section is the last section in the document
+      // the byte range points includes all bytes to the end of the file
+      let lastUpdate = doc.update;
+      if (lastUpdate.view.length === 0 && lastUpdate.previous) {
+        lastUpdate = lastUpdate.previous;
+      }
+      if (lastUpdate === signatureValue.documentUpdate && lastOffset !== doc.view.length) {
+        throw new Error(`${ERR_INCORRECT_BYTE_RANGE}. Document contains extra bytes after signed data.`);
       }
     } catch (e) {
       const state: types.FormattingState = {
@@ -696,13 +736,6 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureField, S
 
       return state;
     }
-
-    const state: types.FormattingState = {
-      type: "valid",
-      code: "formatting",
-      text: "There are not errors in formatting",
-      data: {}
-    };
 
     return state;
   }
