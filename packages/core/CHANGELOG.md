@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.14.0](https://github.com/PeculiarVentures/pdf/compare/v1.13.18...v1.14.0) (2024-01-19)
+
+
+### Bug Fixes
+
+* EOF handling in PDFDocumentUpdate ([d53cfcc](https://github.com/PeculiarVentures/pdf/commit/d53cfcc28171918a65cc63f0e16941c7fc7a35b1))
+* incorrect wrongStructure calculation ([1d13857](https://github.com/PeculiarVentures/pdf/commit/1d13857fa6837e4a434c35eba33a327c3457f888))
+
+
+### Features
+
+* formatting issue in SignatureBoxGroup class ([b53ce8d](https://github.com/PeculiarVentures/pdf/commit/b53ce8dfe83617a115063874f2cf4c2c559c3de6))
+
+
+
+
+
 ## [1.13.18](https://github.com/PeculiarVentures/pdf/compare/v1.13.17...v1.13.18) (2024-01-16)
 
 
