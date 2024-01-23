@@ -1,6 +1,6 @@
 import * as assert from "node:assert";
 import { PDFDocument } from "@peculiarventures/pdf-doc";
-import { PDFRepair, globalRepairRegistry } from "@peculiarventures/pdf-repair";
+import { PDFRepair, PDFRepairStatus, globalRepairRegistry } from "@peculiarventures/pdf-repair";
 
 context("PDFRepair:RemoveNeedAppearances", () => {
   it("should remove NeedAppearances flag", async () => {
@@ -11,6 +11,8 @@ context("PDFRepair:RemoveNeedAppearances", () => {
     acroForm.needAppearances = true;
 
     const repair = new PDFRepair(globalRepairRegistry.filter(o => o.id === "removeNeedAppearances"));
+    const report = await repair.checkDocument(doc);
+    assert.strictEqual(report.status, PDFRepairStatus.repairable);
     const notes = await repair.repairDocument(doc);
     assert.strictEqual(Object.keys(notes).length, 1);
     assert.strictEqual(notes.removeNeedAppearances[0], "Removed NeedAppearances from AcroForm.");
@@ -26,6 +28,10 @@ context("PDFRepair:RemoveNeedAppearances", () => {
       acroForm.needAppearances = false;
 
       const repair = new PDFRepair(globalRepairRegistry.filter(o => o.id === "removeNeedAppearances"));
+
+      const report = await repair.checkDocument(doc);
+      assert.strictEqual(report.status, PDFRepairStatus.notNeeded);
+
       const notes = await repair.repairDocument(doc);
       assert.strictEqual(Object.keys(notes).length, 0);
     });
@@ -35,6 +41,10 @@ context("PDFRepair:RemoveNeedAppearances", () => {
       doc.pages.create();
 
       const repair = new PDFRepair(globalRepairRegistry.filter(o => o.id === "removeNeedAppearances"));
+
+      const report = await repair.checkDocument(doc);
+      assert.strictEqual(report.status, PDFRepairStatus.notNeeded);
+
       const notes = await repair.repairDocument(doc);
       assert.strictEqual(Object.keys(notes).length, 0);
     });
@@ -44,6 +54,10 @@ context("PDFRepair:RemoveNeedAppearances", () => {
       doc.pages.create();
 
       const repair = new PDFRepair(globalRepairRegistry.filter(o => o.id === "removeNeedAppearances"));
+
+      const report = await repair.checkDocument(doc);
+      assert.strictEqual(report.status, PDFRepairStatus.notNeeded);
+
       const notes = await repair.repairDocument(doc);
       assert.strictEqual(Object.keys(notes).length, 0);
     });
