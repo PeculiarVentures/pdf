@@ -16,15 +16,15 @@
         "test/**/*.ts"
       ],
       "rules": {
-        "@typescript-eslint/no-this-alias": 1,
-        "@typescript-eslint/ban-ts-comment": 1,
-        "@typescript-eslint/no-var-requires": 1,
-        "eol-last": 1,
-        "@typescript-eslint/explicit-module-boundary-types": 1,
-        "@typescript-eslint/no-explicit-any": 1,
-        "newline-before-return": 1,
-        "@typescript-eslint/semi": 1,
-        "no-constant-condition": 0,
+        "@typescript-eslint/no-this-alias": "warn",
+        "@typescript-eslint/ban-ts-comment": "warn",
+        "@typescript-eslint/no-var-requires": "off",
+        "eol-last": "warn",
+        "@typescript-eslint/explicit-module-boundary-types": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "newline-before-return": "warn",
+        "@typescript-eslint/semi": "warn",
+        "no-constant-condition": "off",
         "@typescript-eslint/quotes": [
           "warn",
           "double"
@@ -36,7 +36,8 @@
             "allowSingleLine": true
           }
         ],
-        "@typescript-eslint/no-empty-interface": 0
+        "@typescript-eslint/no-empty-interface": "off",
+        "@typescript-eslint/no-unused-vars": "off"
       }
     }
   ]

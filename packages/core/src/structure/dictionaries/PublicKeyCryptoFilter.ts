@@ -16,7 +16,7 @@ export class PublicKeyCryptoFilterDictionary extends CryptoFilterDictionary {
    * Indicates whether the document-level metadata stream shall be encrypted. PDF
    * processors shall respect this value when determining whether metadata
    * shall be encrypted
-   * 
+   *
    * @remarks Used only by crypt filters that are referenced from StmF in an encryption dictionary
    */
   @PDFBooleanField("EncryptMetadata", true, true)
