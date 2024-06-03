@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/PeculiarVentures/pdf#readme",
   "devDependencies": {
-    "@acme-ra/client": "^0.0.20",
+    "@acme-ra/client": "^0.0.26",
     "@peculiar/acme-client": "^1.8.2",
     "@peculiar/acme-core": "^1.8.2",
     "@peculiar/acme-protocol": "^1.8.2",
