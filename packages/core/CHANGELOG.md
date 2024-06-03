@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.15.0](https://github.com/PeculiarVentures/pdf/compare/v1.14.0...v1.15.0) (2024-06-03)
+
+
+### Bug Fixes
+
+* Update type declaration for TS v5 ([d087096](https://github.com/PeculiarVentures/pdf/commit/d087096c1b413134a9bb8ed5d648bf5c1b3ce313))
+
+
+### Features
+
+* Update CryptoEngine to support Ed25519 type ([ca62bcf](https://github.com/PeculiarVentures/pdf/commit/ca62bcf50cf194f93bc04cdf35ee866501bc4e79))
+
+
+
+
+
 # [1.14.0](https://github.com/PeculiarVentures/pdf/compare/v1.13.18...v1.14.0) (2024-01-19)
 
 
