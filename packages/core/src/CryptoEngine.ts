@@ -411,10 +411,11 @@ export class PDFCryptoEngine extends pkijs.CryptoEngine {
     return super.digest(algorithm, buf);
   }
 
+  public override async generateKey(algorithm: "Ed25519", extractable: boolean, keyUsages: ReadonlyArray<"sign" | "verify">): Promise<CryptoKeyPair>;
   public override async generateKey(algorithm: RsaHashedKeyGenParams | EcKeyGenParams, extractable: boolean, keyUsages: KeyUsage[]): Promise<CryptoKeyPair>;
   public override async generateKey(algorithm: AesKeyGenParams | HmacKeyGenParams | Pbkdf2Params, extractable: boolean, keyUsages: KeyUsage[]): Promise<CryptoKey>;
   public override async generateKey(algorithm: globalThis.AlgorithmIdentifier, extractable: boolean, keyUsages: KeyUsage[]): Promise<CryptoKeyPair | CryptoKey>;
-  public override async generateKey(algorithm: globalThis.AlgorithmIdentifier, extractable: boolean, keyUsages: KeyUsage[]): Promise<CryptoKeyPair | CryptoKey> {
+  public override async generateKey(algorithm: globalThis.AlgorithmIdentifier, extractable: boolean, keyUsages: any): Promise<CryptoKeyPair | CryptoKey> {
     if (typeof algorithm !== "string" && algorithm.name.toLowerCase() === "rc4") {
       const key = new Uint8Array((algorithm as any).length);
       pkijs.getRandomValues(key);
