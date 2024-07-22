@@ -924,6 +924,107 @@ context("Page", () => {
       writeFile(pdf);
     });
 
+    context("Algorithms", () => {
+      const rsaKeyGenParams = { publicExponent: new Uint8Array([1, 0, 1]), modulusLength: 2048 };
+      const algorithms = [
+        { name: "RSASSA-PKCS1-v1_5", hash: "SHA-1", ...rsaKeyGenParams },
+        { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256", ...rsaKeyGenParams },
+        { name: "RSASSA-PKCS1-v1_5", hash: "SHA-384", ...rsaKeyGenParams },
+        { name: "RSASSA-PKCS1-v1_5", hash: "SHA-512", ...rsaKeyGenParams },
+        { name: "RSA-PSS", hash: "SHA-1", saltLength: 20, ...rsaKeyGenParams },
+        { name: "RSA-PSS", hash: "SHA-256", saltLength: 32, ...rsaKeyGenParams },
+        { name: "RSA-PSS", hash: "SHA-384", saltLength: 48, ...rsaKeyGenParams },
+        { name: "RSA-PSS", hash: "SHA-512", saltLength: 64, ...rsaKeyGenParams },
+      ];
+      algorithms.forEach((alg) => {
+        it(`Sign with ${alg.name} and ${alg.hash}`, async () => {
+          const crypto = new Crypto() as globalThis.Crypto;
+          pkijs.setEngine("PDF crypto", crypto, new core.PDFCryptoEngine({ crypto: crypto, subtle: crypto.subtle }));
+
+          const doc = await PDFDocument.create(options);
+
+          assert.strictEqual(doc.pages.length, 0);
+
+          const page = doc.pages.create();
+          page.addSignatureBox({
+            groupName: "box1",
+          });
+
+          await doc.save();
+
+          const box1 = doc.getComponentByName("box1");
+          assert.ok(box1 instanceof SignatureBoxGroup);
+
+          const boxes = [
+            box1,
+          ];
+          for (const box of boxes) {
+            const cn = `CN=${box.name}`;
+            await box.sign({
+              dictionaryUpdate: async (dict) => {
+                dict.subFilter = "adbe.pkcs7.detached";
+                dict.Reason.get().text = "Описание причины";
+                dict.Location.get().text = "56.632N 47.928E";
+              },
+              containerCreate: async (data) => {
+
+                //#region Create certificate
+                const keys = await crypto.subtle.generateKey(alg, false, ["sign", "verify"]);
+                const cert = await x509.X509CertificateGenerator.createSelfSigned({
+                  name: cn,
+                  keys,
+                  signingAlgorithm: alg,
+                  extensions: [
+                    new x509.KeyUsagesExtension(
+                      x509.KeyUsageFlags.digitalSignature |
+                      x509.KeyUsageFlags.nonRepudiation |
+                      x509.KeyUsageFlags.keyCertSign
+                    ),
+                    new x509.BasicConstraintsExtension(false),
+                    await x509.AuthorityKeyIdentifierExtension.create(keys.publicKey!, false, crypto),
+                    await x509.SubjectKeyIdentifierExtension.create(keys.publicKey!, false, crypto),
+                    new x509.ExtendedKeyUsageExtension([
+                      "1.3.6.1.4.1.311.10.3.12", // documentSigning
+                      "1.2.840.113583.1.1.5", // pdfAuthenticDocumentsTrust
+                    ]),
+                  ]
+                }, crypto);
+                //#endregion
+
+                //#region Create CMS
+                // Use fixed digest algorithm to check it can be different from the signing algorithm
+                const digestAlg = "SHA-256";
+                const messageDigest = await crypto.subtle.digest(digestAlg, data);
+                const signedData = new cms.CMSSignedData();
+                const signer = signedData.createSigner(cert, {
+                  digestAlgorithm: digestAlg,
+                  signedAttributes: [
+                    new cms.ContentTypeAttribute(cms.CMSContentType.data),
+                    new cms.SigningTimeAttribute(new Date()),
+                    new cms.MessageDigestAttribute(messageDigest),
+                  ]
+                });
+
+                signedData.certificates.push(cert);
+
+                await signedData.sign(keys.privateKey!, signer);
+                //#endregion
+
+                return signedData.toBER();
+              }
+            });
+          }
+
+          const pdf = await doc.save();
+          // writeFile(pdf, `sign-${alg.name}-${alg.hash}`);
+
+          const doc2 = await PDFDocument.load(pdf);
+          const verify = await doc2.verify();
+          assert.strictEqual(verify.items.length, 1);
+          assert.ok(verify.items[0].states.some(state => state.code === "document_modification" && state.type === "valid"), "Document has been modified");
+        });
+      });
+    });
   });
 
   it("Form", async () => {
