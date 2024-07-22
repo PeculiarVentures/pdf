@@ -34,6 +34,6 @@
     "@peculiarventures/pdf-core": "^1.15.0",
     "@peculiarventures/pdf-doc": "^1.15.0",
     "pvtsutils": "^1.3.5",
-    "tslib": "^2.6.2"
+    "tslib": "^2.6.3"
   }
 }
