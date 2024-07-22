@@ -1,5 +1,6 @@
 import { PDFDocument } from "@peculiarventures/pdf-doc";
 import { globalRepairRegistry } from "../PDFRepairRegistry";
+import { PDFRepairStatus } from "../PDFRepairStatus";
 
 globalRepairRegistry.addRule({
   id: "removeNeedAppearances",
@@ -18,7 +19,19 @@ globalRepairRegistry.addRule({
     }
 
     return notes;
-  }
+  },
+  check: async (doc: PDFDocument) => {
+    const catalog = doc.target.update.catalog;
+    if (!catalog || !catalog.AcroForm.has()) {
+      return PDFRepairStatus.notNeeded;
+    }
+    const acroForm = catalog.AcroForm.get();
+    if (acroForm.needAppearances) {
+      return PDFRepairStatus.repairable;
+    }
+
+    return PDFRepairStatus.notNeeded;
+  },
 });
 
 

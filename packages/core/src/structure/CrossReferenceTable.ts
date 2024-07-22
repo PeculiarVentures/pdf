@@ -12,8 +12,24 @@ import type { CrossReferenceStream } from "./CrossReferenceStream";
 
 export class CrossReferenceTable extends TrailerDictionary implements CrossReference {
 
+  /**
+   * End of line for cross-reference table entries. This property allows to
+   * change the EOL for cross-reference table entries during writing. It
+   * should be used for testing purposes only.
+   * @internal
+   */
+  public static EOL = "\r\n";
+
   public objects: PDFDocumentObject[] = [];
   public xrefStream?: CrossReferenceStream;
+
+  /**
+   * Indicates that the cross-reference table has incorrect eol for some entries.
+   *
+   * @remarks
+   * Some documents use 19 bytes for each entry instead of 20 bytes.
+   */
+  public hasIncorrectEol: boolean = false;
 
   protected override onFromPDF(reader: ViewReader): void {
     reader.findIndex(c => !CharSet.whiteSpaceChars.includes(c));
@@ -47,6 +63,7 @@ export class CrossReferenceTable extends TrailerDictionary implements CrossRefer
         } else {
           // In some cases, the line has 19 characters
           reader.read(1);
+          this.hasIncorrectEol = true;
         }
 
         const matches = /([0-9]{10}) ([0-9]{5}) ([fn])/.exec(line);
@@ -113,7 +130,7 @@ export class CrossReferenceTable extends TrailerDictionary implements CrossRefer
         }
         const offset = item.offset.toString().padStart(10, "0");
         const generation = item.generation.toString().padStart(5, "0");
-        writer.writeString(`${offset} ${generation} ${item.type}\r\n`);
+        writer.writeString(`${offset} ${generation} ${item.type}${CrossReferenceTable.EOL}`);
       }
     }
 

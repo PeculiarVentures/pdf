@@ -36,8 +36,11 @@
             "allowSingleLine": true
           }
         ],
-        "@typescript-eslint/no-empty-interface": "off",
-        "@typescript-eslint/no-unused-vars": "off"
+        "@typescript-eslint/no-empty-interface": 0,
+        "@typescript-eslint/no-unused-vars": {
+          "argsIgnorePattern": "^_",
+          "varsIgnorePattern": "^_"
+        }
       }
     }
   ]

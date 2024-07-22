@@ -1,12 +1,23 @@
 import { PDFDocument } from "@peculiarventures/pdf-doc";
 import { PDFRepairRegistry, IRepairRule, globalRepairRegistry } from "./PDFRepairRegistry";
+import { PDFRepairStatus } from "./PDFRepairStatus";
 
 /**
  * An object that records repair notes for a PDF file. The keys are rule IDs and the values are arrays of strings
  * containing the repair notes.
  */
-interface RepairNotes {
+export interface RepairNotes {
   [key: string]: string[];
+}
+
+export interface RepairCheckRule {
+  status: PDFRepairStatus;
+  description: string;
+}
+
+export interface RepairCheck {
+  status: PDFRepairStatus;
+  rules: Record<string, RepairCheckRule>;
 }
 
 /**
@@ -38,5 +49,30 @@ export class PDFRepair {
     }
 
     return repairNotes;
+  }
+
+  /**
+   * Checks if a PDF document needs to be repaired.
+   * @param doc - The PDF document to check.
+   * @returns
+   */
+  async checkDocument(doc: PDFDocument): Promise<RepairCheck> {
+    const check: RepairCheck = {
+      status: PDFRepairStatus.notNeeded,
+      rules: {},
+    };
+
+    for (const rule of this.rules) {
+      const status = await rule.check(doc);
+      if (check.status !== PDFRepairStatus.requireClone && status !== PDFRepairStatus.notNeeded) {
+        check.status = status;
+      }
+      check.rules[rule.id] = {
+        status,
+        description: rule.description,
+      };
+    }
+
+    return check;
   }
 }
