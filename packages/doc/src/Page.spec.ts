@@ -992,10 +992,12 @@ context("Page", () => {
                 //#endregion
 
                 //#region Create CMS
-                const messageDigest = await crypto.subtle.digest(alg.hash, data);
+                // Use fixed digest algorithm to check it can be different from the signing algorithm
+                const digestAlg = "SHA-256";
+                const messageDigest = await crypto.subtle.digest(digestAlg, data);
                 const signedData = new cms.CMSSignedData();
                 const signer = signedData.createSigner(cert, {
-                  digestAlgorithm: alg.hash,
+                  digestAlgorithm: digestAlg,
                   signedAttributes: [
                     new cms.ContentTypeAttribute(cms.CMSContentType.data),
                     new cms.SigningTimeAttribute(new Date()),
