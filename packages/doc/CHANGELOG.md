@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.16.0](https://github.com/PeculiarVentures/pdf/compare/v1.15.0...v1.16.0) (2024-07-22)
+
+
+### Features
+
+* Add RSA-PSS signature algorithm support ([8f194b1](https://github.com/PeculiarVentures/pdf/commit/8f194b18161b55879593e6b0c6dbd49ea10d04bf))
+* Support RSA-PSS algorithm parameters ([51c2273](https://github.com/PeculiarVentures/pdf/commit/51c2273ce1dbbf73f43fd84b340afd2692b8f2ea))
+
+
+
+
+
 # [1.15.0](https://github.com/PeculiarVentures/pdf/compare/v1.14.0...v1.15.0) (2024-06-03)
 
 **Note:** Version bump only for package @peculiarventures/pdf-doc
