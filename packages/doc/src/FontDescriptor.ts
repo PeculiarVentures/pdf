@@ -18,7 +18,7 @@ function flag(f: core.FontDescriptorFlags): PropertyDecorator {
   };
 }
 
-export class FontDescriptorComponent extends WrapObject<core.FontDescriptorDictionary>{
+export class FontDescriptorComponent extends WrapObject<core.FontDescriptorDictionary> {
   /**
    * All glyphs have the same width (as opposed to proportional or variablepitch fonts, which have different widths).
    */

@@ -101,7 +101,7 @@ export enum LineJoinStyle {
    * style") and the resulting notch beyond the ends of the segments shall be filled with
    * a triangle.
    */
-  bevelJoin = 1,
+  bevelJoin = 2,
 }
 
 export interface ContentSetFontSizeParameters {

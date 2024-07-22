@@ -192,12 +192,12 @@ export class PDFDocumentObject implements PDFDocumentObjectParameters {
       case PDFDocumentObjectTypes.compressed:
         res.push(`${this.id} ${0} obj % compressed ObjStm(${this.offset} 0 R)`);
         res.push(this.value.toString());
-        res.push(`endobj`);
+        res.push("endobj");
         break;
       case PDFDocumentObjectTypes.inUse:
         res.push(`${this.id} ${this.generation} obj % in-use`);
         res.push(this.value.toString());
-        res.push(`endobj`);
+        res.push("endobj");
         break;
       case PDFDocumentObjectTypes.free:
         res.push(`${this.id} ${this.generation} obj endobj % free`);
