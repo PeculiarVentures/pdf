@@ -10,7 +10,9 @@ export class CryptoFiltersDictionary extends PDFDictionary {
    */
   public findItem(name: string): CryptoFilterDictionary | null;
   public findItem<T extends CryptoFilterDictionary>(name: string, type: new () => T): T | null;
-  public findItem(name: string, type?: any): CryptoFilterDictionary | null {
+  // @internal
+  public findItem(name: string, type?: new () => CryptoFilterDictionary): CryptoFilterDictionary | null;
+  public findItem(name: string, type?: new () => CryptoFilterDictionary): CryptoFilterDictionary | null {
     if (this.has(name)) {
       return this.get(name, type || CryptoFilterDictionary, true) as CryptoFilterDictionary;
     }
@@ -25,7 +27,7 @@ export class CryptoFiltersDictionary extends PDFDictionary {
    */
   public getItem(name: string): CryptoFilterDictionary;
   public getItem<T extends CryptoFilterDictionary>(name: string, type: new () => T): T;
-  public getItem(name: string, type?: any): CryptoFilterDictionary {
+  public getItem(name: string, type?: new () => CryptoFilterDictionary): CryptoFilterDictionary {
     const res = this.findItem(name, type);
 
     if (!res) {

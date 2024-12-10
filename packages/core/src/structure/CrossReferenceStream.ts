@@ -1,3 +1,4 @@
+import { Convert } from "pvtsutils";
 import { PDFArray, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFName, PDFNameField, PDFNumeric, PDFStream, Maybe, PDFMaybeField } from "../objects";
 import { CatalogDictionary } from "./dictionaries/Catalog";
 import { CrossReference } from "./CrossReference";
@@ -5,7 +6,6 @@ import { PDFDocumentObject, PDFDocumentObjectTypes } from "./DocumentObject";
 import { EncryptDictionary, InformationDictionary, PublicKeyEncryptDictionary, StandardEncryptDictionary, TrailerDictionary } from "./dictionaries";
 import { PDFTextString } from "../objects/TextString";
 import { ViewWriter } from "../ViewWriter";
-import { Convert } from "pvtsutils";
 import { PDFDocumentObjectGrouper } from "./DocumentObjectGrouper";
 import { ViewReader } from "../ViewReader";
 import { ParsingError } from "../errors";
@@ -290,6 +290,7 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
     }
 
     // TODO Implement via static function and Trailer Dictionary interface
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (TrailerDictionary.prototype as any).onCreate.call(this);
   }
 

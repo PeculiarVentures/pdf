@@ -4,7 +4,7 @@ import * as fs from "node:fs";
 import { Crypto } from "@peculiar/webcrypto";
 import * as x509 from "@peculiar/x509";
 import * as core from "@peculiarventures/pdf-core";
-import { CMSContentType, CMSSignedData, ContentTypeAttribute, MessageDigestAttribute, PDFDocument, SignatureBoxGroup, SigningTimeAttribute } from "@peculiarventures/pdf-doc";
+import { CMSContentType, CMSSignedData, ContentTypeAttribute, FormattingState, MessageDigestAttribute, PDFDocument, SignatureBoxGroup, SigningTimeAttribute } from "@peculiarventures/pdf-doc";
 import { BufferSourceConverter, Convert } from "pvtsutils";
 import * as pkijs from "pkijs";
 
@@ -217,8 +217,9 @@ context("SignatureBoxGroup", () => {
           writeFile(raw, "SignatureBox.Group.spec.invalid.pdf");
 
           const verify = await doc.verify();
-          const formattingSate = verify.items[0].states[0];
+          const formattingSate = verify.items[0].states[0] as FormattingState;
           assert.strictEqual(formattingSate.type, "invalid");
+          assert.ok(formattingSate.data.error);
           assert.strictEqual(formattingSate.data.error.message, "The range of bytes points to an incorrect data. Too many bytes after %%EOF marker.");
         });
 
@@ -251,8 +252,9 @@ context("SignatureBoxGroup", () => {
           writeFile(raw, "SignatureBox.Group.spec.invalid.pdf");
 
           const verify = await doc.verify();
-          const formattingSate = verify.items[0].states[0];
+          const formattingSate = verify.items[0].states[0] as FormattingState;
           assert.strictEqual(formattingSate.type, "invalid");
+          assert.ok(formattingSate.data.error);
           assert.strictEqual(formattingSate.data.error.message, "The range of bytes points to an incorrect data. EOL contains invalid characters.");
         });
 
@@ -287,8 +289,9 @@ context("SignatureBoxGroup", () => {
 
           doc = await PDFDocument.load(raw);
           const verify = await doc.verify();
-          const formattingSate = verify.items[0].states[0];
+          const formattingSate = verify.items[0].states[0] as FormattingState;
           assert.strictEqual(formattingSate.type, "invalid");
+          assert.ok(formattingSate.data.error);
           assert.strictEqual(formattingSate.data.error.message, "The range of bytes points to an incorrect data. Document contains extra bytes after signed data.");
         });
       });
@@ -331,8 +334,9 @@ context("SignatureBoxGroup", () => {
 
             const doc2 = await PDFDocument.load(raw);
             const verify = await doc2.verify();
-            const formattingSate = verify.items[0].states[0];
+            const formattingSate = verify.items[0].states[0] as FormattingState;
             assert.strictEqual(formattingSate.type, "invalid");
+            assert.ok(formattingSate.data.error);
             assert.strictEqual(formattingSate.data.error.message, `The range of bytes points to an incorrect data. ByteRange[${index}] points to an incorrect data.`);
           });
         });

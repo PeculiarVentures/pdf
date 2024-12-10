@@ -217,6 +217,7 @@ export class PDFDocument {
     const offset = options.offset || 0;
     const step = options.reversed ? -1 : 1;
 
+    // eslint-disable-next-line no-constant-condition
     for (let i = offset; true; i = i + step) {
       const value = this.view[i];
       if (value === undefined) {

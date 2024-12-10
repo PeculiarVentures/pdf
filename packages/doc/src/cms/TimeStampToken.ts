@@ -1,5 +1,6 @@
 import { AsnConvert } from "@peculiar/asn1-schema";
 import { TSTInfo } from "@peculiar/asn1-tsp";
+import * as pkijs from "pkijs";
 
 import { CMSSignedData, CMSSignedDataVerifyResult } from "./SignedData";
 
@@ -11,7 +12,7 @@ export class TimeStampToken extends CMSSignedData {
 
   public info = new TSTInfo();
 
-  protected override onFromSchema(schema: any): any {
+  protected override onFromSchema(schema: pkijs.SchemaType): pkijs.ContentInfo {
     const result = super.onFromSchema(schema);
 
     const info = this.signedData.encapContentInfo.eContent!.valueBlock.valueHex;

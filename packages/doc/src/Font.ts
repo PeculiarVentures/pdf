@@ -680,7 +680,7 @@ export class TextSizeCounter {
       for (const char of block.text) {
         if (char === TextSizeCounter.NEW_LINE_CHAR) {
           // New line
-          word.text + char;
+          word.text += char;
           rowItem.push(word.text, word.width);
           word = { text: "", width: 0 };
 

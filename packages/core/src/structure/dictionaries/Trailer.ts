@@ -94,7 +94,7 @@ export class TrailerDictionary extends objects.PDFDictionary {
     // if update already has XRef we need to copy data from it
     const xref = update.previous?.xref || null;
     if (xref) {
-      for (const [key, value] of (xref as any as objects.PDFDictionary).items) {
+      for (const [key, value] of (xref as objects.PDFDictionary).items) {
         // ! Don't copy Filters and DecodeParms
         // TODO Current implementation doesn't implement Predicator encoding
         if (key === "Filters" || key === "DecodeParms" || key === "XRefStm") {

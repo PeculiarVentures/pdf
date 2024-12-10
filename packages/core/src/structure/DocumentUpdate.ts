@@ -382,6 +382,7 @@ export class PDFDocumentUpdate {
       } else {
         this.xref = this.createCrossReferenceStream();
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (this.xref as any).onCreate();
     }
 

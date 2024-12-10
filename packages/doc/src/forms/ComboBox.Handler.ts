@@ -10,13 +10,6 @@ export interface ComboBoxCreateParameters extends IFormComponentCreateParameters
 
 }
 
-interface BorderParameters {
-  color?: core.Colors;
-  width: core.TypographySize;
-  length: number;
-  height: number;
-}
-
 export interface ComboBoxCreateParameters {
   left?: core.TypographySize;
   top?: core.TypographySize;
@@ -76,7 +69,7 @@ export class ComboBoxHandler implements IComboBoxHandler {
 
     dict.ft = "Ch";
 
-    const widget = dict.to(core.WidgetDictionary);
+    const _widget = dict.to(core.WidgetDictionary);
 
     const field = dict.to(core.ChoiceDictionary);
     field.t = doc.createString(params.name || core.UUID.generate());

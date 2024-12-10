@@ -23,7 +23,7 @@ export interface globalParametersCryptFilter {
 
 export interface clientSideParametersPublicKey {
   keys: CryptoKey[];
-  certificates: any[];
+  certificates: unknown[];
   algorithm: string;
   encrypt?: {
     seed: ArrayBuffer;

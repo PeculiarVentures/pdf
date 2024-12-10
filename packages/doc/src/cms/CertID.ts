@@ -39,7 +39,7 @@ export class CertificateID extends AsnEncoded<pkijs.CertID> {
     return Convert.ToHex(this.asn.serialNumber.valueBlock.valueHex);
   }
 
-  protected onFromSchema(schema: any): any {
+  protected onFromSchema(schema: pkijs.SchemaType): pkijs.CertID {
     if (schema instanceof pkijs.CertID) {
       return schema;
     }

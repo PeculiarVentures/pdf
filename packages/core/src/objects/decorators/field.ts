@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { PDFDictionary } from "../Dictionary";
 import type { PDFObjectTypes } from "../ObjectTypes";
 import { PDFObjectConstructor, PDFObject } from "../Object";

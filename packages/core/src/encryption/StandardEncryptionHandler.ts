@@ -347,6 +347,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
    * If cache is empty, throws an error.
    * @returns Password
    */
+  // eslint-disable-next-line no-unused-private-class-members
   #getOwnerPassword(): Password {
     if (!this.#ownerPassword) {
       throw new Error("Cannot get the Owner password. It is not set.");

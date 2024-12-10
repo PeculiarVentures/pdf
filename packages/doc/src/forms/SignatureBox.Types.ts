@@ -24,7 +24,7 @@ export interface SignatureState {
   type: SignatureStateType;
   text: string;
   code: string;
-  data: any;
+  data: unknown;
 }
 
 export interface EmbeddedTimestampState extends SignatureState {

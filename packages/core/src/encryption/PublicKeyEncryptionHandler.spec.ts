@@ -10,7 +10,6 @@ import { ViewWriter } from "../ViewWriter";
 import { PublicKeyEncryptionHandler } from "./PublicKeyEncryptionHandler";
 import { ViewReader } from "../ViewReader";
 import { PDFCryptoEngine } from "../CryptoEngine";
-import { PDFStream } from "../objects";
 
 context("PublicKeyEncryptionHandler", () => {
   const crypto = new Crypto();
@@ -120,7 +119,7 @@ context("PublicKeyEncryptionHandler", () => {
         assert.ok(doc2.encryptHandler instanceof PublicKeyEncryptionHandler);
 
         const keyParams = t.params.recipient.key;
-        doc2.encryptHandler.onCertificate = async (o) => {
+        doc2.encryptHandler.onCertificate = async (_o) => {
           return {
             certificate: t.params.recipient.cert,
             key: await crypto.subtle.importKey("pkcs8", keyParams.pkcs8, keyParams.algorithm, false, keyParams.usages),

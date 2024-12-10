@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 import * as asn1js from "asn1js";
 import * as pkijs from "pkijs";
@@ -59,7 +58,7 @@ export abstract class AsnEncoded<TAsn extends pkijs.PkiObject = any> {
     this.asn = this.onFromSchema(schema);
   }
 
-  public toSchema(): any {
+  public toSchema(): pkijs.SchemaType {
     return this.asn.toSchema();
   }
 

@@ -5,7 +5,7 @@ import { AsnEncoded } from "./AsnEncoded";
 
 class PKICertificate extends AsnEncoded {
 
-  protected onFromSchema(schema: any) {
+  protected onFromSchema(schema: pkijs.SchemaType): pkijs.Certificate {
     return new pkijs.Certificate({ schema });
   }
 

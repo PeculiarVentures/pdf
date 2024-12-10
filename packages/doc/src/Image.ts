@@ -109,8 +109,10 @@ export class Image extends WrapObject<core.ImageDictionary> {
       }
 
       throw new Error("Unknown type of the image.");
-    } catch (e: any) {
-      e.message = `Cannot create PDF Image. ${e.message}`;
+    } catch (e) {
+      if (e instanceof Error) {
+        e.message = `Cannot create PDF Image. ${e.message}`;
+      }
 
       throw e;
     }

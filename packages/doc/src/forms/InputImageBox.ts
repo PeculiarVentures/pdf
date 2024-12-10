@@ -25,7 +25,7 @@ export class InputImageBox extends FormComponent {
             if (firstEntry instanceof core.PDFDictionary
               && firstEntry.has("Subtype")
               && firstEntry.get("Subtype", core.PDFName).text === "Image") {
-              return new Image(firstEntry.to(core.ImageDictionary as any), this.document);
+              return new Image(firstEntry.to(core.ImageDictionary), this.document);
             }
           }
         }

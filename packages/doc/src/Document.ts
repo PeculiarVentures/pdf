@@ -315,8 +315,8 @@ export class PDFDocument {
   }
 
   public getComponentByName(name: string): forms.IComponent | null;
-  public getComponentByName<T>(name: string, type: new (target: any, document: PDFDocument) => T): T;
-  public getComponentByName(name: string, type?: typeof WrapObject): forms.IComponent | WrapObject<any> | null {
+  public getComponentByName<T>(name: string, type: new (target: never, document: PDFDocument) => T): T;
+  public getComponentByName(name: string, type?: typeof WrapObject): forms.IComponent | null {
     const acroForm = this.target.update.catalog?.AcroForm;
     let component: forms.IComponent | null = null;
 
@@ -397,8 +397,8 @@ export class PDFDocument {
   }
 
   public getComponentById(id: number, generation?: number): forms.IComponent | null;
-  public getComponentById<T>(id: number, generation: number, type: new (target: any, document: PDFDocument) => T): T;
-  public getComponentById(id: number, generation?: number, type?: typeof WrapObject): forms.IComponent | WrapObject<any> | null {
+  public getComponentById<T>(id: number, generation: number, type: new (target: never, document: PDFDocument) => T): T;
+  public getComponentById(id: number, generation?: number, type?: typeof WrapObject): forms.IComponent | null {
     let component: forms.IComponent | null = null;
 
     try {

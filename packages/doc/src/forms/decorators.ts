@@ -16,7 +16,7 @@ function flag(f: core.AnnotationFlags, fieldFlag = false, repaint = false): Prop
         return !!((flags & f) === f);
       },
       set: function (this: FormComponent, v: boolean): void {
-        const value = (this as any)[propertyKey];
+        const value = (this as unknown as Record<string | symbol, unknown>)[propertyKey];
         if (value === v) {
           return;
         }

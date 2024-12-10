@@ -16,13 +16,13 @@ export class CMSContentInfo extends AsnEncoded {
     return this.asn.content.toBER();
   }
 
-  protected onFromSchema(schema: any): any {
+  protected onFromSchema(schema: pkijs.SchemaType): pkijs.ContentInfo {
     return new pkijs.ContentInfo({ schema });
   }
 
   public constructor() {
     super();
-    
+
     this.asn = new pkijs.ContentInfo();
   }
 

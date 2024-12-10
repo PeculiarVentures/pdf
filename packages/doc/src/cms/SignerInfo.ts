@@ -91,7 +91,7 @@ export class CMSSignerInfo extends AsnEncoded {
     });
   }
 
-  protected onFromSchema(schema: any): any {
+  protected onFromSchema(schema: pkijs.SchemaType): pkijs.SignerInfo {
     const result = schema instanceof pkijs.SignerInfo ? schema : new pkijs.SignerInfo({ schema });
 
     // Load attributes
@@ -105,7 +105,7 @@ export class CMSSignerInfo extends AsnEncoded {
     return result;
   }
 
-  protected readAttributes(attrs?: any[]): attributes.CmsAttribute[] {
+  protected readAttributes(attrs?: pkijs.Attribute[]): attributes.CmsAttribute[] {
     const res: attributes.CmsAttribute[] = [];
     if (attrs) {
       for (const attr of attrs) {
@@ -174,7 +174,7 @@ export class CMSSignerInfo extends AsnEncoded {
     return cert;
   }
 
-  public override toSchema(): any {
+  public override toSchema(): pkijs.SchemaType {
     if (this.unsignedAttributes.length) {
       const attrs: pkijs.Attribute[] = [];
       for (const attr of this.unsignedAttributes) {

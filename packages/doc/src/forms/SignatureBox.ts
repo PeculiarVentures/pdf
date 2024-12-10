@@ -26,7 +26,7 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
       const field = this.getField();
 
       return new SignatureBoxGroup(field.to(core.SignatureField), this.document);
-    } catch (e) {
+    } catch {
       return null;
     }
   }

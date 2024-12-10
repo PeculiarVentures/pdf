@@ -63,7 +63,9 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
 
   public findCertificate(serialNumber: BufferSource, issuer: BufferSource): Promise<X509Certificate | null>;
   public findCertificate(spki: BufferSource): Promise<X509Certificate | null>;
-  public async findCertificate(serialNumber: any, issuer?: any): Promise<X509Certificate | null> {
+  // @internal
+  public findCertificate(serialNumber: BufferSource, issuer?: BufferSource): Promise<X509Certificate | null>;
+  public async findCertificate(serialNumber: BufferSource, issuer?: BufferSource): Promise<X509Certificate | null> {
     if (this.parent) {
       const cert = await this.parent.findCertificate(serialNumber, issuer);
       if (cert) {
@@ -84,8 +86,8 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
   public matchCertificate(cert: X509Certificate, serialNumber: BufferSource, issuer: BufferSource): Promise<boolean>;
   public matchCertificate(cert: X509Certificate, spki: BufferSource): Promise<boolean>;
   // @internal
-  public matchCertificate(cert: X509Certificate, serialNumber: any, issuer?: any): Promise<boolean>;
-  public async matchCertificate(cert: X509Certificate, serialNumber: any, issuer?: any): Promise<boolean> {
+  public matchCertificate(cert: X509Certificate, serialNumber: BufferSource, issuer?: BufferSource): Promise<boolean>;
+  public async matchCertificate(cert: X509Certificate, serialNumber: BufferSource, issuer?: BufferSource): Promise<boolean> {
     if (serialNumber && issuer) {
       // serial number and issuer
       serialNumber = BufferSourceConverter.toArrayBuffer(serialNumber);
@@ -193,7 +195,7 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
 
   protected async fetchCRL(cert: X509Certificate): Promise<IResult<CRL | null>>;
   protected async fetchCRL(uri: string): Promise<IResult<CRL | null>>;
-  protected async fetchCRL(uriOrCert: any): Promise<IResult<CRL | null>> {
+  protected async fetchCRL(uriOrCert: X509Certificate | string): Promise<IResult<CRL | null>> {
     let uri = "";
     if (uriOrCert instanceof X509Certificate) {
       const crlPoints = uriOrCert.getExtension(id_ce_cRLDistributionPoints);

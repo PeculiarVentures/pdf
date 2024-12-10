@@ -308,6 +308,7 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureField, S
         //#endregion
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error instanceof Object) {
         if ("signerCertificate" in error)

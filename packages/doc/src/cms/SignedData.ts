@@ -52,7 +52,7 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
     this.asn.contentType = CMSSignedData.CONTENT_TYPE;
   }
 
-  protected override onFromSchema(schema: any): any {
+  protected override onFromSchema(schema: pkijs.SchemaType): pkijs.ContentInfo {
     const result = super.onFromSchema(schema);
 
     if (result.contentType !== CMSSignedData.CONTENT_TYPE) {
@@ -90,16 +90,18 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
     if (this.signedData.crls) {
       for (const crl of this.signedData.crls) {
         if ("thisUpdate" in crl) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           this.certificateHandler.crls.push(crl as any); // TODO remove any
           this.crls.push({
             type: "crl",
             value: crl,
           });
         } else { // Assumed "revocation value" has "OtherRevocationInfoFormat"
-          if (crl.otherRevInfoFormat === "1.3.6.1.5.5.7.48.1.1") { // Basic OCSP response 
+          if (crl.otherRevInfoFormat === "1.3.6.1.5.5.7.48.1.1") { // Basic OCSP response
             this.certificateHandler.ocsps.push(OCSP.fromSchema(crl.otherRevInfo));
             this.crls.push({
               type: "ocsp",
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               value: crl as any, // TODO remove any
             });
           }
@@ -133,7 +135,7 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
     return result;
   }
 
-  public override toSchema(): any {
+  public override toSchema(): pkijs.SchemaType {
     if (this.certificates.length) {
       const pkiCerts: pkijs.Certificate[] = this.signedData.certificates = [];
       for (const cert of this.certificates) {
@@ -141,13 +143,13 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
       }
     }
     if (this.crls.length) {
-      const crls: any[] = this.signedData.crls = [];
+      const crls: pkijs.SignedDataCRL[] = this.signedData.crls = [];
       for (const crl of this.crls) {
         if (crl.type === "crl") {
-          crls.push(crl.value);
+          crls.push(crl.value as pkijs.CertificateRevocationList);
         } else if (crl.type === "ocsp") {
           // TODO Convert to OtherRevocationInfoFormat
-          crls.push(crl.value);
+          crls.push(crl.value as pkijs.CertificateRevocationList);
         }
       }
     }
@@ -230,7 +232,7 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
       }
 
       if (pkiResult.signerCertificate) {
-        pkiResult.signerCertificate = PKIUtils.certTox509(pkiResult.signerCertificate as any);
+        pkiResult.signerCertificate = PKIUtils.certTox509(pkiResult.signerCertificate as unknown as pkijs.Certificate);
       }
 
       pkiResult.signatureAlgorithm = {

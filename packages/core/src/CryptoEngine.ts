@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as pkijs from "pkijs";
 import { BufferSourceConverter } from "pvtsutils";
 
@@ -363,7 +364,7 @@ export class PDFCryptoEngine extends pkijs.CryptoEngine {
             return this.subtle.importKey("spki", publicKeyInfoView, algorithm, true, ["verify"]);
           }
       }
-    } catch (e) {
+    } catch {
       // nothing
     }
 

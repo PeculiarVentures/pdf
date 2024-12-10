@@ -52,7 +52,7 @@ export abstract class FormComponentRegistry {
   public static get(key: FormComponentType.signatureBoxGroup): typeof SignatureBoxGroup;
   public static get(key: FormComponentType.textEditor): typeof TextEditor;
   public static get(key: string): FormComponentRegistryItem;
-  public static get(key: string): any {
+  public static get(key: string): unknown {
     const item = this.items[key];
     if (item) {
       return item;

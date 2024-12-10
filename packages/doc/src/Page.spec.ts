@@ -352,7 +352,7 @@ context("Page", () => {
       assert.strictEqual(doc.pages.length, 0);
 
       const page = doc.pages.create();
-      const edit = page.addTextEditor({
+      const _edit = page.addTextEditor({
         top: "10mm",
         left: "5mm",
         text: "Default font",
@@ -583,7 +583,7 @@ context("Page", () => {
         groupName: "stepan",
       });
 
-      const img2 = page.addSignatureBox({
+      const _img2 = page.addSignatureBox({
         left: "40mm",
         top: "5mm",
         width: "3cm",

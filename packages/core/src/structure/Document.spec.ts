@@ -1,11 +1,10 @@
 import * as fs from "fs";
 import * as path from "path";
+import * as  pkijs from "pkijs";
 import { PDFArray, PDFDictionary, PDFNumeric, PDFStream } from "../objects";
 import { PDFTextString } from "../objects/TextString";
 import { PDFDocument } from "./Document";
 import { XrefStructure } from "./XrefStructure";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const pkijs = require("pkijs");
 import { Crypto } from "@peculiar/webcrypto";
 import { PDFCryptoEngine } from "../CryptoEngine";
 import { EncryptDictionary } from "./dictionaries";
@@ -143,7 +142,7 @@ context("Document", () => {
 
             // console.log(await doc.toString());
 
-            doc.update.catalog?.Pages;
+            // doc.update.catalog?.Pages;
             // console.log();
             // if (doc.update.xrefStructure && !doc.update.xrefStructure.prev) {
             // debugger;
@@ -216,7 +215,7 @@ context("Document", () => {
       await doc.createUpdate();
       console.log(Convert.ToBinary(pdf));
 
-      const forms = doc.update.catalog!.AcroForm.get();
+      const _forms = doc.update.catalog!.AcroForm.get();
 
       pdf = await doc.toPDF();
       console.log(Convert.ToBinary(pdf));
@@ -340,7 +339,7 @@ context("Document", () => {
 
   it("Create empty PDF", async () => {
     const doc = new PDFDocument();
-    const page = await doc.addPage();
+    const _page = await doc.addPage();
 
     const raw = await doc.toPDF();
     fs.writeFileSync(path.join(filesDir, "..", "new.pdf"), Buffer.from(raw), { flag: "w+" });

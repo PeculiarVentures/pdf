@@ -1,6 +1,7 @@
 import type { PDFDictionary } from "../Dictionary";
 import type { PDFObject, PDFObjectConstructor } from "../Object";
 import { PDFNull } from "../Null";
+import { PDFObjectTypes } from "../ObjectTypes";
 
 export class Maybe<T extends PDFObject> {
 
@@ -35,7 +36,7 @@ export class Maybe<T extends PDFObject> {
 
       this.parent
         .modify()
-        .set(this.name, value as any)
+        .set(this.name, value as unknown as PDFObjectTypes)
         .view = Maybe.DEFAULT_VIEW;
 
       return value;
@@ -57,7 +58,7 @@ export class Maybe<T extends PDFObject> {
       if (this.indirect) {
         value.makeIndirect();
       }
-      parent.set(this.name, value as any);
+      parent.set(this.name, value as unknown as PDFObjectTypes);
     }
   }
 

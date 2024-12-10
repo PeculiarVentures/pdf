@@ -115,6 +115,7 @@ export class PDFDictionary extends PDFObject {
    * @param replace Replace the original item
    */
   public get<T extends PDFObject>(name: PDFDictionaryKey, type: abstract new () => T, replace?: boolean): T;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public get(name: PDFDictionaryKey, type?: any, replace = false): any {
     const pdfName = PDFDictionary.getName(name);
     let res = this.items.get(PDFDictionary.getName(pdfName));
@@ -143,7 +144,7 @@ export class PDFDictionary extends PDFObject {
     let resType: PDFObject;
     try {
       resType = PDFTypeConverter.convert(res, type, replace);
-    } catch (e) {
+    } catch {
       throw new Error(`Cannot convert PDF Dictionary value by name '${pdfName.toString()}' to type '${type.name}'`);
     }
     if (replace && !resType.isIndirect) {

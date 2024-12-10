@@ -3,7 +3,7 @@ export class PDFTypeConverter {
   public static convert<T extends PDFObject>(target: T): T;
   public static convert<T extends PDFObject>(target: PDFObject, type: abstract new () => T, replace?: boolean): T;
 
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public static convert(target: PDFObject, type?: any, replace = false): any {
     if (type) {
       if (type.__proto__ === PDFObject
@@ -17,11 +17,11 @@ export class PDFTypeConverter {
         // extends of simple PDF objects
         if (!(target instanceof type)) {
           const res = new type(target);
-  
+
           if (replace && target.ownerElement instanceof PDFIndirectObject) {
             target.ownerElement.value = res;
           }
-  
+
           return res;
         }
       }

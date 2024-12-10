@@ -222,6 +222,7 @@ export class Graphics extends WrapContentChild {
 
   public rect(width: core.TypographySize, height: core.TypographySize, original?: boolean): this;
   public rect(left: core.TypographySize, top: core.TypographySize, width: core.TypographySize, height: core.TypographySize, original?: boolean): this;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public rect(...args: any[]): this {
     let x, y, width, height: number;
     if (args.length === 2 || args.length === 3) {

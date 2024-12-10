@@ -4,7 +4,6 @@ import { ResourceManager } from "../ResourceManager";
 import { FontComponent } from "../Font";
 import { FormComponent } from "./FormComponent";
 import { fieldFlag } from "./decorators";
-import { FormComponentRegistry, FormComponentType } from "./FormComponent.Registry";
 
 /**
  * Represents a ComboBox form component which allows users to select

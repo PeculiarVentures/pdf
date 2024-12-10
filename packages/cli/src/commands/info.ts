@@ -7,10 +7,10 @@ export const info = new Command("info")
 
 info.description("Prints PDF document information");
 
-info.action(async (file, options, command) => {
+info.action(async (file, _options, _command) => {
   const raw = fs.readFileSync(file);
   const doc = await PDFDocument.load(raw);
-  
+
   const info = await doc.target.toString();
 
   console.log(info);

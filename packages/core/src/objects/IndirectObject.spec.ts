@@ -2,12 +2,13 @@ import * as assert from "assert";
 import { PDFDictionary } from "./Dictionary";
 import { PDFIndirectObject } from "./IndirectObject";
 import { PDFStream } from "./Stream";
+import { PDFObject } from "./Object";
 
 context("IndirectReference", () => {
 
   context("fromPDF", () => {
 
-    const vector: [string, any][] = [
+    const vector: [string, typeof PDFObject][] = [
       // [
       //   "12 0 obj\n  << /Length 7 >> \nendobj",
       //   PDFDictionary,

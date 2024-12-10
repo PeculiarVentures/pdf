@@ -266,10 +266,10 @@ export class TextEditor extends FormComponent {
   /**
    * Looks for a font in the document resources.
    * @param fontName Font name to find
-   * @param value Text value to check if font is suitable
+   * @param _value Text value to check if font is suitable
    * @returns FontComponent if font is found, null otherwise
    */
-  protected findFont(fontName: string, value?: string): FontComponent | null {
+  protected findFont(fontName: string, _value?: string): FontComponent | null {
     let resource: Resource | null = null;
 
     // Find in Appearance.Resources

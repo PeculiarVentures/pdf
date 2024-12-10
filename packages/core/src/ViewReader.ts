@@ -54,6 +54,7 @@ export class ViewReader {
   protected findIndexByCallback(cb: ViewReaderFindCallback): number {
     const step = this.backward ? -1 : 1;
 
+    // eslint-disable-next-line no-constant-condition
     for (this.position; true; this.position += step) {
       const value = this.view[this.position];
       if (value === undefined) {

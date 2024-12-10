@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { PDFIndirectObject, PDFIndirectReference, PDFNull, PDFObject, PDFStream } from "../objects";
 import { CompressedObject } from "./CompressedObject";
 import type { CrossReferenceTable } from "./CrossReferenceTable";

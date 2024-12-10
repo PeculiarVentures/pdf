@@ -1,4 +1,4 @@
-import { PDFArray, PDFBooleanField, PDFDictionary, PDFDictionaryField, PDFTextString } from "../../objects";
+import { PDFArray, PDFBooleanField, PDFDictionaryField, PDFTextString } from "../../objects";
 import { CryptoFilterDictionary } from "./CryptoFilter";
 
 export class PublicKeyCryptoFilterDictionary extends CryptoFilterDictionary {

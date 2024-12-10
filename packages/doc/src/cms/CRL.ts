@@ -5,10 +5,10 @@ import { AsnEncoded } from "./AsnEncoded";
 
 export class CRL extends AsnEncoded {
 
-  protected onFromSchema(schema: any): any {
+  protected onFromSchema(schema: pkijs.SchemaType): pkijs.CertificateRevocationList {
     if (schema instanceof pkijs.CertificateRevocationList) {
       this.asn = schema;
-      
+
       return schema;
     }
 
@@ -17,7 +17,7 @@ export class CRL extends AsnEncoded {
 
   public get issuer(): string {
     const issuerRaw = this.asn.issuer.toSchema().toBER();
-    
+
     return new Name(issuerRaw).toString();
   }
 
@@ -26,7 +26,7 @@ export class CRL extends AsnEncoded {
       return this.asn.verify({
         issuerCertificate: PKIUtils.x509ToCert(issuer),
       });
-    } catch(e) {
+    } catch {
       return false;
     }
   }

@@ -1,10 +1,10 @@
 import { Crypto } from "@peculiar/webcrypto";
 import * as x509 from "@peculiar/x509";
 import * as assert from "assert";
+import * as pkijs from "pkijs";
 import { Convert } from "pvtsutils";
 import { ContentTypeAttribute, MessageDigestAttribute, SigningTimeAttribute } from "./attributes";
 import { CertificateChain } from "./CertificateChain";
-const pkijs = require("pkijs");
 import { CMSSignedData } from "./SignedData";
 import { cms, data } from "./SignedData.vector.spec";
 import { CMSContentType } from "./SignerInfo";
@@ -29,7 +29,7 @@ context("SignedData", () => {
         if (signer.signerCertificate) {
           const chain = new CertificateChain();
           chain.certificateHandler = signedData.certificateHandler;
-          const chainResult = await chain.build(signer.signerCertificate, { checkDate: result.date });
+          const _chainResult = await chain.build(signer.signerCertificate, { checkDate: result.date });
         }
       }
 

@@ -1,4 +1,3 @@
-import * as assert from "assert";
 import { PDFDictionary, PDFNumeric } from "../objects";
 import { PDFDocument } from "./Document";
 import { XrefStructure } from "./XrefStructure";
@@ -30,7 +29,7 @@ context("CrossReferenceTable", () => {
     const doc2 = new PDFDocument();
     await doc2.fromPDF(buf);
 
-    const dict1_2 = doc2.getObject(objDict1.id);
+    const _dict1_2 = doc2.getObject(objDict1.id);
   });
 
 });

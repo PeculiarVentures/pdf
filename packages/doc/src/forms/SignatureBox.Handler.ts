@@ -8,7 +8,7 @@ export interface ISignatureBoxCreateParameters extends IFormComponentCreateParam
   groupName?: string;
 }
 
-export interface ISignatureBoxParameters extends IFormComponentParameters { }
+export type ISignatureBoxParameters = IFormComponentParameters;
 
 export interface ISignatureBoxHandler extends IFormComponentHandler {
   document: PDFDocument;

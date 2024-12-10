@@ -46,7 +46,7 @@ export class RunLengthFilter extends Filter {
     return result.stream.buffer.slice(0, result.start);
   }
 
-  public encodeSync(stream: Uint8Array): ArrayBuffer {
+  public encodeSync(_stream: Uint8Array): ArrayBuffer {
     throw new Error("Method not implemented");
   }
 

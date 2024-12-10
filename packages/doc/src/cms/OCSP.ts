@@ -45,7 +45,7 @@ export class OCSP extends AsnEncoded {
     return this.#certificates;
   }
 
-  protected onFromSchema(schema: any): any {
+  protected onFromSchema(schema: pkijs.SchemaType): pkijs.BasicOCSPResponse {
     if (schema instanceof pkijs.BasicOCSPResponse) {
       this.asn = schema;
 
