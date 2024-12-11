@@ -1,111 +1,247 @@
-import * as assert from "node:assert";
 import { PDFDocument } from "../Document";
-import { PDFBoolean, PDFDictionary, PDFNumeric, PDFObject, PDFTextString } from "../../objects";
+import {
+  PDFBoolean,
+  PDFDictionary,
+  PDFNumeric,
+  PDFObject,
+  PDFTextString
+} from "../../objects";
 import { NameTree } from "./NameTree";
 import { ViewWriter } from "../../ViewWriter";
+import { XrefStructure } from "../XrefStructure";
 
-context("NameTree", () => {
+describe("NameTree", () => {
+  let doc: PDFDocument;
+  let rootKids: NameTree;
+  let rootNames: NameTree;
 
-  const doc = new PDFDocument();
+  beforeAll(async () => {
+    doc = new PDFDocument();
+    doc.options.xref = XrefStructure.Table;
+    doc.options.disableAscii85Encoding = true;
+    doc.options.disableCompressedStreams = true;
+    doc.options.disableCompressedObjects = true;
+    doc.update.addCatalog();
 
-  const rootKids = new NameTree(doc.createDictionary( // Root node
-    ["Kids", doc.createArray(
-      doc.createDictionary( // Intermediate node
-        ["Limits", doc.createArray(doc.createString("AAA"), doc.createString("FFF"))],
-        ["Kids", doc.createArray(
-          doc.createDictionary( // Leaf node
-            ["Limits", doc.createArray(doc.createString("AAA"), doc.createString("CCC"))],
-            ["Names", doc.createArray(
-              doc.createString("AAA"), doc.createNumber(1),
-              doc.createString("BBB"), doc.createNumber(2),
-              doc.createString("CCC"), doc.createNumber(3),
-            )],
-          ).makeIndirect(),
-          doc.createDictionary( // Leaf node
-            ["Limits", doc.createArray(doc.createString("DDD"), doc.createString("FFF"))],
-            ["Names", doc.createArray(
-              doc.createString("DDD"), doc.createNumber(4),
-              doc.createString("EEE"), doc.createNumber(5),
-              doc.createString("FFF"), doc.createNumber(6),
-            )],
-          ).makeIndirect(),
-        )],
-      ).makeIndirect(),
-      doc.createDictionary( // Intermediate node
-        ["Limits", doc.createArray(doc.createString("GGG"), doc.createString("III"))],
-        ["Names", doc.createArray(
-          doc.createString("GGG"), doc.createNumber(7),
-          doc.createString("HHH"), doc.createNumber(8),
-          doc.createString("III"), doc.createNumber(9),
-        )],
-      ).makeIndirect(),
-    )],
-  ).makeIndirect());
+    rootKids = new NameTree(
+      doc
+        .createDictionary(
+          // Root node
+          [
+            "Kids",
+            doc.createArray(
+              doc
+                .createDictionary(
+                  // Intermediate node
+                  [
+                    "Limits",
+                    doc.createArray(
+                      doc.createString("AAA"),
+                      doc.createString("FFF")
+                    )
+                  ],
+                  [
+                    "Kids",
+                    doc.createArray(
+                      doc
+                        .createDictionary(
+                          // Leaf node
+                          [
+                            "Limits",
+                            doc.createArray(
+                              doc.createString("AAA"),
+                              doc.createString("CCC")
+                            )
+                          ],
+                          [
+                            "Names",
+                            doc.createArray(
+                              doc.createString("AAA"),
+                              doc.createNumber(1),
+                              doc.createString("BBB"),
+                              doc.createNumber(2),
+                              doc.createString("CCC"),
+                              doc.createNumber(3)
+                            )
+                          ]
+                        )
+                        .makeIndirect(),
+                      doc
+                        .createDictionary(
+                          // Leaf node
+                          [
+                            "Limits",
+                            doc.createArray(
+                              doc.createString("DDD"),
+                              doc.createString("FFF")
+                            )
+                          ],
+                          [
+                            "Names",
+                            doc.createArray(
+                              doc.createString("DDD"),
+                              doc.createNumber(4),
+                              doc.createString("EEE"),
+                              doc.createNumber(5),
+                              doc.createString("FFF"),
+                              doc.createNumber(6)
+                            )
+                          ]
+                        )
+                        .makeIndirect()
+                    )
+                  ]
+                )
+                .makeIndirect(),
+              doc
+                .createDictionary(
+                  // Intermediate node
+                  [
+                    "Limits",
+                    doc.createArray(
+                      doc.createString("GGG"),
+                      doc.createString("III")
+                    )
+                  ],
+                  [
+                    "Names",
+                    doc.createArray(
+                      doc.createString("GGG"),
+                      doc.createNumber(7),
+                      doc.createString("HHH"),
+                      doc.createNumber(8),
+                      doc.createString("III"),
+                      doc.createNumber(9)
+                    )
+                  ]
+                )
+                .makeIndirect()
+            )
+          ]
+        )
+        .makeIndirect()
+    );
 
-  const rootNames = new NameTree(doc.createDictionary( // Root node
-    ["Names", doc.createArray(
-      doc.createString("AAA"), doc.createNumber(1),
-      doc.createString("BBB"), doc.createNumber(2),
-      doc.createString("CCC"), doc.createNumber(3),
-    )],
-  ));
+    rootNames = new NameTree(
+      doc.createDictionary(
+        // Root node
+        [
+          "Names",
+          doc.createArray(
+            doc.createString("AAA"),
+            doc.createNumber(1),
+            doc.createString("BBB"),
+            doc.createNumber(2),
+            doc.createString("CCC"),
+            doc.createNumber(3)
+          )
+        ]
+      )
+    );
+  });
 
-  context("findValue", () => {
-    const tests: {
-      name: string;
-      params: string;
-      want: number | null;
-    }[] = [
-        {
-          name: "BBB",
-          params: "BBB",
-          want: 2,
-        },
-        {
-          name: "FFF",
-          params: "FFF",
-          want: 6,
-        },
-        {
-          name: "GGG",
-          params: "GGG",
-          want: 7
-        },
-        {
-          name: "WWW (empty)",
-          params: "WWW",
-          want: null
-        },
-      ];
+  describe("type", () => {
+    it("should return EMPTY when no Names or Kids", () => {
+      const tree = new NameTree(doc.createDictionary());
+      expect(tree.type).toBe(NameTree.EMPTY);
+    });
 
-    for (const t of tests) {
-      it(t.name, async () => {
-        const res = rootKids.findValue(t.params);
-        if (t.want === null) {
-          assert.strictEqual(res, t.want);
-        } else {
-          assert.ok(res instanceof PDFNumeric, "Incorrect type of the value");
-          assert.strictEqual(res.value, t.want);
-        }
-      });
-    }
+    it("should return ROOT when has Names without Limits", () => {
+      const tree = new NameTree(
+        doc.createDictionary(["Names", doc.createArray()])
+      );
+      expect(tree.type).toBe(NameTree.ROOT);
+    });
+
+    it("should return LEAF when has both Names and Limits", () => {
+      const tree = new NameTree(
+        doc.createDictionary(
+          ["Names", doc.createArray()],
+          ["Limits", doc.createArray()]
+        )
+      );
+      expect(tree.type).toBe(NameTree.LEAF);
+    });
+
+    it("should return ROOT when has Kids without Limits", () => {
+      const tree = new NameTree(
+        doc.createDictionary(["Kids", doc.createArray()])
+      );
+      expect(tree.type).toBe(NameTree.ROOT);
+    });
+
+    it("should return INTERMEDIATE when has both Kids and Limits", () => {
+      const tree = new NameTree(
+        doc.createDictionary(
+          ["Kids", doc.createArray()],
+          ["Limits", doc.createArray()]
+        )
+      );
+      expect(tree.type).toBe(NameTree.INTERMEDIATE);
+    });
+  });
+
+  describe("findValue", () => {
+    const checkFindValue = (
+      name: string,
+      tree: NameTree,
+      key: string,
+      want: number | null
+    ) => {
+      const res = tree.findValue(key);
+      if (want === null) {
+        expect(res).toBe(want);
+      } else {
+        expect(res).toBeInstanceOf(PDFNumeric);
+        expect((res as PDFNumeric).value).toBe(want);
+      }
+    };
+
+    it("root with Kids - BBB", () => {
+      checkFindValue("BBB", rootKids, "BBB", 2);
+    });
+
+    it("root with Kids - FFF", () => {
+      checkFindValue("FFF", rootKids, "FFF", 6);
+    });
+
+    it("root with Kids - GGG", () => {
+      checkFindValue("GGG", rootKids, "GGG", 7);
+    });
+
+    it("root with Kids - WWW (empty)", () => {
+      checkFindValue("WWW", rootKids, "WWW", null);
+    });
+
+    it("root with Names - BBB", () => {
+      checkFindValue("BBB", rootNames, "BBB", 2);
+    });
   });
 
   it("keys", () => {
     const keys = rootKids.keys();
-    assert.deepStrictEqual(keys, ["AAA", "BBB", "CCC", "DDD", "EEE", "FFF", "GGG", "HHH", "III"]);
+    expect(keys).toEqual([
+      "AAA",
+      "BBB",
+      "CCC",
+      "DDD",
+      "EEE",
+      "FFF",
+      "GGG",
+      "HHH",
+      "III"
+    ]);
   });
 
   it("entries", () => {
-    const keys = rootKids.entries().map(o => {
-      assert.ok(o instanceof PDFNumeric);
-
-      return o.value;
+    const keys = rootKids.entries().map((o) => {
+      expect(o).toBeInstanceOf(PDFNumeric);
+      return (o as PDFNumeric).value;
     });
-    assert.deepStrictEqual(keys, [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    expect(keys).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
   });
 
-  context("getValue", () => {
+  describe("getValue", () => {
     const tests: {
       name: string;
       params: {
@@ -114,108 +250,85 @@ context("NameTree", () => {
       };
       want: number | typeof Error;
     }[] = [
-        {
-          name: "AAA",
-          params: {
-            key: "AAA",
-            type: PDFNumeric,
-          },
-          want: 1,
+      {
+        name: "AAA",
+        params: {
+          key: "AAA",
+          type: PDFNumeric
         },
-        {
-          name: "cannot be retrieved",
-          params: {
-            key: "WWWW",
-          },
-          want: Error,
+        want: 1
+      },
+      {
+        name: "cannot be retrieved",
+        params: {
+          key: "WWWW"
         },
-        {
-          name: "cannot be cast",
-          params: {
-            key: "BBB",
-            type: PDFBoolean,
-          },
-          want: TypeError,
+        want: Error
+      },
+      {
+        name: "cannot be cast",
+        params: {
+          key: "BBB",
+          type: PDFBoolean
         },
-      ];
+        want: TypeError
+      }
+    ];
 
     for (const t of tests) {
       it(t.name, async () => {
         if (typeof t.want === "number") {
           rootKids.getValue(t.params.key, t.params.type);
         } else {
-          assert.throws(() => {
+          expect(() => {
             rootKids.getValue(t.params.key, t.params.type);
-          }, t.want);
+          }).toThrow(t.want);
         }
       });
     }
   });
 
-  context("first", () => {
-    const tests: {
-      name: string;
-      tree: NameTree;
-      want: string | null;
-    }[] = [
-        {
-          name: "root with Kids",
-          tree: rootKids,
-          want: "AAA",
-        },
-        {
-          name: "root with Names",
-          tree: rootNames,
-          want: "AAA",
-        },
-      ];
+  describe("first", () => {
+    const checkFirst = (name: string, tree: NameTree, want: string | null) => {
+      const res = tree.first();
+      if (want === null) {
+        expect(res).toBe(want);
+      } else {
+        expect(res).toBeTruthy();
+        expect(res![0]).toBe(want);
+      }
+    };
 
-    for (const t of tests) {
-      it(t.name, async () => {
-        const res = t.tree.first();
-        if (t.want === null) {
-          assert.strictEqual(res, t.want);
-        } else {
-          assert.ok(res);
-          assert.strictEqual(res[0], t.want);
-        }
-      });
-    }
+    it("root with Kids", async () => {
+      checkFirst("root with Kids", rootKids, "AAA");
+    });
+
+    it("root with Names", async () => {
+      checkFirst("root with Names", rootNames, "AAA");
+    });
   });
 
-  context("last", () => {
-    const tests: {
-      name: string;
-      tree: NameTree;
-      want: string | null;
-    }[] = [
-        {
-          name: "root with Kids",
-          tree: rootKids,
-          want: "III",
-        },
-        {
-          name: "root with Names",
-          tree: rootNames,
-          want: "CCC",
-        },
-      ];
+  describe("last", () => {
+    const checkLast = (name: string, tree: NameTree, want: string | null) => {
+      const res = tree.last();
+      if (want === null) {
+        expect(res).toBe(want);
+      } else {
+        expect(res).toBeTruthy();
+        expect(res![0]).toBe(want);
+      }
+    };
 
-    for (const t of tests) {
-      it(t.name, async () => {
-        const res = t.tree.last();
-        if (t.want === null) {
-          assert.strictEqual(res, t.want);
-        } else {
-          assert.ok(res);
-          assert.strictEqual(res[0], t.want);
-        }
-      });
-    }
+    it("root with Kids", async () => {
+      checkLast("root with Kids", rootKids, "III");
+    });
+
+    it("root with Names", async () => {
+      checkLast("root with Names", rootNames, "CCC");
+    });
   });
 
-  context("setValue", () => {
-
+  describe("setValue", () => {
     it("Root with Names", () => {
       const doc = new PDFDocument();
       const tree = NameTree.create(doc);
@@ -230,16 +343,18 @@ context("NameTree", () => {
       tree.setValue("GGG", doc.createDictionary());
       tree.setValue("HHH", doc.createArray());
 
-      assert.strictEqual(tree.Names.length, 16);
-      assert.strictEqual(tree.Names.toString(), "[ (AAA), 1, (BBB), true, (CCC), 4 0 R, (DDD), null, (EEE), 5 0 R, (FFF), /name, (GGG), 6 0 R, (HHH), 7 0 R ]");
+      expect(tree.Names.length).toBe(16);
+      expect(tree.Names.toString()).toBe(
+        "[ (AAA), 1, (BBB), true, (CCC), 3 0 R, (DDD), null, (EEE), 4 0 R, (FFF), /name, (GGG), 5 0 R, (HHH), 6 0 R ]"
+      );
     });
 
-    context("Root with Kids", () => {
+    describe("Root with Kids", () => {
       let raw: ArrayBuffer;
       let doc2: PDFDocument;
       let tree: NameTree;
 
-      before(async () => {
+      beforeAll(async () => {
         const writer = new ViewWriter();
         await doc.writePDF(writer);
         raw = writer.toArrayBuffer();
@@ -250,49 +365,86 @@ context("NameTree", () => {
         await doc2.fromPDF(raw);
 
         const treeObj = doc2.getObject(rootKids.getIndirect()).value;
-        assert.ok(treeObj instanceof PDFDictionary);
-        tree = treeObj.to(NameTree);
+        expect(treeObj).toBeInstanceOf(PDFDictionary);
+        tree = (treeObj as PDFDictionary).to(NameTree);
       });
 
       it("before AAA, first", async () => {
         tree.setValue("A", doc2.createNumber(1));
 
-        assert.strictEqual(tree.Kids?.get(0, NameTree).Limits?.get(0, PDFTextString).text, "A");
-        assert.strictEqual(tree.Kids?.get(0, NameTree).Limits?.get(1, PDFTextString).text, "FFF");
-        assert.strictEqual(tree.Kids?.get(0, NameTree).Kids?.get(0, NameTree).Limits?.get(0, PDFTextString).text, "A");
-        assert.strictEqual(tree.Kids?.get(0, NameTree).Kids?.get(0, NameTree).Limits?.get(1, PDFTextString).text, "CCC");
-        assert.strictEqual(tree.Kids?.get(0, NameTree).Kids?.get(0, NameTree).Names?.length, 8);
+        expect(
+          tree.Kids?.get(0, NameTree).Limits?.get(0, PDFTextString).text
+        ).toBe("A");
+        expect(
+          tree.Kids?.get(0, NameTree).Limits?.get(1, PDFTextString).text
+        ).toBe("FFF");
+        expect(
+          tree.Kids?.get(0, NameTree)
+            .Kids?.get(0, NameTree)
+            .Limits?.get(0, PDFTextString).text
+        ).toBe("A");
+        expect(
+          tree.Kids?.get(0, NameTree)
+            .Kids?.get(0, NameTree)
+            .Limits?.get(1, PDFTextString).text
+        ).toBe("CCC");
+        expect(
+          tree.Kids?.get(0, NameTree).Kids?.get(0, NameTree).Names?.length
+        ).toBe(8);
       });
 
       it("inside AAA-FFF, middle", async () => {
         tree.setValue("D", doc2.createNumber(1));
 
-        assert.strictEqual(tree.Kids?.get(0, NameTree).Limits?.get(0, PDFTextString).text, "AAA");
-        assert.strictEqual(tree.Kids?.get(0, NameTree).Limits?.get(1, PDFTextString).text, "FFF");
-        assert.strictEqual(tree.Kids?.get(0, NameTree).Kids?.get(0, NameTree).Limits?.get(1, PDFTextString).text, "D");
-        assert.strictEqual(tree.Kids?.get(0, NameTree).Kids?.get(0, NameTree).Names?.length, 8);
+        expect(
+          tree.Kids?.get(0, NameTree).Limits?.get(0, PDFTextString).text
+        ).toBe("AAA");
+        expect(
+          tree.Kids?.get(0, NameTree).Limits?.get(1, PDFTextString).text
+        ).toBe("FFF");
+        expect(
+          tree.Kids?.get(0, NameTree)
+            .Kids?.get(0, NameTree)
+            .Limits?.get(1, PDFTextString).text
+        ).toBe("D");
+        expect(
+          tree.Kids?.get(0, NameTree).Kids?.get(0, NameTree).Names?.length
+        ).toBe(8);
       });
 
       it("between FFF and GGG from different groups, middle", async () => {
         tree.setValue("G", doc2.createNumber(0));
 
-        assert.strictEqual(tree.Kids?.get(0, NameTree).Limits?.get(0, PDFTextString).text, "AAA");
-        assert.strictEqual(tree.Kids?.get(0, NameTree).Limits?.get(1, PDFTextString).text, "G");
-        assert.strictEqual(tree.Kids?.get(1, NameTree).Limits?.get(0, PDFTextString).text, "GGG");
-        assert.strictEqual(tree.Kids?.get(0, NameTree).Kids?.get(1, NameTree).Limits?.get(1, PDFTextString).text, "G");
-        assert.strictEqual(tree.Kids?.get(0, NameTree).Kids?.get(1, NameTree).Names?.length, 8);
+        expect(
+          tree.Kids?.get(0, NameTree).Limits?.get(0, PDFTextString).text
+        ).toBe("AAA");
+        expect(
+          tree.Kids?.get(0, NameTree).Limits?.get(1, PDFTextString).text
+        ).toBe("G");
+        expect(
+          tree.Kids?.get(1, NameTree).Limits?.get(0, PDFTextString).text
+        ).toBe("GGG");
+        expect(
+          tree.Kids?.get(0, NameTree)
+            .Kids?.get(1, NameTree)
+            .Limits?.get(1, PDFTextString).text
+        ).toBe("G");
+        expect(
+          tree.Kids?.get(0, NameTree).Kids?.get(1, NameTree).Names?.length
+        ).toBe(8);
       });
 
       it("after III, last", async () => {
         tree.setValue("J", doc2.createNumber(0));
 
-        assert.strictEqual(tree.Kids?.get(1, NameTree).Limits?.get(0, PDFTextString).text, "GGG");
-        assert.strictEqual(tree.Kids?.get(1, NameTree).Limits?.get(1, PDFTextString).text, "J");
-        assert.strictEqual(tree.Kids?.get(1, NameTree).Names?.length, 8);
+        expect(
+          tree.Kids?.get(1, NameTree).Limits?.get(0, PDFTextString).text
+        ).toBe("GGG");
+        expect(
+          tree.Kids?.get(1, NameTree).Limits?.get(1, PDFTextString).text
+        ).toBe("J");
+        expect(tree.Kids?.get(1, NameTree).Names?.length).toBe(8);
       });
-
     });
-
   });
-
 });
