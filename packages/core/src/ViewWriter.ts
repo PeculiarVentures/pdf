@@ -3,7 +3,6 @@ import { CharSet } from "./CharSet";
 
 export type ViewWriterCallback = (subarray: Uint8Array) => void;
 export class ViewWriter {
-
   private buffer: [Uint8Array, ViewWriterCallback?][] = [];
   private totalLength = 0;
 
@@ -69,4 +68,7 @@ export class ViewWriter {
     return res;
   }
 
+  public toString(): string {
+    return Convert.ToBinary(this.toUint8Array());
+  }
 }
