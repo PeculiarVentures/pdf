@@ -5,13 +5,17 @@ import { ViewReader } from "../ViewReader";
 import { ViewWriter } from "../ViewWriter";
 
 function isPdfIndirect(data: unknown): data is IPDFIndirect {
-  return typeof data === "object" && !!data &&
-    "id" in data && typeof data.id === "number" &&
-    "generation" in data && typeof data.generation === "number";
+  return (
+    typeof data === "object" &&
+    !!data &&
+    "id" in data &&
+    typeof data.id === "number" &&
+    "generation" in data &&
+    typeof data.generation === "number"
+  );
 }
 
 export interface PDFObjectConstructor<T extends PDFObject> {
-
   /**
    * Name of the PDF Object. This name is required for ObjectReader.
    */
@@ -19,10 +23,14 @@ export interface PDFObjectConstructor<T extends PDFObject> {
   fromPDF(this: new () => T, reader: ViewReader): T;
   fromPDF(this: new () => T, data: Uint8Array, offset?: number): T;
   fromPDF(this: new () => T, text: string): T;
-  fromPDF(this: new () => T, data: Uint8Array | ViewReader | string, offset?: number): T;
+  fromPDF(
+    this: new () => T,
+    data: Uint8Array | ViewReader | string,
+    offset?: number
+  ): T;
   create(this: new () => T, update: PDFDocumentUpdate): T;
 
-  new(): T;
+  new (): T;
 }
 
 export interface IPDFIndirect {
@@ -31,7 +39,6 @@ export interface IPDFIndirect {
 }
 
 export abstract class PDFObject {
-
   public static readonly DEFAULT_VIEW = new Uint8Array();
 
   /**
@@ -39,10 +46,13 @@ export abstract class PDFObject {
    * @param target PDF document or update
    * @returns
    */
-  public static create<T extends PDFObject>(this: new () => T, target: PDFDocument | PDFDocumentUpdate): T {
+  public static create<T extends PDFObject>(
+    this: new () => T,
+    target: PDFDocument | PDFDocumentUpdate
+  ): T {
     const obj = new this();
 
-    obj.documentUpdate = ("update" in target) ? target.update : target;
+    obj.documentUpdate = "update" in target ? target.update : target;
     obj.onCreate();
 
     return obj;
@@ -55,20 +65,46 @@ export abstract class PDFObject {
   public static getReader(reader: ViewReader): ViewReader;
   public static getReader(text: string): ViewReader;
   public static getReader(data: BufferSource, offset?: number): ViewReader;
-  public static getReader(data: BufferSource | ViewReader | string, offset?: number): ViewReader;
-  public static getReader(data: BufferSource | ViewReader | string, offset = 0): ViewReader {
-    return (data instanceof ViewReader)
+  public static getReader(
+    data: BufferSource | ViewReader | string,
+    offset?: number
+  ): ViewReader;
+  public static getReader(
+    data: BufferSource | ViewReader | string,
+    offset = 0
+  ): ViewReader {
+    return data instanceof ViewReader
       ? data
-      : (typeof data === "string")
-        ? new ViewReader(new Uint8Array(Convert.FromBinary(data)))
-        : new ViewReader(BufferSourceConverter.toUint8Array(data).subarray(offset));
+      : typeof data === "string"
+      ? new ViewReader(new Uint8Array(Convert.FromBinary(data)))
+      : new ViewReader(
+          BufferSourceConverter.toUint8Array(data).subarray(offset)
+        );
   }
 
-  public static fromPDF<T extends PDFObject>(this: new () => T, reader: ViewReader): T;
-  public static fromPDF<T extends PDFObject>(this: new () => T, data: Uint8Array, offset?: number): T;
-  public static fromPDF<T extends PDFObject>(this: new () => T, text: string): T;
-  public static fromPDF<T extends PDFObject>(this: new () => T, data: Uint8Array | ViewReader | string, offset?: number): T;
-  public static fromPDF<T extends PDFObject>(this: new () => T, data: Uint8Array | ViewReader | string, offset = 0): T {
+  public static fromPDF<T extends PDFObject>(
+    this: new () => T,
+    reader: ViewReader
+  ): T;
+  public static fromPDF<T extends PDFObject>(
+    this: new () => T,
+    data: Uint8Array,
+    offset?: number
+  ): T;
+  public static fromPDF<T extends PDFObject>(
+    this: new () => T,
+    text: string
+  ): T;
+  public static fromPDF<T extends PDFObject>(
+    this: new () => T,
+    data: Uint8Array | ViewReader | string,
+    offset?: number
+  ): T;
+  public static fromPDF<T extends PDFObject>(
+    this: new () => T,
+    data: Uint8Array | ViewReader | string,
+    offset = 0
+  ): T {
     const obj = new this();
     obj.fromPDF(data, offset);
 
@@ -162,20 +198,25 @@ export abstract class PDFObject {
     }
 
     writer.write(new Uint8Array(), (subarray) => {
-      this.view = new Uint8Array(subarray.buffer).subarray(offset, offset + length);
+      this.view = new Uint8Array(subarray.buffer).subarray(
+        offset,
+        offset + length
+      );
     });
   }
 
   public fromPDF(reader: ViewReader): number;
   public fromPDF(text: string): number;
   public fromPDF(data: Uint8Array, offset?: number): number;
-  public fromPDF(data: Uint8Array | ViewReader | string, offset?: number): number;
+  public fromPDF(
+    data: Uint8Array | ViewReader | string,
+    offset?: number
+  ): number;
   public fromPDF(data: Uint8Array | ViewReader | string, offset = 0): number {
     const reader = PDFObject.getReader(data, offset);
 
     const startPosition = reader.position;
     try {
-
       this.onFromPDF(reader);
 
       this.view = reader.view.subarray(startPosition, reader.position);
@@ -196,7 +237,6 @@ export abstract class PDFObject {
 
       throw new ParsingError(message, reader.position);
     }
-
   }
 
   public adoptChild(obj: PDFObject): void {
@@ -208,13 +248,21 @@ export abstract class PDFObject {
     }
   }
 
+  /**
+   * Handles the conversion of the object from PDF stream.
+   * @param reader - The reader to read the object from.
+   */
   protected abstract onFromPDF(reader: ViewReader): void;
 
+  /**
+   * Handles the object writing to PDF stream.
+   * @param writer - The writer to write the object to.
+   */
   protected abstract onWritePDF(writer: ViewWriter): void;
 
   /**
-   * Returns copy of the object
-   * @returns The copy of the current object
+   * Returns copy of the object.
+   * @returns The copy of the current object.
    */
   public copy<T extends PDFObject>(this: T): T {
     const copy = new (this.constructor as PDFObjectConstructor<T>)();
@@ -243,7 +291,10 @@ export abstract class PDFObject {
       } else {
         const indirect = this.findIndirect(true);
         if (indirect) {
-          const obj = this.documentUpdate.document.getObject(indirect.id, indirect.generation);
+          const obj = this.documentUpdate.document.getObject(
+            indirect.id,
+            indirect.generation
+          );
           if (obj.value.documentUpdate === lastUpdate) {
             this.documentUpdate = lastUpdate;
 
@@ -261,6 +312,11 @@ export abstract class PDFObject {
     return this;
   }
 
+  /**
+   * Compares the current object with the target object
+   * @param target - The target object to compare with.
+   * @returns `true` if the objects are equal, otherwise `false`.
+   */
   public equal(target: PDFObject): boolean {
     if (this === target) {
       return true;
@@ -268,15 +324,21 @@ export abstract class PDFObject {
       const thisRef = this.getIndirect();
       const targetRef = target.getIndirect();
 
-      return thisRef.id === targetRef.id &&
-        thisRef.generation === targetRef.generation;
+      return (
+        thisRef.id === targetRef.id &&
+        thisRef.generation === targetRef.generation
+      );
     }
 
     return this.onEqual(target);
   }
 
+  /**
+   * Handles the comparison of the current object with the target object
+   * @param target - The target object to compare with.
+   * @returns `true` if the objects are equal, otherwise `false`.
+   */
   protected abstract onEqual(target: PDFObject): boolean;
-
 }
 
 import type { PDFDocument } from "../structure/Document";

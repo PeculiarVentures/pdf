@@ -7,7 +7,6 @@ import { ObjectTypeEnum } from "./internal";
 import { PDFString } from "./String";
 
 export class PDFComment extends PDFString {
-
   public static readonly NAME = ObjectTypeEnum.Comment;
 
   protected onWritePDF(writer: ViewWriter): void {
@@ -19,13 +18,11 @@ export class PDFComment extends PDFString {
       throw new BadCharError(reader.position - 1);
     }
 
-    const textView = reader.read((c) => c === 0x0d || c === 0x0A);
-    this.text = Convert.ToUtf8String(textView)
-      .trim();
+    const textView = reader.read((c) => c === 0x0d || c === 0x0a);
+    this.text = Convert.ToUtf8String(textView).trim();
   }
 
   public override toString(): string {
     return `% ${this.text}`;
   }
-
 }
