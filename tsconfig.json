@@ -30,9 +30,12 @@
     }
   },
   "exclude": [
+    "node_modules",
+    "coverage",
     "packages/*/build",
     "packages/**/*/*.js",
     "packages/**/*/*.mjs",
-    "eslint.config.mjs"
+    "eslint.config.mjs",
+    "jest.config.js",
   ]
 }
