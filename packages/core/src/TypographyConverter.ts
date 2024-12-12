@@ -49,13 +49,7 @@ export type TypographySize = number | string;
  * @see https://en.wikipedia.org/wiki/Point_(typography)
  */
 export class TypographyConverter {
-  public static converters: PrintMetricConverter[] = [
-    PixelConverter,
-    PointConverter,
-    InchConverter,
-    MillimeterConverter,
-    CentimeterConverter,
-  ];
+  public static converters: PrintMetricConverter[] = [];
 
   public static register(converter: PrintMetricConverter): void {
     this.converters.push(converter);
@@ -70,6 +64,14 @@ export class TypographyConverter {
     }
 
     return null;
+  }
+
+  static {
+    this.register(PixelConverter);
+    this.register(PointConverter);
+    this.register(InchConverter);
+    this.register(CentimeterConverter);
+    this.register(MillimeterConverter);
   }
 
   public static toPoint(value: TypographySize): number {
@@ -100,7 +102,6 @@ export class TypographyConverter {
         point = PointConverter.toPoint(floatValue);
       }
 
-
       // Round to 2 decimal places
       return Math.round(point * 100) / 100;
     } catch (e) {
@@ -125,7 +126,6 @@ export class TypographyConverter {
 
     return new PDFNumeric(valuePt);
   }
-
 }
 
 import { PDFNumeric } from "./objects/Numeric";

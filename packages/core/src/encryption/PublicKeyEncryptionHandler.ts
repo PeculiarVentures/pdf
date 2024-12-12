@@ -3,12 +3,27 @@ import * as pkijs from "pkijs";
 import { Name, X509Certificate } from "@peculiar/x509";
 
 import { PDFArray, PDFHexString, PDFStream, PDFTextString } from "../objects";
-import { CryptoFilterMethods, EncryptDictionary, PublicKeyCryptoFilterDictionary, PublicKeyEncryptDictionary, PublicKeyPermissionFlags, TrailerDictionary } from "../structure/dictionaries";
+import {
+  CryptoFilterMethods,
+  EncryptDictionary,
+  PublicKeyCryptoFilterDictionary,
+  PublicKeyEncryptDictionary,
+  PublicKeyPermissionFlags,
+  TrailerDictionary
+} from "../structure/dictionaries";
 import { staticDataFF } from "./Constants";
-import { EncryptionHandler, EncryptionHandlerCreateParams } from "./EncryptionHandler";
-import { EncryptionAlgorithms, EncryptionKey, EncryptionKeys } from "./EncryptionAlgorithms";
+import {
+  EncryptionHandler,
+  EncryptionHandlerCreateParams
+} from "./EncryptionHandler";
+import {
+  EncryptionAlgorithms,
+  EncryptionKey,
+  EncryptionKeys
+} from "./EncryptionAlgorithms";
 
-export interface PublicKeyEncryptionHandlerCreateParams extends EncryptionHandlerCreateParams {
+export interface PublicKeyEncryptionHandlerCreateParams
+  extends EncryptionHandlerCreateParams {
   permission?: PublicKeyPermissionFlags;
   algorithm: CryptoFilterMethods;
   encryptMetadata?: boolean;
@@ -23,7 +38,9 @@ interface ComputeEncryptionKeyParams {
   encryptMetadata: boolean;
 }
 
-async function computeEncryptionKey(params: ComputeEncryptionKeyParams): Promise<ArrayBuffer> {
+async function computeEncryptionKey(
+  params: ComputeEncryptionKeyParams
+): Promise<ArrayBuffer> {
   const { seed, recipients, crypto } = params;
 
   // The file encryption key used by 7.6.3.1, "Algorithm 1: Encryption of data using the RC4 or AES
@@ -45,8 +62,14 @@ async function computeEncryptionKey(params: ComputeEncryptionKeyParams): Promise
   //    and the document metadata is being left as plaintext
   // d) The first n/8 bytes of the resulting digest shall be used as the file encryption key, where n is the bit length
   //    of the file encryption key.
-  const encryptMetadata = params.encryptMetadata ? new Uint8Array() : staticDataFF;
-  const combinedBuffer = BufferSourceConverter.concat(seed, recipients, encryptMetadata);
+  const encryptMetadata = params.encryptMetadata
+    ? new Uint8Array()
+    : staticDataFF;
+  const combinedBuffer = BufferSourceConverter.concat(
+    seed,
+    recipients,
+    encryptMetadata
+  );
   // const combinedBuffer = BufferSourceConverter.concat(seed, recipients);
 
   const digest = await crypto.digest(digestAlg, combinedBuffer);
@@ -68,12 +91,16 @@ export interface CertificateHandleParams {
   algorithm: Algorithm;
 }
 
-export type CertificateHandle = (params: CertificateHandleParams) => Promise<Recipient | null>;
+export type CertificateHandle = (
+  params: CertificateHandleParams
+) => Promise<Recipient | null>;
 
 export class PublicKeyEncryptionHandler extends EncryptionHandler {
   public static readonly NAME = "Adobe.PubSec";
 
-  public static async create(params: PublicKeyEncryptionHandlerCreateParams): Promise<PublicKeyEncryptionHandler> {
+  public static async create(
+    params: PublicKeyEncryptionHandlerCreateParams
+  ): Promise<PublicKeyEncryptionHandler> {
     const doc = params.document;
     const crypto = params.crypto || pkijs.getCrypto(true);
 
@@ -90,7 +117,9 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
     let encryptionKeys: EncryptionKeys | null = null;
     switch (params.algorithm) {
       case CryptoFilterMethods.AES128:
-        throw new Error("Cannot create PublicKeyEncryptionHandler. AES128 crypto mechanism is not supported");
+        throw new Error(
+          "Cannot create PublicKeyEncryptionHandler. AES128 crypto mechanism is not supported"
+        );
         // encrypt.SubFilter = "adbe.pkcs7.s4";
         // encrypt.Length = 128;
         // encrypt.V = 4; // CF, StmF, and StrF
@@ -108,7 +137,10 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
           encrypt.CF.get().set(DefaultCryptFilter, filter);
 
           const seed = crypto.getRandomValues(new Uint8Array(20));
-          const combined = BufferSourceConverter.concat(seed, new Uint8Array([0xFF, 0xFF, 0xFF, 0xFF]));
+          const combined = BufferSourceConverter.concat(
+            seed,
+            new Uint8Array([0xff, 0xff, 0xff, 0xff])
+          );
 
           filter.Recipients = doc.createArray();
           const recipientBuffers: BufferSource[] = [];
@@ -116,16 +148,22 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
             const envelopedData = new pkijs.EnvelopedData({
               version: 0,
               // NOTE: Acrobat doesn't work with constructed OctetString
-              disableSplit: true,
+              disableSplit: true
             });
             //region Add recipient to CMS EnvelopedData
-            envelopedData.addRecipientByCertificate(pkijs.Certificate.fromBER(recipient.rawData), { useOAEP: false, oaepHashAlgorithm: "SHA-256" });
+            envelopedData.addRecipientByCertificate(
+              pkijs.Certificate.fromBER(recipient.rawData),
+              { useOAEP: false, oaepHashAlgorithm: "SHA-256" }
+            );
             //endregion
 
-            await envelopedData.encrypt({
-              name: "AES-CBC",
-              length: 128,
-            } as AesKeyGenParams, combined);
+            await envelopedData.encrypt(
+              {
+                name: "AES-CBC",
+                length: 128
+              } as AesKeyGenParams,
+              combined
+            );
 
             const cms = new pkijs.ContentInfo({
               contentType: "1.2.840.113549.1.7.3",
@@ -142,24 +180,24 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
             recipients: BufferSourceConverter.concat(recipientBuffers),
             seed: seed.slice(0, 20),
             encryptMetadata: filter.EncryptMetadata,
-            crypto,
+            crypto
           });
 
           encryptionKey = {
             type: params.algorithm,
-            raw: BufferSourceConverter.toUint8Array(key),
+            raw: BufferSourceConverter.toUint8Array(key)
           };
         }
 
         encryptionKeys = {
           stream: {
             type: CryptoFilterMethods.None,
-            raw: new Uint8Array(),
+            raw: new Uint8Array()
           },
           string: {
             type: CryptoFilterMethods.None,
-            raw: new Uint8Array(),
-          },
+            raw: new Uint8Array()
+          }
         };
         encrypt.StmF = "Identity";
         encrypt.StrF = "Identity";
@@ -191,7 +229,9 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
 
     // get xref for ID getting
     if (!doc.update.xref) {
-      throw new Error("Cannot set ID for the PDF document handler. The XRef object is empty.");
+      throw new Error(
+        "Cannot set ID for the PDF document handler. The XRef object is empty."
+      );
     }
     const xref = doc.update.xref as unknown as TrailerDictionary;
 
@@ -199,10 +239,13 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
     let id = crypto.getRandomValues(new Uint8Array(16));
     if (!xref.has("ID")) {
       // Create ID object
-      xref.set("ID", doc.createArray(
-        doc.createHexString(id),
-        doc.createHexString(crypto.getRandomValues(new Uint8Array(16))),
-      ));
+      xref.set(
+        "ID",
+        doc.createArray(
+          doc.createHexString(id),
+          doc.createHexString(crypto.getRandomValues(new Uint8Array(16)))
+        )
+      );
     } else {
       id = xref.get("ID", PDFArray).get(0, PDFHexString).toUint8Array();
     }
@@ -211,7 +254,8 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
 
     return handler;
   }
-  public name: typeof PublicKeyEncryptionHandler.NAME = PublicKeyEncryptionHandler.NAME;
+  public name: typeof PublicKeyEncryptionHandler.NAME =
+    PublicKeyEncryptionHandler.NAME;
 
   public override dictionary!: PublicKeyEncryptDictionary;
 
@@ -221,21 +265,27 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
     await this.#getKeys();
   }
 
-  public async encrypt(stream: BufferSource, target: PDFStream | PDFTextString): Promise<ArrayBuffer> {
+  public async encrypt(
+    stream: BufferSource,
+    target: PDFStream | PDFTextString
+  ): Promise<ArrayBuffer> {
     return EncryptionAlgorithms.encrypt({
       key: await this.#getKey(target),
       data: stream,
       target,
-      crypto: this.crypto,
+      crypto: this.crypto
     });
   }
 
-  public async decrypt(stream: BufferSource, target: PDFStream | PDFTextString): Promise<ArrayBuffer> {
+  public async decrypt(
+    stream: BufferSource,
+    target: PDFStream | PDFTextString
+  ): Promise<ArrayBuffer> {
     return EncryptionAlgorithms.decrypt({
       key: await this.#getKey(target),
       data: stream,
       target,
-      crypto: this.crypto,
+      crypto: this.crypto
     });
   }
 
@@ -253,7 +303,7 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
     // Get crypto key for the target object
     const keys = await this.#getKeys();
 
-    return (target instanceof PDFStream)
+    return target instanceof PDFStream
       ? keys.stream // use StmF key for Stream
       : keys.string; // use StrF key for Literal and Hexadecimal strings
   }
@@ -273,21 +323,23 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
 
         this.#keys = {
           stream: key,
-          string: key,
+          string: key
         };
       } else {
         const keys = await Promise.all([
           this.getKeyF(this.dictionary.StmF),
-          this.getKeyF(this.dictionary.StrF),
+          this.getKeyF(this.dictionary.StrF)
         ]);
 
         this.#keys = {
           stream: keys[0],
-          string: keys[1],
+          string: keys[1]
         };
       }
     } else {
-      throw new Error("Crypto mechanisms with V less than 4 are not supported.");
+      throw new Error(
+        "Crypto mechanisms with V less than 4 are not supported."
+      );
     }
 
     return this.#keys;
@@ -302,16 +354,22 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
     if (filterName === EncryptDictionary.IDENTITY) {
       return {
         type: CryptoFilterMethods.None,
-        raw: new Uint8Array,
+        raw: new Uint8Array()
       };
     }
 
     // get specified crypto filter
-    const filter = this.dictionary.CF.get(true).getItem(filterName, PublicKeyCryptoFilterDictionary);
+    const filter = this.dictionary.CF.get(true).getItem(
+      filterName,
+      PublicKeyCryptoFilterDictionary
+    );
 
-    const recipients = this.dictionary.SubFilter === "adbe.pkcs7.s5"
-      ? (filter.Recipients instanceof PDFTextString ? new PDFArray(filter.Recipients) : filter.Recipients)
-      : this.dictionary.Recipients;
+    const recipients =
+      this.dictionary.SubFilter === "adbe.pkcs7.s5"
+        ? filter.Recipients instanceof PDFTextString
+          ? new PDFArray(filter.Recipients)
+          : filter.Recipients
+        : this.dictionary.Recipients;
 
     // Making "recipient's buffer" (for symmetric key generation)
     const recipientViews: Uint8Array[] = [];
@@ -333,63 +391,97 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
         contentInfo = pkijs.ContentInfo.fromBER(recipientView);
       } catch (e) {
         const message = e instanceof Error ? e.message : "";
-        throw new Error(`Incorrect structure for item #${i} of "Recipients" array. ${message}`);
+        throw new Error(
+          `Incorrect structure for item #${i} of "Recipients" array. ${message}`
+        );
       }
 
       try {
         cmsEnveloped = new pkijs.EnvelopedData({ schema: contentInfo.content });
       } catch (e) {
         const message = e instanceof Error ? e.message : "";
-        throw new Error(`Incorrect structure for item #${i} of "Recipients" array. ${message}`);
+        throw new Error(
+          `Incorrect structure for item #${i} of "Recipients" array. ${message}`
+        );
       }
 
       // Check we do have only one recipient in the CMS Enveloped Data
       if (cmsEnveloped.recipientInfos.length !== 1) {
-        throw new Error(`Incorrect value in "recipientInfos" for item #${i} of "Recipients" array.`);
+        throw new Error(
+          `Incorrect value in "recipientInfos" for item #${i} of "Recipients" array.`
+        );
       }
 
       const recipientInfo = cmsEnveloped.recipientInfos[0];
       // Check that we have "KeyTransRecipientInfo" for the recipient
-      if (!(recipientInfo.value instanceof pkijs.KeyTransRecipientInfo
-        && recipientInfo.variant === 1)) {
-        throw new Error(`Incorrect value in "recipientInfos" for item #${i} of "Recipients" array.`);
+      if (
+        !(
+          recipientInfo.value instanceof pkijs.KeyTransRecipientInfo &&
+          recipientInfo.variant === 1
+        )
+      ) {
+        throw new Error(
+          `Incorrect value in "recipientInfos" for item #${i} of "Recipients" array.`
+        );
       }
 
       if (!this.onCertificate) {
-        throw new Error("Cannot get certificate private key, 'onCertificate' callback is empty.");
+        throw new Error(
+          "Cannot get certificate private key, 'onCertificate' callback is empty."
+        );
       }
 
       if (!(recipientInfo.value.rid instanceof pkijs.IssuerAndSerialNumber)) {
-        throw new Error("Cannot get the recipient ID. Unsupported type of the recipient ID");
+        throw new Error(
+          "Cannot get the recipient ID. Unsupported type of the recipient ID"
+        );
       }
 
       // Convert the recipient ID to JSON compatible with @peculiar/x509
-      const issuerName = new Name(recipientInfo.value.rid.issuer.toSchema().toBER());
-      const serialNumber = Convert.ToHex(recipientInfo.value.rid.serialNumber.valueBlock.valueHexView);
-      const algorithm: Algorithm = this.crypto.getAlgorithmByOID(recipientInfo.value.keyEncryptionAlgorithm.algorithmId, true, "keyEncryptionAlgorithm");
+      const issuerName = new Name(
+        recipientInfo.value.rid.issuer.toSchema().toBER()
+      );
+      const serialNumber = Convert.ToHex(
+        recipientInfo.value.rid.serialNumber.valueBlock.valueHexView
+      );
+      const algorithm: Algorithm = this.crypto.getAlgorithmByOID(
+        recipientInfo.value.keyEncryptionAlgorithm.algorithmId,
+        true,
+        "keyEncryptionAlgorithm"
+      );
       if (algorithm.name === "RSA-OAEP") {
-        const schema = recipientInfo.value.keyEncryptionAlgorithm.algorithmParams;
+        const schema =
+          recipientInfo.value.keyEncryptionAlgorithm.algorithmParams;
         const rsaOAEPParams = new pkijs.RSAESOAEPParams({ schema });
 
-        (algorithm as RsaHashedKeyAlgorithm).hash = this.crypto.getAlgorithmByOID(rsaOAEPParams.hashAlgorithm.algorithmId, true, "rsaOAEPParams.hashAlgorithm");
+        (algorithm as RsaHashedKeyAlgorithm).hash =
+          this.crypto.getAlgorithmByOID(
+            rsaOAEPParams.hashAlgorithm.algorithmId,
+            true,
+            "rsaOAEPParams.hashAlgorithm"
+          );
       }
       const recipient = await this.onCertificate({
         issuer: issuerName.toString(),
         serialNumber: serialNumber,
-        algorithm,
+        algorithm
       });
 
       if (recipient) {
         const decryptedKey = BufferSourceConverter.isBufferSource(recipient.key)
           ? await cmsEnveloped.decrypt(0, {
-            recipientCertificate: pkijs.Certificate.fromBER(recipient.certificate.rawData),
-            recipientPrivateKey: recipient.key,
-          })
+              recipientCertificate: pkijs.Certificate.fromBER(
+                recipient.certificate.rawData
+              ),
+              recipientPrivateKey: recipient.key
+            })
           : await cmsEnveloped.decrypt(0, {
-            recipientCertificate: pkijs.Certificate.fromBER(recipient.certificate.rawData),
-            recipientPrivateKey: recipient.key,
-            crypto: recipient.crypto,
-          });
+              recipientCertificate: pkijs.Certificate.fromBER(
+                recipient.certificate.rawData
+              ),
+              recipientPrivateKey: recipient.key,
+              crypto: recipient.crypto
+            });
 
         // Generate symmetric key
         const key = await computeEncryptionKey({
@@ -397,17 +489,16 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
           seed: decryptedKey.slice(0, 20),
           recipients: recipientsBuffer,
           encryptMetadata: filter.EncryptMetadata,
-          crypto: this.crypto,
+          crypto: this.crypto
         });
 
         return {
           type: filter.CFM,
-          raw: BufferSourceConverter.toUint8Array(key),
+          raw: BufferSourceConverter.toUint8Array(key)
         };
       }
     }
 
     throw new Error("Can not find a recipient");
   }
-
 }

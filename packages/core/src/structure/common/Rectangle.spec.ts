@@ -7,12 +7,12 @@ describe("PDFRectangle", () => {
   let doc: PDFDocument;
 
   beforeAll(() => {
-    doc = new PDFDocument();
-    doc.options.xref = XrefStructure.Table;
-    doc.options.disableAscii85Encoding = true;
-    doc.options.disableCompressedStreams = true;
-    doc.options.disableCompressedObjects = true;
-    doc.update.addCatalog();
+    doc = PDFDocument.create({
+      xref: XrefStructure.Table,
+      disableAscii85Encoding: true,
+      disableCompressedStreams: true,
+      disableCompressedObjects: true
+    });
   });
 
   describe("creation", () => {

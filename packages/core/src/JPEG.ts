@@ -1,12 +1,11 @@
 import { BufferSourceConverter } from "pvtsutils";
 import { ViewReader } from "./ViewReader";
 
-const SOI = 0xFFD8;
-const SOF0 = 0xFFC0;
-const SOF15 = 0xFFCF;
+const SOI = 0xffd8;
+const SOF0 = 0xffc0;
+const SOF15 = 0xffcf;
 
 export class JPEG {
-
   public static readonly DEFAULT_VIEW = new Uint8Array();
 
   public static isJPEG(view: BufferSource): boolean {
@@ -38,10 +37,6 @@ export class JPEG {
       reader.position += reader.readUint16();
     }
 
-    if (reader.isEOF) {
-      throw new Error("JPEG Frame marker not found.");
-    }
-
     // Skip Length parameter
     reader.position += 2;
 
@@ -55,5 +50,4 @@ export class JPEG {
 
     return res;
   }
-
 }

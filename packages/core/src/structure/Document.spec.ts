@@ -1,39 +1,14 @@
-import * as fs from "fs";
-import * as path from "path";
-import * as  pkijs from "pkijs";
-import { PDFArray, PDFDictionary, PDFNumeric, PDFStream } from "../objects";
-import { PDFTextString } from "../objects/TextString";
+import { BufferSourceConverter } from "pvtsutils";
+import { PDFArray, PDFDictionary, PDFNumeric } from "../objects";
 import { PDFDocument } from "./Document";
 import { XrefStructure } from "./XrefStructure";
-import { Crypto } from "@peculiar/webcrypto";
-import { PDFCryptoEngine } from "../CryptoEngine";
-import { EncryptDictionary } from "./dictionaries";
-import { BufferSourceConverter, Convert } from "pvtsutils";
-import * as assert from "assert";
 import { PDFDocumentObjectTypes } from "./DocumentObject";
 import { CrossReferenceStream } from "./CrossReferenceStream";
+import { PageObjectDictionary } from "./dictionaries";
 
-const filesDir = path.join(__dirname, "..", "..", "..", "..", "files");
-
-context("Document", () => {
-
-  async function readFile(name: string): Promise<PDFDocument> {
-    const doc = new PDFDocument();
-
-    const filesPath = path.join(__dirname, "..", "..", "..", "..", "files", `${name}.pdf`);
-    const file = fs.readFileSync(filesPath);
-
-    const crypto = new Crypto();
-    pkijs.setEngine("pdfCryptoEngine", crypto, new PDFCryptoEngine({ crypto: crypto, subtle: crypto.subtle }));
-
-    await doc.fromPDF(file);
-
-    return doc;
-  }
-
-  context("fromPDF", () => {
+describe("Document", () => {
+  describe("fromPDF", () => {
     it("Simple", async () => {
-
       const pdf = [
         "%PDF-1.2",
         "% comment",
@@ -52,198 +27,69 @@ context("Document", () => {
         ""
       ].join("\n");
 
-      const doc = new PDFDocument();
-      await doc.fromPDF(pdf);
+      const _doc = await PDFDocument.fromPDF(pdf);
     });
   });
 
-  context("Crypto", () => {
-    context("Standard", async () => {
-
-
-      it("Decode string", async () => {
-        const doc = await readFile("dd0004.pdf");
-        const obj = doc.getObject(198, 0);
-        const jsDict = obj.value as PDFDictionary;
-        const jsText = await (jsDict.get("JS") as PDFTextString).decode();
-        assert.strictEqual(jsText, "AFNumber_Format(0, 1, 0, 0, \"\", false);");
-      });
-
-      it("Decode string repeat", async () => {
-        const doc = await readFile("dd0004.pdf");
-        const obj = doc.getObject(198, 0);
-        const jsDict = obj.value as PDFDictionary;
-
-        await (jsDict.get("JS") as PDFTextString).decode();
-        const jsTextRepeat = await (jsDict.get("JS") as PDFTextString).decode();
-        assert.strictEqual(jsTextRepeat, "AFNumber_Format(0, 1, 0, 0, \"\", false);");
-      });
-
-      it("Get Encrypt Dictionary params", async () => {
-        const doc = await readFile("dd0004.pdf");
-        const obj2 = doc.getObject(208, 0);
-        const encryptDictionary = obj2.value as EncryptDictionary;
-        const paramO = await (encryptDictionary.get("O") as PDFTextString).decode();
-        assert.strictEqual(paramO, "ÛÕ©ReùíÕbôÏ2_nqóéÁ+ÜLÇsÞlTW");
-      });
-
-      it("Encode", async () => {
-        const doc = await readFile("dd0004.pdf");
-        const obj = doc.getObject(198, 0);
-        const jsDict = obj.value as PDFDictionary;
-        const jsString = jsDict.get("JS") as PDFTextString;
-
-        const expected = await jsString.decode();
-        await jsString.encode();
-        await jsString.encode();
-        const result = await jsString.decode();
-        assert.strictEqual(result, expected);
-      });
-
-    });
-
-    context("Password", async () => {
-      it("Decode stream", async () => {
-        const doc = await readFile("test_1-protected-12345.pdf");
-        doc.options = {
-          password: {
-            user: "12345"
-          }
-        };
-
-        const obj6 = doc.getObject(6, 0);
-        const stream = obj6.value as PDFStream;
-        const decodedStream = await stream.decode();
-        const text = Convert.ToBinary(decodedStream);
-        assert.strictEqual("57.6", text.substr(13545, 4));
-      });
-    });
-  });
-
-  context("Read files", () => {
-    const filesPath = path.join(__dirname, "..", "..", "..", "..", "files");
-    if (fs.existsSync(filesPath)) {
-
-      const files = fs.readdirSync(filesPath);
-      for (const file of files) {
-        const filePath = path.join(filesPath, file);
-        const fileStat = fs.statSync(filePath);
-        if (fileStat.isFile() && path.extname(file) === ".pdf"
-          && path.basename(file) === "212241.pdf"
-        ) {
-          it(file, async () => {
-            const fileData = fs.readFileSync(filePath);
-            console.log("File:", file);
-            console.log("File (Mb):", fileData.length / (1024 * 1024));
-
-            console.time("Time");
-            const doc = new PDFDocument();
-            await doc.fromPDF(fileData);
-
-            // console.log(await doc.toString());
-
-            // doc.update.catalog?.Pages;
-            // console.log();
-            // if (doc.update.xrefStructure && !doc.update.xrefStructure.prev) {
-            // debugger;
-            // }
-
-            // if (doc.update.xrefTable && doc.update.xrefTable.trailer.dictionary.has("Encrypt")) {
-            // debugger;
-            // }
-
-            // const objects = await doc.update.getObjects();
-            // for (const obj of objects) {
-            //   if (obj.value instanceof PDFDictionary) {
-            //     if (obj.value.has("Type") && (obj.value.get("Type") as PDFName).text === "Sig") {
-            //       console.log("Signature");
-            //     }
-            //   }
-            // }
-            // console.log("Objects:", objects.length);
-            console.timeEnd("Time");
-          });
-        }
-      }
-    }
-  });
-
-  context("toPDF", () => {
-    it("Simple", async () => {
-      const doc = new PDFDocument();
+  describe("toPDF", () => {
+    it("should create with xref table", async () => {
+      const doc = PDFDocument.create();
 
       const objNum = doc.append(new PDFNumeric(142));
       const pdf = await doc.toPDF();
 
-      const doc2 = new PDFDocument();
-      await doc2.fromPDF(BufferSourceConverter.toUint8Array(pdf));
+      const doc2 = await PDFDocument.fromPDF(
+        BufferSourceConverter.toUint8Array(pdf)
+      );
 
-      const obj = doc.getObject(objNum.id);
+      const obj = doc2.getObject(objNum.id);
       const num = obj.value as PDFNumeric;
-      assert.strictEqual(num.value, 142);
+      expect(num.value).toBe(142);
     });
 
-    it("Few updates with toPDF", async () => {
-      const doc = new PDFDocument();
+    it("should create with 2 xref trailer sections", async () => {
+      const doc = PDFDocument.create();
 
-      const obj142 = doc.append(new PDFNumeric(142));
-      await doc.toPDF();
-
+      doc.createNumber(142).makeIndirect();
       await doc.createUpdate();
-      const obj143 = doc.append(new PDFNumeric(143));
+
+      doc.createNumber(143).makeIndirect();
 
       const pdf = await doc.toPDF();
 
-      const doc2 = new PDFDocument();
-      await doc2.fromPDF(BufferSourceConverter.toUint8Array(pdf));
+      const doc2 = await PDFDocument.fromPDF(pdf);
+      expect(doc2.update.previous).toBeTruthy();
+      expect(doc2.update.previous!.previous).toBeFalsy();
+    });
 
-      const obj = doc2.getObject(obj142.id);
-      assert(obj.value instanceof PDFNumeric);
-      assert.strictEqual(obj.value.value, 142);
-      const obj2 = doc2.getObject(obj143.id);
-      assert(obj2.value instanceof PDFNumeric);
-      assert.strictEqual(obj2.value.value, 143);
+    it("should create with 2 xref stream sections", async () => {
+      const doc = PDFDocument.create({
+        xref: XrefStructure.Stream
+      });
+
+      doc.createNumber(142).makeIndirect();
+      await doc.createUpdate();
+
+      doc.createNumber(143).makeIndirect();
+
+      const pdf = await doc.toPDF();
+
+      const doc2 = await PDFDocument.fromPDF(pdf);
+      expect(doc2.update.previous).toBeTruthy();
+      expect(doc2.update.previous!.previous).toBeFalsy();
     });
 
     it("Create AcroForms in update using Maybe class", async () => {
-      const doc = new PDFDocument();
-      doc.options.xref = XrefStructure.Table;
-      doc.update.addCatalog();
-
-      let pdf = await doc.toPDF();
-
-      await doc.createUpdate();
-      console.log(Convert.ToBinary(pdf));
-
-      const _forms = doc.update.catalog!.AcroForm.get();
-
-      pdf = await doc.toPDF();
-      console.log(Convert.ToBinary(pdf));
-    });
-
-    it("Few updates without toPDF", async () => {
-      const doc = new PDFDocument();
-
-      const obj142 = doc.append(new PDFNumeric(142));
-
-      await doc.createUpdate();
-      const obj143 = doc.append(new PDFNumeric(143));
-
+      const doc = PDFDocument.create();
+      doc.update.catalog!.AcroForm.get();
       const pdf = await doc.toPDF();
 
-      const doc2 = new PDFDocument();
-      await doc2.fromPDF(BufferSourceConverter.toUint8Array(pdf));
-
-      const obj = doc2.getObject(obj142.id);
-      assert(obj.value instanceof PDFNumeric);
-      assert.strictEqual(obj.value.value, 142);
-      const obj2 = doc2.getObject(obj143.id);
-      assert(obj2.value instanceof PDFNumeric);
-      assert.strictEqual(obj2.value.value, 143);
+      const doc2 = await PDFDocument.fromPDF(pdf);
+      expect(doc2.update.catalog!.AcroForm).toBeTruthy();
     });
 
     it("Delete obj", async () => {
-      const doc = new PDFDocument();
+      const doc = PDFDocument.create();
 
       const obj142 = doc.append(new PDFNumeric(142));
 
@@ -253,104 +99,82 @@ context("Document", () => {
 
       const pdf = await doc.toPDF();
 
-      const doc2 = new PDFDocument();
-      await doc2.fromPDF(BufferSourceConverter.toUint8Array(pdf));
+      const doc2 = await PDFDocument.fromPDF(
+        BufferSourceConverter.toUint8Array(pdf)
+      );
 
       const obj = doc2.getObject(obj142.id);
-      assert.strictEqual(obj.type, PDFDocumentObjectTypes.free);
+      expect(obj.type).toBe(PDFDocumentObjectTypes.free);
       const obj2 = doc2.getObject(obj143.id);
-      assert(obj2.value instanceof PDFNumeric);
-      assert.strictEqual(obj2.type, PDFDocumentObjectTypes.inUse);
+      expect(obj2.value).toBeInstanceOf(PDFNumeric);
+      expect(obj2.type).toBe(PDFDocumentObjectTypes.inUse);
     });
-    // const page = doc.append(new PDFDictionary());
-    // const catalog = new CatalogDictionary();
-    // const pageRef = new PDFIndirectReference(page.id, page.generation);
-    // pageRef.documentUpdate = page.documentUpdate;
-    // catalog.set("Pages", pageRef);
-    // doc.append(catalog);
+
     it("XRef Stream", async () => {
-      const doc = new PDFDocument();
+      const doc = PDFDocument.create({
+        xref: XrefStructure.Stream
+      });
 
       doc.append(new PDFNumeric(142));
       doc.append(new PDFNumeric(143));
       const pdf = await doc.toPDF();
 
-      const doc2 = new PDFDocument();
-      await doc2.fromPDF(BufferSourceConverter.toUint8Array(pdf));
+      const doc2 = await PDFDocument.fromPDF(
+        BufferSourceConverter.toUint8Array(pdf)
+      );
 
-      assert.ok(doc.update.xref);
-      assert.ok(doc2.update.xref);
-      assert(doc.update.xref instanceof CrossReferenceStream);
-      assert(doc2.update.xref instanceof CrossReferenceStream);
-      assert.strictEqual(doc2.update.xref.size, doc.update.xref.size);
-      assert.strictEqual(doc2.update.xref.Type, doc.update.xref.Type);
-
-      assert.ok(doc.update.xref.Index);
-      assert.ok(doc2.update.xref.Index);
-      for (let index = 0; index < doc2.update.xref.Index.length; index++) {
-        assert.strictEqual(doc2.update.xref.Index[index].start, doc.update.xref.Index[index].start);
-        assert.strictEqual(doc2.update.xref.Index[index].size, doc.update.xref.Index[index].size);
+      expect(doc.update.xref).toBeTruthy();
+      expect(doc2.update.xref).toBeTruthy();
+      expect(doc.update.xref).toBeInstanceOf(CrossReferenceStream);
+      const xref = doc.update.xref as CrossReferenceStream;
+      expect(doc2.update.xref).toBeInstanceOf(CrossReferenceStream);
+      const xref2 = doc.update.xref as CrossReferenceStream;
+      expect(xref2.size).toBe(xref.size);
+      expect(xref2.Type).toBe(xref.Type);
+      expect(xref.Index).toBeTruthy();
+      expect(xref2.Index).toBeTruthy();
+      for (let index = 0; index < xref2.Index!.length; index++) {
+        expect(xref2.Index![index].start).toBe(xref.Index![index].start);
+        expect(xref2.Index![index].size).toBe(xref.Index![index].size);
       }
 
-      for (let index = 0; index < doc2.update.xref.W.length; index++) {
-        assert.strictEqual(doc2.update.xref.W[index], doc.update.xref.W[index]);
-        assert.strictEqual(doc2.update.xref.W[index], doc.update.xref.W[index]);
+      for (let index = 0; index < xref2.W.length; index++) {
+        expect(xref2.W[index]).toBe(xref.W[index]);
+        expect(xref2.W[index]).toBe(xref.W[index]);
       }
 
-      assert.strictEqual(doc2.update.xref.length.value, doc.update.xref.length.value);
+      expect(xref2.length.value).toBe(xref.length.value);
     });
   });
 
-  context("Pages", () => {
+  describe("Pages", () => {
     it("addPage empty", async () => {
-      const doc = new PDFDocument();
-      doc.options = { xref: XrefStructure.Table };
+      const doc = PDFDocument.create();
 
       await doc.addPage();
       await doc.addPage();
 
       const docRaw = await doc.toPDF();
-      fs.writeFileSync(path.join(filesDir, "..", "new.pdf"), Buffer.from(docRaw), { flag: "w+" });
-    });
 
-    it("addPage copy", async () => {
-      const doc = await readFile("blank_with_sensitive");
-      doc.options = { xref: XrefStructure.Table };
-      const page = doc.getObject(8);
-      await doc.createUpdate();
-      await doc.addPage(page);
+      const doc2 = await PDFDocument.fromPDF(docRaw);
+      expect(doc2.update.catalog).toBeTruthy();
+      const catalog = doc2.update.catalog!;
+      expect(catalog.Pages).toBeTruthy();
+      const pages = catalog.Pages;
+      expect(pages.Kids).toBeTruthy();
+      expect(pages.Count).toBe(2);
+      expect(pages.Kids!.length).toBe(2);
 
-      const docRaw = await doc.toPDF();
-      fs.writeFileSync(path.join(filesDir, "..", "new.pdf"), Buffer.from(docRaw), { flag: "w+" });
-    });
-
-    it("addPage from other doc", async () => {
-      const doc = await readFile("dd0004");
-
-      const page = doc.getObject(4);
-
-      const doc2 = await readFile("blank_with_sensitive");
-      await doc2.addPage(page);
-
-      const docRaw = await doc2.toPDF();
-      fs.writeFileSync(path.join(filesDir, "..", "new.pdf"), Buffer.from(docRaw), { flag: "w+" });
+      const firstPage = pages.Kids.get(0, PageObjectDictionary);
+      expect(firstPage.type).toBe("Page");
+      const secondPage = pages.Kids.get(1, PageObjectDictionary);
+      expect(secondPage.type).toBe("Page");
     });
   });
 
-  it("Create empty PDF", async () => {
-    const doc = new PDFDocument();
-    const _page = await doc.addPage();
-
-    const raw = await doc.toPDF();
-    fs.writeFileSync(path.join(filesDir, "..", "new.pdf"), Buffer.from(raw), { flag: "w+" });
-
-    console.log(await doc.toString());
-  });
-
-  context("indirect", () => {
-
+  describe("indirect", () => {
     it("set direct and indirect object to dictionary", async () => {
-      const doc = new PDFDocument();
+      const doc = PDFDocument.create();
 
       const dict = doc.createDictionary().makeIndirect();
       const direct = doc.createNumber(9);
@@ -364,20 +188,23 @@ context("Document", () => {
       const doc2 = await PDFDocument.fromPDF(pdf);
 
       const dict2 = doc2.getObject(dict.getIndirect()).value;
-      assert.ok(dict2 instanceof PDFDictionary);
-      const direct2 = dict2.get("Direct");
-      assert.ok(!direct2.isIndirect());
-      const indirect2 = dict2.get("Indirect");
-      assert.ok(indirect2.isIndirect());
+      expect(dict2).toBeInstanceOf(PDFDictionary);
+      const dict2_dict = dict2 as PDFDictionary;
+      const direct2 = dict2_dict.get("Direct");
+      expect(direct2.isIndirect()).toBe(false);
+      const indirect2 = dict2_dict.get("Indirect");
+      expect(indirect2.isIndirect()).toBe(true);
     });
 
     it("set direct and indirect objects to array", async () => {
-      const doc = new PDFDocument();
+      const doc = PDFDocument.create();
 
-      const array = doc.createArray(
-        doc.createNumber(9), // direct
-        doc.createNumber(10).makeIndirect(), // indirect
-      ).makeIndirect();
+      const array = doc
+        .createArray(
+          doc.createNumber(9), // direct
+          doc.createNumber(10).makeIndirect() // indirect
+        )
+        .makeIndirect();
 
       const pdf = await doc.toPDF();
       // console.log(Convert.ToBinary(pdf));
@@ -385,36 +212,49 @@ context("Document", () => {
       const doc2 = await PDFDocument.fromPDF(pdf);
 
       const array2 = doc2.getObject(array.getIndirect()).value;
-      assert.ok(array2 instanceof PDFArray);
-      const directNumber = array2.get(0, PDFNumeric);
-      assert.ok(!directNumber.isIndirect());
-      assert.strictEqual(directNumber.value, 9);
-      assert.ok(array2.get(1).isIndirect());
+      expect(array2).toBeInstanceOf(PDFArray);
+      const array2_array = array2 as PDFArray;
+      const directNumber = array2_array.get(0, PDFNumeric);
+      expect(directNumber.isIndirect()).toBe(false);
+      expect(directNumber.value).toBe(9);
+      expect(array2_array.get(1).isIndirect()).toBe(true);
     });
-
   });
 
-  context("modify", () => {
+  describe("modify", () => {
     it("new update", async () => {
-      const doc = new PDFDocument();
-      const num = doc.createNumber(1).makeIndirect();
+      const doc = PDFDocument.create({
+        xref: XrefStructure.Table
+      });
 
+      // create indirect object
+      const num = doc.createNumber(1).makeIndirect();
+      const numRef = num.getIndirect();
+
+      // save update
       await doc.createUpdate();
 
+      // modify object
       num.modify();
       num.value = 2;
 
+      // save update
       const pdf = await doc.toPDF();
 
+      // read PDF
       const doc2 = await PDFDocument.fromPDF(pdf);
 
-      const numLast = doc2.getObject(4).value;
-      assert.ok(numLast instanceof PDFNumeric);
-      assert.strictEqual(numLast.value, 2);
-      const numPrev = doc2.update.previous!.getObject(4).value;
-      assert.ok(numPrev instanceof PDFNumeric);
-      assert.strictEqual(numPrev.value, 1);
+      // check object last value
+      const numLast = doc2.getObject(numRef.id).value;
+      expect(numLast).toBeInstanceOf(PDFNumeric);
+      const numLast_num = numLast as PDFNumeric;
+      expect(numLast_num.value).toBe(2);
+
+      // check object previous value
+      const numPrev = doc2.update.previous!.getObject(numRef.id).value;
+      expect(numPrev).toBeInstanceOf(PDFNumeric);
+      const numPrev_num = numPrev as PDFNumeric;
+      expect(numPrev_num.value).toBe(1);
     });
   });
-
 });

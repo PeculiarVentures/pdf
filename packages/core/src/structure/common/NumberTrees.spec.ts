@@ -6,12 +6,12 @@ describe("NumberTrees", () => {
   let doc: PDFDocument;
 
   beforeAll(() => {
-    doc = new PDFDocument();
-    doc.options.xref = XrefStructure.Table;
-    doc.options.disableAscii85Encoding = true;
-    doc.options.disableCompressedStreams = true;
-    doc.options.disableCompressedObjects = true;
-    doc.update.addCatalog();
+    doc = PDFDocument.create({
+      disableAscii85Encoding: true,
+      disableCompressedStreams: true,
+      disableCompressedObjects: true,
+      xref: XrefStructure.Table
+    });
   });
 
   describe("creation", () => {

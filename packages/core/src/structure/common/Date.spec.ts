@@ -69,7 +69,7 @@ describe("PDFDate", () => {
 
   describe("createDate", () => {
     it("should create PDFDate with current date when no date provided", () => {
-      const doc = new PDFDocument();
+      const doc = PDFDocument.create();
       const now = new Date();
       const pdfDate = PDFDate.createDate(doc);
       const result = pdfDate.getDate();
@@ -78,7 +78,7 @@ describe("PDFDate", () => {
     });
 
     it("should create PDFDate with provided date", () => {
-      const doc = new PDFDocument();
+      const doc = PDFDocument.create();
       const testDate = new Date("2021-10-04T01:02:03.000Z");
       const pdfDate = PDFDate.createDate(doc, testDate);
       const result = pdfDate.getDate();

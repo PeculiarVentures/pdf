@@ -160,7 +160,7 @@ describe("Dictionary", () => {
           public Point!: Maybe<PointDictionary>;
         }
 
-        const doc = new PDFDocument();
+        const doc = PDFDocument.create();
         const test = TestDictionary.create(doc.update);
         test.Point.get().Left = 1;
         test.Point.get().Top = 2;

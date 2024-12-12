@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { PDFIndirectObject, PDFIndirectReference, PDFNull, PDFObject, PDFStream } from "../objects";
+import {
+  PDFIndirectObject,
+  PDFIndirectReference,
+  PDFNull,
+  PDFObject,
+  PDFStream
+} from "../objects";
 import { CompressedObject } from "./CompressedObject";
 import type { CrossReferenceTable } from "./CrossReferenceTable";
 import type { PDFDocumentUpdate } from "./DocumentUpdate";
@@ -8,7 +14,7 @@ export enum PDFDocumentObjectTypes {
   null = "z",
   free = "f",
   inUse = "n",
-  compressed = "c",
+  compressed = "c"
 }
 
 export interface PDFDocumentObjectParameters {
@@ -33,7 +39,6 @@ export interface PDFDocumentObjectParameters {
 }
 
 export class PDFDocumentObject implements PDFDocumentObjectParameters {
-
   public documentUpdate: PDFDocumentUpdate;
   public id: number;
   public offset: number;
@@ -53,7 +58,7 @@ export class PDFDocumentObject implements PDFDocumentObjectParameters {
       this.id,
       this.type === PDFDocumentObjectTypes.compressed
         ? 0 // Compressed objects use 'generation' field for index keeping
-        : this.generation,
+        : this.generation
     );
 
     ref.documentUpdate = this.documentUpdate;
@@ -75,7 +80,7 @@ export class PDFDocumentObject implements PDFDocumentObjectParameters {
       documentUpdate: this.documentUpdate,
       generation: this.generation,
       offset: 0, // Erase offset for copies. Because the copied object is not appended to PDF document
-      type: this.type,
+      type: this.type
     });
 
     if (!this.#value && this.type !== PDFDocumentObjectTypes.free) {
@@ -92,7 +97,7 @@ export class PDFDocumentObject implements PDFDocumentObjectParameters {
       type: PDFDocumentObjectTypes.inUse,
       id: indirect.id,
       generation: indirect.generation,
-      documentUpdate: indirect.documentUpdate!, // TODO remove !
+      documentUpdate: indirect.documentUpdate! // TODO remove !
     });
 
     obj.#value = indirect;
@@ -146,8 +151,14 @@ export class PDFDocumentObject implements PDFDocumentObjectParameters {
 
         this.#value = value;
       } else if (this.type === PDFDocumentObjectTypes.free) {
-        if (this.documentUpdate.xref && "xrefStream" in this.documentUpdate.xref && this.documentUpdate.xref.xrefStream) {
-          const obj = (this.documentUpdate.xref.xrefStream as CrossReferenceTable).objects.find((obj) => obj.id === this.id);
+        if (
+          this.documentUpdate.xref &&
+          "xrefStream" in this.documentUpdate.xref &&
+          this.documentUpdate.xref.xrefStream
+        ) {
+          const obj = (
+            this.documentUpdate.xref.xrefStream as CrossReferenceTable
+          ).objects.find((obj) => obj.id === this.id);
           if (obj) {
             const value = new PDFIndirectObject();
             value.documentUpdate = this.documentUpdate;
@@ -168,7 +179,6 @@ export class PDFDocumentObject implements PDFDocumentObjectParameters {
       } else {
         throw new Error(`Unknown object type: ${this.type}`);
       }
-
     }
 
     return this.#value.value;
@@ -207,5 +217,4 @@ export class PDFDocumentObject implements PDFDocumentObjectParameters {
 
     return res.join("\n");
   }
-
 }

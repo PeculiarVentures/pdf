@@ -16,12 +16,12 @@ describe("NameTree", () => {
   let rootNames: NameTree;
 
   beforeAll(async () => {
-    doc = new PDFDocument();
-    doc.options.xref = XrefStructure.Table;
-    doc.options.disableAscii85Encoding = true;
-    doc.options.disableCompressedStreams = true;
-    doc.options.disableCompressedObjects = true;
-    doc.update.addCatalog();
+    doc = PDFDocument.create({
+      disableAscii85Encoding: true,
+      disableCompressedStreams: true,
+      disableCompressedObjects: true,
+      xref: XrefStructure.Table
+    });
 
     rootKids = new NameTree(
       doc
@@ -330,7 +330,7 @@ describe("NameTree", () => {
 
   describe("setValue", () => {
     it("Root with Names", () => {
-      const doc = new PDFDocument();
+      const doc = PDFDocument.create();
       const tree = NameTree.create(doc);
       tree.Names = doc.createArray();
 
@@ -361,8 +361,7 @@ describe("NameTree", () => {
       });
 
       beforeEach(async () => {
-        doc2 = new PDFDocument();
-        await doc2.fromPDF(raw);
+        doc2 = await PDFDocument.fromPDF(raw);
 
         const treeObj = doc2.getObject(rootKids.getIndirect()).value;
         expect(treeObj).toBeInstanceOf(PDFDictionary);

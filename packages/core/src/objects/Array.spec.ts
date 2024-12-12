@@ -201,9 +201,7 @@ describe("PDFArray", () => {
     let doc: PDFDocument;
 
     beforeEach(() => {
-      doc = new PDFDocument();
-      doc.options.xref = XrefStructure.Table;
-      doc.update.addCatalog();
+      doc = PDFDocument.create();
     });
 
     it("should write a simple array", () => {

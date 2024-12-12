@@ -95,9 +95,11 @@ export interface StandardAlgorithm12Params extends StandardAlgorithm11Params {
   o: BufferSource;
 }
 
-const passwordPadding = new Uint8Array([0x28, 0xBF, 0x4E, 0x5E, 0x4E, 0x75, 0x8A, 0x41,
-  0x64, 0x00, 0x4E, 0x56, 0xFF, 0xFA, 0x01, 0x08, 0x2E, 0x2E, 0x00, 0xB6, 0xD0, 0x68,
-  0x3E, 0x80, 0x2F, 0x0C, 0xA9, 0xFE, 0x64, 0x53, 0x69, 0x7A]);
+const passwordPadding = new Uint8Array([
+  0x28, 0xbf, 0x4e, 0x5e, 0x4e, 0x75, 0x8a, 0x41, 0x64, 0x00, 0x4e, 0x56, 0xff,
+  0xfa, 0x01, 0x08, 0x2e, 0x2e, 0x00, 0xb6, 0xd0, 0x68, 0x3e, 0x80, 0x2f, 0x0c,
+  0xa9, 0xfe, 0x64, 0x53, 0x69, 0x7a
+]);
 
 /**
  * Converts the Password into the Uint8Array
@@ -117,7 +119,9 @@ function passwordToView(password: Password): Uint8Array {
  * @param password Password
  * @returns 32-bytes buffer
  */
-export function padPassword(password: Password = new Uint8Array(0)): ArrayBuffer {
+export function padPassword(
+  password: Password = new Uint8Array(0)
+): ArrayBuffer {
   // That is, if the password string is n bytes long, append the first 32 - n bytes of the padding string to
   // the end of the password string. If the password string is empty (zero-length), meaning there is no
   // user password, substitute the entire padding string in its place.
@@ -132,7 +136,10 @@ export function padPassword(password: Password = new Uint8Array(0)): ArrayBuffer
   result.set(passwordView);
   if (passwordView.length < result.length) {
     // copy padding string after the copied password
-    result.set(passwordPadding.subarray(0, 32 - passwordView.length), passwordView.length);
+    result.set(
+      passwordPadding.subarray(0, 32 - passwordView.length),
+      passwordView.length
+    );
   }
 
   return result;
@@ -157,16 +164,21 @@ interface CycleResult {
  * Implements Password algorithms
  */
 export class StandardEncryptionAlgorithm {
-
   private static async cycle(params: CycleParams): Promise<CycleResult> {
     // a) Make a new string, K1, consisting of 64 repetitions of the sequence: input password, K, the 48-byte user
     //    key. The 48 byte user key is only used when checking the owner password or creating the owner key. If
     //    checking the user password or creating the user key, K1 is the concatenation of the input password
     //    and K.
     let resultBuffer = new ArrayBuffer(0);
-    let combinedBuffer = BufferSourceConverter.concat(params.password, params.internalData);
+    let combinedBuffer = BufferSourceConverter.concat(
+      params.password,
+      params.internalData
+    );
     if (params.isOwner) {
-      combinedBuffer = BufferSourceConverter.concat(combinedBuffer, params.hashedUserPassword || new ArrayBuffer(0));
+      combinedBuffer = BufferSourceConverter.concat(
+        combinedBuffer,
+        params.hashedUserPassword || new ArrayBuffer(0)
+      );
     }
 
     // 64 repetitions of the sequence
@@ -174,15 +186,25 @@ export class StandardEncryptionAlgorithm {
       resultBuffer = BufferSourceConverter.concat(resultBuffer, combinedBuffer);
     }
 
-    const importedKey = await params.crypto.importKey("raw", params.internalData.slice(0, 16), algorithms.AesCBC, false, ["encrypt"]);
+    const importedKey = await params.crypto.importKey(
+      "raw",
+      params.internalData.slice(0, 16),
+      algorithms.AesCBC,
+      false,
+      ["encrypt"]
+    );
 
     // b) Encrypt K1 with the AES-128 (CBC, no padding) algorithm, using the first 16 bytes of K as the key and the
     //    second 16 bytes of K as the initialization vector. The result of this encryption is E.
-    let encryptedResult = await params.crypto.encrypt({
-      name: "AES-CBC",
-      length: 128,
-      iv: params.internalData.slice(16, 32)
-    }, importedKey, resultBuffer);
+    let encryptedResult = await params.crypto.encrypt(
+      {
+        name: "AES-CBC",
+        length: 128,
+        iv: params.internalData.slice(16, 32)
+      },
+      importedKey,
+      resultBuffer
+    );
 
     encryptedResult = encryptedResult.slice(0, resultBuffer.byteLength); // There is padding in WebCrypto - remove unnecessary tail bytes
 
@@ -193,9 +215,9 @@ export class StandardEncryptionAlgorithm {
 
     // The math trick I got from PDF.js (https://github.com/mozilla/pdf.js)
     for (let i = 0; i < 16; i++) {
-      remainder *= (256 % 3);
+      remainder *= 256 % 3;
       remainder %= 3;
-      remainder += ((view[i] >>> 0) % 3);
+      remainder += (view[i] >>> 0) % 3;
       remainder %= 3;
     }
 
@@ -205,15 +227,24 @@ export class StandardEncryptionAlgorithm {
     switch (remainder) {
       case 0:
         // if the result is 0, the next hash used is SHA-256,
-        digestedEncryptResult = await params.crypto.digest(algorithms.sha256, encryptedResult);
+        digestedEncryptResult = await params.crypto.digest(
+          algorithms.sha256,
+          encryptedResult
+        );
         break;
       case 1:
         // if the result is 1, the next hash used is SHA-384,
-        digestedEncryptResult = await params.crypto.digest(algorithms.sha384, encryptedResult);
+        digestedEncryptResult = await params.crypto.digest(
+          algorithms.sha384,
+          encryptedResult
+        );
         break;
       case 2:
         // if the result is 2, the next hash used is SHA-512.
-        digestedEncryptResult = await params.crypto.digest(algorithms.sha512, encryptedResult);
+        digestedEncryptResult = await params.crypto.digest(
+          algorithms.sha512,
+          encryptedResult
+        );
         break;
       default:
         throw new Error("Something went wrong");
@@ -224,14 +255,15 @@ export class StandardEncryptionAlgorithm {
       // e) Look at the very last byte of E. If the value of that byte (taken as an unsigned integer) is greater than the
       //    round number - 32, repeat steps (a-d) again.
       // f) Repeat from steps (a-e) until the value of the last byte is ≤ (round number) - 32.
-      if (view[view.length - 1] > (params.roundNumber - 32)) { // noinspection TailRecursionJS
+      if (view[view.length - 1] > params.roundNumber - 32) {
+        // noinspection TailRecursionJS
         return this.cycle({
           internalData: digestedEncryptResult,
           roundNumber: params.roundNumber + 1,
           check: true,
           password: new ArrayBuffer(0),
           hashedUserPassword: new ArrayBuffer(0),
-          crypto: params.crypto,
+          crypto: params.crypto
         });
       }
     }
@@ -248,7 +280,9 @@ export class StandardEncryptionAlgorithm {
    * @param params Parameters
    * @returns Encryption key
    */
-  public static async algorithm2(params: StandardAlgorithm2Params): Promise<ArrayBuffer> {
+  public static async algorithm2(
+    params: StandardAlgorithm2Params
+  ): Promise<ArrayBuffer> {
     // a) Prepare password
     const passwordPadded = padPassword(params.password);
 
@@ -264,9 +298,9 @@ export class StandardEncryptionAlgorithm {
       params.id,
       // f) If document metadata is not being encrypted, pass 4 bytes with
       //    the value 0xFFFFFFFF to the MD5 hash function
-      (params.revision >= 4 && !params.encryptMetadata)
+      params.revision >= 4 && !params.encryptMetadata
         ? new Uint8Array([255, 255, 255, 255])
-        : new Uint8Array(),
+        : new Uint8Array()
     );
     // g) Finish the hash.
     let hash = await params.crypto.digest(algorithms.md5, hashData);
@@ -292,7 +326,9 @@ export class StandardEncryptionAlgorithm {
    * Retrieving the file encryption key from an encrypted document in order to decrypt it (revision 6 and later)
    * @param params Parameters
    */
-  public static async algorithm2A(params: StandardAlgorithm2AParams): Promise<ArrayBuffer> {
+  public static async algorithm2A(
+    params: StandardAlgorithm2AParams
+  ): Promise<ArrayBuffer> {
     let eKey: ArrayBuffer;
     const uView = passwordToView(params.u).subarray(0, 48);
 
@@ -314,17 +350,28 @@ export class StandardEncryptionAlgorithm {
       //    encryption key.
       const oView = passwordToView(params.o).subarray(0, 48);
       const uKey = await this.algorithm2B({
-        data: BufferSourceConverter.concat(passwordView, oView.subarray(40, 48), uView),
+        data: BufferSourceConverter.concat(
+          passwordView,
+          oView.subarray(40, 48),
+          uView
+        ),
         password: passwordView,
         u: uView,
-        crypto: params.crypto,
+        crypto: params.crypto
       });
-      const key = await params.crypto.importKey("raw", uKey, "AES-CBC", false, ["encrypt", "decrypt"]);
-      eKey = await params.crypto.decrypt({
-        name: "AES-CBC",
-        iv: new ArrayBuffer(16),
-        pad: true, // PDFCryptoEngine supports this option
-      } as AesCbcParams, key, params.oe);
+      const key = await params.crypto.importKey("raw", uKey, "AES-CBC", false, [
+        "encrypt",
+        "decrypt"
+      ]);
+      eKey = await params.crypto.decrypt(
+        {
+          name: "AES-CBC",
+          iv: new ArrayBuffer(16),
+          pad: true // PDFCryptoEngine supports this option
+        } as AesCbcParams,
+        key,
+        params.oe
+      );
 
       eKey = eKey.slice(0, 32);
     } else {
@@ -333,16 +380,26 @@ export class StandardEncryptionAlgorithm {
       //    is the key used to decrypt the 32-byte UE string using AES-256 in CBC mode with no padding and an
       //    initialization vector of zero. The 32-byte result is the file encryption key.
       const uKey = await this.algorithm2B({
-        data: BufferSourceConverter.concat(passwordView, uView.subarray(40, 48)),
+        data: BufferSourceConverter.concat(
+          passwordView,
+          uView.subarray(40, 48)
+        ),
         password: passwordView,
-        crypto: params.crypto,
+        crypto: params.crypto
       });
-      const key = await params.crypto.importKey("raw", uKey, "AES-CBC", false, ["encrypt", "decrypt"]);
-      eKey = await params.crypto.decrypt({
-        name: "AES-CBC",
-        iv: new ArrayBuffer(16),
-        pad: true, // PDFCryptoEngine supports this option
-      } as AesCbcParams, key, params.ue);
+      const key = await params.crypto.importKey("raw", uKey, "AES-CBC", false, [
+        "encrypt",
+        "decrypt"
+      ]);
+      eKey = await params.crypto.decrypt(
+        {
+          name: "AES-CBC",
+          iv: new ArrayBuffer(16),
+          pad: true // PDFCryptoEngine supports this option
+        } as AesCbcParams,
+        key,
+        params.ue
+      );
 
       eKey = eKey.slice(0, 32);
     }
@@ -351,16 +408,28 @@ export class StandardEncryptionAlgorithm {
     //    the file encryption key as the key. Verify that bytes 9-11 of the result are the characters "a", "d", "b". Bytes
     //    0-3 of the decrypted Perms entry, treated as a little-endian integer, are the user permissions. They shall
     //    match the value in the P key.
-    const aesEcb = await params.crypto.importKey("raw", eKey, "AES-ECB", false, ["encrypt", "decrypt"]);
-    const perms = await params.crypto.decrypt({
-      name: "AES-ECB",
-      iv: new ArrayBuffer(16),
-      pad: true, // PDFCryptoEngine supports this option
-    } as AesCbcParams, aesEcb, params.perms);
+    const aesEcb = await params.crypto.importKey(
+      "raw",
+      eKey,
+      "AES-ECB",
+      false,
+      ["encrypt", "decrypt"]
+    );
+    const perms = await params.crypto.decrypt(
+      {
+        name: "AES-ECB",
+        iv: new ArrayBuffer(16),
+        pad: true // PDFCryptoEngine supports this option
+      } as AesCbcParams,
+      aesEcb,
+      params.perms
+    );
     const p = new Int32Array(perms.slice(0, 4))[0];
     const adb = perms.slice(9, 12);
     if (!(p === params.p && Convert.ToBinary(adb) === "adb")) {
-      throw new Error("Cannot get the file encryption key, the field Perms doesn't match requirements.");
+      throw new Error(
+        "Cannot get the file encryption key, the field Perms doesn't match requirements."
+      );
     }
 
     return eKey;
@@ -370,7 +439,9 @@ export class StandardEncryptionAlgorithm {
    * Computing a hash (revision 6 and later)
    * @param params Parameters
    */
-  public static async algorithm2B(params: StandardAlgorithm2BParams): Promise<ArrayBuffer> {
+  public static async algorithm2B(
+    params: StandardAlgorithm2BParams
+  ): Promise<ArrayBuffer> {
     const u = params.u || new ArrayBuffer(0);
 
     // Take the SHA-256 hash of the original input to the algorithm and name the resulting 32 bytes, K
@@ -386,7 +457,11 @@ export class StandardEncryptionAlgorithm {
       //    key. The 48 byte user key is only used when checking the owner password or creating the owner key. If
       //    checking the user password or creating the user key, K1 is the concatenation of the input password
       //    and K.
-      const sequence = BufferSourceConverter.concat(passwordToView(params.password), k, u);
+      const sequence = BufferSourceConverter.concat(
+        passwordToView(params.password),
+        k,
+        u
+      );
       const sequenceView = BufferSourceConverter.toUint8Array(sequence);
       const k1: Uint8Array = new Uint8Array(sequence.byteLength * 64);
       for (let i = 0; i < 64; i++) {
@@ -395,14 +470,30 @@ export class StandardEncryptionAlgorithm {
 
       // b) Encrypt K1 with the AES-128 (CBC, no padding) algorithm, using the first 16 bytes of K as the key and the
       //    second 16 bytes of K as the initialization vector. The result of this encryption is E.
-      const aesKey = await params.crypto.importKey("raw", k.slice(0, 16), "AES-CBC", false, ["encrypt"]);
-      e = await params.crypto.encrypt({ name: "AES-CBC", iv: BufferSourceConverter.toUint8Array(k).subarray(16, 32) }, aesKey, k1);
+      const aesKey = await params.crypto.importKey(
+        "raw",
+        k.slice(0, 16),
+        "AES-CBC",
+        false,
+        ["encrypt"]
+      );
+      e = await params.crypto.encrypt(
+        {
+          name: "AES-CBC",
+          iv: BufferSourceConverter.toUint8Array(k).subarray(16, 32)
+        },
+        aesKey,
+        k1
+      );
       e = e.slice(0, k1.byteLength); // There is padding in WebCrypto - remove unnecessary tail bytes
 
       // c) Taking the first 16 bytes of E as an unsigned big-endian integer, compute the remainder, modulo 3. If the
       //    result is 0, the next hash used is SHA-256, if the result is 1, the next hash used is SHA-384, if the result is 2,
       //    the next hash used is SHA-512.
-      const remainder = BufferSourceConverter.toUint8Array(e).subarray(0, 16).reduce((a, b) => a + b, 0) % 3;
+      const remainder =
+        BufferSourceConverter.toUint8Array(e)
+          .subarray(0, 16)
+          .reduce((a, b) => a + b, 0) % 3;
 
       // d) Using the hash algorithm determined in step c, take the hash of E. The result is a new value of K, which
       //    will be 32, 48, or 64 bytes in length.
@@ -443,7 +534,9 @@ export class StandardEncryptionAlgorithm {
    * Computing the encryption dictionary’s O-entry value (revision 4 and earlier)
    * @param params Parameters
    */
-  public static async algorithm3(params: StandardAlgorithm3Params): Promise<ArrayBuffer> {
+  public static async algorithm3(
+    params: StandardAlgorithm3Params
+  ): Promise<ArrayBuffer> {
     // This algorithm is deprecated in PDF 2.0.
 
     // a) Pad or truncate the owner password string
@@ -461,16 +554,21 @@ export class StandardEncryptionAlgorithm {
     // d) Create an RC4 file encryption key using the first n bytes of the output from the final MD5 hash,
     //    where n shall always be 5 for security handlers of revision 2 but, for security handlers of revision 3
     //    or greater, shall depend on the value of the encryption dictionary’s Length entry.
-    const encKey = (params.revision >= 3)
-      ? hashView.slice(0, params.length >> 3)
-      : hashView.slice(0, 5);
+    const encKey =
+      params.revision >= 3
+        ? hashView.slice(0, params.length >> 3)
+        : hashView.slice(0, 5);
 
     // e) Pad or truncate the user password string
     const userPassword = padPassword(params.user);
 
     // f) Encrypt the result of step (e), using an RC4 encryption function with the file encryption key
     //    obtained instep (d).
-    let checkData = await params.crypto.encrypt(algorithms.rc4, encKey as unknown as CryptoKey, userPassword);
+    let checkData = await params.crypto.encrypt(
+      algorithms.rc4,
+      encKey as unknown as CryptoKey,
+      userPassword
+    );
 
     // g) (Security handlers of revision 3 or greater) Do the following 19 times:
     //    Take the output from the previous invocation of the RC4 function and pass it as input to a new invocation
@@ -484,7 +582,11 @@ export class StandardEncryptionAlgorithm {
         for (let j = 0; j < n; ++j) {
           derivedKey[j] = encKey[j] ^ i;
         }
-        checkData = await params.crypto.encrypt(algorithms.rc4, derivedKey as unknown as CryptoKey, checkData);
+        checkData = await params.crypto.encrypt(
+          algorithms.rc4,
+          derivedKey as unknown as CryptoKey,
+          checkData
+        );
       }
     }
 
@@ -498,7 +600,9 @@ export class StandardEncryptionAlgorithm {
    * @param params Parameters
    * @returns
    */
-  public static async algorithm4(params: StandardAlgorithm4Params): Promise<ArrayBuffer> {
+  public static async algorithm4(
+    params: StandardAlgorithm4Params
+  ): Promise<ArrayBuffer> {
     // This algorithm is deprecated in PDF 2.0.
 
     // a) Create a file encryption key based on the user password string, as described in
@@ -509,7 +613,11 @@ export class StandardEncryptionAlgorithm {
     // b) Encrypt the 32-byte padding string shown in step (b) of 7.6.4.3.1, "Algorithm 2:
     //    Computing an encryption key in order to encrypt a document (revision 4 and earlier)",
     //    using an RC4 encryption function with the file encryption key from the preceding step.
-    const encryptedPadding = await params.crypto.encrypt(algorithms.rc4, fileEncryptionKey as unknown as CryptoKey, passwordPadding);
+    const encryptedPadding = await params.crypto.encrypt(
+      algorithms.rc4,
+      fileEncryptionKey as unknown as CryptoKey,
+      passwordPadding
+    );
 
     // c) Store the result of step (b) as the value of the U entry in the encryption dictionary.
     return encryptedPadding;
@@ -520,7 +628,9 @@ export class StandardEncryptionAlgorithm {
    * @param params Parameters
    * @returns 32-bytes check data
    */
-  public static async algorithm5(params: StandardAlgorithm5Params): Promise<ArrayBuffer> {
+  public static async algorithm5(
+    params: StandardAlgorithm5Params
+  ): Promise<ArrayBuffer> {
     // a) Create a file encryption key based on the user password string, as described in 7.6.4.3.1, "Algorithm 2:
     //    Computing an encryption key in order to encrypt a document (revision 4 and earlier)".
     const encKey = await this.algorithm2(params);
@@ -532,13 +642,17 @@ export class StandardEncryptionAlgorithm {
       //    input to this function.
       passwordPadding,
       // c) Pass the first element of the file’s file identifier array
-      params.id,
+      params.id
     );
     const hash = await params.crypto.digest(algorithms.md5, md5Data);
 
     // d) Encrypt the 16-byte result of the hash, using an RC4 encryption function with the encryption key from
     //    step (a).
-    let checkData = await params.crypto.encrypt(algorithms.rc4, encKey as unknown as CryptoKey, hash);
+    let checkData = await params.crypto.encrypt(
+      algorithms.rc4,
+      encKey as unknown as CryptoKey,
+      hash
+    );
 
     // e) Do the following 19 times: Take the output from the previous invocation of the RC4 function and pass it as
     //    input to a new invocation of the function; use a file encryption key generated by taking each byte of the
@@ -550,7 +664,11 @@ export class StandardEncryptionAlgorithm {
       for (let j = 0; j < n; ++j) {
         derivedKey[j] = encKeyView[j] ^ i;
       }
-      checkData = await params.crypto.encrypt(algorithms.rc4, derivedKey as unknown as CryptoKey, checkData);
+      checkData = await params.crypto.encrypt(
+        algorithms.rc4,
+        derivedKey as unknown as CryptoKey,
+        checkData
+      );
     }
 
     // f) Append 16 bytes of arbitrary padding to the output from the final invocation of the RC4 function and
@@ -565,7 +683,9 @@ export class StandardEncryptionAlgorithm {
    * Authenticating the user password (Security handlers of revision 4 and earlier)
    * @param params Parameters
    */
-  public static async algorithm6(params: StandardAlgorithm6Params): Promise<boolean> {
+  public static async algorithm6(
+    params: StandardAlgorithm6Params
+  ): Promise<boolean> {
     // This algorithm is deprecated in PDF 2.0.
 
     let u: ArrayBuffer;
@@ -585,7 +705,7 @@ export class StandardEncryptionAlgorithm {
     if (params.revision >= 3) {
       return BufferSourceConverter.isEqual(
         BufferSourceConverter.toUint8Array(u).subarray(0, 16),
-        BufferSourceConverter.toUint8Array(params.u).subarray(0, 16),
+        BufferSourceConverter.toUint8Array(params.u).subarray(0, 16)
       );
     }
 
@@ -600,7 +720,9 @@ export class StandardEncryptionAlgorithm {
    * Authenticating the owner password (Security handlers of revision 4 and earlier)
    * @param params Parameters
    */
-  public static async algorithm7(params: StandardAlgorithm7Params): Promise<boolean> {
+  public static async algorithm7(
+    params: StandardAlgorithm7Params
+  ): Promise<boolean> {
     // This algorithm is deprecated in PDF 2.0.
 
     // a) Compute a file encryption key from the supplied password string, as described in step (a) to step (d) of
@@ -629,7 +751,9 @@ export class StandardEncryptionAlgorithm {
    * Computing the encryption dictionary’s U (user password) and UE (user encryption key) values
    * @param params Parameters
    */
-  public static async algorithm8(params: StandardAlgorithm8Params): Promise<StandardAlgorithm8Result> {
+  public static async algorithm8(
+    params: StandardAlgorithm8Params
+  ): Promise<StandardAlgorithm8Result> {
     const { crypto } = params;
     const password = passwordToView(params.password);
 
@@ -638,15 +762,21 @@ export class StandardEncryptionAlgorithm {
     //    2.B with an input string consisting of the UTF-8 password concatenated with the User Validation Salt. The
     //    48-byte string consisting of the 32-byte hash followed by the User Validation Salt followed by the User
     //    Key Salt is stored as the U key.
-    const random = BufferSourceConverter.toUint8Array(params.random || crypto.getRandomValues(new Uint8Array(16)));
+    const random = BufferSourceConverter.toUint8Array(
+      params.random || crypto.getRandomValues(new Uint8Array(16))
+    );
     const userValidationSalt = random.subarray(0, 8);
     const userKeySalt = random.subarray(8);
     const hash = await this.algorithm2B({
       data: BufferSourceConverter.concat(password, userValidationSalt),
       password,
-      crypto: params.crypto,
+      crypto: params.crypto
     });
-    const u = BufferSourceConverter.concat(hash, userValidationSalt, userKeySalt);
+    const u = BufferSourceConverter.concat(
+      hash,
+      userValidationSalt,
+      userKeySalt
+    );
 
     // b) Compute the 32-byte hash using algorithm 2.B with an input string consisting of the UTF-8 password
     //    concatenated with the User Key Salt. Using this hash as the key, encrypt the file encryption key using AES256
@@ -655,13 +785,19 @@ export class StandardEncryptionAlgorithm {
     const hashUE = await this.algorithm2B({
       data: BufferSourceConverter.concat(password, userKeySalt),
       password,
-      crypto: params.crypto,
+      crypto: params.crypto
     });
-    const key = await params.crypto.importKey("raw", hashUE, "AES-CBC", false, ["encrypt"]);
-    const encryptedKey = await params.crypto.encrypt({
-      name: "AES-CBC",
-      iv: new ArrayBuffer(16),
-    }, key, params.key);
+    const key = await params.crypto.importKey("raw", hashUE, "AES-CBC", false, [
+      "encrypt"
+    ]);
+    const encryptedKey = await params.crypto.encrypt(
+      {
+        name: "AES-CBC",
+        iv: new ArrayBuffer(16)
+      },
+      key,
+      params.key
+    );
     const ue = encryptedKey.slice(0, params.key.byteLength); // Remove AES padding
 
     return { u, ue };
@@ -671,13 +807,17 @@ export class StandardEncryptionAlgorithm {
    * Computing the encryption dictionary’s O (owner password) and OE (owner encryption key) values
    * @param params Parameters
    */
-  public static async algorithm9(params: StandardAlgorithm9Params): Promise<StandardAlgorithm9Result> {
+  public static async algorithm9(
+    params: StandardAlgorithm9Params
+  ): Promise<StandardAlgorithm9Result> {
     const { crypto } = params;
     const password = passwordToView(params.password);
     const u = BufferSourceConverter.toUint8Array(params.u).subarray(0, 48);
 
     // a) Generate 16 random bytes of data using a strong random number generator.
-    const random = BufferSourceConverter.toUint8Array(params.random || crypto.getRandomValues(new Uint8Array(16)));
+    const random = BufferSourceConverter.toUint8Array(
+      params.random || crypto.getRandomValues(new Uint8Array(16))
+    );
     //    The first 8 bytes are the Owner Validation Salt.
     const ownerValidationSalt = random.subarray(0, 8);
     //    The second 8 bytes are the Owner Key Salt.
@@ -688,11 +828,15 @@ export class StandardEncryptionAlgorithm {
       data: BufferSourceConverter.concat(password, ownerValidationSalt, u),
       password,
       u,
-      crypto,
+      crypto
     });
     //    The 48-byte string consisting of the 32-byte hash followed by the Owner Validation Salt followed by the Owner Key
     //    Salt is stored as the O key.
-    const o = BufferSourceConverter.concat(hashO, ownerValidationSalt, ownerKeySalt);
+    const o = BufferSourceConverter.concat(
+      hashO,
+      ownerValidationSalt,
+      ownerKeySalt
+    );
 
     // b) Compute the 32-byte hash using 7.6.4.3.3, "Algorithm 2.B: Computing a hash (revision 6 and later)" with
     //    an input string consisting of the UTF-8 password concatenated with the Owner Key Salt and then
@@ -704,13 +848,23 @@ export class StandardEncryptionAlgorithm {
       data: BufferSourceConverter.concat(password, ownerKeySalt, u),
       password,
       u,
-      crypto,
+      crypto
     });
-    const key = await crypto.importKey("raw", hashOE, algorithms.AesCBC, false, ["encrypt"]);
-    const encryptedKey = await crypto.encrypt({
-      name: "AES-CBC",
-      iv: new ArrayBuffer(16),
-    }, key, params.key);
+    const key = await crypto.importKey(
+      "raw",
+      hashOE,
+      algorithms.AesCBC,
+      false,
+      ["encrypt"]
+    );
+    const encryptedKey = await crypto.encrypt(
+      {
+        name: "AES-CBC",
+        iv: new ArrayBuffer(16)
+      },
+      key,
+      params.key
+    );
     const oe = encryptedKey.slice(0, params.key.byteLength); // remove AES padding
 
     return { o, oe };
@@ -722,15 +876,27 @@ export class StandardEncryptionAlgorithm {
    * @param fileEncryptionKey File encryption key
    * @param encryptMetadata Flag from "EncryptMetadata" PDF key
    */
-  public static async algorithm10(params: StandardAlgorithm10Params): Promise<ArrayBuffer> {
+  public static async algorithm10(
+    params: StandardAlgorithm10Params
+  ): Promise<ArrayBuffer> {
     // Fill a 16-byte block as follows:
     // a) Extend the permissions (contents of the P integer) to 64 bits by setting the upper 32 bits to all 1’s
     const constPart = new Uint8Array([
-      0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+      0xff,
+      0xff,
+      0xff,
+      0xff,
+      0xff,
+      0xff,
+      0xff,
+      0xff,
       // c) Set byte 8 to the ASCII character "T" or "F" according to the EncryptMetadata Boolean.
-      (params.encryptMetadata) ? 0x54 : 0x46,
+      params.encryptMetadata ? 0x54 : 0x46,
       // d) Set bytes 9-11 to the ASCII characters '"a", "d", "b"
-      0x61, 0x64, 0x62]);
+      0x61,
+      0x64,
+      0x62
+    ]);
 
     // b) Record the 8 bytes of permission in the bytes 0-7 of the block, low order byte first.
     constPart.set(new Uint8Array(new Int32Array([params.permissions]).buffer)); // Set first 4 bytes as "P" value (low bytes first)
@@ -741,12 +907,22 @@ export class StandardEncryptionAlgorithm {
     // f) Encrypt the 16-byte block using AES-256 in ECB mode with an initialization vector of zero, using the file
     //    encryption key as the key. The result (16 bytes) is stored as the Perms string, and checked for validity
     //    when the file is opened.
-    const key = await params.crypto.importKey("raw", params.key, { name: "AES-ECB", length: params.key.byteLength << 3 }, false, ["encrypt"]);
-    const res = await params.crypto.encrypt({
-      name: "AES-ECB",
-      padding: false,
-      iv: new ArrayBuffer(16)
-    } as Algorithm, key, BufferSourceConverter.concat(constPart.buffer, random));
+    const key = await params.crypto.importKey(
+      "raw",
+      params.key,
+      { name: "AES-ECB", length: params.key.byteLength << 3 },
+      false,
+      ["encrypt"]
+    );
+    const res = await params.crypto.encrypt(
+      {
+        name: "AES-ECB",
+        padding: false,
+        iv: new ArrayBuffer(16)
+      } as Algorithm,
+      key,
+      BufferSourceConverter.concat(constPart.buffer, random)
+    );
 
     return res.slice(0, 16);
   }
@@ -755,7 +931,9 @@ export class StandardEncryptionAlgorithm {
    * Authenticating the user password (Security handlers of revision 6)
    * @param params Parameters
    */
-  public static async algorithm11(params: StandardAlgorithm11Params): Promise<boolean> {
+  public static async algorithm11(
+    params: StandardAlgorithm11Params
+  ): Promise<boolean> {
     // a) Test the password against the user key by computing the 32-byte hash using 7.6.4.3.3, "Algorithm 2.B:
     //     Computing a hash (revision 6 and later)" with an input string consisting of the UTF-8 password
     //     concatenated with the 8 bytes of User Validation Salt (see 7.6.4.4.6, "Algorithm 8: Computing the
@@ -769,7 +947,7 @@ export class StandardEncryptionAlgorithm {
     const hash = await this.algorithm2B({
       data: BufferSourceConverter.concat(passwordView, userValidationSalt),
       password: passwordView,
-      crypto: params.crypto,
+      crypto: params.crypto
     });
 
     return BufferSourceConverter.isEqual(hash, userPassword);
@@ -779,7 +957,9 @@ export class StandardEncryptionAlgorithm {
    * Authenticating the owner password (Security handlers of revision 6)
    * @param params Parameters
    */
-  public static async algorithm12(params: StandardAlgorithm12Params): Promise<boolean> {
+  public static async algorithm12(
+    params: StandardAlgorithm12Params
+  ): Promise<boolean> {
     // a) Test the password against the owner key by computing the 32-byte hash using algorithm 2.B with an
     //    input string consisting of the UTF-8 password concatenated with the 8 bytes of Owner Validation Salt and
     //    the 48 byte U string. If the 32 byte result matches the first 32 bytes of the O string, this is the owner
@@ -789,10 +969,14 @@ export class StandardEncryptionAlgorithm {
     const oView = BufferSourceConverter.toUint8Array(params.o).subarray(0, 48);
     const ownerValidationSalt = oView.subarray(32, 40);
     const hash = await this.algorithm2B({
-      data: BufferSourceConverter.concat(passwordView, ownerValidationSalt, uView),
+      data: BufferSourceConverter.concat(
+        passwordView,
+        ownerValidationSalt,
+        uView
+      ),
       password: passwordView,
       u: uView,
-      crypto: params.crypto,
+      crypto: params.crypto
     });
 
     return BufferSourceConverter.isEqual(hash, oView.subarray(0, 32));
