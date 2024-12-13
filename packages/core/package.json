@@ -34,7 +34,6 @@
     "@peculiar/x509": "^1.12.3",
     "@types/events": "^3.0.0",
     "asn1js": "^3.0.5",
-    "bytestreamjs": "2.0.1",
     "events": "3.3.0",
     "pako": "^2.1.0",
     "pkijs": "^3.2.4",
