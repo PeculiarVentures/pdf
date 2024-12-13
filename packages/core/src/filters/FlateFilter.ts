@@ -1,10 +1,9 @@
 import { Filter } from "./Filter";
 import * as pako from "pako";
-import * as bs from "bytestreamjs";
+import { BufferSourceConverter } from "pvtsutils";
 import { PDFNumeric } from "../objects/Numeric";
 import { TIFFPredictor } from "./TIFFPredictor";
 import { PNGPredictor } from "./PNGPredictor";
-import { BufferSourceConverter } from "pvtsutils";
 
 export interface FlateFilterBuildHuffmanCodesResult {
   codes: Record<number, string>;
@@ -12,7 +11,6 @@ export interface FlateFilterBuildHuffmanCodesResult {
 }
 
 export class FlateFilter extends Filter {
-
   public static readonly PREDICTOR = 1;
   public static readonly COLUMNS = 1;
   public static readonly COLORS = 1;
@@ -42,16 +40,28 @@ export class FlateFilter extends Filter {
 
     if (this.decodeParams) {
       if (this.decodeParams.has(FlateFilter.FIELD_PREDICTOR)) {
-        predictor = this.decodeParams.get(FlateFilter.FIELD_PREDICTOR, PDFNumeric).value;
+        predictor = this.decodeParams.get(
+          FlateFilter.FIELD_PREDICTOR,
+          PDFNumeric
+        ).value;
       }
       if (this.decodeParams.has(FlateFilter.FIELD_COLUMNS)) {
-        columns = this.decodeParams.get(FlateFilter.FIELD_COLUMNS, PDFNumeric).value;
+        columns = this.decodeParams.get(
+          FlateFilter.FIELD_COLUMNS,
+          PDFNumeric
+        ).value;
       }
       if (this.decodeParams.has(FlateFilter.FIELD_COLORS)) {
-        colors = this.decodeParams.get(FlateFilter.FIELD_COLORS, PDFNumeric).value;
+        colors = this.decodeParams.get(
+          FlateFilter.FIELD_COLORS,
+          PDFNumeric
+        ).value;
       }
       if (this.decodeParams.has(FlateFilter.FIELD_BITS_PER_COMPONENT)) {
-        bitsPerComponent = this.decodeParams.get(FlateFilter.FIELD_BITS_PER_COMPONENT, PDFNumeric).value;
+        bitsPerComponent = this.decodeParams.get(
+          FlateFilter.FIELD_BITS_PER_COMPONENT,
+          PDFNumeric
+        ).value;
       }
     }
 
@@ -63,7 +73,9 @@ export class FlateFilter extends Filter {
         throw e;
       }
 
-      throw new Error(`Cannot decode the stream using the FlateDecode filter. ${e}`);
+      throw new Error(
+        `Cannot decode the stream using the FlateDecode filter. ${e}`
+      );
     }
 
     if (!result) {
@@ -73,14 +85,14 @@ export class FlateFilter extends Filter {
     if (predictor > 1) {
       if (predictor === 2) {
         result = new TIFFPredictor({
-          columns,
-        }).decode(new bs.ByteStream({ view: result })).view;
+          columns
+        }).decode(result);
       } else {
         result = new PNGPredictor({
           columns,
           colors,
-          bitsPerComponent,
-        }).decode(new bs.ByteStream({ view: result })).view;
+          bitsPerComponent
+        }).decode(result);
       }
     }
 

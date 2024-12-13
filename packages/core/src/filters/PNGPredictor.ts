@@ -1,129 +1,104 @@
-import * as bs from "bytestreamjs";
 import { Predictor } from "./Predicator";
 
 export class PNGPredictor extends Predictor {
+  public static readonly className = "PNGPredictor";
 
-	public static readonly className = "PNGPredictor";
+  public decode(view: Uint8Array): Uint8Array {
+    const bytesPerPixel = (this.colors * this.bitsPerComponent + 7) >> 3;
+    const bytesPerRow =
+      (this.colors * this.bitsPerComponent * this.columns + 7) >> 3;
 
-	public decode(stream: bs.ByteStream): bs.ByteStream {
-		//#region Initial variables
-		const result = new bs.SeqStream({
-			stream: new bs.ByteStream(),
-			appendBlock: stream.buffer.byteLength
-		});
+    // Store initial data
+    this.prevData = new Uint8Array(view);
 
-		const streamLength = stream.buffer.byteLength;
+    // Create result array
+    const result = new Uint8Array(
+      Math.ceil(view.length / (bytesPerRow + 1)) * bytesPerRow
+    );
+    let resultPos = 0;
+    let pos = 0;
 
-		const bytesPerPixel = (this.colors * this.bitsPerComponent + 7) >> 3;
-		const bytesPerRow = (this.colors * this.bitsPerComponent * this.columns + 7) >> 3;
+    while (pos < view.length) {
+      const type = view[pos++];
+      const row = view.subarray(pos, pos + bytesPerRow);
+      pos += bytesPerRow;
 
-		let count = 0;
+      switch (type) {
+        case 0: // None
+          result.set(row, resultPos);
+          break;
 
-		const row = new Uint8Array(bytesPerRow);
-		//#endregion
-		//#region Store initial data from "Stream"
-		this.prevData = stream.copy(0, stream.view.length);
-		//#endregion
-		while (count < streamLength) {
-			const type = stream.view[count++];
-			// row.set(new Uint8Array(stream.buffer, count, bytesPerRow));
-			row.set(stream.view.subarray(count, count + bytesPerRow));
-			count += bytesPerRow;
+        case 1: // Sub
+          for (let i = 0; i < bytesPerPixel; i++) {
+            result[resultPos + i] = row[i];
+          }
+          for (let i = bytesPerPixel; i < bytesPerRow; i++) {
+            result[resultPos + i] =
+              (row[i] + result[resultPos + i - bytesPerPixel]) & 0xff;
+          }
+          break;
 
-			switch (type) {
-				//#region Filter type 0: None
-				case 0:
-					result.append(new bs.ByteStream({
-						view: row
-					}));
-					break;
-				//#endregion
-				//#region Filter type 1: Sub
-				case 1:
-					{
-						for (let i = 0; i < bytesPerPixel; i++)
-							result.appendChar(row[i]);
+        case 2: // Up
+          for (let i = 0; i < bytesPerRow; i++) {
+            const up =
+              resultPos >= bytesPerRow
+                ? result[resultPos - bytesPerRow + i]
+                : 0;
+            result[resultPos + i] = (row[i] + up) & 0xff;
+          }
+          break;
 
-						for (let i = bytesPerPixel; i < bytesPerRow; i++)
-							result.appendChar((row[i] + result.stream.view[result.start - bytesPerPixel]) & 0xFF);
-					}
-					break;
-				//#endregion
-				//#region Filter type 2: Up
-				case 2:
-					{
-						for (let i = 0; i < bytesPerRow; i++)
-							result.appendChar((row[i] + (result.stream.view[result.start - bytesPerRow] || 0)) & 0xFF);
-					}
-					break;
-				//#endregion
-				//#region Filter type 3: Average
-				case 3:
-					{
-						for (let i = 0; i < bytesPerPixel; ++i)
-							result.appendChar(((result.stream.view[result.start - bytesPerRow] || 0) >> 1) + row[i]);
+        case 3: // Average
+          for (let i = 0; i < bytesPerRow; i++) {
+            const left =
+              i < bytesPerPixel ? 0 : result[resultPos + i - bytesPerPixel];
+            const up =
+              resultPos >= bytesPerRow
+                ? result[resultPos - bytesPerRow + i]
+                : 0;
+            result[resultPos + i] =
+              (row[i] + Math.floor((left + up) / 2)) & 0xff;
+          }
+          break;
 
-						for (let i = bytesPerPixel; i < bytesPerRow; ++i)
-							result.appendChar((((result.stream.view[result.start - bytesPerRow] || 0) + (result.stream.view[result.start - bytesPerPixel] || 0) >> 1) + row[i]) & 0xFF);
-					}
-					break;
-				//#endregion
-				//#region Filter type 4: Paeth
-				case 4:
-					{
-						for (let i = 0; i < bytesPerPixel; ++i)
-							result.appendChar(((result.stream.view[result.start - bytesPerRow] || 0) + row[i]) & 0xFF);
+        case 4: // Paeth
+          for (let i = 0; i < bytesPerRow; i++) {
+            const left =
+              i < bytesPerPixel ? 0 : result[resultPos + i - bytesPerPixel];
+            const up =
+              resultPos >= bytesPerRow
+                ? result[resultPos - bytesPerRow + i]
+                : 0;
+            const upLeft =
+              i < bytesPerPixel || resultPos < bytesPerRow
+                ? 0
+                : result[resultPos - bytesPerRow + i - bytesPerPixel];
+            result[resultPos + i] =
+              (row[i] + paethPredictor(left, up, upLeft)) & 0xff;
+          }
+          break;
 
-						for (let i = bytesPerPixel; i < bytesPerRow; ++i) {
-							const a = (result.stream.view[result.start - bytesPerPixel] || 0);
-							const b = (result.stream.view[result.start - bytesPerRow] || 0);
-							const c = (result.stream.view[result.start - bytesPerRow - bytesPerPixel] || 0);
+        default:
+          throw new Error(`Unsupported predictor type: ${type}`);
+      }
 
-							const p = a + b - c;
+      resultPos += bytesPerRow;
+    }
 
-							let pa = p - a;
-							if (pa < 0)
-								pa = -pa;
+    return result;
+  }
 
-							let pb = p - b;
-							if (pb < 0)
-								pb = -pb;
+  public encode(view: Uint8Array): Uint8Array {
+    return view;
+  }
+}
 
-							let pc = p - c;
-							if (pc < 0)
-								pc = -pc;
-
-							switch (true) {
-								case ((pa <= pb) && (pa <= pc)):
-									result.appendChar((a + row[i]) & 0xFF);
-									break;
-								case (pb <= pc):
-									result.appendChar((b + row[i]) & 0xFF);
-									break;
-								default:
-									result.appendChar((c + row[i]) & 0xFF);
-							}
-						}
-					}
-					break;
-				//#endregion
-				//#region default
-				default:
-					throw new Error(`Unsupported predictor type: ${type}`);
-				//#endregion
-			}
-		}
-
-		//#region Initialize value of input Stream
-		stream.buffer = result.stream.buffer.slice(0, result.start);
-		stream.view = new Uint8Array(stream.buffer);
-		//#endregion
-
-		return stream;
-	}
-
-	public encode(stream: bs.ByteStream): bs.ByteStream {
-		return stream;
-	}
-
+function paethPredictor(a: number, b: number, c: number): number {
+  const p = a + b - c;
+  const pa = Math.abs(p - a);
+  const pb = Math.abs(p - b);
+  const pc = Math.abs(p - c);
+  if (pa <= pb && pa <= pc) return a;
+  if (pb <= pc) return b;
+  return c;
 }
