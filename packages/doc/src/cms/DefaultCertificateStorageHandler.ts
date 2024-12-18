@@ -1,13 +1,33 @@
 import { AsnConvert, OctetString } from "@peculiar/asn1-schema";
-import { CertID, id_pkix_ocsp_nonce, OCSPRequest, OCSPResponse, OCSPResponseStatus, Request, TBSRequest } from "@peculiar/asn1-ocsp";
-import { id_ce_cRLDistributionPoints, CRLDistributionPoints, id_pe_authorityInfoAccess, AuthorityInfoAccessSyntax, id_ad_ocsp, Extension } from "@peculiar/asn1-x509";
-import { SubjectKeyIdentifierExtension, X509Certificate, X509Certificates } from "@peculiar/x509";
+import {
+  CertID,
+  id_pkix_ocsp_nonce,
+  OCSPRequest,
+  OCSPResponse,
+  OCSPResponseStatus,
+  Request,
+  TBSRequest
+} from "@peculiar/asn1-ocsp";
+import {
+  id_ce_cRLDistributionPoints,
+  CRLDistributionPoints,
+  id_pe_authorityInfoAccess,
+  AuthorityInfoAccessSyntax,
+  id_ad_ocsp,
+  Extension
+} from "@peculiar/asn1-x509";
+import {
+  SubjectKeyIdentifierExtension,
+  X509Certificate,
+  X509Certificates
+} from "@peculiar/x509";
 import { isEqualBuffer } from "pvutils";
 import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 import * as pkijs from "pkijs";
 
-export class DefaultCertificateStorageHandler implements ICertificateStorageHandler {
-
+export class DefaultCertificateStorageHandler
+  implements ICertificateStorageHandler
+{
   public parent: ICertificateStorageHandler | null = null;
 
   public static async getSKI(cert: X509Certificate): Promise<ArrayBuffer> {
@@ -21,25 +41,57 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
     return cert.publicKey.getKeyIdentifier(crypto);
   }
 
-  public static async isIssuerCertificate(leaf: X509Certificate, issuer: X509Certificate): Promise<boolean> {
+  private static isEqualGeneralNamesAndRDNs(
+    generalNames: pkijs.GeneralName[],
+    rdn: pkijs.RelativeDistinguishedNames
+  ): boolean {
+    return (
+      generalNames.length === 1 &&
+      generalNames[0].type === 4 &&
+      generalNames[0].value instanceof pkijs.RelativeDistinguishedNames &&
+      rdn.isEqual(generalNames[0].value)
+    );
+  }
+
+  public static async isIssuerCertificate(
+    leaf: X509Certificate,
+    issuer: X509Certificate
+  ): Promise<boolean> {
     // leaf certificate's issuer name must be equal to issuer's subject name
     if (leaf.issuer !== issuer.subject) {
       return false;
     }
 
-    const akiExt = PKIUtils.findExtension(PKIUtils.x509ToCert(leaf), PKIUtils.AUTHORITY_KEY_IDENTIFIER);
+    const akiExt = PKIUtils.findExtension(
+      PKIUtils.x509ToCert(leaf),
+      PKIUtils.AUTHORITY_KEY_IDENTIFIER
+    );
     if (akiExt) {
       const issuerSKI = await DefaultCertificateStorageHandler.getSKI(issuer);
       if ("keyIdentifier" in akiExt.parsedValue) {
-        if (!isEqualBuffer(akiExt.parsedValue.keyIdentifier.valueBlock.valueHex, issuerSKI)) {
+        if (
+          !isEqualBuffer(
+            akiExt.parsedValue.keyIdentifier.valueBlock.valueHex,
+            issuerSKI
+          )
+        ) {
           return false;
         }
-      } else if ("authorityCertIssuer" in akiExt.parsedValue
-        && "authorityCertSerialNumber" in akiExt.parsedValue) {
+      } else if (
+        "authorityCertIssuer" in akiExt.parsedValue &&
+        "authorityCertSerialNumber" in akiExt.parsedValue
+      ) {
         const pkiIssuer = PKIUtils.x509ToCert(issuer);
-        const { authorityCertIssuer, authorityCertSerialNumber } = akiExt.parsedValue;
-        if (!(pkiIssuer.subject.isEqual(authorityCertIssuer)
-          && pkiIssuer.serialNumber.isEqual(authorityCertSerialNumber))) {
+        const { authorityCertIssuer, authorityCertSerialNumber } =
+          akiExt.parsedValue;
+        if (
+          !(
+            DefaultCertificateStorageHandler.isEqualGeneralNamesAndRDNs(
+              authorityCertIssuer,
+              pkiIssuer.issuer
+            ) && pkiIssuer.serialNumber.isEqual(authorityCertSerialNumber)
+          )
+        ) {
           return false;
         }
       }
@@ -48,7 +100,7 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
     try {
       const res = await leaf.verify({
         publicKey: issuer,
-        signatureOnly: true,
+        signatureOnly: true
       });
 
       return res;
@@ -61,11 +113,20 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
   public crls: CRL[] = [];
   public ocsps: OCSP[] = [];
 
-  public findCertificate(serialNumber: BufferSource, issuer: BufferSource): Promise<X509Certificate | null>;
+  public findCertificate(
+    serialNumber: BufferSource,
+    issuer: BufferSource
+  ): Promise<X509Certificate | null>;
   public findCertificate(spki: BufferSource): Promise<X509Certificate | null>;
   // @internal
-  public findCertificate(serialNumber: BufferSource, issuer?: BufferSource): Promise<X509Certificate | null>;
-  public async findCertificate(serialNumber: BufferSource, issuer?: BufferSource): Promise<X509Certificate | null> {
+  public findCertificate(
+    serialNumber: BufferSource,
+    issuer?: BufferSource
+  ): Promise<X509Certificate | null>;
+  public async findCertificate(
+    serialNumber: BufferSource,
+    issuer?: BufferSource
+  ): Promise<X509Certificate | null> {
     if (this.parent) {
       const cert = await this.parent.findCertificate(serialNumber, issuer);
       if (cert) {
@@ -83,19 +144,52 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
     return null;
   }
 
-  public matchCertificate(cert: X509Certificate, serialNumber: BufferSource, issuer: BufferSource): Promise<boolean>;
-  public matchCertificate(cert: X509Certificate, spki: BufferSource): Promise<boolean>;
+  /**
+   * Check if the certificate matches the given serial number and issuer name.
+   * @param cert - The certificate to check.
+   * @param serialNumber - The serial number to check.
+   * @param issuer - The issuer name to check.
+   * @returns Returns `true` if the certificate matches the given serial number and issuer name, otherwise `false`.
+   */
+  public matchCertificate(
+    cert: X509Certificate,
+    serialNumber: BufferSource,
+    issuer: BufferSource
+  ): Promise<boolean>;
+  /**
+   * Check if the certificate matches the given subject public key identifier.
+   * @param cert - The certificate to check.
+   * @param spki - The subject public key identifier to check.
+   * @returns Returns `true` if the certificate matches the given subject public key identifier, otherwise `false`.
+   */
+  public matchCertificate(
+    cert: X509Certificate,
+    spki: BufferSource
+  ): Promise<boolean>;
   // @internal
-  public matchCertificate(cert: X509Certificate, serialNumber: BufferSource, issuer?: BufferSource): Promise<boolean>;
-  public async matchCertificate(cert: X509Certificate, serialNumber: BufferSource, issuer?: BufferSource): Promise<boolean> {
+  public matchCertificate(
+    cert: X509Certificate,
+    serialNumber: BufferSource,
+    issuer?: BufferSource
+  ): Promise<boolean>;
+  public async matchCertificate(
+    cert: X509Certificate,
+    serialNumber: BufferSource,
+    issuer?: BufferSource
+  ): Promise<boolean> {
     if (serialNumber && issuer) {
       // serial number and issuer
       serialNumber = BufferSourceConverter.toArrayBuffer(serialNumber);
       issuer = BufferSourceConverter.toArrayBuffer(issuer);
 
       const pkiCert = PKIUtils.x509ToCert(cert);
-      if (isEqualBuffer(pkiCert.serialNumber.valueBlock.valueHex, serialNumber)
-        && isEqualBuffer(pkiCert.issuer.valueBeforeDecode, issuer)) {
+      if (
+        isEqualBuffer(
+          pkiCert.serialNumber.valueBeforeDecodeView,
+          serialNumber
+        ) &&
+        isEqualBuffer(pkiCert.issuer.valueBeforeDecode, issuer)
+      ) {
         return true;
       }
     } else {
@@ -111,21 +205,24 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
     return false;
   }
 
-  public async findIssuer(cert: X509Certificate): Promise<X509Certificate | null> {
-    if (this.parent) {
-      const issuerCert = await this.parent.findIssuer(cert);
-      if (issuerCert) {
-        return issuerCert;
-      }
+  public async findIssuer(
+    cert: X509Certificate
+  ): Promise<X509Certificate | null> {
+    let issuerCert = await this.parent?.findIssuer(cert);
+    if (issuerCert) {
+      return issuerCert;
     }
 
-    let issuerCert: X509Certificate | null = null;
     // Self-signed certificate
     if (await cert.isSelfSigned()) {
       issuerCert = cert;
     } else {
       for (const item of this.certificates) {
-        const isIssuer = await DefaultCertificateStorageHandler.isIssuerCertificate(cert, item);
+        const isIssuer =
+          await DefaultCertificateStorageHandler.isIssuerCertificate(
+            cert,
+            item
+          );
         if (isIssuer) {
           issuerCert = item;
           break;
@@ -133,7 +230,7 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
       }
     }
 
-    return issuerCert;
+    return issuerCert || null;
   }
 
   public async isTrusted(cert: X509Certificate): Promise<IsTrustedResult> {
@@ -143,16 +240,21 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
         return trusted;
       }
     }
-
-    return {
-      target: this,
-      result: false,
-    };
+    return { target: this, result: false };
   }
 
-  public findRevocation(type: "crl", cert: X509Certificate): Promise<IResult<CRL | null>>;
-  public findRevocation(type: "ocsp", cert: X509Certificate): Promise<IResult<OCSP | null>>;
-  public async findRevocation(type: RevocationType, cert: X509Certificate): Promise<IResult<CRL | OCSP | null>> {
+  public findRevocation(
+    type: "crl",
+    cert: X509Certificate
+  ): Promise<IResult<CRL | null>>;
+  public findRevocation(
+    type: "ocsp",
+    cert: X509Certificate
+  ): Promise<IResult<OCSP | null>>;
+  public async findRevocation(
+    type: RevocationType,
+    cert: X509Certificate
+  ): Promise<IResult<CRL | OCSP | null>> {
     let res;
     switch (type) {
       case "crl":
@@ -179,33 +281,37 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
       if (issuer && issuer.subject === crl.issuer) {
         const ok = await crl.verify(issuer);
         if (ok) {
-          return {
-            result: crl,
-            target: this,
-          };
+          return { result: crl, target: this };
         }
       }
     }
 
-    return {
-      result: null,
-      target: this,
-    };
+    return { result: null, target: this };
   }
 
   protected async fetchCRL(cert: X509Certificate): Promise<IResult<CRL | null>>;
   protected async fetchCRL(uri: string): Promise<IResult<CRL | null>>;
-  protected async fetchCRL(uriOrCert: X509Certificate | string): Promise<IResult<CRL | null>> {
+  protected async fetchCRL(
+    uriOrCert: X509Certificate | string
+  ): Promise<IResult<CRL | null>> {
     let uri = "";
     if (uriOrCert instanceof X509Certificate) {
       const crlPoints = uriOrCert.getExtension(id_ce_cRLDistributionPoints);
       if (crlPoints) {
-        const asnCrlPoints = AsnConvert.parse(crlPoints.value, CRLDistributionPoints);
+        const asnCrlPoints = AsnConvert.parse(
+          crlPoints.value,
+          CRLDistributionPoints
+        );
         for (const point of asnCrlPoints) {
           if (point.distributionPoint && point.distributionPoint.fullName) {
             for (const fullName of point.distributionPoint.fullName) {
-              if (fullName.uniformResourceIdentifier && fullName.uniformResourceIdentifier.startsWith("http")) {
-                const crl = await this.fetchCRL(fullName.uniformResourceIdentifier);
+              if (
+                fullName.uniformResourceIdentifier &&
+                fullName.uniformResourceIdentifier.startsWith("http")
+              ) {
+                const crl = await this.fetchCRL(
+                  fullName.uniformResourceIdentifier
+                );
                 if (crl.result) {
                   return crl;
                 }
@@ -217,7 +323,7 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
 
       return {
         result: null,
-        target: this,
+        target: this
       };
     }
     uri = uriOrCert;
@@ -227,21 +333,20 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
 
       return {
         result: CRL.fromBER(raw),
-        target: this,
+        target: this
       };
     } catch (e) {
       return {
         result: null,
         target: this,
-        error: e instanceof Error
-          ? e
-          : new Error("Unknown error on CRL fetching"),
+        error:
+          e instanceof Error ? e : new Error("Unknown error on CRL fetching")
       };
     }
 
     return {
       result: null,
-      target: this,
+      target: this
     };
   }
 
@@ -258,9 +363,18 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
     throw new Error(`Error on CRL requesting (HTTP status: ${resp.status}).`);
   }
 
-  public fetchRevocation(type: "crl", cert: X509Certificate): Promise<IResult<CRL | null>>;
-  public fetchRevocation(type: "ocsp", cert: X509Certificate): Promise<IResult<OCSP | null>>;
-  public async fetchRevocation(type: RevocationType, cert: X509Certificate): Promise<IResult<CRL | OCSP | null>> {
+  public fetchRevocation(
+    type: "crl",
+    cert: X509Certificate
+  ): Promise<IResult<CRL | null>>;
+  public fetchRevocation(
+    type: "ocsp",
+    cert: X509Certificate
+  ): Promise<IResult<OCSP | null>>;
+  public async fetchRevocation(
+    type: RevocationType,
+    cert: X509Certificate
+  ): Promise<IResult<CRL | OCSP | null>> {
     if (this.parent) {
       const res = await this.parent.fetchRevocation(type, cert);
       if (res.result || res.stopPropagation) {
@@ -278,7 +392,9 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
     }
   }
 
-  protected async findOCSP(cert: X509Certificate): Promise<IResult<OCSP | null>> {
+  protected async findOCSP(
+    cert: X509Certificate
+  ): Promise<IResult<OCSP | null>> {
     for (const ocsp of this.ocsps) {
       const issuer = await this.findIssuer(cert);
       if (issuer) {
@@ -286,11 +402,15 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
           const certId = new CertificateID();
           certId.fromSchema(ocspResponse.certID);
 
-          const currentCertID = await CertificateID.create(certId.hashAlgorithm, cert, issuer);
+          const currentCertID = await CertificateID.create(
+            certId.hashAlgorithm,
+            cert,
+            issuer
+          );
           if (currentCertID.equal(certId)) {
             return {
               result: ocsp,
-              target: this,
+              target: this
             };
           }
         }
@@ -299,43 +419,62 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
 
     return {
       target: this,
-      result: null,
+      result: null
     };
   }
 
   public async fetchOCSP(cert: X509Certificate): Promise<IResult<OCSP | null>> {
     const authorityInfoAccess = cert.getExtension(id_pe_authorityInfoAccess);
     if (authorityInfoAccess) {
-      const asnAuthorityInfoAccess = AsnConvert.parse(authorityInfoAccess.value, AuthorityInfoAccessSyntax);
+      const asnAuthorityInfoAccess = AsnConvert.parse(
+        authorityInfoAccess.value,
+        AuthorityInfoAccessSyntax
+      );
       for (const accessDesc of asnAuthorityInfoAccess) {
-        if (accessDesc.accessMethod === id_ad_ocsp && accessDesc.accessLocation.uniformResourceIdentifier) {
+        if (
+          accessDesc.accessMethod === id_ad_ocsp &&
+          accessDesc.accessLocation.uniformResourceIdentifier
+        ) {
           try {
             const issuer = await this.findIssuer(cert);
             if (issuer) {
-              const request = await this.createOCSPRequest(cert, issuer, "SHA-1");
-              const ocspRespRaw = await this.requestOCSP(accessDesc.accessLocation.uniformResourceIdentifier, request);
+              const request = await this.createOCSPRequest(
+                cert,
+                issuer,
+                "SHA-1"
+              );
+              const ocspRespRaw = await this.requestOCSP(
+                accessDesc.accessLocation.uniformResourceIdentifier,
+                request
+              );
 
               const ocspResp = AsnConvert.parse(ocspRespRaw, OCSPResponse);
               if (ocspResp.responseStatus !== OCSPResponseStatus.successful) {
                 return {
                   result: null,
                   target: this,
-                  error: new Error(`Bad OCSP response status '${OCSPResponseStatus[ocspResp.responseStatus] || ocspResp.responseStatus}'.`),
+                  error: new Error(
+                    `Bad OCSP response status '${
+                      OCSPResponseStatus[ocspResp.responseStatus] ||
+                      ocspResp.responseStatus
+                    }'.`
+                  )
                 };
               }
 
               return {
                 result: OCSP.fromBER(ocspResp.responseBytes!.response),
-                target: this,
+                target: this
               };
             }
           } catch (e) {
             return {
               result: null,
               target: this,
-              error: e instanceof Error
-                ? e
-                : new Error("Unknown error on OCSP fetching"),
+              error:
+                e instanceof Error
+                  ? e
+                  : new Error("Unknown error on OCSP fetching")
             };
           }
         }
@@ -345,11 +484,15 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
     return {
       result: null,
       target: this,
-      error: new Error("Not implemented"),
+      error: new Error("Not implemented")
     };
   }
 
-  public async createOCSPRequest(cert: X509Certificate, issuer: X509Certificate, hashAlgorithm: AlgorithmIdentifier = "SHA-256"): Promise<ArrayBuffer> {
+  public async createOCSPRequest(
+    cert: X509Certificate,
+    issuer: X509Certificate,
+    hashAlgorithm: AlgorithmIdentifier = "SHA-256"
+  ): Promise<ArrayBuffer> {
     const certID = await CertificateID.create(hashAlgorithm, cert, issuer);
     const nonce = pkijs.getCrypto(true).getRandomValues(new Uint8Array(20));
     const ocspReq = new OCSPRequest({
@@ -360,18 +503,21 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
             singleRequestExtensions: [
               new Extension({
                 extnID: id_pkix_ocsp_nonce,
-                extnValue: new OctetString(nonce),
+                extnValue: new OctetString(nonce)
               })
             ]
-          }),
+          })
         ]
-      }),
+      })
     });
 
     return AsnConvert.serialize(ocspReq);
   }
 
-  public async requestOCSP(uri: string, ocspRequest: BufferSource): Promise<ArrayBuffer> {
+  public async requestOCSP(
+    uri: string,
+    ocspRequest: BufferSource
+  ): Promise<ArrayBuffer> {
     if (!globalThis.fetch) {
       throw new Error("`globalThis.fetch` is undefined.");
     }
@@ -381,7 +527,7 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
       headers: {
         "content-type": "application/ocsp-request"
       },
-      body: BufferSourceConverter.toArrayBuffer(ocspRequest),
+      body: BufferSourceConverter.toArrayBuffer(ocspRequest)
     });
     if (resp.status === 200) {
       const ocspRespRaw = await resp.arrayBuffer();
@@ -391,7 +537,6 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
 
     throw new Error(`Error on CRL requesting (HTTP status: ${resp.status}).`);
   }
-
 }
 
 import { CRL } from "./CRL";
@@ -399,4 +544,9 @@ import { OCSP } from "./OCSP";
 import { CertificateID } from "./CertID";
 import { PKIUtils } from "./PKIUtils";
 
-import type { ICertificateStorageHandler, IResult, IsTrustedResult, RevocationType } from "./ICertificateStorageHandler";
+import type {
+  ICertificateStorageHandler,
+  IResult,
+  IsTrustedResult,
+  RevocationType
+} from "./ICertificateStorageHandler";
