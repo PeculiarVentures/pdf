@@ -26,7 +26,7 @@ export interface DocumentOptions {
 const headerChars = new Uint8Array(Convert.FromUtf8String("%PDF-"));
 
 const defaultOptions: DocumentOptions = {
-  xref: 1,
+  xref: 0, // XRef Stream
   disableAscii85Encoding: false,
   disableCompressedStreams: false,
   disableCompressedObjects: false
