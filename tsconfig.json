@@ -27,6 +27,9 @@
       "@peculiarventures/pdf-repair": [
         "./packages/repair/src"
       ],
+      "@peculiarventures/pdf-tests": [
+        "./packages/tests/src"
+      ],
     }
   },
   "exclude": [
