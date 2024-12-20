@@ -53,13 +53,34 @@ export class PdfRenderingHelper {
     return new PdfRenderingHelper(doc);
   }
 
+  /**
+   * Get SHA-256 hash of a page in a PDF document.
+   * @param buffer - PDF document buffer
+   * @param pageNumber - Page number (default 1)
+   * @param writeFile - Write the rendered page to a file (default false)
+   * @returns SHA-256 hash of the page
+   *
+   * @remarks This method is used to compare the rendering of a page in a PDF document.
+   * It creates a PNG image of the page and calculates the SHA-256 hash of the image. If
+   * `writeFile` is set to `true`, it writes the image to a file in the workspace directory
+   * with the name `page_<pageNumber>.png` and the PDF document to `tmp.pdf`.
+   */
   static async getPageHash(
     buffer: BufferSource,
     pageNumber = 1,
     writeFile?: boolean
   ): Promise<string> {
     const pdf = await PdfRenderingHelper.load(buffer);
-    return pdf.getPageHash(pageNumber, writeFile);
+    const hash = await pdf.getPageHash(pageNumber, writeFile);
+
+    if (writeFile) {
+      fs.writeFileSync(
+        path.resolve(__dirname, `../../../tmp.pdf`),
+        Buffer.from(BufferSourceConverter.toArrayBuffer(buffer))
+      );
+    }
+
+    return hash;
   }
 
   private document: pdfjs.PDFDocumentProxy;

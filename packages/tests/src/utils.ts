@@ -25,5 +25,13 @@ export async function reopenPdfDocument(
   params?: PDFDocumentLoadParameters
 ): Promise<PDFDocument> {
   const buffer = await doc.save();
-  return PDFDocument.load(buffer, params);
+  const doc2 = await PDFDocument.load(buffer, params);
+  doc2.target.options.disableAscii85Encoding =
+    doc.target.options.disableAscii85Encoding;
+  doc2.target.options.disableCompressedStreams =
+    doc.target.options.disableCompressedStreams;
+  doc2.target.options.disableCompressedObjects =
+    doc.target.options.disableCompressedObjects;
+
+  return doc2;
 }
