@@ -57,7 +57,7 @@ describe("CheckBox", () => {
       checkBox.checked = true;
 
       const pdf = await doc.save();
-      const pageHash = await PdfRenderingHelper.getPageHash(pdf, 1, true);
+      const pageHash = await PdfRenderingHelper.getPageHash(pdf, 1);
 
       expect(pageHash).toBe(
         "fa09bde7805bf1b37c3534d15e708e5d673b0d31c008da8923cbecc13a01fdc0"
