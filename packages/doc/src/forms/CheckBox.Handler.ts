@@ -1,8 +1,14 @@
 import * as core from "@peculiarventures/pdf-core";
-import { FormComponentHandler, IFormComponentCreateParameters, IFormComponentHandler, IFormComponentParameters } from "./FormComponent.Handler";
+import {
+  FormComponentHandler,
+  IFormComponentCreateParameters,
+  IFormComponentHandler,
+  IFormComponentParameters
+} from "./FormComponent.Handler";
 import { FormObject } from "../FormObject";
 
-export interface ICheckBoxCreateParameters extends IFormComponentCreateParameters {
+export interface ICheckBoxCreateParameters
+  extends IFormComponentCreateParameters {
   enabled?: boolean;
   value?: string;
 }
@@ -18,8 +24,10 @@ export interface ICheckBoxHandler extends IFormComponentHandler {
   drawOff(content: FormObject, params: IFormComponentParameters): void;
 }
 
-export class CheckBoxHandler extends FormComponentHandler implements ICheckBoxHandler {
-
+export class CheckBoxHandler
+  extends FormComponentHandler
+  implements ICheckBoxHandler
+{
   public ON_STATE_NAME = "Yes";
   public OFF_STATE_NAME = "Off";
 
@@ -33,7 +41,8 @@ export class CheckBoxHandler extends FormComponentHandler implements ICheckBoxHa
     const graphics = object.graphics();
 
     // Draw background
-    graphics.fillColor(params.backgroundColor)
+    graphics
+      .fillColor(params.backgroundColor)
       .rect(xPt, yPt, widthPt, heightPt)
       .fill();
 
@@ -47,7 +56,9 @@ export class CheckBoxHandler extends FormComponentHandler implements ICheckBoxHa
     }
   }
 
-  public override getParameters(params: ICheckBoxCreateParameters): ICheckBoxParameters {
+  public override getParameters(
+    params: ICheckBoxCreateParameters
+  ): ICheckBoxParameters {
     return {
       ...super.getParameters(params),
       enabled: params.enabled || false,
@@ -56,19 +67,21 @@ export class CheckBoxHandler extends FormComponentHandler implements ICheckBoxHa
   }
 
   public drawCheck(object: FormObject, params: IFormComponentParameters): void {
-    const size = params.width - params.height > 0
-      ? params.height - params.borderWidth * 2
-      : params.width - params.borderWidth * 2;
+    const size =
+      params.width - params.height > 0
+        ? params.height - params.borderWidth * 2
+        : params.width - params.borderWidth * 2;
     const x = (params.width - size) / 2;
     const y = (params.height - size) / 2;
     const lineWidth = params.borderWidth || 1;
 
-    object.graphics()
+    object
+      .graphics()
       .strokeColor(params.foreColor)
       .lineWidth(lineWidth)
-      .pathTo(x + (size / 4), y + (size / 2))
-      .pathLine(x + (size / 2), y + size * 0.8)
-      .pathLine(x + (size / 1.3), y + size * 0.13)
+      .pathTo(x + size / 4, y + size / 2)
+      .pathLine(x + size / 2, y + size * 0.8)
+      .pathLine(x + size / 1.3, y + size * 0.13)
       .stroke();
   }
 
@@ -84,14 +97,20 @@ export class CheckBoxHandler extends FormComponentHandler implements ICheckBoxHa
     return widget;
   }
 
-  protected fillField(field: core.IFieldDictionary, params: ICheckBoxParameters): void {
+  protected fillField(
+    field: core.IFieldDictionary,
+    params: ICheckBoxParameters
+  ): void {
     field.ft = "Btn";
-    field.t = this.document.target.createString(core.UUID.generate());
+    field.t = this.document.target.createString(params.name);
     const stateName = params.enabled ? params.value : this.OFF_STATE_NAME;
     field.V = this.document.target.createName(stateName);
   }
 
-  protected fillWidget(widget: core.WidgetDictionary, params: ICheckBoxParameters): void {
+  protected fillWidget(
+    widget: core.WidgetDictionary,
+    params: ICheckBoxParameters
+  ): void {
     const x = params.left;
     const y = params.top - params.height;
 
@@ -112,7 +131,7 @@ export class CheckBoxHandler extends FormComponentHandler implements ICheckBoxHa
 
     widget.AP.get().N = this.document.target.createDictionary(
       [params.value, on.target.makeIndirect()],
-      [this.OFF_STATE_NAME, off.target.makeIndirect()],
+      [this.OFF_STATE_NAME, off.target.makeIndirect()]
     );
   }
 
@@ -150,7 +169,10 @@ export class CheckBoxHandler extends FormComponentHandler implements ICheckBoxHa
     this.drawCheck(object, params);
   }
 
-  protected override setFontStyle(widget: core.WidgetDictionary, params: IFormComponentParameters): void {
+  protected override setFontStyle(
+    widget: core.WidgetDictionary,
+    params: IFormComponentParameters
+  ): void {
     const mk = widget.MK.get();
     // PDF doesn't have field for the fore color annotation. For variable text use DA.
     // If set DA for graphics Acrobat doesn't show images

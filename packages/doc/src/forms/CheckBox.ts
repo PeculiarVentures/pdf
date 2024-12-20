@@ -5,7 +5,6 @@ import { FormObject } from "../FormObject";
 import { FormComponent } from "./FormComponent";
 
 export class CheckBox extends FormComponent {
-
   public get checked(): boolean {
     return this.target.as !== "Off";
   }
@@ -70,6 +69,7 @@ export class CheckBox extends FormComponent {
 
           // draw content
           const params: IFormComponentParameters = {
+            name: this.name,
             left: this.left,
             top: this.top,
             height: this.height,
@@ -77,7 +77,7 @@ export class CheckBox extends FormComponent {
             foreColor: this.foreColor,
             backgroundColor: this.backgroundColor,
             borderColor: this.borderColor,
-            borderWidth: this.borderWidth,
+            borderWidth: this.borderWidth
           };
           const handler = this.getHandler();
           form.clear();
@@ -108,5 +108,4 @@ export class CheckBox extends FormComponent {
       throw new Error("Unsupported type of N field");
     }
   }
-
 }
