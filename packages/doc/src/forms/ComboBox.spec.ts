@@ -32,7 +32,7 @@ describe("ComboBox", () => {
   });
 
   it("draw", async () => {
-    const pageHash = await PdfRenderingHelper.getPageHash(docRaw, 1);
+    const pageHash = await PdfRenderingHelper.getPageHash(docRaw, 1, true);
     expect(pageHash).toBe(
       "3d89d848445a0e51f22e88729efd70bf0d4a32b5164bb33f89c46471110b7c1c"
     );
