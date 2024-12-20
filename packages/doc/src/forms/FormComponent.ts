@@ -147,7 +147,7 @@ export class FormComponent
   }
 
   protected onBorderWidthChanged(): void {
-    // nothing
+    this.paint();
   }
 
   /**
@@ -178,7 +178,7 @@ export class FormComponent
   }
 
   protected onBorderColorChanged(): void {
-    // nothing
+    this.paint();
   }
 
   /**
@@ -209,7 +209,7 @@ export class FormComponent
   }
 
   protected onBackgroundColorChanged(): void {
-    // nothing
+    this.paint();
   }
 
   /**
@@ -261,7 +261,7 @@ export class FormComponent
   }
 
   protected onForeColorChanged(): void {
-    // nothing
+    this.paint();
   }
 
   /**
