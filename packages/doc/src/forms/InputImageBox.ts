@@ -3,9 +3,7 @@ import { Image } from "../Image";
 import { ResourceManager } from "../ResourceManager";
 import { FormComponent } from "./FormComponent";
 
-
 export class InputImageBox extends FormComponent {
-
   private _image?: Image | null;
 
   public get image(): Image | null {
@@ -22,10 +20,15 @@ export class InputImageBox extends FormComponent {
           if (resources.XObject && resources.XObject.items.size) {
             const firstKey = [...resources.XObject.items.keys()][0];
             const firstEntry = resources.XObject.get(firstKey);
-            if (firstEntry instanceof core.PDFDictionary
-              && firstEntry.has("Subtype")
-              && firstEntry.get("Subtype", core.PDFName).text === "Image") {
-              return new Image(firstEntry.to(core.ImageDictionary), this.document);
+            if (
+              firstEntry instanceof core.PDFDictionary &&
+              firstEntry.has("Subtype") &&
+              firstEntry.get("Subtype", core.PDFName).text === "Image"
+            ) {
+              return new Image(
+                firstEntry.to(core.ImageDictionary),
+                this.document
+              );
             }
           }
         }
@@ -46,28 +49,18 @@ export class InputImageBox extends FormComponent {
     // Create resource
     const form = core.FormDictionary.create(update);
     if (!value) {
-      // set empty form
-      // form.bBox.urX = this.width;
-      // form.bBox.urY = this.height;
-      // const width = 2 / 2;
-      // const content = new core.PDFContent();
-      // const graphics = content.createGraphics();
-      // graphics
-      //   .begin()
-      //   .setColor([0, 0.073, 0.790])
-      //   .drawRectangle(0, this.height, this.width, this.height)
-      //   .fill()
-      //   .setColor([0.165, 0.521, 1])
-      //   .drawRectangle(width, this.height - width, this.width - width * 2, this.height - width * 2)
-      //   .stroke()
-      //   .end();
-      // form.stream = content.toUint8Array();
-      this.target.MK.get().delete("I");
+      // Clear image
+      form.stream = new Uint8Array();
+
+      this.target.MK.get().I = null;
       this.target.AP.get().N = form.makeIndirect();
     } else {
       form.bBox.urX = value.width;
       form.bBox.urY = value.height;
-      const resources = new ResourceManager(form.Resources.get(), this.document);
+      const resources = new ResourceManager(
+        form.Resources.get(),
+        this.document
+      );
       const resource = resources.set(value.target);
 
       // Draw image
@@ -85,5 +78,4 @@ export class InputImageBox extends FormComponent {
 
     this._image = value;
   }
-
 }
