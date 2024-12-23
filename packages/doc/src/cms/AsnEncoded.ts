@@ -7,20 +7,25 @@ import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 export type AsnEncodedStringFormat = "hex" | "base64" | "base64url";
 
 export abstract class AsnEncoded<TAsn extends pkijs.PkiObject = any> {
-
   /**
    * Creates new object from the ASN.1 encoded buffer source
    * @param raw Buffer source
    * @returns New object
    */
-  public static fromBER<T extends AsnEncoded>(this: new () => T, raw: BufferSource): T {
+  public static fromBER<T extends AsnEncoded>(
+    this: new () => T,
+    raw: BufferSource
+  ): T {
     const item = new this();
     item.fromBER(raw);
 
     return item;
   }
 
-  public static fromSchema<T extends AsnEncoded>(this: new () => T, schema: any): T {
+  public static fromSchema<T extends AsnEncoded>(
+    this: new () => T,
+    schema: any
+  ): T {
     const item = new this();
     item.fromSchema(schema);
 

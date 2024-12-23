@@ -38,7 +38,7 @@ export class FontDictionary extends PDFDictionary {
    */
   @PDFDictionaryField({
     name: "FontDescriptor",
-    type: FontDescriptorDictionary,
+    type: FontDescriptorDictionary
   })
   public FontDescriptor!: FontDescriptorDictionary;
 

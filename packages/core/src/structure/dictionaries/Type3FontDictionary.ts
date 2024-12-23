@@ -1,4 +1,12 @@
-import { PDFArray, PDFArrayField, PDFDictionary, PDFDictionaryField, PDFNameField, PDFNumberField, PDFStream } from "../../objects";
+import {
+  PDFArray,
+  PDFArrayField,
+  PDFDictionary,
+  PDFDictionaryField,
+  PDFNameField,
+  PDFNumberField,
+  PDFStream
+} from "../../objects";
 import { Metrics, PDFRectangle } from "../common";
 import { FontDictionary } from "./FontDictionary";
 
@@ -35,7 +43,7 @@ export class Type3FontDictionary extends FontDictionary {
    */
   @PDFDictionaryField({
     name: "FontMatrix",
-    type: Metrics,
+    type: Metrics
   })
   public FontMatrix!: Metrics;
 
@@ -48,7 +56,7 @@ export class Type3FontDictionary extends FontDictionary {
    */
   @PDFDictionaryField({
     name: "CharProcs",
-    type: PDFDictionary,
+    type: PDFDictionary
   })
   public CharProcs!: PDFDictionary;
 
@@ -58,7 +66,7 @@ export class Type3FontDictionary extends FontDictionary {
    */
   @PDFDictionaryField({
     name: "Encoding",
-    type: PDFDictionary,
+    type: PDFDictionary
   })
   public Encoding!: PDFDictionary;
 
@@ -97,7 +105,7 @@ export class Type3FontDictionary extends FontDictionary {
    */
   @PDFDictionaryField({
     name: "Resources",
-    type: PDFDictionary,
+    type: PDFDictionary
   })
   public Resources!: PDFDictionary;
 
@@ -108,10 +116,9 @@ export class Type3FontDictionary extends FontDictionary {
   @PDFDictionaryField({
     name: "ToUnicode",
     type: PDFStream,
-    optional: true,
+    optional: true
   })
   public ToUnicode!: PDFStream;
-
 
   protected override onCreate(): void {
     super.onCreate();

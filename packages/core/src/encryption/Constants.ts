@@ -1,5 +1,5 @@
-export const staticDataFF = new Uint8Array([0xFF, 0xFF, 0xFF, 0xFF]);
-export const staticData = new Uint8Array([0x73, 0x41, 0x6C, 0x54]);
+export const staticDataFF = new Uint8Array([0xff, 0xff, 0xff, 0xff]);
+export const staticData = new Uint8Array([0x73, 0x41, 0x6c, 0x54]);
 export const algorithms = {
   md5: { name: "MD5" },
   rc4: { name: "RC4" },

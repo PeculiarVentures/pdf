@@ -6,7 +6,6 @@ import { PublicKeyEncryptDictionary } from "./PublicKeyEncrypt";
 import { StandardEncryptDictionary } from "./StandardEncrypt";
 
 export class TrailerDictionary extends objects.PDFDictionary {
-
   /**
    * The total number of entries in the file’s cross-reference table,
    * as defined by the combination of the original section and all update sections
@@ -32,7 +31,7 @@ export class TrailerDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Root",
     type: CatalogDictionary,
-    indirect: true,
+    indirect: true
   })
   public Root!: CatalogDictionary;
 
@@ -47,7 +46,7 @@ export class TrailerDictionary extends objects.PDFDictionary {
     type: objects.PDFDictionary,
     optional: true,
     cache: true,
-    get: o => {
+    get: (o) => {
       const filter = o.get("Filter");
       // TODO Add EncryptDictionaryFactory
       if (filter instanceof objects.PDFName) {
@@ -59,7 +58,7 @@ export class TrailerDictionary extends objects.PDFDictionary {
         }
       }
       throw new Error("Wrong type for 'Filter'");
-    },
+    }
   })
   public Encrypt!: null | EncryptDictionary;
 
@@ -82,7 +81,7 @@ export class TrailerDictionary extends objects.PDFDictionary {
     name: "ID",
     type: objects.PDFArray,
     optional: true,
-    get: o => o.items,
+    get: (o) => o.items
   })
   public ID!: null | objects.PDFTextString[];
 
@@ -118,5 +117,4 @@ export class TrailerDictionary extends objects.PDFDictionary {
       }
     }
   }
-
 }

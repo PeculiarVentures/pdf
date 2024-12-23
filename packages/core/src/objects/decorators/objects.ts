@@ -10,71 +10,97 @@ import { PDFStream } from "../Stream";
 import { PDFObjectTypes } from "../ObjectTypes";
 import { PDFDictionaryField } from "./field";
 
-
-export function PDFNumberField(name: string, optional = false, defaultValue?: number): PropertyDecorator {
+export function PDFNumberField(
+  name: string,
+  optional = false,
+  defaultValue?: number
+): PropertyDecorator {
   return PDFDictionaryField({
     name,
     type: PDFNumeric,
-    get: o => o.value,
+    get: (o) => o.value,
     set: (value: number) => new PDFNumeric(value),
     optional,
     defaultValue
   });
 }
 
-export function PDFNameField(name: string, optional = false, defaultValue?: string): PropertyDecorator {
+export function PDFNameField(
+  name: string,
+  optional = false,
+  defaultValue?: string
+): PropertyDecorator {
   return PDFDictionaryField({
     name,
     type: PDFName,
-    get: o => o.text,
+    get: (o) => o.text,
     set: (value: string) => new PDFName(value),
     optional,
-    defaultValue,
+    defaultValue
   });
 }
 
-export function PDFLiteralStringField(name: string, optional = false, defaultValue?: string): PropertyDecorator {
+export function PDFLiteralStringField(
+  name: string,
+  optional = false,
+  defaultValue?: string
+): PropertyDecorator {
   return PDFDictionaryField({
     name,
     type: PDFLiteralString,
-    get: o => o.text,
+    get: (o) => o.text,
     set: (value: string) => new PDFLiteralString(value),
     optional,
-    defaultValue,
+    defaultValue
   });
 }
 
-export function PDFHexStringField(name: string, optional = false, defaultValue?: string): PropertyDecorator {
+export function PDFHexStringField(
+  name: string,
+  optional = false,
+  defaultValue?: string
+): PropertyDecorator {
   return PDFDictionaryField({
     name,
     type: PDFHexString,
-    get: o => o.text,
+    get: (o) => o.text,
     set: (value: string) => new PDFHexString(value),
     optional,
-    defaultValue,
+    defaultValue
   });
 }
 
-export function PDFBooleanField(name: string, optional = false, defaultValue?: boolean): PropertyDecorator {
+export function PDFBooleanField(
+  name: string,
+  optional = false,
+  defaultValue?: boolean
+): PropertyDecorator {
   return PDFDictionaryField({
     name,
     type: PDFBoolean,
-    get: o => o.value,
+    get: (o) => o.value,
     set: (value: boolean) => new PDFBoolean(value),
     optional,
-    defaultValue,
+    defaultValue
   });
 }
-export function PDFArrayField(name: string, optional = false, defaultValue?: PDFArray): PropertyDecorator {
+export function PDFArrayField(
+  name: string,
+  optional = false,
+  defaultValue?: PDFArray
+): PropertyDecorator {
   return PDFDictionaryField({
     name,
     type: PDFArray,
     optional,
-    defaultValue,
+    defaultValue
   });
 }
 
-export function PDFStreamField(name: string, optional = false): PropertyDecorator {
+export function PDFStreamField(
+  name: string,
+  optional = false
+): PropertyDecorator {
   return PDFDictionaryField({
     name,
     type: PDFStream,
@@ -82,7 +108,11 @@ export function PDFStreamField(name: string, optional = false): PropertyDecorato
   });
 }
 
-export function PDFTextField(name: string, prefer: typeof PDFLiteralString | typeof PDFHexString, optional = false): PropertyDecorator {
+export function PDFTextField(
+  name: string,
+  prefer: typeof PDFLiteralString | typeof PDFHexString,
+  optional = false
+): PropertyDecorator {
   return PDFDictionaryField({
     name,
     type: PDFTextString,
@@ -105,26 +135,36 @@ export function PDFTextField(name: string, prefer: typeof PDFLiteralString | typ
   });
 }
 
-export function PDFTextStringField(name: string, optional = false): PropertyDecorator {
+export function PDFTextStringField(
+  name: string,
+  optional = false
+): PropertyDecorator {
   return PDFDictionaryField({
     name,
     type: PDFTextString,
-    optional,
+    optional
   });
 }
 
-export function PDFArrayOrDictionaryField(name: string, optional = false): PropertyDecorator {
+export function PDFArrayOrDictionaryField(
+  name: string,
+  optional = false
+): PropertyDecorator {
   return PDFDictionaryField({
     name,
-    optional,
+    optional
   });
 }
 
-export function PDFMaybeField(name: string, type: abstract new () => PDFObjectTypes, indirect = false): PropertyDecorator {
+export function PDFMaybeField(
+  name: string,
+  type: abstract new () => PDFObjectTypes,
+  indirect = false
+): PropertyDecorator {
   return PDFDictionaryField({
     name,
     type,
     maybe: true,
-    indirect,
+    indirect
   });
 }

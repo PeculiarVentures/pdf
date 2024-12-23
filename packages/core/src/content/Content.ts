@@ -921,7 +921,10 @@ export class PDFContent extends EventEmitter {
 }
 
 export class PDFContentScope extends PDFContent {
-  constructor(public begin: PDFOperator, public end: PDFOperator) {
+  constructor(
+    public begin: PDFOperator,
+    public end: PDFOperator
+  ) {
     super();
 
     this.push(begin);

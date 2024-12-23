@@ -24,7 +24,7 @@ export enum ChoiceFlags {
    * if clear, at most one item shall be selected.
    *
    * @since PDF 1.4
-  */
+   */
   multiSelect = 1 << 21,
   /**
    * If set, text entered in the field shall not be spell-checked. This flag
@@ -49,11 +49,10 @@ export enum ChoiceFlags {
    *
    * @since PDF 1.5
    */
-  commitOnSelChange = 1 << 26,
+  commitOnSelChange = 1 << 26
 }
 
 export class ChoiceDictionary extends PDFField {
-
   declare public ff: FieldFlags | ChoiceFlags;
 
   /**
@@ -98,5 +97,4 @@ export class ChoiceDictionary extends PDFField {
 
     this.ft = "Ch";
   }
-
 }

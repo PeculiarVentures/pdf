@@ -13,7 +13,6 @@ export class FileSpecificationEntries extends objects.PDFDictionary {
  * Represents file specification dictionary described in `Table 43: Entries in a file specification dictionary`
  */
 export class FileSpecificationDictionary extends objects.PDFDictionary {
-
   public static TYPE = "Filespec";
 
   /**
@@ -166,7 +165,7 @@ export class FileSpecificationDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "RF",
     type: objects.PDFDictionary,
-    optional: true,
+    optional: true
   })
   public RF!: objects.PDFDictionary | null;
 
@@ -191,7 +190,7 @@ export class FileSpecificationDictionary extends objects.PDFDictionary {
     name: "CI",
     type: objects.PDFDictionary,
     optional: true,
-    indirect: true,
+    indirect: true
   })
   public CI!: objects.PDFDictionary | null;
 
@@ -208,5 +207,4 @@ export class FileSpecificationDictionary extends objects.PDFDictionary {
   protected override onCreate(): void {
     this.Type = FileSpecificationDictionary.TYPE;
   }
-
 }

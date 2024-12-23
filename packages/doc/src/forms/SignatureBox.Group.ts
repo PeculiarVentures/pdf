@@ -277,9 +277,8 @@ export class SignatureBoxGroup extends FormComponentGroup<
 
         const verificationResult = await signer.verify(content, checkDate);
 
-        const modificationState = await this.verifyModification(
-          verificationResult
-        );
+        const modificationState =
+          await this.verifyModification(verificationResult);
         result.states.push(modificationState);
 
         //Check signature for "signature-time-stamp" attribute

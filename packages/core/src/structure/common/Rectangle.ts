@@ -3,8 +3,13 @@ import { PDFNumeric } from "../../objects/Numeric";
 import { PDFArray } from "../../objects/Array";
 
 export class PDFRectangle extends PDFArray {
-
-  public static createWithData(update: PDFDocumentUpdate, llX: number, llY: number, urX: number, urY: number): PDFRectangle {
+  public static createWithData(
+    update: PDFDocumentUpdate,
+    llX: number,
+    llY: number,
+    urX: number,
+    urY: number
+  ): PDFRectangle {
     const rect = this.create(update);
 
     rect.get(0, PDFNumeric).value = llX;
@@ -56,7 +61,12 @@ export class PDFRectangle extends PDFArray {
   }
 
   protected override onCreate(): void {
-    this.items = [new PDFNumeric(0), new PDFNumeric(0), new PDFNumeric(0), new PDFNumeric(0)];
+    this.items = [
+      new PDFNumeric(0),
+      new PDFNumeric(0),
+      new PDFNumeric(0),
+      new PDFNumeric(0)
+    ];
   }
 
   /**
@@ -66,12 +76,11 @@ export class PDFRectangle extends PDFArray {
    * @throws If any of the coordinates are not numbers.
    */
   public toArray(): Array<number> {
-
     if (this.items.length !== 4) {
       throw new Error("The rectangle must have 4 coordinates");
     }
 
-    const result = this.items.map(o => {
+    const result = this.items.map((o) => {
       if (!(o instanceof PDFNumeric)) {
         throw new Error("All rectangle coordinates must be numbers");
       }
@@ -80,6 +89,5 @@ export class PDFRectangle extends PDFArray {
     });
 
     return result;
-
   }
 }

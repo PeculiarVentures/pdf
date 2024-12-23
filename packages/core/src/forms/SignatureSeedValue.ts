@@ -8,36 +8,35 @@ export enum SignatureSeedValueFlags {
   reasons = 0x08,
   legalAttestation = 0x10,
   addRevInfo = 0x20,
-  digestMethod = 0x40,
+  digestMethod = 0x40
 }
 
 export class SignatureSeedValueDictionary extends objects.PDFDictionary {
-
   /**
-   * The type of PDF object that this dictionary describes 
-   * 
+   * The type of PDF object that this dictionary describes
+   *
    * if present, shall be SV for a seed value dictionary
    */
   @objects.PDFDictionaryField({
     name: "Type",
     type: objects.PDFName,
     optional: true,
-    get: o => o.text
+    get: (o) => o.text
   })
   public type!: objects.PDFName | null;
 
   /**
-   * A set of bit flags specifying the interpretation of specific entries in this dictionary. 
-   * 
-   * A value of 1 for the flag indicates that the associated entry is a required constraint. 
+   * A set of bit flags specifying the interpretation of specific entries in this dictionary.
+   *
+   * A value of 1 for the flag indicates that the associated entry is a required constraint.
    * A value of 0 indicates that the associated entry is an optional constraint.
    */
   @objects.PDFDictionaryField({
     name: "Ff",
     type: objects.PDFNumeric,
     optional: true,
-    get: o => o.value,
-    defaultValue: 0,
+    get: (o) => o.value,
+    defaultValue: 0
   })
   public ff!: SignatureSeedValueFlags;
 
@@ -48,7 +47,7 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
     name: "Filter",
     type: objects.PDFName,
     optional: true,
-    get: o => o.text,
+    get: (o) => o.text
   })
   public filter!: string | null;
 
@@ -58,7 +57,7 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "SubFilter",
     type: objects.PDFArray,
-    optional: true,
+    optional: true
   })
   public subFilter!: objects.PDFArray | null;
 
@@ -71,7 +70,7 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "DigestMethod",
     type: objects.PDFArray,
-    optional: true,
+    optional: true
   })
   public digestMethod!: objects.PDFArray | null;
 
@@ -85,19 +84,19 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "V",
     type: objects.PDFNumeric,
-    optional: true,
+    optional: true
   })
   public v!: number | null;
 
   /**
-   * A certificate seed value dictionary containing 
+   * A certificate seed value dictionary containing
    * information about the characteristics of the certificate that shall be used
    * when signing
    */
   @objects.PDFDictionaryField({
     name: "Cert",
     type: objects.PDFDictionary,
-    optional: true,
+    optional: true
   })
   public cert!: objects.PDFDictionary | null;
 
@@ -109,7 +108,7 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Reasons",
     type: objects.PDFArray,
-    optional: true,
+    optional: true
   })
   public reasons!: objects.PDFArray | null;
 
@@ -122,7 +121,7 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
     type: objects.PDFDictionary,
     optional: true,
     cache: true,
-    get: o => new SignatureMDPDictionary(o)
+    get: (o) => new SignatureMDPDictionary(o)
   })
   public mdp!: SignatureMDPDictionary | null;
 
@@ -132,7 +131,7 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "TimeStamp",
     type: objects.PDFDictionary,
-    optional: true,
+    optional: true
   })
   public timeStamp!: objects.PDFDictionary | null;
 
@@ -142,7 +141,7 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "LegalAttestation",
     type: objects.PDFArray,
-    optional: true,
+    optional: true
   })
   public legalAttestation!: objects.PDFArray | null;
 
@@ -156,5 +155,4 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
     defaultValue: false
   })
   public addRevInfo!: boolean;
-
 }

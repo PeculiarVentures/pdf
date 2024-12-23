@@ -1,8 +1,6 @@
 import { Filter } from "./Filter";
 
-
 export class JBIG2Filter extends Filter {
-
   public static readonly NAME = "JBIG2Decode";
   public name = JBIG2Filter.NAME;
 
@@ -25,5 +23,4 @@ export class JBIG2Filter extends Filter {
   public encodeSync(stream: Uint8Array): ArrayBuffer {
     return stream;
   }
-
 }

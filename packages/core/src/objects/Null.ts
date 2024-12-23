@@ -8,7 +8,6 @@ import { PDFObject } from "./Object";
 const nullChars = new Uint8Array([0x6e, 0x75, 0x6c, 0x6c]); // null
 
 export class PDFNull extends PDFObject {
-
   public static readonly NAME = ObjectTypeEnum.Null;
 
   protected onWritePDF(writer: ViewWriter): void {
@@ -16,7 +15,7 @@ export class PDFNull extends PDFObject {
   }
 
   protected onFromPDF(reader: ViewReader): void {
-    if (!nullChars.every(c => c === reader.readByte())) {
+    if (!nullChars.every((c) => c === reader.readByte())) {
       throw new BadCharError(reader.position - 1);
     }
   }
@@ -28,5 +27,4 @@ export class PDFNull extends PDFObject {
   protected onEqual(target: PDFObject): boolean {
     return target instanceof PDFNull;
   }
-
 }

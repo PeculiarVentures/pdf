@@ -5,10 +5,17 @@ import * as cms from "../cms";
 import { FormObject } from "../FormObject";
 import { type SignatureBoxGroup } from "./SignatureBox.Group";
 
-
-export type SignatureBoxCreateImageCallback = (this: SignatureBoxGroup) => FormObject;
-export type SignatureDictionaryUpdateCallback = (this: SignatureBoxGroup, filed: core.SignatureDictionary) => Promise<void>;
-export type SignatureFieldSigningCallback = (this: SignatureBoxGroup, data: Uint8Array) => Promise<ArrayBuffer>;
+export type SignatureBoxCreateImageCallback = (
+  this: SignatureBoxGroup
+) => FormObject;
+export type SignatureDictionaryUpdateCallback = (
+  this: SignatureBoxGroup,
+  filed: core.SignatureDictionary
+) => Promise<void>;
+export type SignatureFieldSigningCallback = (
+  this: SignatureBoxGroup,
+  data: Uint8Array
+) => Promise<ArrayBuffer>;
 
 export interface SignatureBoxSignParameters {
   containerSize?: number;
@@ -71,7 +78,10 @@ export interface EmbeddedSigningTimeState extends SigningTimeState {
   };
 }
 
-export type SigningTimeStates = EmptySigningTimeState | LocalSigningTimeState | EmbeddedSigningTimeState;
+export type SigningTimeStates =
+  | EmptySigningTimeState
+  | LocalSigningTimeState
+  | EmbeddedSigningTimeState;
 
 export interface SigningTimeVerifiedState extends SignatureState {
   type: "info";
@@ -120,13 +130,13 @@ export interface FormattingState extends SignatureState {
 }
 
 export type SignatureStates =
-  SignatureState |
-  DocumentModificationState |
-  SigningTimeStates |
-  FormattingState |
-  SignerCertificateState |
-  LtvState |
-  DocumentModificationState;
+  | SignatureState
+  | DocumentModificationState
+  | SigningTimeStates
+  | FormattingState
+  | SignerCertificateState
+  | LtvState
+  | DocumentModificationState;
 
 export interface SignatureVerifyResult {
   signedData: cms.CMSSignedData | null;

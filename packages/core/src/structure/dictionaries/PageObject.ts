@@ -28,11 +28,10 @@ export enum PageTabsOrders {
    * Widget order
    * @remarks PDF 2.0
    */
-  widget = "order",
+  widget = "order"
 }
 
 export class PageObjectDictionary extends PageDictionary {
-
   public static readonly TYPE = "Page";
 
   /**
@@ -69,7 +68,7 @@ export class PageObjectDictionary extends PageDictionary {
     type: objects.PDFArray,
     name: "BleedBox",
     optional: true,
-    get: o => new PDFRectangle(o),
+    get: (o) => new PDFRectangle(o)
   })
   public bleedBox!: PDFRectangle | null;
 
@@ -82,7 +81,7 @@ export class PageObjectDictionary extends PageDictionary {
     type: objects.PDFArray,
     name: "TrimBox",
     optional: true,
-    get: o => new PDFRectangle(o),
+    get: (o) => new PDFRectangle(o)
   })
   public trimBox!: PDFRectangle | null;
 
@@ -96,7 +95,7 @@ export class PageObjectDictionary extends PageDictionary {
     type: objects.PDFArray,
     name: "ArtBox",
     optional: true,
-    get: o => new PDFRectangle(o),
+    get: (o) => new PDFRectangle(o)
   })
   public artBox!: PDFRectangle | null;
 
@@ -109,7 +108,7 @@ export class PageObjectDictionary extends PageDictionary {
   @objects.PDFDictionaryField({
     type: objects.PDFDictionary,
     name: "BoxColorInfo",
-    optional: true,
+    optional: true
   })
   public boxColorInfo!: objects.PDFDictionary | null;
 
@@ -118,7 +117,7 @@ export class PageObjectDictionary extends PageDictionary {
    */
   @objects.PDFDictionaryField({
     name: "Contents",
-    optional: true,
+    optional: true
   })
   public contents!: objects.PDFStream | objects.PDFArray | null;
 
@@ -130,7 +129,7 @@ export class PageObjectDictionary extends PageDictionary {
   @objects.PDFDictionaryField({
     name: "Group",
     type: objects.PDFDictionary,
-    optional: true,
+    optional: true
   })
   public group!: objects.PDFDictionary | null;
 
@@ -141,7 +140,7 @@ export class PageObjectDictionary extends PageDictionary {
   @objects.PDFDictionaryField({
     name: "Thumb",
     type: objects.PDFStream,
-    optional: true,
+    optional: true
   })
   public thumb!: objects.PDFStream | null;
 
@@ -153,7 +152,7 @@ export class PageObjectDictionary extends PageDictionary {
   @objects.PDFDictionaryField({
     name: "B",
     type: objects.PDFArray,
-    optional: true,
+    optional: true
   })
   public b!: objects.PDFArray | null;
 
@@ -175,7 +174,7 @@ export class PageObjectDictionary extends PageDictionary {
   @objects.PDFDictionaryField({
     name: "Trans",
     type: objects.PDFDictionary,
-    optional: true,
+    optional: true
   })
   public trans!: objects.PDFDictionary | null;
 
@@ -186,7 +185,7 @@ export class PageObjectDictionary extends PageDictionary {
   @objects.PDFDictionaryField({
     name: "Annots",
     type: objects.PDFArray,
-    optional: true,
+    optional: true
   })
   public annots!: objects.PDFArray | null;
 
@@ -198,7 +197,7 @@ export class PageObjectDictionary extends PageDictionary {
   @objects.PDFDictionaryField({
     name: "AA",
     type: objects.PDFDictionary,
-    optional: true,
+    optional: true
   })
   public aa!: objects.PDFDictionary | null;
 
@@ -209,7 +208,7 @@ export class PageObjectDictionary extends PageDictionary {
   @objects.PDFDictionaryField({
     name: "Metadata",
     type: objects.PDFStream,
-    optional: true,
+    optional: true
   })
   public metadata!: objects.PDFStream | null;
 
@@ -220,7 +219,7 @@ export class PageObjectDictionary extends PageDictionary {
   @objects.PDFDictionaryField({
     name: "PieceInfo",
     type: objects.PDFDictionary,
-    optional: true,
+    optional: true
   })
   public pieceInfo!: objects.PDFDictionary | null;
 
@@ -254,7 +253,7 @@ export class PageObjectDictionary extends PageDictionary {
   @objects.PDFDictionaryField({
     name: "SeparationInfo",
     type: objects.PDFDictionary,
-    optional: true,
+    optional: true
   })
   public separationInfo!: objects.PDFDictionary | null;
 
@@ -279,7 +278,7 @@ export class PageObjectDictionary extends PageDictionary {
   @objects.PDFDictionaryField({
     name: "PresSteps",
     type: objects.PDFDictionary,
-    optional: true,
+    optional: true
   })
   public presSteps!: objects.PDFDictionary | null;
 
@@ -365,11 +364,12 @@ export class PageObjectDictionary extends PageDictionary {
     const contents = this.getOrCreateContents();
     if (contents instanceof objects.PDFArray) {
       // TODO Maybe add document.createContentStream
-      const contentStream = this.getDocumentUpdate().document.createStream(content.toArrayBuffer());
+      const contentStream = this.getDocumentUpdate().document.createStream(
+        content.toArrayBuffer()
+      );
       contents.items.push(contentStream.makeIndirect());
     } else {
       throw new Error("Stream is not supported yet");
     }
   }
-
 }

@@ -22,10 +22,11 @@ export enum FormComponentType {
   radioButtonGroup = "radio_button_group"
 }
 
-export type FormComponentRegistryItem = typeof FormComponent | typeof FormComponentGroup;
+export type FormComponentRegistryItem =
+  | typeof FormComponent
+  | typeof FormComponentGroup;
 
 export abstract class FormComponentRegistry {
-
   public static items: Record<string, FormComponentRegistryItem> = {};
 
   public static register(key: string, value: FormComponentRegistryItem): void {
@@ -42,14 +43,20 @@ export abstract class FormComponentRegistry {
   }
 
   public static get(key: FormComponentType.form): typeof FormComponent;
-  public static get(key: FormComponentType.formGroup): typeof FormComponentGroup;
+  public static get(
+    key: FormComponentType.formGroup
+  ): typeof FormComponentGroup;
   public static get(key: FormComponentType.checkBox): typeof CheckBox;
   public static get(key: FormComponentType.comboBox): typeof ComboBox;
   public static get(key: FormComponentType.inputImageBox): typeof InputImageBox;
   public static get(key: FormComponentType.radioButton): typeof RadioButton;
-  public static get(key: FormComponentType.radioButtonGroup): typeof RadioButtonGroup;
+  public static get(
+    key: FormComponentType.radioButtonGroup
+  ): typeof RadioButtonGroup;
   public static get(key: FormComponentType.signatureBox): typeof SignatureBox;
-  public static get(key: FormComponentType.signatureBoxGroup): typeof SignatureBoxGroup;
+  public static get(
+    key: FormComponentType.signatureBoxGroup
+  ): typeof SignatureBoxGroup;
   public static get(key: FormComponentType.textEditor): typeof TextEditor;
   public static get(key: string): FormComponentRegistryItem;
   public static get(key: string): unknown {
@@ -60,5 +67,4 @@ export abstract class FormComponentRegistry {
 
     throw new Error(`Form component with key '${key}' not found`);
   }
-
 }

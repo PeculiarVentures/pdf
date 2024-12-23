@@ -4,10 +4,14 @@ import { ResourceManager } from "./ResourceManager";
 import { WrapContentObject } from "./WrapContentObject";
 
 export class FormObject extends WrapContentObject<core.FormDictionary> {
-
-  public static create(document: PDFDocument, width: core.TypographySize = 0, height: core.TypographySize = 0): FormObject {
-    const formDict = core.FormDictionary.create(document.target.update)
-      .makeIndirect();
+  public static create(
+    document: PDFDocument,
+    width: core.TypographySize = 0,
+    height: core.TypographySize = 0
+  ): FormObject {
+    const formDict = core.FormDictionary.create(
+      document.target.update
+    ).makeIndirect();
 
     formDict.bBox.llX = 0;
     formDict.bBox.llY = 0;
@@ -44,9 +48,11 @@ export class FormObject extends WrapContentObject<core.FormDictionary> {
   public set height(v: core.TypographySize) {
     if (this.height !== v) {
       if (this.target.bBox.urY < 0) {
-        this.target.bBox.urY -= core.TypographyConverter.toPoint(v) - this.height;
+        this.target.bBox.urY -=
+          core.TypographyConverter.toPoint(v) - this.height;
       } else {
-        this.target.bBox.urY += core.TypographyConverter.toPoint(v) - this.height;
+        this.target.bBox.urY +=
+          core.TypographyConverter.toPoint(v) - this.height;
       }
     }
   }
@@ -64,5 +70,4 @@ export class FormObject extends WrapContentObject<core.FormDictionary> {
 
     return minY;
   }
-
 }

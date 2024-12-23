@@ -1,7 +1,12 @@
-import { Maybe, PDFArray, PDFDictionary, PDFMaybeField, PDFNameField } from "../objects";
+import {
+  Maybe,
+  PDFArray,
+  PDFDictionary,
+  PDFMaybeField,
+  PDFNameField
+} from "../objects";
 
 export class DocumentSecurityStoreDictionary extends PDFDictionary {
-
   public static readonly TYPE = "DSS";
 
   /**
@@ -45,5 +50,4 @@ export class DocumentSecurityStoreDictionary extends PDFDictionary {
 
     this.Type = DocumentSecurityStoreDictionary.TYPE;
   }
-
 }

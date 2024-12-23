@@ -2,12 +2,17 @@ import * as core from "@peculiarventures/pdf-core";
 import { FormObject } from "../FormObject";
 import { FormComponent } from "./FormComponent";
 import { IFormGroupedComponent } from "./FormComponent.Group";
-import { SignatureBoxSignParameters, SignatureBoxGroupVerifyParams, SignatureVerifyResult } from "./SignatureBox.Types";
+import {
+  SignatureBoxSignParameters,
+  SignatureBoxGroupVerifyParams,
+  SignatureVerifyResult
+} from "./SignatureBox.Types";
 import { SignatureBoxGroup } from "./SignatureBox.Group";
 
-
-export class SignatureBox extends FormComponent implements IFormGroupedComponent {
-
+export class SignatureBox
+  extends FormComponent
+  implements IFormGroupedComponent
+{
   public get groupName(): string | null {
     return this.getField().getFullName();
   }
@@ -25,7 +30,10 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
     try {
       const field = this.getField();
 
-      return new SignatureBoxGroup(field.to(core.SignatureField), this.document);
+      return new SignatureBoxGroup(
+        field.to(core.SignatureField),
+        this.document
+      );
     } catch {
       return null;
     }
@@ -34,7 +42,9 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
   public getGroup(): SignatureBoxGroup {
     const group = this.findGroup();
     if (!group) {
-      throw Error("Cannot sign document. SignatureBox is not assigned to the Signature field.");
+      throw Error(
+        "Cannot sign document. SignatureBox is not assigned to the Signature field."
+      );
     }
 
     return group;
@@ -44,32 +54,32 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
     const nForm = this.getAppearance();
 
     nForm.target.modify();
-    const gr = nForm
-      .clear()
-      .graphics();
+    const gr = nForm.clear().graphics();
 
     const widthScale = this.width / object.width;
     const heightScale = this.height / object.height;
     const scale = Math.min(widthScale, heightScale);
     if (widthScale < heightScale) {
-      gr.translate(0, (this.height - (object.height * scale)) / 2);
+      gr.translate(0, (this.height - object.height * scale) / 2);
     } else {
-      gr.translate((this.width - (object.width * scale)) / 2, 0);
+      gr.translate((this.width - object.width * scale) / 2, 0);
     }
-    gr
-      .scale(scale, scale)
-      .drawObject(object);
+    gr.scale(scale, scale).drawObject(object);
 
     return this;
   }
 
-  public async sign(params: SignatureBoxSignParameters): Promise<SignatureBoxGroup> {
+  public async sign(
+    params: SignatureBoxSignParameters
+  ): Promise<SignatureBoxGroup> {
     const group = this.getGroup();
 
     return group.sign(params);
   }
 
-  public async verify(params?: SignatureBoxGroupVerifyParams): Promise<SignatureVerifyResult> {
+  public async verify(
+    params?: SignatureBoxGroupVerifyParams
+  ): Promise<SignatureVerifyResult> {
     const group = this.getGroup();
 
     return group.verify(params);
@@ -83,13 +93,20 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
       const formDict = core.FormDictionary.create(update);
 
       // Update BBox to match widget size
-      formDict.bBox = core.PDFRectangle.createWithData(update, 0, 0, this.width, this.height);
+      formDict.bBox = core.PDFRectangle.createWithData(
+        update,
+        0,
+        0,
+        this.width,
+        this.height
+      );
 
       ap.N = formDict.makeIndirect();
     }
-    const formDict = (ap.N instanceof core.PDFStream)
-      ? ap.N.to(core.FormDictionary, true)
-      : core.FormDictionary.create(update).makeIndirect();
+    const formDict =
+      ap.N instanceof core.PDFStream
+        ? ap.N.to(core.FormDictionary, true)
+        : core.FormDictionary.create(update).makeIndirect();
 
     return new FormObject(formDict, this.document);
   }
@@ -133,8 +150,7 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
     // The group already exists, and it is Field + Widget
     // Split it by creating new group and moving widget to it
     const doc = this.document.target;
-    const newField = core.SignatureField.create(doc.update)
-      .makeIndirect();
+    const newField = core.SignatureField.create(doc.update).makeIndirect();
 
     // Remove previous field from Kids array if it exists
     const parent = singleWidget.Parent;
@@ -142,8 +158,19 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
 
     // Move fields from old to new and remove from old
     const fieldNames = [
-      "FT", "Parent", "Kids", "T", "TU", "TM", "Ff", "V", "DV", "AA", // Field
-      "V", "Lock", "SV", // SigField
+      "FT",
+      "Parent",
+      "Kids",
+      "T",
+      "TU",
+      "TM",
+      "Ff",
+      "V",
+      "DV",
+      "AA", // Field
+      "V",
+      "Lock",
+      "SV" // SigField
     ];
     for (const [key, value] of singleWidget.items) {
       if (fieldNames.includes(key)) {
@@ -184,5 +211,4 @@ export class SignatureBox extends FormComponent implements IFormGroupedComponent
       }
     }
   }
-
 }

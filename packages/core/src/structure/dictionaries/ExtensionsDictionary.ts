@@ -1,8 +1,12 @@
-import { Maybe, PDFDictionary, PDFMaybeField, PDFNameField } from "../../objects";
+import {
+  Maybe,
+  PDFDictionary,
+  PDFMaybeField,
+  PDFNameField
+} from "../../objects";
 import { DeveloperExtensionsDictionary } from "./DeveloperExtensionsDictionary";
 
 export class ExtensionsDictionary extends PDFDictionary {
-
   public static readonly TYPE = "Extensions";
 
   /**
@@ -19,5 +23,4 @@ export class ExtensionsDictionary extends PDFDictionary {
    */
   @PDFMaybeField("ADBE", DeveloperExtensionsDictionary)
   public ADBE!: Maybe<DeveloperExtensionsDictionary>;
-
 }

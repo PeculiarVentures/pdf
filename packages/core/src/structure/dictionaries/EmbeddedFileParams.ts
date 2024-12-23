@@ -1,11 +1,10 @@
 import * as objects from "../../objects";
 import * as common from "../common";
 
-
 export class EmbeddedFileParams extends objects.PDFDictionary {
   /**
-  * The size of the uncompressed embedded file, in bytes.
-  */
+   * The size of the uncompressed embedded file, in bytes.
+   */
   @objects.PDFNumberField("Size", true)
   public Size!: number | null;
 
@@ -32,7 +31,7 @@ export class EmbeddedFileParams extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Mac",
     type: objects.PDFDictionary,
-    optional: true,
+    optional: true
   })
   public Mac!: objects.PDFDictionary | null;
 

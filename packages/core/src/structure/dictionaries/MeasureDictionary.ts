@@ -1,7 +1,15 @@
-import { PDFArray, PDFArrayField, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFNameField, PDFTextString, PDFTextStringField } from "../../objects";
+import {
+  PDFArray,
+  PDFArrayField,
+  PDFDictionary,
+  PDFDictionaryField,
+  PDFNumberField,
+  PDFNameField,
+  PDFTextString,
+  PDFTextStringField
+} from "../../objects";
 
 export class MeasureDictionary extends PDFDictionary {
-
   public static readonly TYPE = "PtData";
   public static readonly SUBTYPE = "Cloud";
 
@@ -24,16 +32,14 @@ export class MeasureDictionary extends PDFDictionary {
     this.type = MeasureDictionary.TYPE;
     this.subtype = MeasureDictionary.SUBTYPE;
   }
-
 }
 
 export class RectilinearMeasureDictionary extends MeasureDictionary {
-
   /**
    * A text string expressing the scale ratio of the drawing in the region
    * corresponding to this dictionary. Universally recognised unit abbreviations
    * should be used, either matching those of the number format arrays in this
-   * dictionary or those of commonly used scale ratios. 
+   * dictionary or those of commonly used scale ratios.
    */
   @PDFTextStringField("R")
   public r!: PDFTextString;
@@ -46,16 +52,16 @@ export class RectilinearMeasureDictionary extends MeasureDictionary {
    * The directions of the x and y axes are in the measuring coordinate system and
    * are independent of the page rotation. These directions shall be determined by
    * the BBox entry of the containing viewport (see "Table 265: Entries in a viewport
-   * dictionary"). 
+   * dictionary").
    */
   @PDFArrayField("X")
   public x!: PDFArray;
 
   /**
-   * A number format array for measurement of change along the y axis. The first 
-   * element in the array shall contain the scale factor for converting from default 
-   * user space units to the largest units in the measuring coordinate system along 
-   * the y axis. 
+   * A number format array for measurement of change along the y axis. The first
+   * element in the array shall contain the scale factor for converting from default
+   * user space units to the largest units in the measuring coordinate system along
+   * the y axis.
    * @remarks Required when the x and y scales have different units or conversion factors
    */
   @PDFArrayField("Y", true)
@@ -76,7 +82,7 @@ export class RectilinearMeasureDictionary extends MeasureDictionary {
    * the array shall specify the conversion to the largest area unit from units
    * represented by the first element in X, squared. The scale factors from X, Y (if
    * present) and CYX (if Y is present) shall be used to convert from default user
-   * space to the appropriate units before applying the area function. 
+   * space to the appropriate units before applying the area function.
    */
   @PDFArrayField("A")
   public a!: PDFArray;
@@ -85,7 +91,7 @@ export class RectilinearMeasureDictionary extends MeasureDictionary {
    * A number format array for measurement of angles. The first element
    * in the array shall specify the conversion to the largest angle unit from degrees.
    * The scale factor from CYX (if present) shall be used to convert from default user
-   * space to the appropriate units before applying the angle function. 
+   * space to the appropriate units before applying the angle function.
    */
   @PDFArrayField("T", true)
   public t!: PDFArray | null;
@@ -107,9 +113,9 @@ export class RectilinearMeasureDictionary extends MeasureDictionary {
    * directions by which x and y increase in value from this origin shall be
    * determined by the viewport’s BBox entry (see "Table 265: Entries in a viewport
    * dictionary").
-   * 
+   *
    * Default value: the first coordinate pair (lower-left corner) of the rectangle
-   * specified by the viewport’s BBox entry. 
+   * specified by the viewport’s BBox entry.
    */
   @PDFArrayField("O", true)
   public o!: PDFArray | null;
@@ -137,21 +143,19 @@ export class RectilinearMeasureDictionary extends MeasureDictionary {
     this.d = document.createArray();
     this.a = document.createArray();
   }
-
 }
 
 export class GeospatialMeasureDictionary extends MeasureDictionary {
-
   /**
    * An array of numbers that shall be taken pairwise to define a series
    * of points that describes the bounds of an area for which geospatial transformations
    * are valid.
-   * 
+   *
    * For maps, this bounding polygon is known as a neatline. These numbers are
    * expressed relative to a unit square that describes the BBox associated with a
    * Viewport or Form XObject, or the bounds of an Image XObject. If not present, the
    * default values shall define a rectangle describing the full unit square, with values of
-   * [0.0 0.0 0.0 1.0 1.0 1.0 1.0 0.0]. 
+   * [0.0 0.0 0.0 1.0 1.0 1.0 1.0 0.0].
    * @note The polygon description need not be explicitly closed by repeating the
    * first point values as a final point.
    * @remarks PDF 2.0
@@ -164,7 +168,7 @@ export class GeospatialMeasureDictionary extends MeasureDictionary {
    * @remarks PDF 2.0
    */
   @PDFDictionaryField({
-    name: "GCS",
+    name: "GCS"
   })
   public gcs!: PDFDictionary;
 
@@ -172,19 +176,19 @@ export class GeospatialMeasureDictionary extends MeasureDictionary {
    * A projected or geographic coordinate system that shall be used for
    * the display of position values, such as latitude and longitude. Formatting the
    * displayed representation of these values is controlled by the interactive PDF
-   * processor. 
+   * processor.
    * @remarks PDF 2.0
    */
   @PDFDictionaryField({
     name: "DCS",
-    optional: true,
+    optional: true
   })
   public dcs!: PDFDictionary | null;
 
   /**
    * Preferred Display Units. An array of three names that identify in
-   * order a linear display unit, an area display unit, and an angular display unit. 
-   * 
+   * order a linear display unit, an area display unit, and an angular display unit.
+   *
    * The following are valid linear display units:
    * - M a metre
    * - KM a kilometre
@@ -192,7 +196,7 @@ export class GeospatialMeasureDictionary extends MeasureDictionary {
    * - USFT a U.S. Survey foot
    * - MI an international mile
    * - NM an international nautical mile
-   * 
+   *
    * The following are valid area display units:
    * - SQM a square metre
    * - HA a hectare (10,000 square metres)
@@ -200,7 +204,7 @@ export class GeospatialMeasureDictionary extends MeasureDictionary {
    * - SQFT a square foot (US Survey)
    * - A an acre
    * - SQMI a square mile (international)
-   * 
+   *
    * The following are valid angular display units:
    * - DEG a degree
    * - GRD a grad (1/400 of a circle, or 0.9 degrees)
@@ -221,7 +225,7 @@ export class GeospatialMeasureDictionary extends MeasureDictionary {
    * value of each tripe is an elevation value.
    * @remarks PDF 2.0
    * @note Any projected coordinate system includes an underlying geographic
-   * coordinate system. 
+   * coordinate system.
    */
   @PDFArrayField("GPTS")
   public gpts!: PDFArray;
@@ -247,7 +251,7 @@ export class GeospatialMeasureDictionary extends MeasureDictionary {
    * If GCS specifies GCS (geographical) then PCSM should be ignored and always
    * used GPTS. If PCSM is present, it has priority over GPTS, and GPTS values may be
    * ignored. This priority provides backward compatibility.
-   * 
+   *
    * PCSM acronym = "Projected Coordinate System Matrix"
    * @remarks PDF 2.0
    */
@@ -262,17 +266,18 @@ export class GeospatialMeasureDictionary extends MeasureDictionary {
     this.gcs = document.createDictionary();
     this.gpts = document.createArray();
   }
-
 }
 
 export class MeasureFactory {
-
   public static items = new Map<string, typeof MeasureDictionary>([
     [RectilinearMeasureDictionary.SUBTYPE, RectilinearMeasureDictionary],
-    [GeospatialMeasureDictionary.SUBTYPE, GeospatialMeasureDictionary],
+    [GeospatialMeasureDictionary.SUBTYPE, GeospatialMeasureDictionary]
   ]);
 
-  public static register(subtype: string, value: typeof MeasureDictionary): void {
+  public static register(
+    subtype: string,
+    value: typeof MeasureDictionary
+  ): void {
     this.items.set(subtype, value);
   }
 

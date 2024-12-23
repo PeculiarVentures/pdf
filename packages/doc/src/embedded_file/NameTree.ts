@@ -2,14 +2,20 @@ import * as core from "@peculiarventures/pdf-core";
 import { PDFDocument } from "../Document";
 import { WrapObject } from "../WrapObject";
 
-export class NameTree<T extends core.PDFObject = core.PDFObject> extends WrapObject<core.NameTree> implements Iterable<[string, T]> {
-
+export class NameTree<T extends core.PDFObject = core.PDFObject>
+  extends WrapObject<core.NameTree>
+  implements Iterable<[string, T]>
+{
   protected type: abstract new () => T;
 
-  constructor(target: core.NameTree, document: PDFDocument, type?: new () => T) {
+  constructor(
+    target: core.NameTree,
+    document: PDFDocument,
+    type?: new () => T
+  ) {
     super(target, document);
 
-    this.type = type || core.PDFObject as unknown as new () => T;
+    this.type = type || (core.PDFObject as unknown as new () => T);
   }
 
   [Symbol.iterator](): Iterator<[string, T], unknown, undefined> {
@@ -25,7 +31,7 @@ export class NameTree<T extends core.PDFObject = core.PDFObject> extends WrapObj
 
           return {
             done: false,
-            value: [key, _this.get(key)],
+            value: [key, _this.get(key)]
           };
         } else {
           return {
@@ -44,7 +50,9 @@ export class NameTree<T extends core.PDFObject = core.PDFObject> extends WrapObj
       if (res instanceof core.PDFDictionary) {
         return core.PDFTypeConverter.convert(res, this.type, true);
       }
-      throw new Error("Unable to cast value to type because the types do not match.");
+      throw new Error(
+        "Unable to cast value to type because the types do not match."
+      );
     }
 
     return res;
@@ -59,7 +67,9 @@ export class NameTree<T extends core.PDFObject = core.PDFObject> extends WrapObj
     }
 
     if (!(res instanceof type)) {
-      throw new Error("Unable to cast value to type because the types do not match.");
+      throw new Error(
+        "Unable to cast value to type because the types do not match."
+      );
     }
 
     return res;
@@ -68,5 +78,4 @@ export class NameTree<T extends core.PDFObject = core.PDFObject> extends WrapObj
   public set(key: string, value: T): void {
     this.target.setValue(key, value);
   }
-
 }

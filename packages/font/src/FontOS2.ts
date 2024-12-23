@@ -6,7 +6,6 @@ import * as asn from "@peculiar/asn1-schema";
 // fontDescriptor.stemV = (50 + Math.pow(os2.usWeightClass / 65, 2)); // ??? Very unclear how to calculate this value
 @asn.AsnType({ type: asn.AsnTypeTypes.Sequence })
 export class FontOS2 {
-
   @asn.AsnProp({ type: asn.AsnPropTypes.Integer })
   public sCapHeight = 0;
 
@@ -15,5 +14,4 @@ export class FontOS2 {
 
   @asn.AsnProp({ type: asn.AsnPropTypes.Integer })
   public usWeightClass = 0;
-
 }

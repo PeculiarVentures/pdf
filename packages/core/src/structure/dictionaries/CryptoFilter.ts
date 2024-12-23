@@ -21,7 +21,7 @@ export enum CryptoFilterMethods {
    * Chaining (CBC) mode with a 16-byte block size and an
    * initialization vector that shall be randomly generated and placed
    * as the first 16 bytes in the stream or string. The key size
-   * (Length) shall be 128 bits. 
+   * (Length) shall be 128 bits.
    * @since PDF 1.6
    */
   AES128 = "AESV2",
@@ -33,14 +33,13 @@ export enum CryptoFilterMethods {
    * with padding mode with a 16-byte block size and an
    * initialization vector that is randomly generated and placed as
    * the first 16 bytes in the stream or string. The key size (Length)
-   * shall be 256 bits. 
+   * shall be 256 bits.
    * @since PDF 2.0
    */
-  AES256 = "AESV3",
+  AES256 = "AESV3"
 }
 
 export class CryptoFilterDictionary extends PDFDictionary {
-
   public static TYPE = "CryptFilter";
 
   /**
@@ -63,5 +62,4 @@ export class CryptoFilterDictionary extends PDFDictionary {
    */
   @PDFNumberField("Length", true)
   public Length!: null | number;
-
 }

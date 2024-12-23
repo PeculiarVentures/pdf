@@ -1,8 +1,16 @@
-import { Maybe, PDFArray, PDFDateField, PDFDictionary, PDFMaybeField, PDFNameField, PDFStream, PDFStreamField } from "../objects";
+import {
+  Maybe,
+  PDFArray,
+  PDFDateField,
+  PDFDictionary,
+  PDFMaybeField,
+  PDFNameField,
+  PDFStream,
+  PDFStreamField
+} from "../objects";
 import { PDFDate } from "../structure/common/Date";
 
 export class ValidationRelatedInformationDictionary extends PDFDictionary {
-
   public static readonly TYPE = "VRI";
 
   /**
@@ -51,5 +59,4 @@ export class ValidationRelatedInformationDictionary extends PDFDictionary {
    */
   @PDFStreamField("TS", true)
   public TS!: PDFStream | null;
-
 }

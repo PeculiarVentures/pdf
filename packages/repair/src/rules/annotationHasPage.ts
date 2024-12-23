@@ -18,11 +18,13 @@ globalRepairRegistry.addRule({
           const pageRef = page.target.getIndirect();
           annot.set("P", page.target);
 
-          notes.push(`Annotation '${objRef.id} ${objRef.generation} R' has no P. Set P to page '${pageRef.id} ${pageRef.generation} R'`);
+          notes.push(
+            `Annotation '${objRef.id} ${objRef.generation} R' has no P. Set P to page '${pageRef.id} ${pageRef.generation} R'`
+          );
         }
       }
     }
 
     return notes;
-  },
+  }
 });

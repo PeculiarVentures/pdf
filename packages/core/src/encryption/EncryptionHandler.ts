@@ -12,7 +12,6 @@ export interface EncryptionHandlerCreateParams {
 }
 
 export abstract class EncryptionHandler {
-
   /**
    * Name of the encryption handler
    */
@@ -32,18 +31,23 @@ export abstract class EncryptionHandler {
   public abstract authenticate(): Promise<void>;
 
   /**
-   * Encrypts incoming data 
+   * Encrypts incoming data
    * @param data Data that should be encrypted
    * @param target Target object which includes that data
    * @returns Returns encrypted message
    */
-  public abstract encrypt(data: BufferSource, target: PDFStream | PDFTextString): Promise<ArrayBuffer>;
+  public abstract encrypt(
+    data: BufferSource,
+    target: PDFStream | PDFTextString
+  ): Promise<ArrayBuffer>;
   /**
-   * Decrypts incoming data 
+   * Decrypts incoming data
    * @param data Data that should be decrypted
    * @param target Target object which includes that data
    * @returns Returns decrypted message
    */
-  public abstract decrypt(data: BufferSource, target: PDFStream | PDFTextString): Promise<ArrayBuffer>;
-
+  public abstract decrypt(
+    data: BufferSource,
+    target: PDFStream | PDFTextString
+  ): Promise<ArrayBuffer>;
 }

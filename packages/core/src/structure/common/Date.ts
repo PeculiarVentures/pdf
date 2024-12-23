@@ -3,10 +3,10 @@ import { PDFLiteralString } from "../../objects/LiteralString";
 import type { PDFDocumentUpdate } from "../DocumentUpdate";
 import type { PDFDocument } from "../Document";
 
-const regexData = /D.(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(?:(Z)|(?:([-+])(\d{2})'(\d{2})))?/;
+const regexData =
+  /D.(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(?:(Z)|(?:([-+])(\d{2})'(\d{2})))?/;
 
 export class PDFDate extends PDFLiteralString {
-
   public async getDateAsync(): Promise<Date> {
     await this.decode();
     if (this.encrypted === undefined || this.encrypted) {
@@ -45,10 +45,10 @@ export class PDFDate extends PDFLiteralString {
     const timeZoneHoursAndMinutes = `${timeZoneHours.toString().padStart(2, "0")}'${timeZoneMinutes.toString().padStart(2, "0")}'`;
 
     switch (true) {
-      case (timeZoneOffset > 0):
+      case timeZoneOffset > 0:
         timeZoneString = `-${timeZoneHoursAndMinutes}`;
         break;
-      case (timeZoneOffset < 0):
+      case timeZoneOffset < 0:
         timeZoneString = `+${timeZoneHoursAndMinutes}`;
         break;
     }
@@ -68,27 +68,30 @@ export class PDFDate extends PDFLiteralString {
     // DD shall be the day (01–31)
     // HH shall be the hour (00–23)
     // mm shall be the minute (00–59)
-    // SS shall be the second (00–59) 
+    // SS shall be the second (00–59)
     // O shall be the relationship of local time to Universal Time (UT), and shall be denoted by one of the
     // characters PLUS SIGN (U+002B) (+), HYPHEN-MINUS (U+002D) (-), or LATIN CAPITAL LETTER Z
     // (U+005A) (Z) (see below)
     // HH followed by APOSTROPHE (U+0027) (') shall be the absolute value of the offset from UT in hours
     // (00–23)
-    // mm shall be the absolute value of the offset from UT in minutes (00–59) 
+    // mm shall be the absolute value of the offset from UT in minutes (00–59)
 
     this.encrypted = false;
     this.text = stringDate;
   }
 
   constructor(param?: Date | PDFString | string | BufferSource) {
-    super((param instanceof Date) ? "" : param);
+    super(param instanceof Date ? "" : param);
 
     if (param instanceof Date) {
       this.setDate(param);
     }
   }
 
-  public static createDate(update: PDFDocument | PDFDocumentUpdate, date = new Date): PDFDate {
+  public static createDate(
+    update: PDFDocument | PDFDocumentUpdate,
+    date = new Date()
+  ): PDFDate {
     const pdfDate = this.create(update);
 
     pdfDate.setDate(date);

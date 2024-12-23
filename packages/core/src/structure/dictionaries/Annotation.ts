@@ -1,4 +1,15 @@
-import { Maybe, PDFArray, PDFArrayField, PDFDateField, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFMaybeField, PDFNameField, PDFTextString } from "../../objects";
+import {
+  Maybe,
+  PDFArray,
+  PDFArrayField,
+  PDFDateField,
+  PDFDictionary,
+  PDFDictionaryField,
+  PDFNumberField,
+  PDFMaybeField,
+  PDFNameField,
+  PDFTextString
+} from "../../objects";
 import { PDFRectangle } from "../common/Rectangle";
 import { AppearanceDictionary } from "./AppearanceDictionary";
 import { PageObjectDictionary } from "./PageObject";
@@ -9,7 +20,7 @@ export enum AnnotationFlags {
    * and for which no annotation handler is available. If set, do not render the unknown
    * annotation using an appearance stream specified by its appearance dictionary, if any (see
    * annotation and do not print it even if the Print flag is set. If clear, render such an unknown
-   * 12.5.5, "Appearance streams"). 
+   * 12.5.5, "Appearance streams").
    */
   invisible = 1 << 0,
   /**
@@ -18,7 +29,7 @@ export enum AnnotationFlags {
    * @remarks In cases where screen space is limited, the ability to hide and show
    * annotations selectively can be used in combination with appearance
    * streams (see 12.5.5, "Appearance streams") to render auxiliary popup
-   * information similar in function to online help systems. 
+   * information similar in function to online help systems.
    * @remarks PDF 1.2
    */
   hidden = 1 << 1,
@@ -28,7 +39,7 @@ export enum AnnotationFlags {
    * screen. If the annotation does not contain any appearance streams this flag shall be
    * ignored.
    * @remarks This can be useful for annotations representing interactive push-buttons,
-   * which would serve no meaningful purpose on the printed page. 
+   * which would serve no meaningful purpose on the printed page.
    * @remarks PDF 1.2
    */
   print = 1 << 2,
@@ -36,7 +47,7 @@ export enum AnnotationFlags {
    * If set, do not scale the annotation’s appearance to match the magnification of the
    * page. The location of the annotation on the page (defined by the upper-left corner of its
    * annotation rectangle) shall remain fixed, regardless of the page magnification. See further
-   * discussion following this table. 
+   * discussion following this table.
    * @remarks PDF 1.3
    */
   noZoom = 1 << 3,
@@ -50,7 +61,7 @@ export enum AnnotationFlags {
   /**
    * If set, do not render the annotation on the screen or allow it to interact with the
    * user. The annotation may be printed (depending on the setting of the Print flag) but
-   * should be considered hidden for purposes of on-screen display and user interaction. 
+   * should be considered hidden for purposes of on-screen display and user interaction.
    * @remarks PDF 1.3
    */
   noView = 1 << 5,
@@ -59,10 +70,10 @@ export enum AnnotationFlags {
    * be rendered or printed (depending on the settings of the NoView and Print flags) but
    * should not respond to mouse clicks or change its appearance in response to mouse
    * motions.
-   * 
+   *
    * This flag shall be ignored for widget annotations; its function is subsumed by the
    * ReadOnly flag of the associated form field (see "Table 226: Field flags common to all field
-   * types"). 
+   * types").
    * @remarks PDF 1.3
    */
   readOnly = 1 << 6,
@@ -86,7 +97,7 @@ export enum AnnotationFlags {
    * properties, such as position and size.
    * @remarks PDF 1.7
    */
-  lockedContents = 1 << 9,
+  lockedContents = 1 << 9
 }
 
 export enum SubTypeAnnotation {
@@ -201,11 +212,10 @@ export enum SubTypeAnnotation {
   /**
    * 3D Annotations
    */
-  threeD = "3D",
+  threeD = "3D"
 }
 
 export class AnnotationDictionary extends PDFDictionary {
-
   public static readonly TYPE = "Annot";
 
   /**
@@ -223,11 +233,11 @@ export class AnnotationDictionary extends PDFDictionary {
 
   /**
    * The annotation rectangle, defining the location of the annotation on the page
-   * in default user space units. 
+   * in default user space units.
    */
   @PDFDictionaryField({
     name: "Rect",
-    type: PDFRectangle,
+    type: PDFRectangle
   })
   public rect!: PDFRectangle;
 
@@ -240,7 +250,7 @@ export class AnnotationDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "Contents",
     type: PDFTextString,
-    optional: true,
+    optional: true
   })
   public contents!: string | null;
 
@@ -252,7 +262,7 @@ export class AnnotationDictionary extends PDFDictionary {
     name: "P",
     type: PageObjectDictionary,
     optional: true,
-    indirect: true,
+    indirect: true
   })
   public p!: PageObjectDictionary | null;
 
@@ -263,7 +273,7 @@ export class AnnotationDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "NM",
     type: PDFTextString,
-    optional: true,
+    optional: true
   })
   public nm!: string | null;
 
@@ -320,12 +330,12 @@ export class AnnotationDictionary extends PDFDictionary {
 
   /**
    * An optional content group or optional content membership dictionary
-   * specifying the optional content properties for the annotation. 
+   * specifying the optional content properties for the annotation.
    */
   @PDFDictionaryField({
     name: "OC",
     type: PDFDictionary,
-    optional: true,
+    optional: true
   })
   public oc!: PDFDictionary | null;
 
@@ -335,7 +345,7 @@ export class AnnotationDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "AF",
     type: PDFDictionary,
-    optional: true,
+    optional: true
   })
   public af!: PDFDictionary | null;
 
@@ -359,7 +369,7 @@ export class AnnotationDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "Lang",
     type: PDFTextString,
-    optional: true,
+    optional: true
   })
   public lang!: string | null;
 

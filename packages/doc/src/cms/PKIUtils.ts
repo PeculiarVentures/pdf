@@ -4,15 +4,12 @@ import * as pkijs from "pkijs";
 import { AsnEncoded } from "./AsnEncoded";
 
 class PKICertificate extends AsnEncoded {
-
   protected onFromSchema(schema: pkijs.SchemaType): pkijs.Certificate {
     return new pkijs.Certificate({ schema });
   }
-
 }
 
 export class PKIUtils {
-
   public static AUTHORITY_KEY_IDENTIFIER = "2.5.29.35";
   public static SUBJECT_KEY_IDENTIFIER = "2.5.29.14";
 
@@ -30,7 +27,10 @@ export class PKIUtils {
     return new X509Certificate(raw);
   }
 
-  public static findExtension(cert: pkijs.Certificate, extnID: string): pkijs.Extension | null {
+  public static findExtension(
+    cert: pkijs.Certificate,
+    extnID: string
+  ): pkijs.Extension | null {
     if (cert.extensions) {
       for (const extension of cert.extensions) {
         if (extension.extnID === extnID) {
@@ -41,5 +41,4 @@ export class PKIUtils {
 
     return null;
   }
-
 }

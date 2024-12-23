@@ -1,8 +1,12 @@
-import { PDFArray, PDFBooleanField, PDFDictionaryField, PDFTextString } from "../../objects";
+import {
+  PDFArray,
+  PDFBooleanField,
+  PDFDictionaryField,
+  PDFTextString
+} from "../../objects";
 import { CryptoFilterDictionary } from "./CryptoFilter";
 
 export class PublicKeyCryptoFilterDictionary extends CryptoFilterDictionary {
-
   /**
    * If the crypt filter is referenced from StmF or StrF in the
    * encryption dictionary, this entry shall be an array of byte strings, where
@@ -21,5 +25,4 @@ export class PublicKeyCryptoFilterDictionary extends CryptoFilterDictionary {
    */
   @PDFBooleanField("EncryptMetadata", true, true)
   public EncryptMetadata!: boolean;
-
 }

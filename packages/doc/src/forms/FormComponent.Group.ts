@@ -10,8 +10,13 @@ export interface IFormGroupedComponent extends IComponent {
   findGroup(): FormComponentGroup | null;
 }
 
-export class FormComponentGroup<TTarget extends core.PDFField = core.PDFField, TItem extends IFormGroupedComponent = IFormGroupedComponent> extends WrapObject<TTarget> implements IComponent, Iterable<TItem> {
-
+export class FormComponentGroup<
+    TTarget extends core.PDFField = core.PDFField,
+    TItem extends IFormGroupedComponent = IFormGroupedComponent
+  >
+  extends WrapObject<TTarget>
+  implements IComponent, Iterable<TItem>
+{
   private get acroFormFields(): core.PDFArray {
     const fields = this.target.documentUpdate?.catalog?.AcroForm.get().Fields;
     if (!fields) {
@@ -72,7 +77,10 @@ export class FormComponentGroup<TTarget extends core.PDFField = core.PDFField, T
     if (this.target.Kids.has()) {
       const kids = this.target.Kids.get();
 
-      const component = FormComponentFactory.create(kids.get(index, core.WidgetDictionary, true), this.document);
+      const component = FormComponentFactory.create(
+        kids.get(index, core.WidgetDictionary, true),
+        this.document
+      );
       if (component instanceof FormComponent) {
         return component as unknown as TItem;
       }
@@ -169,5 +177,4 @@ export class FormComponentGroup<TTarget extends core.PDFField = core.PDFField, T
   public get name(): string {
     return this.target.getFullName();
   }
-
 }

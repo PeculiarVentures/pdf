@@ -9,7 +9,7 @@ const options: PDFDocumentCreateParameters = {
   version: PDFVersion.v1_6,
   disableCompressedStreams: true,
   disableCompressedObjects: true,
-  useXrefTable: true,
+  useXrefTable: true
 };
 
 // interface TableRow {
@@ -33,7 +33,6 @@ const options: PDFDocumentCreateParameters = {
 // }
 
 context("Examples", () => {
-
   //   it("audit", async () => {
   //     function addLink(rect: TextRectangle, uri: string, page: PDFPage) {
   //       const doc = page.document.target;
@@ -553,11 +552,11 @@ context("Examples", () => {
           ["Milk 1 L", "$7.95"],
           ["Orvital Organic Medium Egg (53-62 G)", "$18.95"],
           ["Bread 400 Gr.", "$3.95"],
-          ["Книжка", "$2.95"],
+          ["Книжка", "$2.95"]
         ],
         bonus: [
           ["Subtotal", "$89.25"],
-          ["Shipping", "$5"],
+          ["Shipping", "$5"]
         ],
         total: "$94.25"
       }
@@ -582,43 +581,46 @@ context("Examples", () => {
     const page = doc.pages.create();
     const mediaWidth = page.width - padding * 2;
 
-    page.graphics()
-      .fillColor(themeColor)
-      .rect(0, 0, page.width, 70)
-      .fill();
+    page.graphics().fillColor(themeColor).rect(0, 0, page.width, 70).fill();
 
     const rightSide = page.width - padding;
 
-    page.graphics()
+    page
+      .graphics()
       .strokeColor(themeColor)
       .lineWidth(1)
       .line(leftSide, 167, rightSide, 167)
       .stroke();
 
-    page.text()
+    page
+      .text()
       .color(whiteColor)
       .font(fontHelv, 18)
       .move(leftSide, 44)
       .show("INVOICE");
 
     const graphics = page.graphics();
-    graphics.drawText({
-      width: mediaWidth,
-      align: TextAlignment.right,
-      blocks: [
-        {
-          text: template.invoiceNumber,
-          font: fontHelvBold,
-          style: {
-            color: whiteColor,
-            size: 18,
+    graphics.drawText(
+      {
+        width: mediaWidth,
+        align: TextAlignment.right,
+        blocks: [
+          {
+            text: template.invoiceNumber,
+            font: fontHelvBold,
+            style: {
+              color: whiteColor,
+              size: 18
+            }
           }
-        }
-      ]
-    }, leftSide, 44);
+        ]
+      },
+      leftSide,
+      44
+    );
 
-    graphics
-      .drawText({
+    graphics.drawText(
+      {
         width: mediaWidth,
         blocks: [
           {
@@ -626,14 +628,17 @@ context("Examples", () => {
             font: fontHelvBoldOblique,
             style: {
               color: themeColor,
-              size: 42,
+              size: 42
             }
           }
         ]
-      }, leftSide, 97);
+      },
+      leftSide,
+      97
+    );
 
-    graphics
-      .drawText({
+    graphics.drawText(
+      {
         width: mediaWidth,
         align: TextAlignment.right,
         blocks: [
@@ -642,14 +647,17 @@ context("Examples", () => {
             font: fontHelvBold,
             style: {
               color: blackColor,
-              size: 12,
+              size: 12
             }
           }
         ]
-      }, leftSide, 86);
+      },
+      leftSide,
+      86
+    );
 
-    graphics
-      .drawText({
+    graphics.drawText(
+      {
         width: mediaWidth,
         align: TextAlignment.right,
         leading: 1.2,
@@ -659,14 +667,17 @@ context("Examples", () => {
             font: fontHelv,
             style: {
               color: grayColor,
-              size: 10,
+              size: 10
             }
           }
         ]
-      }, leftSide, 110);
+      },
+      leftSide,
+      110
+    );
 
-    graphics
-      .drawText({
+    graphics.drawText(
+      {
         width: mediaWidth,
         align: TextAlignment.right,
         blocks: [
@@ -675,14 +686,17 @@ context("Examples", () => {
             font: fontHelvBold,
             style: {
               color: themeColor,
-              size: 12,
+              size: 12
             }
           }
         ]
-      }, leftSide, 186);
+      },
+      leftSide,
+      186
+    );
 
-    graphics
-      .drawText({
+    graphics.drawText(
+      {
         width: mediaWidth,
         align: TextAlignment.right,
         blocks: [
@@ -691,14 +705,17 @@ context("Examples", () => {
             font: fontHelvBold,
             style: {
               color: blackColor,
-              size: 24,
+              size: 24
             }
           }
         ]
-      }, leftSide, 214);
+      },
+      leftSide,
+      214
+    );
 
-    graphics
-      .drawText({
+    graphics.drawText(
+      {
         width: mediaWidth,
         align: TextAlignment.right,
         blocks: [
@@ -707,19 +724,27 @@ context("Examples", () => {
             font: fontHelvBold,
             style: {
               color: blackColor,
-              size: 12,
+              size: 12
             }
           },
           {
-            text: new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" }),
+            text: new Date().toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric"
+            }),
             font: fontHelv,
             style: {
               color: grayColor,
-              size: 12,
+              size: 12
             }
           }
         ]
-      }, leftSide, 264);
+      },
+      leftSide,
+      264
+    );
 
     let currentTop = 292;
 
@@ -737,7 +762,7 @@ context("Examples", () => {
       const columnWidth2 = tableWidth - columnWidth1;
       const textStyle = {
         size: fontSize,
-        color: blackColor,
+        color: blackColor
       };
       const totalPadding = 200;
 
@@ -747,53 +772,69 @@ context("Examples", () => {
         .rect(tableLeft, currentTop, tableWidth, tableRowHeight)
         .fill();
 
-      tableGraphics.drawText({
-        width: columnWidth1 - cellPadding * 2,
-        blocks: [
-          {
-            text: "Description",
-            font: fontHelvBold,
-            style: textStyle,
-          }
-        ]
-      }, tableLeft + cellPadding, currentTop + cellPadding);
-      tableGraphics.drawText({
-        width: columnWidth2 - cellPadding * 2,
-        align: TextAlignment.right,
-        blocks: [
-          {
-            text: "Amount",
-            font: fontHelvBold,
-            style: textStyle,
-          }
-        ]
-      }, tableLeft + columnWidth1 + cellPadding, currentTop + cellPadding);
+      tableGraphics.drawText(
+        {
+          width: columnWidth1 - cellPadding * 2,
+          blocks: [
+            {
+              text: "Description",
+              font: fontHelvBold,
+              style: textStyle
+            }
+          ]
+        },
+        tableLeft + cellPadding,
+        currentTop + cellPadding
+      );
+      tableGraphics.drawText(
+        {
+          width: columnWidth2 - cellPadding * 2,
+          align: TextAlignment.right,
+          blocks: [
+            {
+              text: "Amount",
+              font: fontHelvBold,
+              style: textStyle
+            }
+          ]
+        },
+        tableLeft + columnWidth1 + cellPadding,
+        currentTop + cellPadding
+      );
 
       currentTop += tableRowHeight;
 
       for (const [description, amount] of template.table.items) {
         // Draw rows
-        tableGraphics.drawText({
-          width: columnWidth1 - cellPadding * 2,
-          blocks: [
-            {
-              text: description,
-              font: fontHelvBold,
-              style: textStyle,
-            }
-          ]
-        }, tableLeft + cellPadding, currentTop + cellPadding);
-        tableGraphics.drawText({
-          width: columnWidth2 - cellPadding * 2,
-          align: TextAlignment.right,
-          blocks: [
-            {
-              text: amount,
-              font: fontHelv,
-              style: textStyle,
-            }
-          ]
-        }, tableLeft + columnWidth1 + cellPadding, currentTop + cellPadding);
+        tableGraphics.drawText(
+          {
+            width: columnWidth1 - cellPadding * 2,
+            blocks: [
+              {
+                text: description,
+                font: fontHelvBold,
+                style: textStyle
+              }
+            ]
+          },
+          tableLeft + cellPadding,
+          currentTop + cellPadding
+        );
+        tableGraphics.drawText(
+          {
+            width: columnWidth2 - cellPadding * 2,
+            align: TextAlignment.right,
+            blocks: [
+              {
+                text: amount,
+                font: fontHelv,
+                style: textStyle
+              }
+            ]
+          },
+          tableLeft + columnWidth1 + cellPadding,
+          currentTop + cellPadding
+        );
 
         currentTop += tableRowHeight;
 
@@ -801,7 +842,6 @@ context("Examples", () => {
           .strokeColor(grayColor)
           .line(tableLeft, currentTop, tableLeft + tableWidth, currentTop)
           .stroke();
-
       }
 
       const bonusRowHeight = 11;
@@ -809,28 +849,35 @@ context("Examples", () => {
 
       for (const [description, amount] of template.table.bonus) {
         // Draw rows
-        tableGraphics.drawText({
-          width: columnWidth1 - cellPadding * 2 - totalPadding,
-          blocks: [
-            {
-              text: description,
-              font: fontHelv,
-              style: textStyle,
-            }
-          ]
-        }, tableLeft + cellPadding + totalPadding, currentTop);
-        tableGraphics.drawText({
-          width: columnWidth2 - cellPadding * 2,
-          align: TextAlignment.right,
-          blocks: [
-            {
-              text: amount,
-              font: fontHelv,
-              style: textStyle,
-            }
-          ]
-        }, tableLeft + columnWidth1 + cellPadding, currentTop);
-
+        tableGraphics.drawText(
+          {
+            width: columnWidth1 - cellPadding * 2 - totalPadding,
+            blocks: [
+              {
+                text: description,
+                font: fontHelv,
+                style: textStyle
+              }
+            ]
+          },
+          tableLeft + cellPadding + totalPadding,
+          currentTop
+        );
+        tableGraphics.drawText(
+          {
+            width: columnWidth2 - cellPadding * 2,
+            align: TextAlignment.right,
+            blocks: [
+              {
+                text: amount,
+                font: fontHelv,
+                style: textStyle
+              }
+            ]
+          },
+          tableLeft + columnWidth1 + cellPadding,
+          currentTop
+        );
 
         currentTop += bonusRowHeight;
       }
@@ -838,36 +885,49 @@ context("Examples", () => {
       currentTop += cellPadding;
       tableGraphics
         .strokeColor(grayColor)
-        .line(tableLeft + totalPadding, currentTop, tableLeft + tableWidth, currentTop)
+        .line(
+          tableLeft + totalPadding,
+          currentTop,
+          tableLeft + tableWidth,
+          currentTop
+        )
         .stroke();
 
       // Total
       currentTop += cellPadding;
 
-      tableGraphics.drawText({
-        width: columnWidth1 - cellPadding * 2 - totalPadding,
-        blocks: [
-          {
-            text: "Total",
-            font: fontHelv,
-            style: textStyle,
-          }
-        ]
-      }, tableLeft + cellPadding + totalPadding, currentTop);
-      tableGraphics.drawText({
-        width: columnWidth2 - cellPadding * 2,
-        align: TextAlignment.right,
-        blocks: [
-          {
-            text: template.table.total,
-            font: fontHelvBold,
-            style: {
-              size: 17,
-              color: blackColor,
-            },
-          }
-        ]
-      }, tableLeft + columnWidth1 + cellPadding, currentTop);
+      tableGraphics.drawText(
+        {
+          width: columnWidth1 - cellPadding * 2 - totalPadding,
+          blocks: [
+            {
+              text: "Total",
+              font: fontHelv,
+              style: textStyle
+            }
+          ]
+        },
+        tableLeft + cellPadding + totalPadding,
+        currentTop
+      );
+      tableGraphics.drawText(
+        {
+          width: columnWidth2 - cellPadding * 2,
+          align: TextAlignment.right,
+          blocks: [
+            {
+              text: template.table.total,
+              font: fontHelvBold,
+              style: {
+                size: 17,
+                color: blackColor
+              }
+            }
+          ]
+        },
+        tableLeft + columnWidth1 + cellPadding,
+        currentTop
+      );
 
       currentTop += cellPadding;
     }
@@ -880,8 +940,8 @@ context("Examples", () => {
       .line(leftSide, thankYouTop, leftSide + 80, thankYouTop)
       .stroke();
 
-    graphics
-      .drawText({
+    graphics.drawText(
+      {
         width: mediaWidth,
         blocks: [
           {
@@ -893,13 +953,14 @@ context("Examples", () => {
             }
           }
         ]
-      }, leftSide, thankYouTop + 10);
+      },
+      leftSide,
+      thankYouTop + 10
+    );
 
     console.time("serialize pdf");
     const pdf = await doc.save();
     console.timeEnd("serialize pdf");
     writeFile(pdf);
   });
-
-
 });

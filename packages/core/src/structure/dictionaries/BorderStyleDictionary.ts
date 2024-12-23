@@ -1,4 +1,10 @@
-import { PDFArray, PDFArrayField, PDFDictionary, PDFNumberField, PDFNameField } from "../../objects";
+import {
+  PDFArray,
+  PDFArrayField,
+  PDFDictionary,
+  PDFNumberField,
+  PDFNameField
+} from "../../objects";
 
 export enum BorderStyle {
   /**
@@ -23,22 +29,21 @@ export enum BorderStyle {
   /**
    * A single line along the bottom of the annotation rectangle
    */
-  underline = "U",
+  underline = "U"
 }
 
 export class BorderStyleDictionary extends PDFDictionary {
-
   public static readonly TYPE = "Border";
 
   /**
    * The type of PDF object that this dictionary describes; if present, shall
-   * be `Border` for a border style dictionary. 
+   * be `Border` for a border style dictionary.
    */
   @PDFNameField("Type", true)
   public type!: typeof BorderStyleDictionary.TYPE | null;
 
   /**
-   * The border width in points. If this value is 0, no border shall drawn. 
+   * The border width in points. If this value is 0, no border shall drawn.
    * Default value: 1
    */
   @PDFNumberField("W", true, 1)
@@ -63,5 +68,4 @@ export class BorderStyleDictionary extends PDFDictionary {
   protected override onCreate(): void {
     this.type = BorderStyleDictionary.TYPE;
   }
-
 }

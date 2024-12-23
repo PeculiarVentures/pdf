@@ -8,11 +8,12 @@ function sortById(a: PDFDocumentObject, b: PDFDocumentObject): number {
     return -1;
   }
 
-  throw new Error("Cross-Reference cannot have objects with the same identifiers");
+  throw new Error(
+    "Cross-Reference cannot have objects with the same identifiers"
+  );
 }
 
 export class PDFDocumentObjectGrouper {
-
   public static group(items: PDFDocumentObject[]): PDFDocumentObject[][] {
     const groups: PDFDocumentObject[][] = [];
 

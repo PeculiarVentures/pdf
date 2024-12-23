@@ -3,7 +3,6 @@ import { Convert } from "pvtsutils";
 import { PDFStream } from "../objects";
 
 export class PDFContentStream extends PDFStream {
-
   #content?: PDFContent;
 
   constructor();
@@ -19,7 +18,9 @@ export class PDFContentStream extends PDFStream {
 
   public get content(): PDFContent {
     if (!this.#content) {
-      const content = this.#content = PDFContent.fromString(Convert.ToBinary(this.stream));
+      const content = (this.#content = PDFContent.fromString(
+        Convert.ToBinary(this.stream)
+      ));
 
       const clearCallback = this.clear.bind(this, true);
       content.once("push", clearCallback);
@@ -45,7 +46,6 @@ export class PDFContentStream extends PDFStream {
   public override clear(streamOnly = false): void {
     super.clear(streamOnly);
   }
-
 }
 
 import { PDFContent } from "./Content";

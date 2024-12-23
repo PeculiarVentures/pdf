@@ -8,7 +8,10 @@ import { ResourceDictionary } from "./ResourceDictionary";
  * @param name - The fully qualified name of the field to find.
  * @returns The field with the fully qualified name, or `null`
  */
-function findFieldInList(fields: objects.PDFArray, name: string): PDFField | null {
+function findFieldInList(
+  fields: objects.PDFArray,
+  name: string
+): PDFField | null {
   for (const item of fields) {
     if (!(item instanceof objects.PDFDictionary)) {
       continue;
@@ -52,17 +55,16 @@ export enum SignatureFlags {
    * as opposed to an incremental update. Merely updating the file by
    * appending new information to the end of the previous version is safe
    */
-  appendOnly = 2,
+  appendOnly = 2
 }
 
 export class InteractiveFormDictionary extends objects.PDFDictionary {
-
   /**
    * An array of references to the document’s root fields (those with no ancestors in the field hierarchy).
    */
   @objects.PDFDictionaryField({
     name: "Fields",
-    type: objects.PDFArray,
+    type: objects.PDFArray
   })
   public Fields!: objects.PDFArray;
 
@@ -124,7 +126,7 @@ export class InteractiveFormDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     name: "XFA",
-    optional: true,
+    optional: true
   })
   public xfa!: objects.PDFArray | objects.PDFStream | null;
 
@@ -135,7 +137,7 @@ export class InteractiveFormDictionary extends objects.PDFDictionary {
   }
 
   public findFieldByGroup(type: string, group: string): PDFField | null {
-    const field = this.Fields.items.find(o => {
+    const field = this.Fields.items.find((o) => {
       if (o instanceof PDFField) {
         if (o.ft === type && o.t.text === group) {
           return o;
@@ -221,9 +223,12 @@ export class InteractiveFormDictionary extends objects.PDFDictionary {
     }
 
     // Now, create the new field.
-    const newField = new PDFField(doc.createDictionary(
-      ["T", doc.createString(segments[segments.length - 1])]
-    )).makeIndirect();
+    const newField = new PDFField(
+      doc.createDictionary([
+        "T",
+        doc.createString(segments[segments.length - 1])
+      ])
+    ).makeIndirect();
 
     // If there's a parent, add the new field to its children.
     if (parent) {
@@ -244,5 +249,4 @@ export class InteractiveFormDictionary extends objects.PDFDictionary {
   public findField(name: string): PDFField | null {
     return findFieldInList(this.Fields, name);
   }
-
 }

@@ -3,7 +3,8 @@ import { globalRepairRegistry } from "../PDFRepairRegistry";
 
 globalRepairRegistry.addRule({
   id: "removeNeedAppearances",
-  description: "Removes the NeedAppearances field from AcroForm to prevent unintended modifications by Adobe Acrobat.",
+  description:
+    "Removes the NeedAppearances field from AcroForm to prevent unintended modifications by Adobe Acrobat.",
   apply: async (doc: PDFDocument) => {
     const notes: string[] = [];
     const catalog = doc.target.update.catalog;
@@ -20,5 +21,3 @@ globalRepairRegistry.addRule({
     return notes;
   }
 });
-
-

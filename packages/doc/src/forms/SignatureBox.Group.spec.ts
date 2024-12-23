@@ -4,12 +4,25 @@ import * as fs from "node:fs";
 import { Crypto } from "@peculiar/webcrypto";
 import * as x509 from "@peculiar/x509";
 import * as core from "@peculiarventures/pdf-core";
-import { CMSContentType, CMSSignedData, ContentTypeAttribute, FormattingState, MessageDigestAttribute, PDFDocument, SignatureBoxGroup, SigningTimeAttribute } from "@peculiarventures/pdf-doc";
+import {
+  CMSContentType,
+  CMSSignedData,
+  ContentTypeAttribute,
+  FormattingState,
+  MessageDigestAttribute,
+  PDFDocument,
+  SignatureBoxGroup,
+  SigningTimeAttribute
+} from "@peculiarventures/pdf-doc";
 import { BufferSourceConverter, Convert } from "pvtsutils";
 import * as pkijs from "pkijs";
 
 const crypto = new Crypto() as globalThis.Crypto;
-pkijs.setEngine("PDF crypto", crypto, new core.PDFCryptoEngine({ crypto: crypto, subtle: crypto.subtle }));
+pkijs.setEngine(
+  "PDF crypto",
+  crypto,
+  new core.PDFCryptoEngine({ crypto: crypto, subtle: crypto.subtle })
+);
 
 const WRITE_FILES = false;
 
@@ -18,14 +31,18 @@ export function writeFile(data: BufferSource, name = "tmp"): void {
     return;
   }
   const filePath = path.resolve(__dirname, `../../../../${name}.pdf`);
-  fs.writeFileSync(filePath, Buffer.from(BufferSourceConverter.toArrayBuffer(data)), { flag: "w+" });
+  fs.writeFileSync(
+    filePath,
+    Buffer.from(BufferSourceConverter.toArrayBuffer(data)),
+    { flag: "w+" }
+  );
   console.log(`File saved to ${filePath}`);
 }
 
 async function createEmptyDocument() {
   const doc = await PDFDocument.create({
     useXrefTable: true,
-    disableCompressedStreams: true,
+    disableCompressedStreams: true
   });
   assert.strictEqual(doc.pages.length, 0);
   const page = doc.pages.create();
@@ -38,36 +55,51 @@ async function createSelfSignedCertificate() {
     name: "RSASSA-PKCS1-v1_5",
     hash: "SHA-256",
     publicExponent: new Uint8Array([1, 0, 1]),
-    modulusLength: 2048,
+    modulusLength: 2048
   };
   const keys = await crypto.subtle.generateKey(alg, false, ["sign", "verify"]);
-  const cert = await x509.X509CertificateGenerator.createSelfSigned({
-    serialNumber: "0102030405",
-    notBefore: new Date("2021-06-29"),
-    notAfter: new Date("2022-06-29"),
-    name: "CN=Test",
-    keys,
-    signingAlgorithm: alg,
-    extensions: [
-      new x509.KeyUsagesExtension(
-        x509.KeyUsageFlags.digitalSignature |
-        x509.KeyUsageFlags.nonRepudiation |
-        x509.KeyUsageFlags.keyCertSign
-      ),
-      new x509.BasicConstraintsExtension(false),
-      await x509.AuthorityKeyIdentifierExtension.create(keys.publicKey!, false, crypto),
-      await x509.SubjectKeyIdentifierExtension.create(keys.publicKey!, false, crypto),
-      new x509.ExtendedKeyUsageExtension([
-        "1.3.6.1.4.1.311.10.3.12", // documentSigning
-        "1.2.840.113583.1.1.5", // pdfAuthenticDocumentsTrust
-      ]),
-    ]
-  }, crypto);
+  const cert = await x509.X509CertificateGenerator.createSelfSigned(
+    {
+      serialNumber: "0102030405",
+      notBefore: new Date("2021-06-29"),
+      notAfter: new Date("2022-06-29"),
+      name: "CN=Test",
+      keys,
+      signingAlgorithm: alg,
+      extensions: [
+        new x509.KeyUsagesExtension(
+          x509.KeyUsageFlags.digitalSignature |
+            x509.KeyUsageFlags.nonRepudiation |
+            x509.KeyUsageFlags.keyCertSign
+        ),
+        new x509.BasicConstraintsExtension(false),
+        await x509.AuthorityKeyIdentifierExtension.create(
+          keys.publicKey!,
+          false,
+          crypto
+        ),
+        await x509.SubjectKeyIdentifierExtension.create(
+          keys.publicKey!,
+          false,
+          crypto
+        ),
+        new x509.ExtendedKeyUsageExtension([
+          "1.3.6.1.4.1.311.10.3.12", // documentSigning
+          "1.2.840.113583.1.1.5" // pdfAuthenticDocumentsTrust
+        ])
+      ]
+    },
+    crypto
+  );
 
   return { keys, cert };
 }
 
-function signHandler(hash: string, keys: CryptoKeyPair, cert: x509.X509Certificate) {
+function signHandler(
+  hash: string,
+  keys: CryptoKeyPair,
+  cert: x509.X509Certificate
+) {
   return async (data: Uint8Array) => {
     const messageDigest = await crypto.subtle.digest(hash, data);
     const signedData = new CMSSignedData();
@@ -76,7 +108,7 @@ function signHandler(hash: string, keys: CryptoKeyPair, cert: x509.X509Certifica
       signedAttributes: [
         new ContentTypeAttribute(CMSContentType.data),
         new SigningTimeAttribute(new Date()),
-        new MessageDigestAttribute(messageDigest),
+        new MessageDigestAttribute(messageDigest)
       ]
     });
 
@@ -88,17 +120,34 @@ function signHandler(hash: string, keys: CryptoKeyPair, cert: x509.X509Certifica
   };
 }
 
-function checkSignatureValue(signatureValue: core.SignatureDictionary, doc: PDFDocument, eol: string, isLastSignature: boolean) {
+function checkSignatureValue(
+  signatureValue: core.SignatureDictionary,
+  doc: PDFDocument,
+  eol: string,
+  isLastSignature: boolean
+) {
   const byteRange = signatureValue.ByteRange.get();
   assert.strictEqual(byteRange.get(0, core.PDFNumeric).value, 0);
-  assert.strictEqual(byteRange.get(1, core.PDFNumeric).value, signatureValue.Contents.view.byteOffset);
-  assert.strictEqual(byteRange.get(2, core.PDFNumeric).value, signatureValue.Contents.view.byteOffset + signatureValue.Contents.view.byteLength);
-  const lastByte = byteRange.get(3, core.PDFNumeric).value + byteRange.get(2, core.PDFNumeric).value;
+  assert.strictEqual(
+    byteRange.get(1, core.PDFNumeric).value,
+    signatureValue.Contents.view.byteOffset
+  );
+  assert.strictEqual(
+    byteRange.get(2, core.PDFNumeric).value,
+    signatureValue.Contents.view.byteOffset +
+      signatureValue.Contents.view.byteLength
+  );
+  const lastByte =
+    byteRange.get(3, core.PDFNumeric).value +
+    byteRange.get(2, core.PDFNumeric).value;
 
   if (isLastSignature) {
     assert.strictEqual(lastByte, doc.target.view.byteLength);
   } else {
-    const endView = doc.target.view.subarray(lastByte - eol.length - 5, lastByte);
+    const endView = doc.target.view.subarray(
+      lastByte - eol.length - 5,
+      lastByte
+    );
     assert.strictEqual(Convert.ToBinary(endView), `%%EOF${eol}`);
   }
 }
@@ -116,24 +165,25 @@ context("SignatureBoxGroup", () => {
           "\n", // LF
           "\r\n", // CRLF
           "\n\n", // LFLF (Acrobat Reader supports this EOL)
-          "\n\n\n", // LFLFLF (Acrobat Reader supports this EOL)
+          "\n\n\n" // LFLFLF (Acrobat Reader supports this EOL)
         ].forEach((eol) => {
           it(`should create valid PDF with EOL = ${JSON.stringify(eol)}`, async () => {
             core.PDFDocumentUpdate.EOF_EOL = eol;
             const emptyDoc = await createEmptyDocument();
             let doc = emptyDoc.doc;
             const page = emptyDoc.page;
-            const fileName = JSON.stringify(eol)
-              .replace(/"/g, "") // remove quotes
-              .replace(/\\/g, "") // remove backslash
-              || "empty";
+            const fileName =
+              JSON.stringify(eol)
+                .replace(/"/g, "") // remove quotes
+                .replace(/\\/g, "") || // remove backslash
+              "empty";
 
             // Add signature box
             page.addSignatureBox({
-              groupName: "box1",
+              groupName: "box1"
             });
             page.addSignatureBox({
-              groupName: "box2",
+              groupName: "box2"
             });
 
             // Save document
@@ -148,7 +198,7 @@ context("SignatureBoxGroup", () => {
                 dict.Reason.get().text = "Описание причины";
                 dict.Location.get().text = "56.632N 47.928E";
               },
-              containerCreate: signHandler("SHA-256", keys, cert),
+              containerCreate: signHandler("SHA-256", keys, cert)
             });
             let raw = await doc.save();
             writeFile(raw, `SignatureBox.Group.spec.${fileName}.1.pdf`);
@@ -168,7 +218,7 @@ context("SignatureBoxGroup", () => {
                 dict.Reason.get().text = "Описание причины 2";
                 dict.Location.get().text = "56.632N 47.928E";
               },
-              containerCreate: signHandler("SHA-256", keys, cert),
+              containerCreate: signHandler("SHA-256", keys, cert)
             });
             raw = await doc.save();
             writeFile(raw, `SignatureBox.Group.spec.${fileName}.2.pdf`);
@@ -196,7 +246,7 @@ context("SignatureBoxGroup", () => {
 
           // Add signature box
           page.addSignatureBox({
-            groupName: "box1",
+            groupName: "box1"
           });
 
           // Save document
@@ -211,7 +261,7 @@ context("SignatureBoxGroup", () => {
               dict.Reason.get().text = "Описание причины";
               dict.Location.get().text = "56.632N 47.928E";
             },
-            containerCreate: signHandler("SHA-256", keys, cert),
+            containerCreate: signHandler("SHA-256", keys, cert)
           });
           const raw = await doc.save();
           writeFile(raw, "SignatureBox.Group.spec.invalid.pdf");
@@ -220,7 +270,10 @@ context("SignatureBoxGroup", () => {
           const formattingSate = verify.items[0].states[0] as FormattingState;
           assert.strictEqual(formattingSate.type, "invalid");
           assert.ok(formattingSate.data.error);
-          assert.strictEqual(formattingSate.data.error.message, "The range of bytes points to an incorrect data. Too many bytes after %%EOF marker.");
+          assert.strictEqual(
+            formattingSate.data.error.message,
+            "The range of bytes points to an incorrect data. Too many bytes after %%EOF marker."
+          );
         });
 
         it("should return invalid state if there are 'EOL contains invalid characters'", async () => {
@@ -231,7 +284,7 @@ context("SignatureBoxGroup", () => {
 
           // Add signature box
           page.addSignatureBox({
-            groupName: "box1",
+            groupName: "box1"
           });
 
           // Save document
@@ -246,7 +299,7 @@ context("SignatureBoxGroup", () => {
               dict.Reason.get().text = "Описание причины";
               dict.Location.get().text = "56.632N 47.928E";
             },
-            containerCreate: signHandler("SHA-256", keys, cert),
+            containerCreate: signHandler("SHA-256", keys, cert)
           });
           const raw = await doc.save();
           writeFile(raw, "SignatureBox.Group.spec.invalid.pdf");
@@ -255,7 +308,10 @@ context("SignatureBoxGroup", () => {
           const formattingSate = verify.items[0].states[0] as FormattingState;
           assert.strictEqual(formattingSate.type, "invalid");
           assert.ok(formattingSate.data.error);
-          assert.strictEqual(formattingSate.data.error.message, "The range of bytes points to an incorrect data. EOL contains invalid characters.");
+          assert.strictEqual(
+            formattingSate.data.error.message,
+            "The range of bytes points to an incorrect data. EOL contains invalid characters."
+          );
         });
 
         it("should return invalid state if there are 'Document contains extra bytes after signed data'", async () => {
@@ -266,7 +322,7 @@ context("SignatureBoxGroup", () => {
 
           // Add signature box
           page.addSignatureBox({
-            groupName: "box1",
+            groupName: "box1"
           });
 
           // Save document
@@ -281,7 +337,7 @@ context("SignatureBoxGroup", () => {
               dict.Reason.get().text = "Описание причины";
               dict.Location.get().text = "56.632N 47.928E";
             },
-            containerCreate: signHandler("SHA-256", keys, cert),
+            containerCreate: signHandler("SHA-256", keys, cert)
           });
           let raw = await doc.save();
           raw = BufferSourceConverter.concat(raw, Buffer.from("\n"));
@@ -292,7 +348,10 @@ context("SignatureBoxGroup", () => {
           const formattingSate = verify.items[0].states[0] as FormattingState;
           assert.strictEqual(formattingSate.type, "invalid");
           assert.ok(formattingSate.data.error);
-          assert.strictEqual(formattingSate.data.error.message, "The range of bytes points to an incorrect data. Document contains extra bytes after signed data.");
+          assert.strictEqual(
+            formattingSate.data.error.message,
+            "The range of bytes points to an incorrect data. Document contains extra bytes after signed data."
+          );
         });
       });
       context("ByteRange", () => {
@@ -300,7 +359,7 @@ context("SignatureBoxGroup", () => {
           it(`should return invalid state if ByteRange[${index}] points to incorrect data`, async () => {
             const { doc, page } = await createEmptyDocument();
             page.addSignatureBox({
-              groupName: "box1",
+              groupName: "box1"
             });
             await doc.save();
 
@@ -327,7 +386,7 @@ context("SignatureBoxGroup", () => {
                 }
 
                 return signHandler("SHA-256", keys, cert)(data);
-              },
+              }
             });
             const raw = await doc.save();
             writeFile(raw, "SignatureBox.Group.spec.invalid.pdf");
@@ -337,7 +396,10 @@ context("SignatureBoxGroup", () => {
             const formattingSate = verify.items[0].states[0] as FormattingState;
             assert.strictEqual(formattingSate.type, "invalid");
             assert.ok(formattingSate.data.error);
-            assert.strictEqual(formattingSate.data.error.message, `The range of bytes points to an incorrect data. ByteRange[${index}] points to an incorrect data.`);
+            assert.strictEqual(
+              formattingSate.data.error.message,
+              `The range of bytes points to an incorrect data. ByteRange[${index}] points to an incorrect data.`
+            );
           });
         });
       });

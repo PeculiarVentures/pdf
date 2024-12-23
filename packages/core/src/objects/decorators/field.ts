@@ -4,8 +4,10 @@ import type { PDFObjectTypes } from "../ObjectTypes";
 import { PDFObjectConstructor, PDFObject } from "../Object";
 import { Maybe } from "./Maybe";
 
-
-export interface PDFDictionaryFieldParameters<T extends PDFObjectTypes, TReturn = any> {
+export interface PDFDictionaryFieldParameters<
+  T extends PDFObjectTypes,
+  TReturn = any
+> {
   name: string;
   optional?: boolean;
   type?: abstract new () => T;
@@ -18,7 +20,10 @@ export interface PDFDictionaryFieldParameters<T extends PDFObjectTypes, TReturn 
 }
 const cache = new WeakMap<PDFObject, Map<string | symbol, any>>();
 
-export function PDFDictionaryField<T extends PDFObjectTypes = PDFObjectTypes, TReturn = any>(parameters: PDFDictionaryFieldParameters<T, TReturn>): PropertyDecorator {
+export function PDFDictionaryField<
+  T extends PDFObjectTypes = PDFObjectTypes,
+  TReturn = any
+>(parameters: PDFDictionaryFieldParameters<T, TReturn>): PropertyDecorator {
   return (target: any, propertyKey: string | symbol) => {
     //#region Check parameters
     if ("type" in parameters && !parameters.type) {
@@ -31,7 +36,8 @@ export function PDFDictionaryField<T extends PDFObjectTypes = PDFObjectTypes, TR
     Object.defineProperty(target, propertyKey, {
       enumerable: false,
       get: function (this: PDFDictionary) {
-        let cachedObject: Map<string | symbol, any> | undefined = cache.get(this);
+        let cachedObject: Map<string | symbol, any> | undefined =
+          cache.get(this);
         if (!cachedObject) {
           // Init cashed map
           cachedObject = new Map();
@@ -45,7 +51,12 @@ export function PDFDictionaryField<T extends PDFObjectTypes = PDFObjectTypes, TR
 
         if (parameters.maybe) {
           const type = parameters.type as PDFObjectConstructor<T>;
-          const maybe = new Maybe(this, parameters.name, !!parameters.indirect, type);
+          const maybe = new Maybe(
+            this,
+            parameters.name,
+            !!parameters.indirect,
+            type
+          );
 
           return maybe;
         } else {
@@ -65,8 +76,12 @@ export function PDFDictionaryField<T extends PDFObjectTypes = PDFObjectTypes, TR
             }
 
             return res;
-          } else if (!(parameters.optional || parameters.defaultValue !== undefined)) {
-            throw new Error(`Cannot get required filed '${parameters.name}' from the PDF Dictionary`);
+          } else if (
+            !(parameters.optional || parameters.defaultValue !== undefined)
+          ) {
+            throw new Error(
+              `Cannot get required filed '${parameters.name}' from the PDF Dictionary`
+            );
           }
         }
 
@@ -76,12 +91,18 @@ export function PDFDictionaryField<T extends PDFObjectTypes = PDFObjectTypes, TR
         if (value === undefined || value === null) {
           this.delete(parameters.name);
         } else {
-          const result = parameters.set ? parameters.set.call(this, value) : value;
+          const result = parameters.set
+            ? parameters.set.call(this, value)
+            : value;
 
           if (parameters.type && !(result instanceof parameters.type)) {
-            throw new Error(`PDF Dictionary field '${parameters.name}' contains invalid data type`);
+            throw new Error(
+              `PDF Dictionary field '${parameters.name}' contains invalid data type`
+            );
           } else if (!(result instanceof PDFObject)) {
-            throw new Error(`PDF Dictionary field '${parameters.name}' must be PDF object`);
+            throw new Error(
+              `PDF Dictionary field '${parameters.name}' must be PDF object`
+            );
           }
           if (parameters.indirect) {
             result.makeIndirect();
@@ -94,7 +115,8 @@ export function PDFDictionaryField<T extends PDFObjectTypes = PDFObjectTypes, TR
         this.view = PDFObject.DEFAULT_VIEW;
 
         if (parameters.cache) {
-          let cachedObject: Map<string | symbol, any> | undefined = cache.get(this);
+          let cachedObject: Map<string | symbol, any> | undefined =
+            cache.get(this);
           if (!cachedObject) {
             cachedObject = new Map();
             cache.set(this, cachedObject);

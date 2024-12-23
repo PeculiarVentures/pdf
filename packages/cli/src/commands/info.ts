@@ -2,8 +2,7 @@ import { PDFDocument } from "@peculiarventures/pdf-doc";
 import { Command } from "commander";
 import * as fs from "fs";
 
-export const info = new Command("info")
-  .argument("<pdf file>");
+export const info = new Command("info").argument("<pdf file>");
 
 info.description("Prints PDF document information");
 

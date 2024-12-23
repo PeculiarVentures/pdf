@@ -19,7 +19,7 @@ export enum FieldFlags {
   /**
    * If set, the field shall not be exported by a submit-form action
    */
-  noExport = 1 << 2,
+  noExport = 1 << 2
 }
 
 export interface IFieldDictionary extends PDFDictionary {
@@ -83,8 +83,10 @@ export interface IFieldDictionary extends PDFDictionary {
   aa: AdditionalActionsDictionary | null;
 }
 
-export class PDFField extends objects.PDFDictionary implements IFieldDictionary {
-
+export class PDFField
+  extends objects.PDFDictionary
+  implements IFieldDictionary
+{
   /**
    * The type of field that this dictionary describes
    *
@@ -105,7 +107,7 @@ export class PDFField extends objects.PDFDictionary implements IFieldDictionary 
     name: "Parent",
     type: PDFField,
     optional: true,
-    indirect: true,
+    indirect: true
   })
   public Parent!: PDFField | null;
 
@@ -127,7 +129,7 @@ export class PDFField extends objects.PDFDictionary implements IFieldDictionary 
   @objects.PDFDictionaryField({
     name: "TU",
     type: objects.PDFLiteralString,
-    optional: true,
+    optional: true
   })
   public TU!: objects.PDFLiteralString | null;
 
@@ -137,7 +139,7 @@ export class PDFField extends objects.PDFDictionary implements IFieldDictionary 
   @objects.PDFDictionaryField({
     name: "TM",
     type: objects.PDFLiteralString,
-    optional: true,
+    optional: true
   })
   public tm!: objects.PDFLiteralString | null;
 
@@ -152,7 +154,7 @@ export class PDFField extends objects.PDFDictionary implements IFieldDictionary 
    */
   @objects.PDFDictionaryField({
     name: "V",
-    optional: true,
+    optional: true
   })
   public V!: objects.PDFObjectTypes | null;
 
@@ -161,7 +163,7 @@ export class PDFField extends objects.PDFDictionary implements IFieldDictionary 
    */
   @objects.PDFDictionaryField({
     name: "DV",
-    optional: true,
+    optional: true
   })
   public dv!: objects.PDFObjectTypes | null;
 
@@ -171,7 +173,7 @@ export class PDFField extends objects.PDFDictionary implements IFieldDictionary 
   @objects.PDFDictionaryField({
     name: "AA",
     type: AdditionalActionsDictionary,
-    optional: true,
+    optional: true
   })
   public aa!: AdditionalActionsDictionary | null;
 
@@ -282,5 +284,4 @@ export class PDFField extends objects.PDFDictionary implements IFieldDictionary 
 
     return false;
   }
-
 }

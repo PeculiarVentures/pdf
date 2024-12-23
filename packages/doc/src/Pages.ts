@@ -6,7 +6,7 @@ import { WrapObject } from "./WrapObject";
 
 export enum PDFPageOrientation {
   portrait,
-  landscape,
+  landscape
 }
 
 export interface PDFPagesCreateParameters {
@@ -16,7 +16,6 @@ export interface PDFPagesCreateParameters {
 }
 
 export class PDFPages extends WrapObject<core.PageTreeNodesDictionary> {
-
   [Symbol.iterator](): Iterator<PDFPage, unknown, undefined> {
     let pointer = 0;
     const pages = this.target.getPages();
@@ -27,7 +26,7 @@ export class PDFPages extends WrapObject<core.PageTreeNodesDictionary> {
         if (pointer < pages.length) {
           return {
             done: false,
-            value: new PDFPage(pages[pointer++], doc),
+            value: new PDFPage(pages[pointer++], doc)
           };
         } else {
           return {
@@ -68,13 +67,14 @@ export class PDFPages extends WrapObject<core.PageTreeNodesDictionary> {
   public create({
     orientation = PDFPageOrientation.portrait,
     width = "210mm",
-    height = "297mm",
+    height = "297mm"
   }: PDFPagesCreateParameters = {}): PDFPage {
     const page = core.PageObjectDictionary.create(this.target.documentUpdate!);
 
-    page.MediaBox = orientation === PDFPageOrientation.portrait
-      ? page.createMediaBox(width, height)
-      : page.createMediaBox(height, width);
+    page.MediaBox =
+      orientation === PDFPageOrientation.portrait
+        ? page.createMediaBox(width, height)
+        : page.createMediaBox(height, width);
 
     this.target.addPage(page);
 
@@ -90,9 +90,7 @@ export class PDFPages extends WrapObject<core.PageTreeNodesDictionary> {
   }
 
   public remove(page: PDFPage | number): void {
-    this.target.remove((typeof page === "number")
-      ? page
-      : page.target);
+    this.target.remove(typeof page === "number" ? page : page.target);
   }
 
   public first(): PDFPage | null {
@@ -103,9 +101,7 @@ export class PDFPages extends WrapObject<core.PageTreeNodesDictionary> {
     const pages = this.target.getPages();
     const last = pages[pages.length - 1];
 
-    return last
-      ? new PDFPage(last, this.document)
-      : null;
+    return last ? new PDFPage(last, this.document) : null;
   }
 
   /**
@@ -120,10 +116,12 @@ export class PDFPages extends WrapObject<core.PageTreeNodesDictionary> {
    * @param params An object specifying options for the merge operation.
    * @returns A Promise that resolves when the merge operation is complete.
    */
-  public async append(doc: PDFDocument, params?: copy.PDFCopierAppendParams): Promise<void> {
+  public async append(
+    doc: PDFDocument,
+    params?: copy.PDFCopierAppendParams
+  ): Promise<void> {
     const copier = await copy.PDFCopier.create(this.document.target);
 
     copier.append(doc.target, params);
   }
-
 }

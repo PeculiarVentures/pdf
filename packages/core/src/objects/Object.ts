@@ -76,10 +76,10 @@ export abstract class PDFObject {
     return data instanceof ViewReader
       ? data
       : typeof data === "string"
-      ? new ViewReader(new Uint8Array(Convert.FromBinary(data)))
-      : new ViewReader(
-          BufferSourceConverter.toUint8Array(data).subarray(offset)
-        );
+        ? new ViewReader(new Uint8Array(Convert.FromBinary(data)))
+        : new ViewReader(
+            BufferSourceConverter.toUint8Array(data).subarray(offset)
+          );
   }
 
   public static fromPDF<T extends PDFObject>(

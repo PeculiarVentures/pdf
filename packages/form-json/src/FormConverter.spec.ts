@@ -4,7 +4,6 @@ import { writeFile } from "packages/doc/src/Document.spec";
 import { globalFormConverter } from "./registry";
 
 context("FormConverter", () => {
-
   it("convert file to JSON", async () => {
     const raw = fs.readFileSync("/Users/microshine/Downloads/form.pdf");
     const doc = await PDFDocument.load(raw);
@@ -22,31 +21,30 @@ context("FormConverter", () => {
       {
         name: "Text1",
         type: "text_editor",
-        text: "hello world",
+        text: "hello world"
       },
       {
         name: "Check Box2",
         type: "check_box",
-        checked: true,
+        checked: true
       },
       {
         name: "Check Box3",
         type: "check_box",
-        checked: false,
+        checked: false
       },
       {
         name: "Group4",
         type: "radio_button_group",
-        selected: "Choice2",
+        selected: "Choice2"
       },
       {
         name: "Dropdown5",
         type: "combo_box",
-        selected: ["option2"],
+        selected: ["option2"]
       }
     ]);
 
     writeFile(await doc.save());
   });
-
 });

@@ -4,18 +4,17 @@ import { SignatureReferenceDictionary } from "./SignatureReference";
 
 export enum SignatureType {
   signature = "Sig",
-  timeStamp = "DocTimeStamp",
+  timeStamp = "DocTimeStamp"
 }
 
 export class SignatureDictionary extends objects.PDFDictionary {
-
   /**
    * The type of PDF object that this dictionary describes; if present, shall be Sig for a signature dictionary or
    * DocTimeStamp for a timestamp signature dictionary.
-   * 
-   * The default value is: Sig. 
+   *
+   * The default value is: Sig.
    * @remarks
-   * - Optional if Sig 
+   * - Optional if Sig
    * - Required if DocTimeStamp
    */
   @objects.PDFNameField("Type", true, SignatureType.signature)
@@ -23,7 +22,7 @@ export class SignatureDictionary extends objects.PDFDictionary {
 
   /**
    * The name of the preferred signature handler to use when validating this signature
-   * 
+   *
    * If the Prop_Build entry is not present, it shall be also the
    * name of the signature handler that was used to create the signature. If
    * Prop_Build is present, it may be used to determine the name of the handler that
@@ -34,10 +33,10 @@ export class SignatureDictionary extends objects.PDFDictionary {
   public filter!: string;
 
   /**
-   * A name that describes the encoding of the signature value 
+   * A name that describes the encoding of the signature value
    * and key information in the signature dictionary
-   * 
-   * (PDF 1.6) The following values for public-key cryptographic signatures 
+   *
+   * (PDF 1.6) The following values for public-key cryptographic signatures
    * shall be used: adbe.x509.rsa_sha1, adbe.pkcs7.detached, and adbe.pkcs7.sha1
    */
   @objects.PDFNameField("SubFilter", true)
@@ -48,23 +47,23 @@ export class SignatureDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     type: objects.PDFHexString,
-    name: "Contents",
+    name: "Contents"
   })
   public Contents!: objects.PDFHexString;
 
   /**
    * An array of byte strings that shall represent the X.509 certificate chain used when
-   * signing and verifying signatures that use public-key cryptography, or a byte string 
+   * signing and verifying signatures that use public-key cryptography, or a byte string
    * if the chain has only one entry
    */
   @objects.PDFDictionaryField({
     name: "Cert",
-    optional: true,
+    optional: true
   })
   public cert!: objects.PDFArray | objects.PDFHexString | null;
 
   /**
-   * An array of pairs of integers (starting byte offset, length in bytes) that shall 
+   * An array of pairs of integers (starting byte offset, length in bytes) that shall
    * describe the exact byte range for the digest calculation
    */
   @objects.PDFMaybeField("ByteRange", objects.PDFArray)
@@ -77,14 +76,15 @@ export class SignatureDictionary extends objects.PDFDictionary {
     name: "Reference",
     type: objects.PDFArray,
     cache: true,
-    get: o => o.items.map(ref => {
-      if (!(ref instanceof objects.PDFDictionary)) {
-        throw new TypeError("Unsupported type of the field 'Reference'");
-      }
+    get: (o) =>
+      o.items.map((ref) => {
+        if (!(ref instanceof objects.PDFDictionary)) {
+          throw new TypeError("Unsupported type of the field 'Reference'");
+        }
 
-      return new SignatureReferenceDictionary(ref);
-    }),
-    optional: true,
+        return new SignatureReferenceDictionary(ref);
+      }),
+    optional: true
   })
   public reference!: SignatureReferenceDictionary[] | null;
 
@@ -96,7 +96,7 @@ export class SignatureDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Changes",
     type: objects.PDFArray,
-    optional: true,
+    optional: true
   })
   public changes?: objects.PDFArray;
 
@@ -108,7 +108,7 @@ export class SignatureDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Name",
     type: objects.PDFLiteralString,
-    optional: true,
+    optional: true
   })
   public name!: objects.PDFLiteralString | null;
 
@@ -118,8 +118,8 @@ export class SignatureDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "M",
     type: objects.PDFLiteralString,
-    get: o => new PDFDate(o),
-    optional: true,
+    get: (o) => new PDFDate(o),
+    optional: true
   })
   public signingTime!: PDFDate | null;
 
@@ -142,7 +142,7 @@ export class SignatureDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "ContactInfo",
     type: objects.PDFLiteralString,
-    optional: true,
+    optional: true
   })
   public contactInfo!: objects.PDFLiteralString | null;
 
@@ -152,8 +152,8 @@ export class SignatureDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "R",
     type: objects.PDFNumeric,
-    get: o => o.value,
-    optional: true,
+    get: (o) => o.value,
+    optional: true
   })
   public r!: string | null;
 
@@ -163,8 +163,8 @@ export class SignatureDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "V",
     type: objects.PDFNumeric,
-    get: o => o.value,
-    optional: true,
+    get: (o) => o.value,
+    optional: true
   })
   public v!: string | null;
 
@@ -178,31 +178,31 @@ export class SignatureDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Prop_Build",
     type: objects.PDFDictionary,
-    optional: true,
+    optional: true
   })
   public propBuild!: objects.PDFDictionary | null;
 
   /**
-   * The number of seconds since the signer was last authenticated, 
+   * The number of seconds since the signer was last authenticated,
    * used in claims of signature repudiation
    */
   @objects.PDFDictionaryField({
     name: "Prop_AuthTime",
     type: objects.PDFNumeric,
-    get: o => o.value,
-    optional: true,
+    get: (o) => o.value,
+    optional: true
   })
   public propAuthTime!: number | null;
 
   /**
-   * The method that shall be used to authenticate the signer, 
+   * The method that shall be used to authenticate the signer,
    * used in claims of signature repudiation
    */
   @objects.PDFDictionaryField({
     name: "Prop_AuthType",
     type: objects.PDFName,
-    get: o => o.text,
-    optional: true,
+    get: (o) => o.text,
+    optional: true
   })
   public propAuthType!: string | null;
 
@@ -212,8 +212,7 @@ export class SignatureDictionary extends objects.PDFDictionary {
     const document = this.getDocument();
 
     this.type = SignatureType.signature;
-    this.filter = "Adobe.PPKLite";  
+    this.filter = "Adobe.PPKLite";
     this.Contents = document.createHexString();
   }
-
 }

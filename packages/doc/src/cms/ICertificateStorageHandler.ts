@@ -19,7 +19,6 @@ export interface IsTrustedResult extends IResult<boolean> {
 export type RevocationType = "crl" | "ocsp";
 
 export interface ICertificateStorageHandler {
-
   parent: ICertificateStorageHandler | null;
 
   certificates: X509Certificates;
@@ -32,7 +31,10 @@ export interface ICertificateStorageHandler {
    * @param issuer DER encoded X509 name
    * @returns X509 certificate or null
    */
-  findCertificate(serialNumber: BufferSource, issuer: BufferSource): Promise<X509Certificate | null>;
+  findCertificate(
+    serialNumber: BufferSource,
+    issuer: BufferSource
+  ): Promise<X509Certificate | null>;
 
   /**
    * Returns certificate that has the given subject public key identifier
@@ -41,14 +43,35 @@ export interface ICertificateStorageHandler {
    */
   findCertificate(spki: BufferSource): Promise<X509Certificate | null>;
   // @internal
-  findCertificate(spkiOrSerialNumber: BufferSource, issuer?: BufferSource): Promise<X509Certificate | null>;
+  findCertificate(
+    spkiOrSerialNumber: BufferSource,
+    issuer?: BufferSource
+  ): Promise<X509Certificate | null>;
 
-  findRevocation(type: "crl", cert: X509Certificate): Promise<IResult<CRL | null>>;
-  findRevocation(type: "ocsp", cert: X509Certificate): Promise<IResult<OCSP | null>>;
-  findRevocation(type: RevocationType, cert: X509Certificate): Promise<IResult<CRL | OCSP | null>>;
-  fetchRevocation(type: "crl", cert: X509Certificate): Promise<IResult<CRL | null>>;
-  fetchRevocation(type: "ocsp", cert: X509Certificate): Promise<IResult<OCSP | null>>;
-  fetchRevocation(type: RevocationType, cert: X509Certificate): Promise<IResult<CRL | OCSP | null>>;
+  findRevocation(
+    type: "crl",
+    cert: X509Certificate
+  ): Promise<IResult<CRL | null>>;
+  findRevocation(
+    type: "ocsp",
+    cert: X509Certificate
+  ): Promise<IResult<OCSP | null>>;
+  findRevocation(
+    type: RevocationType,
+    cert: X509Certificate
+  ): Promise<IResult<CRL | OCSP | null>>;
+  fetchRevocation(
+    type: "crl",
+    cert: X509Certificate
+  ): Promise<IResult<CRL | null>>;
+  fetchRevocation(
+    type: "ocsp",
+    cert: X509Certificate
+  ): Promise<IResult<OCSP | null>>;
+  fetchRevocation(
+    type: RevocationType,
+    cert: X509Certificate
+  ): Promise<IResult<CRL | OCSP | null>>;
 
   /**
    * Returns issuer certificate

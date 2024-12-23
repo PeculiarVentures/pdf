@@ -1,8 +1,6 @@
 import * as objects from "../../objects";
 
-
 export class CharacterEncodingDictionary extends objects.PDFDictionary {
-
   public static readonly TYPE = "Encoding";
 
   /**

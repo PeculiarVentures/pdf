@@ -1,7 +1,6 @@
 import { PDFError } from "./Error";
 
 export class ParsingError extends PDFError {
-
   public static override readonly NAME: string = "ParsingError";
 
   public position: number;
@@ -13,5 +12,4 @@ export class ParsingError extends PDFError {
     this.message = message;
     this.position = position;
   }
-
 }

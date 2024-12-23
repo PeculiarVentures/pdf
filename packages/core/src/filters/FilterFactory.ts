@@ -12,7 +12,7 @@ import { LZWFilter } from "./LZWFilter";
 import { RunLengthFilter } from "./RunLengthFilter";
 
 export interface FilterConstructor {
-  new(decodeParams?: PDFDictionary | null): Filter;
+  new (decodeParams?: PDFDictionary | null): Filter;
   NAME: string;
 }
 

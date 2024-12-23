@@ -8,8 +8,10 @@ import { PointDataDictionary } from "./PointDataDictionary";
 import { ResourceDictionary } from "./ResourceDictionary";
 import { XObjectDictionary, XOBJECT_TYPE } from "./XObjectDictionary";
 
-export class FormDictionary extends PDFContentStream implements XObjectDictionary {
-
+export class FormDictionary
+  extends PDFContentStream
+  implements XObjectDictionary
+{
   public static readonly SUBTYPE = "Form";
 
   /**
@@ -42,7 +44,7 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
    */
   @objects.PDFDictionaryField({
     name: "BBox",
-    type: PDFRectangle,
+    type: PDFRectangle
   })
   public bBox!: PDFRectangle;
 
@@ -95,7 +97,7 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
   @objects.PDFDictionaryField({
     name: "Group",
     type: objects.PDFDictionary,
-    optional: true,
+    optional: true
   })
   public group!: objects.PDFDictionary | null;
 
@@ -108,7 +110,7 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
   @objects.PDFDictionaryField({
     name: "Ref",
     type: objects.PDFDictionary,
-    optional: true,
+    optional: true
   })
   public ref!: objects.PDFDictionary | null;
 
@@ -120,7 +122,7 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
   @objects.PDFDictionaryField({
     name: "Metadata",
     type: objects.PDFStream,
-    optional: true,
+    optional: true
   })
   public metadata!: objects.PDFStream | null;
 
@@ -131,7 +133,7 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
   @objects.PDFDictionaryField({
     name: "PieceInfo",
     type: objects.PDFDictionary,
-    optional: true,
+    optional: true
   })
   public pieceInfo!: objects.PDFDictionary | null;
 
@@ -185,7 +187,7 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
   @objects.PDFDictionaryField({
     name: "OPI",
     optional: true,
-    type: OPIDictionary,
+    type: OPIDictionary
   })
   public opi!: OPIDictionary;
 
@@ -201,7 +203,7 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
   @objects.PDFDictionaryField({
     name: "OC",
     optional: true,
-    type: objects.PDFDictionary, // TODO Implement "Optional content" (see 8.11)
+    type: objects.PDFDictionary // TODO Implement "Optional content" (see 8.11)
   })
   public oc!: objects.PDFDictionary;
 
@@ -237,7 +239,7 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
       const MeasureType = MeasureFactory.get(v.subtype);
 
       return new MeasureType(v);
-    },
+    }
   })
   public measure!: MeasureDictionary | null;
 
@@ -249,7 +251,7 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
   @objects.PDFDictionaryField({
     name: "PtData",
     optional: true,
-    type: PointDataDictionary,
+    type: PointDataDictionary
   })
   public ptData!: PointDataDictionary | null;
 
@@ -258,9 +260,14 @@ export class FormDictionary extends PDFContentStream implements XObjectDictionar
 
     this.Type = XOBJECT_TYPE;
     this.Subtype = FormDictionary.SUBTYPE;
-    this.bBox = PDFRectangle.createWithData(this.getDocumentUpdate(), 0, 0, 0, 0);
+    this.bBox = PDFRectangle.createWithData(
+      this.getDocumentUpdate(),
+      0,
+      0,
+      0,
+      0
+    );
     this.formType = 1;
     this.Resources.set(ResourceDictionary.create(this.getDocumentUpdate()));
   }
-
 }

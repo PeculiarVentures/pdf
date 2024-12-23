@@ -5,7 +5,6 @@ import { JsonComponent, JsonComponentUpdate } from "../types";
  * Abstract class representing a ComponentConverter for an IComponent type.
  */
 export abstract class ComponentConverter<T extends pdfDoc.IComponent> {
-
   /**
    * The constructor function for the associated IComponent type.
    */

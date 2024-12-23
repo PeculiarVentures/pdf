@@ -4,14 +4,14 @@ import { PDFNull } from "../Null";
 import { PDFObjectTypes } from "../ObjectTypes";
 
 export class Maybe<T extends PDFObject> {
-
   public static readonly DEFAULT_VIEW = new Uint8Array(0);
 
   constructor(
     public parent: PDFDictionary,
     public name: string,
     public indirect: boolean,
-    private _type: PDFObjectConstructor<T>) { }
+    private _type: PDFObjectConstructor<T>
+  ) {}
 
   /**
    * Gets or creates the internal value. Value creation depends on the `required` filed value.
@@ -21,12 +21,19 @@ export class Maybe<T extends PDFObject> {
    * @returns returns internal value
    */
   public get(required = false, compressed?: boolean): T {
-    if (!this.parent.has(this.name) || this.parent.get(this.name) instanceof PDFNull) {
+    if (
+      !this.parent.has(this.name) ||
+      this.parent.get(this.name) instanceof PDFNull
+    ) {
       if (required) {
-        throw new Error(`Cannot get required field '${this.name}'. Field is empty.`);
+        throw new Error(
+          `Cannot get required field '${this.name}'. Field is empty.`
+        );
       }
       if (!this.parent.documentUpdate) {
-        throw new Error("Parent object doesn't assigned to PDF document update.");
+        throw new Error(
+          "Parent object doesn't assigned to PDF document update."
+        );
       }
 
       const value = this._type.create(this.parent.documentUpdate);
@@ -36,8 +43,8 @@ export class Maybe<T extends PDFObject> {
 
       this.parent
         .modify()
-        .set(this.name, value as unknown as PDFObjectTypes)
-        .view = Maybe.DEFAULT_VIEW;
+        .set(this.name, value as unknown as PDFObjectTypes).view =
+        Maybe.DEFAULT_VIEW;
 
       return value;
     }
@@ -61,5 +68,4 @@ export class Maybe<T extends PDFObject> {
       parent.set(this.name, value as unknown as PDFObjectTypes);
     }
   }
-
 }

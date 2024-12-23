@@ -19,10 +19,12 @@ function getCount(this: PageTreeNodesDictionary, o: objects.PDFNumeric) {
 }
 
 export class PageTreeNodesDictionary extends PageDictionary {
-
   public static readonly TYPE = "Pages";
 
-  public static createWithData(target: PDFDocument | PDFDocumentUpdate, ...items: Array<PageTreeNodesDictionary | PageObjectDictionary>): PageTreeNodesDictionary {
+  public static createWithData(
+    target: PDFDocument | PDFDocumentUpdate,
+    ...items: Array<PageTreeNodesDictionary | PageObjectDictionary>
+  ): PageTreeNodesDictionary {
     const res = this.create(target);
 
     res.push(...items);
@@ -42,7 +44,7 @@ export class PageTreeNodesDictionary extends PageDictionary {
   @objects.PDFDictionaryField({
     name: "Parent",
     type: PageTreeNodesDictionary,
-    optional: true,
+    optional: true
   })
   public Parent!: PageTreeNodesDictionary | null;
 
@@ -60,7 +62,7 @@ export class PageTreeNodesDictionary extends PageDictionary {
     name: "Count",
     type: objects.PDFNumeric,
     get: getCount,
-    set: setCount,
+    set: setCount
   })
   public Count!: number;
 
@@ -84,7 +86,10 @@ export class PageTreeNodesDictionary extends PageDictionary {
     return this.Kids.indexOf(page);
   }
 
-  public insertBefore(newPage: PageObjectDictionary, refPage?: PageObjectDictionary): void {
+  public insertBefore(
+    newPage: PageObjectDictionary,
+    refPage?: PageObjectDictionary
+  ): void {
     this.modify();
     newPage.makeIndirect();
 
@@ -127,7 +132,9 @@ export class PageTreeNodesDictionary extends PageDictionary {
    * @returns
    * @deprecated
    */
-  public async addPageOld(page?: PageObjectDictionary | PDFDocumentObject): Promise<PDFDocumentObject> {
+  public async addPageOld(
+    page?: PageObjectDictionary | PDFDocumentObject
+  ): Promise<PDFDocumentObject> {
     this.modify();
     const documentUpdate = this.getDocumentUpdate();
     let pageDictionary: PageObjectDictionary;
@@ -156,7 +163,9 @@ export class PageTreeNodesDictionary extends PageDictionary {
             throw new Error("The page must contain the Page type");
           }
         } else {
-          throw new Error("The PDFDocumentObject must contain PageObjectDictionary");
+          throw new Error(
+            "The PDFDocumentObject must contain PageObjectDictionary"
+          );
         }
       } else {
         pageDictionary = page;
@@ -174,13 +183,19 @@ export class PageTreeNodesDictionary extends PageDictionary {
       this.Count++;
 
       // Download all indirect references of object
-      if (page.documentUpdate && page.documentUpdate.document !== documentUpdate.document) {
+      if (
+        page.documentUpdate &&
+        page.documentUpdate.document !== documentUpdate.document
+      ) {
         await this.copyAllRef(addedPage, page.documentUpdate);
       }
 
       // Set our parent to page
       const ref = this.ownerElement as objects.PDFIndirect;
-      addedPageValue.set("Parent", new objects.PDFIndirectReference(ref.id, ref.generation));
+      addedPageValue.set(
+        "Parent",
+        new objects.PDFIndirectReference(ref.id, ref.generation)
+      );
 
       return addedPage;
     }
@@ -194,7 +209,12 @@ export class PageTreeNodesDictionary extends PageDictionary {
    * @param key
    * @returns
    */
-  public async copyAllRef(element: PDFDocumentObject | objects.PDFObject, secondUpdate: PDFDocumentUpdate, references: Map<string, { id: number, generation: number; }> = new Map(), key?: string): Promise<void> {
+  public async copyAllRef(
+    element: PDFDocumentObject | objects.PDFObject,
+    secondUpdate: PDFDocumentUpdate,
+    references: Map<string, { id: number; generation: number }> = new Map(),
+    key?: string
+  ): Promise<void> {
     if (element instanceof PDFDocumentObject) {
       // PDFDocumentObject
       await this.copyAllRef(element.value, secondUpdate, references);
@@ -218,7 +238,10 @@ export class PageTreeNodesDictionary extends PageDictionary {
           // Update PDFIndirectReference
           element.id = newObj.id;
           element.generation = newObj.generation;
-          references.set(mapRef, { id: newObj.id, generation: newObj.generation });
+          references.set(mapRef, {
+            id: newObj.id,
+            generation: newObj.generation
+          });
           // console.log(mapRef);
 
           await this.copyAllRef(newObj, secondUpdate, references);
@@ -283,7 +306,9 @@ export class PageTreeNodesDictionary extends PageDictionary {
     return res;
   }
 
-  public push(...items: Array<PageTreeNodesDictionary | PageObjectDictionary>): void {
+  public push(
+    ...items: Array<PageTreeNodesDictionary | PageObjectDictionary>
+  ): void {
     this.modify();
 
     for (const item of items) {
@@ -303,7 +328,6 @@ export class PageTreeNodesDictionary extends PageDictionary {
       }
     }
   }
-
 }
 
 import { PageObjectDictionary } from "./PageObject";

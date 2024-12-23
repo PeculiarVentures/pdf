@@ -52,7 +52,6 @@ export interface TextDrawParams {
 }
 
 export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
-
   #resources?: ResourceManager;
   #content?: core.PDFContentStream;
 
@@ -66,7 +65,10 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
 
   public get resources(): ResourceManager {
     if (!this.#resources) {
-      this.#resources = new ResourceManager(this.target.Resources, this.document);
+      this.#resources = new ResourceManager(
+        this.target.Resources,
+        this.document
+      );
     }
 
     return this.#resources;
@@ -101,7 +103,8 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
   }
 
   public set rightPadding(value: core.TypographySize) {
-    this.getOrCreateCropBox().urX = this.width - core.TypographyConverter.toPoint(value);
+    this.getOrCreateCropBox().urX =
+      this.width - core.TypographyConverter.toPoint(value);
   }
 
   public get topPadding(): number {
@@ -109,7 +112,8 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
   }
 
   public set topPadding(value: core.TypographySize) {
-    this.getOrCreateCropBox().urY = this.height - core.TypographyConverter.toPoint(value);
+    this.getOrCreateCropBox().urY =
+      this.height - core.TypographyConverter.toPoint(value);
   }
 
   public get bottomPadding(): number {
@@ -122,14 +126,22 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
 
   protected getOrCreateCropBox(): core.PDFRectangle {
     if (!this.target.CropBox) {
-      this.target.CropBox = this.document.target.createRectangle(0, 0, this.width, this.height);
+      this.target.CropBox = this.document.target.createRectangle(
+        0,
+        0,
+        this.width,
+        this.height
+      );
     }
 
     return this.target.CropBox;
   }
 
-  public addCheckBox(params: forms.ICheckBoxCreateParameters = {}): forms.CheckBox {
-    params.top = this.height - core.TypographyConverter.toPoint(params.top || 0);
+  public addCheckBox(
+    params: forms.ICheckBoxCreateParameters = {}
+  ): forms.CheckBox {
+    params.top =
+      this.height - core.TypographyConverter.toPoint(params.top || 0);
 
     const widget = this.document.checkBoxHandler.create(params);
 
@@ -147,8 +159,11 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
     return res;
   }
 
-  public addRadioButton(params: forms.IRadioButtonCreateParameters): forms.RadioButton {
-    params.top = this.height - core.TypographyConverter.toPoint(params.top || 0);
+  public addRadioButton(
+    params: forms.IRadioButtonCreateParameters
+  ): forms.RadioButton {
+    params.top =
+      this.height - core.TypographyConverter.toPoint(params.top || 0);
 
     const groupName = params.group || core.UUID.generate();
     const group = this.document.radioButtonHandler.getOrCreateGroup(groupName);
@@ -170,8 +185,11 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
     return res;
   }
 
-  public addTextEditor(params: forms.TextEditorCreateParameters): forms.TextEditor {
-    params.top = this.height - core.TypographyConverter.toPoint(params.top || 0);
+  public addTextEditor(
+    params: forms.TextEditorCreateParameters
+  ): forms.TextEditor {
+    params.top =
+      this.height - core.TypographyConverter.toPoint(params.top || 0);
 
     const widget = this.document.textEditorHandler.create(params);
 
@@ -214,7 +232,9 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
         contents.items[contents.length - 1] = contentStream;
       } else {
         // Create new content stream);
-        contentStream = core.PDFContentStream.create(this.document.target.update);
+        contentStream = core.PDFContentStream.create(
+          this.document.target.update
+        );
         contents.push(contentStream);
       }
     }
@@ -240,8 +260,11 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
     return contentStream;
   }
 
-  public addInputImageBox(params: forms.InputImageBoxCreateParameters): forms.InputImageBox {
-    params.top = this.height - core.TypographyConverter.toPoint(params.top || 0);
+  public addInputImageBox(
+    params: forms.InputImageBoxCreateParameters
+  ): forms.InputImageBox {
+    params.top =
+      this.height - core.TypographyConverter.toPoint(params.top || 0);
 
     const widget = this.document.inputImageHandler.create(params);
 
@@ -254,8 +277,11 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
     return component;
   }
 
-  public addSignatureBox(params: forms.ISignatureBoxCreateParameters = {}): forms.SignatureBox {
-    params.top = this.height - core.TypographyConverter.toPoint(params.top || 0);
+  public addSignatureBox(
+    params: forms.ISignatureBoxCreateParameters = {}
+  ): forms.SignatureBox {
+    params.top =
+      this.height - core.TypographyConverter.toPoint(params.top || 0);
 
     const widget = this.document.signatureBoxHandler.create(params);
 
@@ -273,7 +299,7 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
   public addComboBox(params: forms.ComboBoxCreateParameters): forms.ComboBox {
     const paramsCopy = {
       ...params,
-      top: this.height - core.TypographyConverter.toPoint(params.top || 0),
+      top: this.height - core.TypographyConverter.toPoint(params.top || 0)
     };
 
     const widget = this.document.comboBoxHandler.create(paramsCopy);
@@ -295,18 +321,21 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
       comboBox.options = params.options;
     }
     if (params.selected) {
-      comboBox.selected = typeof params.selected === "string" ? [params.selected] : params.selected;
+      comboBox.selected =
+        typeof params.selected === "string"
+          ? [params.selected]
+          : params.selected;
     }
 
     // AP
-    comboBox.target.MK.get().BG = this.document.target.createArray(doc.createNumber(1));
+    comboBox.target.MK.get().BG = this.document.target.createArray(
+      doc.createNumber(1)
+    );
     const helv = this.document.addFont(fonts.DefaultFonts.Helvetica);
     comboBox.font = helv;
     comboBox.fontSize = 12;
     comboBox.textColor = 0;
 
-
     return comboBox;
   }
-
 }
