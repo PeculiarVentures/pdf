@@ -330,7 +330,9 @@ describe("NameTree", () => {
 
   describe("setValue", () => {
     it("Root with Names", () => {
-      const doc = PDFDocument.create();
+      const doc = PDFDocument.create({
+        xref: XrefStructure.Table
+      });
       const tree = NameTree.create(doc);
       tree.Names = doc.createArray();
 
