@@ -47,7 +47,7 @@ export interface EmbeddedTimestampState extends SignatureState {
 export interface SigningTimeState extends SignatureState {
   code: "signing_time";
   data: {
-    type: "local" | "empty" | "embedded";
+    type: "local" | "empty" | "embedded" | "dss";
   };
 }
 
@@ -69,7 +69,7 @@ export interface LocalSigningTimeState extends SigningTimeState {
 export interface EmbeddedSigningTimeState extends SigningTimeState {
   type: "valid" | "invalid";
   data: {
-    type: "embedded";
+    type: "embedded" | "dss";
     date: Date;
     signature?: cms.CMSSignedDataVerifyResult;
     signer?: X509Certificate;
@@ -138,19 +138,35 @@ export type SignatureStates =
   | LtvState
   | DocumentModificationState;
 
+/**
+ * Result of signature verification
+ */
 export interface SignatureVerifyResult {
+  /** CMS signed data object */
   signedData: cms.CMSSignedData | null;
+  /** Overall verification result */
   verificationResult: boolean;
+  /** Optional verification message */
   message?: string;
+  /** The date to check the signature */
   checkDate: Date | null;
+  /** Indicates if signature uses SHA-1 algorithm */
   hasSHA1: boolean;
+  /** Signer's name */
   name: string | null;
+  /** Signing location */
   location: string | null;
+  /** Signing reason */
   reason: string | null;
+  /** Date and time when signature was created */
   signingTime: Date | null;
+  /** Type of the signature */
   signatureType: SignatureType;
+  /** Signer's certificate */
   signerCertificate: X509Certificate | null;
+  /** Certificate validation chain result */
   certificatePath?: cms.CertificateChainResult;
+  /** Array of signature validation states */
   states: SignatureStates[];
 }
 

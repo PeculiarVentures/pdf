@@ -266,7 +266,9 @@ export class SignatureBoxGroup extends FormComponentGroup<
 
         const timeStamp = await this.getTimeStamp(signedData);
         const signingTime = await this.getSigningTime(
-          signedData instanceof cms.TimeStampToken ? signedData : timeStamp
+          signedData instanceof cms.TimeStampToken
+            ? signedData
+            : timeStamp?.value
         );
 
         result.signingTime = signingTime;
@@ -277,8 +279,9 @@ export class SignatureBoxGroup extends FormComponentGroup<
 
         const verificationResult = await signer.verify(content, checkDate);
 
-        const modificationState =
-          await this.verifyModification(verificationResult);
+        const modificationState = await this.verifyModification(
+          verificationResult
+        );
         result.states.push(modificationState);
 
         //Check signature for "signature-time-stamp" attribute
@@ -609,11 +612,12 @@ export class SignatureBoxGroup extends FormComponentGroup<
     checkDate
   }: types.VerifySigningTimeParams): Promise<types.SigningTimeStates> {
     if (signedData) {
-      const timeStamp = await this.getTimeStamp(signedData);
+      const timeStampRes = await this.getTimeStamp(signedData);
       const signer = this.getSigner(signedData);
 
-      if (timeStamp) {
+      if (timeStampRes) {
         // Embedded timestamp
+        const { source, value: timeStamp } = timeStampRes;
         timeStamp.certificateHandler.parent = signedData.certificateHandler;
         const tsaResult = await timeStamp.verify(
           signer.asn.signature.valueBlock.valueHex,
@@ -621,10 +625,13 @@ export class SignatureBoxGroup extends FormComponentGroup<
         );
         const state: types.EmbeddedSigningTimeState = {
           type: "valid",
-          text: "The signature includes an embedded timestamp",
+          text:
+            source === "embedded"
+              ? "The signature includes an embedded timestamp"
+              : "The signature includes a timestamp embedded in the document",
           code: "signing_time",
           data: {
-            type: "embedded",
+            type: source,
             date: timeStamp.info.genTime,
             signature: tsaResult,
             info: tsaResult.info
@@ -656,6 +663,8 @@ export class SignatureBoxGroup extends FormComponentGroup<
           state.data.chain &&
           state.data.chain.resultCode === cms.CertificateChainStatusCode.badDate
         ) {
+          // * Not testable: timestamp validation always uses token's own date
+          // TODO: Remove this check if it is not needed
           state.text += " but it is expired";
         } else if (
           !tsaResult.signatureVerified ||
@@ -722,9 +731,10 @@ export class SignatureBoxGroup extends FormComponentGroup<
     return signer;
   }
 
-  protected async getTimeStamp(
-    signedData: cms.CMSSignedData
-  ): Promise<cms.TimeStampToken | null> {
+  protected async getTimeStamp(signedData: cms.CMSSignedData): Promise<{
+    source: "embedded" | "dss";
+    value: cms.TimeStampToken;
+  } | null> {
     const signer = signedData.signers[0];
     const tsa = signer.unsignedAttributes.find(
       (o) => o instanceof cms.TimeStampTokenAttribute
@@ -735,10 +745,16 @@ export class SignatureBoxGroup extends FormComponentGroup<
       if (vri && vri.TS) {
         const raw = await vri.TS.decode();
 
-        return cms.TimeStampToken.fromBER(raw);
+        return {
+          source: "dss",
+          value: cms.TimeStampToken.fromBER(raw)
+        };
       }
     } else {
-      return tsa.token;
+      return {
+        source: "embedded",
+        value: tsa.token
+      };
     }
 
     return null;
