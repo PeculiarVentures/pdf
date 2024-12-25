@@ -89,7 +89,9 @@ describe("Document", () => {
     });
 
     it("Delete obj", async () => {
-      const doc = PDFDocument.create();
+      const doc = PDFDocument.create({
+        xref: XrefStructure.Table
+      });
 
       const obj142 = doc.append(new PDFNumeric(142));
 
