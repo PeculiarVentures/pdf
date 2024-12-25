@@ -2,7 +2,7 @@ import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 import * as pkijs from "pkijs";
 
 import type { clientSideParametersPublicKey } from "../encryption/Constants";
-import type { PageObjectDictionary } from "./dictionaries";
+import type { CatalogDictionary, PageObjectDictionary } from "./dictionaries";
 import type { ViewReader } from "../ViewReader";
 import { EncryptionFactory, EncryptionHandler } from "../encryption";
 
@@ -75,6 +75,15 @@ export class PDFDocument {
   public update = new PDFDocumentUpdate(this);
 
   public options: DocumentOptions = {};
+
+  public get catalog(): CatalogDictionary {
+    const catalog = this.update.catalog;
+    if (!catalog) {
+      throw new Error("Catalog is not found");
+    }
+
+    return catalog;
+  }
 
   #encryptHandler?: EncryptionHandler | null;
   public get encryptHandler(): EncryptionHandler | null {
