@@ -41,12 +41,16 @@ export class PdfRenderingHelper {
     }
   };
 
-  static async load(buffer: BufferSource): Promise<PdfRenderingHelper> {
+  static async load(
+    buffer: BufferSource,
+    password?: string
+  ): Promise<PdfRenderingHelper> {
     const data = BufferSourceConverter.toUint8Array(buffer).slice(); // pdfjs modifies the buffer
     const doc = await pdfjs.getDocument({
       data,
       cMapUrl: this.CANVAS_PARAMS.url.cMapUrl,
       cMapPacked: true,
+      password,
       standardFontDataUrl: this.CANVAS_PARAMS.url.standardFontDataUrl
     }).promise;
 
@@ -82,9 +86,10 @@ export class PdfRenderingHelper {
   static async getPageHash(
     buffer: BufferSource,
     pageNumber = 1,
-    writeFile?: boolean
+    writeFile?: boolean,
+    password?: string
   ): Promise<string> {
-    const pdf = await PdfRenderingHelper.load(buffer);
+    const pdf = await PdfRenderingHelper.load(buffer, password);
     const hash = await pdf.getPageHash(pageNumber, writeFile);
 
     if (writeFile) {
