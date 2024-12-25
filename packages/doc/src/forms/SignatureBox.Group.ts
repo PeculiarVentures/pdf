@@ -379,7 +379,7 @@ export class SignatureBoxGroup extends FormComponentGroup<
               result.verificationResult = false;
               result.states.push({
                 type: "info",
-                text: "Signer's identity has not yet been verified",
+                text: "The signer's identity has not been verified yet",
                 code: "identity_verification",
                 data: {
                   state: "not_verified",
@@ -792,7 +792,7 @@ export class SignatureBoxGroup extends FormComponentGroup<
         return {
           type: "warn",
           code: "formatting",
-          text: "Document structure doesn't match PDF specification.",
+          text: "Document structure doesn't match PDF specification",
           data: {}
         };
       }
