@@ -1,16 +1,21 @@
 import * as x509 from "@peculiar/x509";
 import * as core from "@peculiarventures/pdf-core";
 import {
+  AdobeRevocationInfoArchival,
   CertificateID,
+  CmsAttribute,
   CMSContentType,
   CMSSignedData,
   ContentTypeAttribute,
   CRL,
+  DocumentModificationState,
   EmbeddedSigningTimeState,
   FormattingState,
+  LtvState,
   MessageDigestAttribute,
   OCSP,
   PDFDocument,
+  RevocationData,
   SignatureBoxGroup,
   SignatureStates,
   SignatureVerifyResult,
@@ -23,6 +28,7 @@ import {
 import {
   createPdfWithPage,
   getTimeStampToken,
+  PdfRenderingHelper,
   RootCertificateStorageHandler
 } from "@peculiarventures/pdf-tests";
 import { BufferSourceConverter, Convert } from "pvtsutils";
@@ -248,7 +254,10 @@ describe("SignatureBoxGroup", () => {
       hash: "SHA-256"
     };
     let digicertCaCert: x509.X509Certificate;
-    let caCert: x509.X509Certificate;
+    let rootCert: x509.X509Certificate;
+    let intermediateCert: x509.X509Certificate;
+    let intermediateCrl: CRL;
+    let intermediateOcsp: OCSP;
     let leafCert: x509.X509Certificate;
     let leafCrl: CRL;
     let leafOcsp: OCSP;
@@ -259,14 +268,14 @@ describe("SignatureBoxGroup", () => {
       //   "sign",
       //   "verify"
       // ]);
-      // caCert = await x509.X509CertificateGenerator.createSelfSigned({
+      // rootCert = await x509.X509CertificateGenerator.createSelfSigned({
       //   name: "CN=Test CA, O=Signing",
       //   notBefore: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30), // 30 days
       //   notAfter: new Date(Date.now() + 1000 * 60 * 60 * 24 * 10 * 365), // 10 years
       //   keys: caKeys,
       //   signingAlgorithm: signingAlg,
       //   extensions: [
-      //     new x509.BasicConstraintsExtension(true, 0, true),
+      //     new x509.BasicConstraintsExtension(true, 1, true),
       //     new x509.KeyUsagesExtension(
       //       x509.KeyUsageFlags.keyCertSign |
       //         x509.KeyUsageFlags.cRLSign |
@@ -283,14 +292,15 @@ describe("SignatureBoxGroup", () => {
       //     )
       //   ]
       // });
-      // caCert.privateKey = caKeys.privateKey;
-      // console.log(caCert.toString());
+      // rootCert.privateKey = caKeys.privateKey;
+      // console.log(rootCert.toString());
       // const pkcs8 = await crypto.subtle.exportKey("pkcs8", caKeys.privateKey);
       // const pkcs8Pem = x509.PemConverter.encode(pkcs8, "PRIVATE KEY");
       // console.log(pkcs8Pem);
       // const spki = await crypto.subtle.exportKey("spki", caKeys.publicKey);
       // const spkiPem = x509.PemConverter.encode(spki, "PUBLIC KEY");
       // console.log(spkiPem);
+
       digicertCaCert = new x509.X509Certificate(
         [
           "MIIDtzCCAp+gAwIBAgIQDOfg5RfYRv6P5WD8G/AwOTANBgkqhkiG9w0BAQUFADBlMQswCQYDVQQGEwJV",
@@ -312,26 +322,27 @@ describe("SignatureBoxGroup", () => {
         ].join("")
       );
 
-      caCert = new x509.X509Certificate(
+      rootCert = new x509.X509Certificate(
         [
-          "MIIBrDCCAVKgAwIBAgIQBRJIitlrypgYVKnoWO58wDAKBggqhkjOPQQDAjAkMRAw",
-          "DgYDVQQDEwdUZXN0IENBMRAwDgYDVQQKEwdTaWduaW5nMB4XDTI0MTEyNDIwMTM1",
-          "N1oXDTM0MTIyMjIwMTM1N1owJDEQMA4GA1UEAxMHVGVzdCBDQTEQMA4GA1UEChMH",
-          "U2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABEmIG3YlTA/tBUKC6ovw",
-          "30ubyphb2XlC5AOTTnpcGu4Gz0UJ15R7ojUTRjJnBMTvBFnX+pOysbHgkul00/ci",
-          "o2ijZjBkMBIGA1UdEwEB/wQIMAYBAf8CAQAwDgYDVR0PAQH/BAQDAgGGMB0GA1Ud",
-          "DgQWBBQczEe+lpBwQscNG83aOaesdB4jpDAfBgNVHSMEGDAWgBQczEe+lpBwQscN",
-          "G83aOaesdB4jpDAKBggqhkjOPQQDAgNIADBFAiEAt2q3W9XBZlbxokHQJMPD5q1e",
-          "bYiRDXJUFZ9Ii2HD2YUCIEgjPUknspJuqJe06XaX6fTscdt8aURK6amGYn0qWVL5"
+          "MIIBrTCCAVKgAwIBAgIQDNGxhTp+lvzzRF85TTjTyjAKBggqhkjOPQQDAjAkMRAw",
+          "DgYDVQQDEwdUZXN0IENBMRAwDgYDVQQKEwdTaWduaW5nMB4XDTI0MTEyNTAxMDgz",
+          "MVoXDTM0MTIyMzAxMDgzMVowJDEQMA4GA1UEAxMHVGVzdCBDQTEQMA4GA1UEChMH",
+          "U2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABBPA1Nu/qbz9FXX0J7ib",
+          "afr/fyUC4pItcjrceS4AocPLL/fxyYaxkzNbiy7HFj1RDnuA31DyoFcs3j8Rk/bd",
+          "aDKjZjBkMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYDVR0PAQH/BAQDAgGGMB0GA1Ud",
+          "DgQWBBQs9JVbGFuyO7sJw3+GDolRftk0ujAfBgNVHSMEGDAWgBQs9JVbGFuyO7sJ",
+          "w3+GDolRftk0ujAKBggqhkjOPQQDAgNJADBGAiEA37yRwv9/Z/IanoM/zkKgAAuv",
+          "3psn+rLc1y2PAY7BhfwCIQCtZZ76VDAHlau1etKGyNuwEqxJLey1UxlzXR2274e3",
+          "+w=="
         ].join("")
       );
-      caCert.privateKey = await crypto.subtle.importKey(
+      rootCert.privateKey = await crypto.subtle.importKey(
         "pkcs8",
         Convert.FromBase64(
           [
-            "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgZ2jxtIkGb00CpbOk",
-            "kBBUXQKlYVN5SUraifGQ8qVA6sGhRANCAARJiBt2JUwP7QVCguqL8N9Lm8qYW9l5",
-            "QuQDk056XBruBs9FCdeUe6I1E0YyZwTE7wRZ1/qTsrGx4JLpdNP3IqNo"
+            "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgXWn0lBforfLExCzT",
+            "RB7I1DagoCYiy7UvTbnRMMzNks2hRANCAAQTwNTbv6m8/RV19Ce4m2n6/38lAuKS",
+            "LXI63HkuAKHDyy/38cmGsZMzW4suxxY9UQ57gN9Q8qBXLN4/EZP23Wgy"
           ].join("")
         ),
         keyAlg,
@@ -339,17 +350,79 @@ describe("SignatureBoxGroup", () => {
         ["sign"]
       );
 
+      const intermediateKeys = await crypto.subtle.generateKey(keyAlg, false, [
+        "sign",
+        "verify"
+      ]);
+      intermediateCert = await x509.X509CertificateGenerator.create({
+        subject: "CN=Test Intermediate, O=Signing",
+        issuer: rootCert.subject,
+        notBefore: new Date(Date.now() - 1000 * 60 * 60 * 24 * 14), // 14 days
+        notAfter: new Date(Date.now() + 1000 * 60 * 60 * 24 * 76), // 76 days
+        publicKey: intermediateKeys.publicKey,
+        signingKey: rootCert.privateKey,
+        signingAlgorithm: signingAlg,
+        extensions: [
+          new x509.BasicConstraintsExtension(true, 0, true),
+          new x509.KeyUsagesExtension(
+            x509.KeyUsageFlags.digitalSignature |
+              x509.KeyUsageFlags.keyCertSign |
+              x509.KeyUsageFlags.cRLSign,
+            true
+          ),
+          await x509.AuthorityKeyIdentifierExtension.create(
+            rootCert.publicKey,
+            false
+          ),
+          await x509.SubjectKeyIdentifierExtension.create(
+            intermediateKeys.publicKey,
+            false
+          )
+        ]
+      });
+      intermediateCert.privateKey = intermediateKeys.privateKey;
+
+      const interCrl = await x509.X509CrlGenerator.create({
+        issuer: rootCert.subject,
+        thisUpdate: new Date(),
+        nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
+        signingKey: rootCert.privateKey,
+        signingAlgorithm: signingAlg
+      });
+      intermediateCrl = CRL.fromBER(interCrl.rawData);
+
+      intermediateOcsp = await OCSP.create({
+        issuer: rootCert,
+        producedAt: new Date(),
+        responses: [
+          {
+            certId: await CertificateID.create(
+              "SHA-1",
+              intermediateCert,
+              rootCert
+            ),
+            status: {
+              type: "good"
+            },
+            thisUpdate: new Date(),
+            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365) // 1 year
+          }
+        ],
+        signingKey: rootCert.privateKey,
+        signingAlgorithm: signingAlg
+      });
+
       const leafKeys = await crypto.subtle.generateKey(keyAlg, false, [
         "sign",
         "verify"
       ]);
       leafCert = await x509.X509CertificateGenerator.create({
         subject: "CN=Test Leaf, O=Signing",
-        issuer: caCert.subject,
+        issuer: intermediateCert.subject,
         notBefore: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), // 7 days
         notAfter: new Date(Date.now() + 1000 * 60 * 60 * 24 * 23), // 23 days
         publicKey: leafKeys.publicKey,
-        signingKey: caCert.privateKey,
+        signingKey: intermediateCert.privateKey,
         signingAlgorithm: signingAlg,
         extensions: [
           // new x509.BasicConstraintsExtension(false, undefined, true),
@@ -359,7 +432,7 @@ describe("SignatureBoxGroup", () => {
             true
           ),
           await x509.AuthorityKeyIdentifierExtension.create(
-            caCert.publicKey,
+            intermediateKeys.publicKey,
             false
           ),
           await x509.SubjectKeyIdentifierExtension.create(
@@ -380,20 +453,24 @@ describe("SignatureBoxGroup", () => {
       leafCert.privateKey = leafKeys.privateKey;
 
       const crl = await x509.X509CrlGenerator.create({
-        issuer: caCert.subject,
+        issuer: intermediateCert.subject,
         thisUpdate: new Date(),
         nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
-        signingKey: caCert.privateKey,
+        signingKey: intermediateCert.privateKey,
         signingAlgorithm: signingAlg
       });
       leafCrl = CRL.fromBER(crl.rawData);
 
       leafOcsp = await OCSP.create({
-        issuer: caCert,
+        issuer: intermediateCert,
         producedAt: new Date(),
         responses: [
           {
-            certId: await CertificateID.create("SHA-1", leafCert, caCert),
+            certId: await CertificateID.create(
+              "SHA-1",
+              leafCert,
+              intermediateCert
+            ),
             status: {
               type: "good"
             },
@@ -401,99 +478,161 @@ describe("SignatureBoxGroup", () => {
             nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365) // 1 year
           }
         ],
-        signingKey: caCert.privateKey,
+        signingKey: intermediateCert.privateKey,
         signingAlgorithm: signingAlg
       });
     });
 
-    describe("signing time", () => {
-      async function createSignedDocument(
-        options: {
-          signingTime?: "local" | "embedded" | "dss" | "empty";
-          invalidateTimestamp?: boolean;
-        } = {}
-      ) {
-        const doc = await PDFDocument.create();
-        const page = doc.pages.create();
-        const box = page.addSignatureBox({ groupName: "box1" });
-        await doc.save();
+    async function createSignedDocument(
+      options: {
+        /** Revocation method. Default is "crl" */
+        revocation?: "crl" | "ocsp" | "none" | "one-missing";
+        revocationStore?: "dss" | "cms" | "adobe-attr";
+        signingTime?: "local" | "embedded" | "dss" | "empty";
+        invalidateTimestamp?: boolean;
+      } = {}
+    ) {
+      options.revocation ??= "crl";
+      options.revocationStore ??= "dss";
 
-        let timeStampToken: TimeStampToken | null = null;
-        const signature = await box.sign({
-          containerSize: 8192,
-          dictionaryUpdate: async (dict) => {
-            dict.subFilter = "ETSI.CAdES.detached";
-            dict.Reason.get().text = "Test Reason";
-            dict.Location.get().text = "Test Location";
-            if (options.signingTime === "local") {
-              dict.signingTime = core.PDFDate.createDate(
-                doc.target,
-                new Date()
-              );
-            }
-          },
-          containerCreate: async (data) => {
-            const signedData = new CMSSignedData();
-            const hash = await crypto.subtle.digest("SHA-256", data);
-            const signer = signedData.createSigner(leafCert, {
-              digestAlgorithm: "SHA-256",
-              signedAttributes: [
-                new ContentTypeAttribute(CMSContentType.data),
-                new MessageDigestAttribute(hash),
-                await SigningCertificateV2Attribute.create("SHA-256", leafCert)
-              ]
-            });
+      const doc = await PDFDocument.create();
+      const page = doc.pages.create();
+      const box = page.addSignatureBox({ groupName: "box1" });
+      await doc.save();
 
-            signedData.certificates.push(leafCert);
-            await signedData.sign(leafCert.privateKey!, signer);
-
-            if (
-              options.signingTime === "embedded" ||
-              options.signingTime === "dss"
-            ) {
-              timeStampToken = await getTimeStampToken(
-                options.invalidateTimestamp
-                  ? new Uint8Array([0]) // invalid signature value
-                  : signedData.signers[0].signatureValue
-              );
-              if (options.signingTime === "embedded") {
-                signedData.signers[0].unsignedAttributes.push(
-                  new TimeStampTokenAttribute(timeStampToken)
-                );
-              }
-            }
-
-            return signedData.toBER();
+      let timeStampToken: TimeStampToken | null = null;
+      const signature = await box.sign({
+        containerSize: 8192,
+        dictionaryUpdate: async (dict) => {
+          dict.subFilter = "ETSI.CAdES.detached";
+          dict.Reason.get().text = "Test Reason";
+          dict.Location.get().text = "Test Location";
+          if (options.signingTime === "local") {
+            dict.signingTime = core.PDFDate.createDate(doc.target, new Date());
           }
-        });
+        },
+        containerCreate: async (data) => {
+          const signedData = new CMSSignedData();
+          const hash = await crypto.subtle.digest("SHA-256", data);
+          const signedAttributes: CmsAttribute[] = [
+            new ContentTypeAttribute(CMSContentType.data),
+            new MessageDigestAttribute(hash),
+            await SigningCertificateV2Attribute.create("SHA-256", leafCert)
+          ];
 
-        const signatureThumbprint = await signature.thumbprint();
-        doc.dss.add(caCert, signatureThumbprint);
-        doc.dss.add(leafCrl, signatureThumbprint);
+          if (options.revocationStore === "adobe-attr") {
+            const revocations: RevocationData[] = [];
+            switch (options.revocation) {
+              case "crl":
+                revocations.push(leafCrl, intermediateCrl);
+                break;
+              case "ocsp":
+                revocations.push(leafOcsp);
+                revocations.push({
+                  type: "ocsp", // other revocation method
+                  value: intermediateOcsp
+                });
+                break;
+              case "one-missing":
+                revocations.push(leafCrl);
+                break;
+              default:
+            }
 
-        if (options.signingTime === "dss" && timeStampToken) {
-          doc.dss.addTimeStamp(timeStampToken, signatureThumbprint);
+            signedAttributes.push(new AdobeRevocationInfoArchival(revocations));
+          }
+
+          const signer = signedData.createSigner(leafCert, {
+            digestAlgorithm: "SHA-256",
+            signedAttributes
+          });
+
+          signedData.certificates.push(leafCert);
+          if (options.revocationStore === "cms") {
+            switch (options.revocation) {
+              case "crl":
+                signedData.revocations.push(intermediateCrl);
+                signedData.revocations.push(leafCrl);
+                break;
+              case "ocsp":
+                signedData.revocations.push(intermediateOcsp);
+                signedData.revocations.push(leafOcsp);
+                break;
+              case "one-missing":
+                signedData.revocations.push(leafCrl);
+                break;
+              default:
+            }
+          }
+
+          await signedData.sign(leafCert.privateKey!, signer);
+
+          if (
+            options.signingTime === "embedded" ||
+            options.signingTime === "dss"
+          ) {
+            timeStampToken = await getTimeStampToken(
+              options.invalidateTimestamp
+                ? new Uint8Array([0]) // invalid signature value
+                : signedData.signers[0].signatureValue
+            );
+            if (options.signingTime === "embedded") {
+              signedData.signers[0].unsignedAttributes.push(
+                new TimeStampTokenAttribute(timeStampToken)
+              );
+            }
+          }
+
+          return signedData.toBER();
         }
+      });
 
-        return doc;
+      const signatureThumbprint = await signature.thumbprint();
+      doc.dss.add(rootCert, signatureThumbprint);
+      doc.dss.add(intermediateCert, signatureThumbprint);
+      if (options.revocationStore === "dss") {
+        switch (options.revocation) {
+          case "one-missing":
+            doc.dss.add(leafCrl, signatureThumbprint);
+            break;
+          case "crl":
+            doc.dss.add(intermediateCrl, signatureThumbprint);
+            doc.dss.add(leafCrl, signatureThumbprint);
+            break;
+          case "ocsp":
+            doc.dss.add(intermediateOcsp, signatureThumbprint);
+            doc.dss.add(leafOcsp, signatureThumbprint);
+            break;
+          default:
+        }
       }
 
-      async function verifyDocument(doc: PDFDocument, date?: Date) {
-        const doc2 = await PDFDocument.load(await doc.save());
-        doc2.certificateHandler.parent = new RootCertificateStorageHandler({
-          trustedCertificates: [caCert, digicertCaCert],
-          revocations: {
-            "http://leaf.cer/crl": leafCrl,
-            "http://leaf.cer/ocsp": leafOcsp
-          }
-        });
-        return doc2.verify({
-          checkDate: date
-        });
+      if (options.signingTime === "dss" && timeStampToken) {
+        doc.dss.addTimeStamp(timeStampToken, signatureThumbprint);
       }
 
+      return doc;
+    }
+
+    async function verifyDocument(doc: PDFDocument, date?: Date) {
+      const doc2 = await PDFDocument.load(await doc.save());
+      doc2.certificateHandler.parent = new RootCertificateStorageHandler({
+        trustedCertificates: [rootCert, digicertCaCert],
+        revocations: {
+          "http://leaf.cer/crl": leafCrl,
+          "http://leaf.cer/ocsp": leafOcsp
+        }
+      });
+      return doc2.verify({
+        checkDate: date
+      });
+    }
+
+    describe("signing time", () => {
       it("should verify signature with certificates, revocations and timestamp in DSS", async () => {
-        const doc = await createSignedDocument({ signingTime: "dss" });
+        const doc = await createSignedDocument({
+          signingTime: "dss"
+        });
         const verify = await verifyDocument(doc);
 
         const state = getSignatureState(
@@ -508,7 +647,10 @@ describe("SignatureBoxGroup", () => {
       });
 
       it("should verify signature with certificates, revocations and timestamp in CMS", async () => {
-        const doc = await createSignedDocument({ signingTime: "embedded" });
+        const doc = await createSignedDocument({
+          signingTime: "embedded",
+          revocation: "ocsp"
+        });
         const verify = await verifyDocument(doc);
 
         const state = getSignatureState(
@@ -584,23 +726,173 @@ describe("SignatureBoxGroup", () => {
       });
     });
 
-    describe("states", () => {
-      describe("formatting", () => {
-        it("should return invalid formatting state", async () => {
-          const { doc } = await createAndSignDocument();
-          const signatures = doc.getSignatures();
-          const signature = signatures[0] as SignatureBoxGroup;
-          const contents = signature.target.V?.Contents;
-          expect(contents).toBeDefined();
-          contents!.text = contents!.text.replace(/^./, "\x00");
-          const verify = await signature.verify();
-          const formattingState = verify.states.find(
-            (o) => o.code === "formatting"
-          );
-          expect(formattingState).toBeDefined();
-          expect(formattingState?.type).toBe("invalid");
+    describe("formatting", () => {
+      it("should return valid formatting state", async () => {
+        const doc = await createSignedDocument();
+        const verify = await doc.verify();
+        const formattingState = getSignatureState(
+          verify.items[0],
+          "formatting"
+        ) as FormattingState;
+        expect(formattingState.type).toBe("valid");
+        expect(formattingState.text).toBe("There are not errors in formatting");
+      });
+
+      it("should return invalid formatting state for invalid signature value content", async () => {
+        const doc = await createSignedDocument();
+
+        // modify the SignatureValue Content to make it invalid
+        const signatures = doc.getSignatures();
+        const signature = signatures[0] as SignatureBoxGroup;
+        const contents = signature.target.V?.Contents;
+        expect(contents).toBeDefined();
+        contents!.text = contents!.text.replace(/^./, "\x00");
+
+        // verify the signature
+        const verify = await signature.verify();
+        const formattingState = getSignatureState(
+          verify,
+          "formatting"
+        ) as FormattingState;
+        expect(formattingState.type).toBe("invalid");
+        expect(formattingState.text).toBe(
+          "There are errors in the formatting or information contained in the signature"
+        );
+      });
+
+      it("should return warn formatting state for wrong document structure", async () => {
+        const doc = await createSignedDocument();
+        doc.target.wrongStructure = true;
+
+        const verify = await doc.verify();
+
+        const formattingState = getSignatureState(
+          verify.items[0],
+          "formatting"
+        ) as FormattingState;
+        expect(formattingState.type).toBe("warn");
+        expect(formattingState.text).toBe(
+          "Document structure doesn't match PDF specification"
+        );
+      });
+    });
+
+    describe("ltv", () => {
+      it("should return valid ltv state", async () => {
+        const doc = await createSignedDocument();
+        const verify = await doc.verify();
+        const ltvState = getSignatureState(verify.items[0], "ltv") as LtvState;
+        expect(ltvState.type).toBe("info");
+        expect(ltvState.text).toBe("Signature is LTV enabled");
+        expect(ltvState.data).toEqual({
+          state: true
         });
       });
+
+      it("should return invalid ltv state", async () => {
+        const doc = await createSignedDocument({
+          revocation: "none"
+        });
+        const verify = await doc.verify();
+        const ltvState = getSignatureState(verify.items[0], "ltv") as LtvState;
+        expect(ltvState.type).toBe("info");
+        expect(ltvState.text).toBe("Signature is not LTV enabled");
+        expect(ltvState.data).toEqual({
+          state: false,
+          reason: "PDF document doesn't have revocation items"
+        });
+      });
+
+      it("should detect if one revocation item is missing", async () => {
+        const doc = await createSignedDocument({
+          revocation: "one-missing"
+        });
+        const verify = await verifyDocument(doc);
+        const ltvState = getSignatureState(verify.items[0], "ltv") as LtvState;
+        expect(ltvState.type).toBe("info");
+        expect(ltvState.text).toBe("Signature is not LTV enabled");
+        expect(ltvState.data).toEqual({
+          state: false,
+          reason:
+            "No revocation values found for one of certificates: No CRLs for specific certificate issuer"
+        });
+      });
+    });
+
+    describe("document modification", () => {
+      it("should return valid document modification state", async () => {
+        const doc = await createSignedDocument();
+        const verify = await doc.verify();
+        const state = getSignatureState(
+          verify.items[0],
+          "document_modification"
+        ) as DocumentModificationState;
+        expect(state.type).toBe("valid");
+        expect(state.data.state).toBe("not_modified");
+      });
+
+      it("should return invalid with error when document is modified", async () => {
+        const doc = await createSignedDocument();
+        doc.target.view[12] = 0xf0; // modify the document
+
+        const verify = await doc.verify();
+        const state = getSignatureState(
+          verify.items[0],
+          "document_modification"
+        ) as DocumentModificationState;
+        expect(state.type).toBe("invalid");
+        expect(state.data.state).toBe("error");
+      });
+
+      it("should return invalid if signature is invalid", async () => {
+        const doc = await createSignedDocument();
+        const signature = doc.getSignatures()[0] as SignatureBoxGroup;
+        const contents = signature.target.V!.Contents;
+        const signedData = CMSSignedData.fromBER(
+          Convert.FromBinary(contents.text)
+        );
+        signedData.signers[0].asn.signature.valueBlock.valueHexView[0] = 0x00; // modify the signature
+        contents.text = Convert.ToBinary(signedData.toBER());
+
+        const verify = await signature.verify();
+        const state = getSignatureState(
+          verify,
+          "document_modification"
+        ) as DocumentModificationState;
+        expect(state.type).toBe("invalid");
+        expect(state.data.state).toBe("modified");
+      });
+    });
+
+    it("should return valid signature state with embedded revocations", async () => {
+      // TODO: Acrobat does't use revocations from CAdES revocation info, it's not clear why
+      const doc = await createSignedDocument({
+        revocationStore: "cms"
+      });
+      const verify = await verifyDocument(doc);
+      const ltvState = getSignatureState(verify.items[0], "ltv") as LtvState;
+      expect(ltvState.type).toBe("info");
+      expect(ltvState.data.state).toBe(true);
+      const identityState = getSignatureState(
+        verify.items[0],
+        "identity_verification"
+      ) as SignatureStates;
+      expect(identityState.type).toBe("valid");
+    });
+
+    it("should return valid signature state with Adobe Archive Attribute", async () => {
+      const doc = await createSignedDocument({
+        revocationStore: "adobe-attr"
+      });
+      const verify = await verifyDocument(doc);
+      const ltvState = getSignatureState(verify.items[0], "ltv") as LtvState;
+      expect(ltvState.type).toBe("info");
+      expect(ltvState.data.state).toBe(true);
+      const identityState = getSignatureState(
+        verify.items[0],
+        "identity_verification"
+      ) as SignatureStates;
+      expect(identityState.type).toBe("valid");
     });
   });
 });
