@@ -1,24 +1,16 @@
-import * as assert from "assert";
-import { PDFDocument } from "./Document";
-import { writeFile } from "./Document.spec";
+import { createPdfWithPage } from "@peculiarventures/pdf-tests";
 import { PDFPageOrientation } from "./Pages";
 
-context("Pages", () => {
-  it("Add 3 pages of different sizes", async () => {
-    const doc = await PDFDocument.create({
-      version: 1.3
-    });
-
-    assert.strictEqual(doc.pages.length, 0);
-
-    const a4P = doc.pages.create(); // A4 portrait
-
+describe("Pages", () => {
+  it("should create multiple pages with different sizes and orientations", async () => {
+    const doc = await createPdfWithPage();
+    const a4P = doc.pages.get(0); // A4 portrait
     const a4L = doc.pages.create({
       // A4 landscape
       orientation: PDFPageOrientation.landscape
     });
-    assert.strictEqual(a4P.height, a4L.width);
-    assert.strictEqual(a4P.width, a4L.height);
+    expect(a4P.height).toBe(a4L.width);
+    expect(a4P.width).toBe(a4L.height);
 
     doc.pages.create({
       // custom size
@@ -27,79 +19,75 @@ context("Pages", () => {
     });
 
     const page = doc.pages.get(2);
-    assert.strictEqual(page.height, 595.28);
-    assert.strictEqual(page.width, 425.2);
-
-    assert.strictEqual(doc.pages.length, 3);
+    expect(page.height).toBeCloseTo(595.28);
+    expect(page.width).toBeCloseTo(425.2);
+    expect(doc.pages.length).toBe(3);
   });
 
-  it("Insert page before first", async () => {
-    const doc = await PDFDocument.create({
-      version: 1.3
-    });
-
-    assert.strictEqual(doc.pages.length, 0);
-
-    const page1 = doc.pages.create();
-
-    doc.pages.create();
+  it("should insert a new page before the first page", async () => {
+    const doc = await createPdfWithPage();
+    const page1 = doc.pages.get(0); // 1st page
+    doc.pages.create(); // 2nd page
 
     const page3 = doc.pages.create({
+      // 3rd page
       // custom size
       width: "15cm",
       height: "210mm"
     });
-
-    assert.strictEqual(doc.pages.length, 3);
+    expect(doc.pages.length).toBe(3);
 
     doc.pages.insertBefore(page3, page1);
 
     const page = doc.pages.get(0);
-    assert.strictEqual(page.height, 595.28);
-    assert.strictEqual(page.width, 425.2);
+    expect(page.height).toBe(595.28);
+    expect(page.width).toBe(425.2);
   });
 
-  it("Remove page", async () => {
-    const doc = await PDFDocument.create({
-      version: 1.3
-    });
-
-    assert.strictEqual(doc.pages.length, 0);
-
-    doc.pages.create();
-    doc.pages.create();
+  it("should remove a page from the document", async () => {
+    const doc = await createPdfWithPage();
+    doc.pages.create(); // 2nd page
 
     const page3 = doc.pages.create({
+      // 3rd page
       // custom size
       width: "15cm",
       height: "210mm"
     });
-
-    assert.strictEqual(doc.pages.length, 3);
+    expect(doc.pages.length).toBe(3);
 
     doc.pages.remove(page3);
-
-    assert.strictEqual(doc.pages.length, 2);
-
-    writeFile(await doc.save());
+    expect(doc.pages.length).toBe(2);
   });
 
-  it("merge", async () => {
-    const doc1 = await PDFDocument.create();
+  it("should merge pages from one document into another", async () => {
+    const doc1 = await createPdfWithPage();
     doc1.pages.create();
-    doc1.pages.create();
-    assert.equal(doc1.pages.length, 2);
+    expect(doc1.pages.length).toBe(2);
 
-    const doc2 = await PDFDocument.create();
+    const doc2 = await createPdfWithPage();
     doc2.pages.create();
     doc2.pages.create();
-    doc2.pages.create();
-    assert.equal(doc2.pages.length, 3);
+    expect(doc2.pages.length).toBe(3);
 
     await doc1.pages.append(doc2, {
       pages: [2, 3]
     });
+    expect(doc1.pages.length).toBe(4);
+  });
 
-    assert.equal(doc1.pages.length, 4);
+  describe("get content", () => {
+    it("should create and manage content streams correctly", async () => {
+      const doc = await createPdfWithPage();
+      const page = doc.pages.get(0);
+
+      // Get initial content stream
+      const content1 = page.content;
+      expect(content1).toBeDefined();
+
+      // Second call should return the same stream in same update
+      const content2 = page.content;
+      expect(content2).toBe(content1);
+    });
   });
 });

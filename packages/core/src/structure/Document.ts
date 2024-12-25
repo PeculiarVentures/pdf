@@ -428,6 +428,15 @@ export class PDFDocument {
     return PDFRectangle.createWithData(this.update, llX, llY, urX, urY);
   }
 
+  /**
+   * Creates a PDFDate object from the given date.
+   * @param date - The date to create the PDFDate from.
+   * @returns A PDFDate object.
+   */
+  public createDate(date = new Date()): PDFDate {
+    return PDFDate.createDate(this, date);
+  }
+
   public async decrypt(): Promise<void> {
     let update: PDFDocumentUpdate | null = this.update;
 
@@ -459,7 +468,7 @@ import * as objects from "../objects";
 import { ParsingError } from "../errors";
 import { ViewWriter } from "../ViewWriter";
 import { PDFDocumentUpdate } from "./DocumentUpdate";
-import { PDFRectangle } from "./common";
+import { PDFDate, PDFRectangle } from "./common";
 import { CrossReferenceTable } from "./CrossReferenceTable";
 import { CharSet } from "../CharSet";
 import { PDFDocumentObject } from "./DocumentObject";

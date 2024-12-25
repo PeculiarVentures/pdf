@@ -99,7 +99,7 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
   }
 
   public get rightPadding(): number {
-    return this.width - (this.target.CropBox?.urX || 0);
+    return this.target.CropBox ? this.width - this.target.CropBox.urX : 0;
   }
 
   public set rightPadding(value: core.TypographySize) {
@@ -108,7 +108,7 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
   }
 
   public get topPadding(): number {
-    return this.height - (this.target.CropBox?.urY || 0);
+    return this.target.CropBox ? this.height - this.target.CropBox.urY : 0;
   }
 
   public set topPadding(value: core.TypographySize) {
