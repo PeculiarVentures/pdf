@@ -76,16 +76,20 @@ export class OCSP
     });
     const responseDataRaw = asnSchema.AsnConvert.serialize(responseData);
     const crypto = pkijs.getCrypto(true);
+    const signingAlgorithm = {
+      ...params.signingAlgorithm,
+      ...params.signingKey.algorithm
+    };
     const signature = await crypto.signWithPrivateKey(
       responseDataRaw,
       params.signingKey,
       {
-        algorithm: params.signingAlgorithm
+        algorithm: signingAlgorithm
       }
     );
 
     // convert algorithm to ASN.1
-    const signatureAlgorithm = AlgorithmFactory.toBER(params.signingAlgorithm);
+    const signatureAlgorithm = AlgorithmFactory.toBER(signingAlgorithm);
 
     const basicOcsp = new asnOcsp.BasicOCSPResponse({
       tbsResponseData: responseData,
