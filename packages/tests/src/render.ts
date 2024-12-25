@@ -54,6 +54,20 @@ export class PdfRenderingHelper {
   }
 
   /**
+   * Writes binary data to a PDF file
+   * @param buffer - The binary data to write to the file. Can be any BufferSource type (ArrayBuffer, TypedArray, etc.)
+   * @param filePath - Optional. The path where the PDF file should be written. If not provided, defaults to '../../../tmp.pdf' relative to current directory
+   * @throws {Error} If file cannot be written or if buffer cannot be converted to ArrayBuffer
+   */
+  public static writeToFile(buffer: BufferSource, filePath?: string): void {
+    filePath ??= path.resolve(__dirname, `../../../tmp.pdf`);
+    fs.writeFileSync(
+      filePath,
+      Buffer.from(BufferSourceConverter.toArrayBuffer(buffer))
+    );
+  }
+
+  /**
    * Get SHA-256 hash of a page in a PDF document.
    * @param buffer - PDF document buffer
    * @param pageNumber - Page number (default 1)
@@ -74,10 +88,7 @@ export class PdfRenderingHelper {
     const hash = await pdf.getPageHash(pageNumber, writeFile);
 
     if (writeFile) {
-      fs.writeFileSync(
-        path.resolve(__dirname, `../../../tmp.pdf`),
-        Buffer.from(BufferSourceConverter.toArrayBuffer(buffer))
-      );
+      this.writeToFile(buffer);
     }
 
     return hash;

@@ -5,6 +5,7 @@ import {
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { BufferSourceConverter } from "pvtsutils";
+import { xrefTableOptions } from "./options";
 
 export async function writePdfFile(
   data: BufferSource | PDFDocument,
@@ -34,4 +35,12 @@ export async function reopenPdfDocument(
     doc.target.options.disableCompressedObjects;
 
   return doc2;
+}
+
+export async function createPdfWithPage(
+  options = xrefTableOptions
+): Promise<PDFDocument> {
+  const doc = await PDFDocument.create(options);
+  doc.pages.create();
+  return doc;
 }
