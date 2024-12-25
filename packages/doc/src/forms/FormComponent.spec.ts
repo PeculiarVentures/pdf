@@ -1,13 +1,16 @@
 import * as core from "@peculiarventures/pdf-core";
 import { PDFDocument } from "../Document";
 import { FormComponent } from "./FormComponent";
+import { PDFPage } from "../Page";
 
 describe("FormComponent", () => {
   let doc: PDFDocument;
+  let page: PDFPage;
   let component: FormComponent;
 
   beforeEach(async () => {
     doc = await PDFDocument.create();
+    page = doc.pages.create();
     const widget = core.WidgetDictionary.create(doc.target);
     widget.Parent = core.PDFField.create(doc.target);
     component = new FormComponent(widget, doc);
@@ -49,6 +52,30 @@ describe("FormComponent", () => {
       expect(component.top).toBe(100);
       expect(component.target.rect.urY).toBe(100);
       expect(component.target.rect.toString()).toBe("[ 0, 50, 100, 100 ]");
+    });
+
+    it("should get/set dimensions on page", () => {
+      page.target.addAnnot(component.target);
+
+      expect(component.top).toBe(791.89);
+      expect(component.left).toBe(0);
+      expect(component.width).toBe(100);
+      expect(component.height).toBe(50);
+
+      // Change dimensions
+      component.top = 500;
+      component.left = 100;
+      component.width = 200;
+      component.height = 100;
+
+      expect(component.top).toBe(500);
+      expect(component.target.rect.urY).toBe(341.89);
+      expect(component.left).toBe(100);
+      expect(component.target.rect.llX).toBe(100);
+      expect(component.width).toBe(200);
+      expect(component.target.rect.urX).toBe(300);
+      expect(component.height).toBe(100);
+      expect(component.target.rect.llY).toBe(241.89);
     });
   });
 
