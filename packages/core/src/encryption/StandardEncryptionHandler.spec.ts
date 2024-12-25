@@ -167,14 +167,14 @@ describe("StandardEncryptionHandler", () => {
       {
         name: "RC4 U:<empty>",
         params: {
-          file: "rc4_u",
+          // file: "rc4_u",
           algorithm: CryptoFilterMethods.RC4
         }
       },
       {
         name: "RC4 U:12345 O:54321",
         params: {
-          file: "rc4_u12345_o54321",
+          // file: "rc4_u12345_o54321",
           algorithm: CryptoFilterMethods.RC4,
           userPassword: "12345",
           ownerPassword: "54321"
@@ -183,14 +183,14 @@ describe("StandardEncryptionHandler", () => {
       {
         name: "AES128 U:<empty>",
         params: {
-          file: "aes128_u",
+          // file: "aes128_u",
           algorithm: CryptoFilterMethods.AES128
         }
       },
       {
         name: "AES128 U:12345 O:54321",
         params: {
-          file: "aes128_u12345_o54321",
+          // file: "aes128_u12345_o54321",
           algorithm: CryptoFilterMethods.AES128,
           userPassword: "12345",
           ownerPassword: "54321"
@@ -199,14 +199,14 @@ describe("StandardEncryptionHandler", () => {
       {
         name: "AES256 U:<empty>",
         params: {
-          file: "aes256_u",
+          // file: "aes256_u",
           algorithm: CryptoFilterMethods.AES256
         }
       },
       {
         name: "AES256 U:12345",
         params: {
-          file: "aes256_u12345",
+          // file: "aes256_u12345",
           algorithm: CryptoFilterMethods.AES256,
           userPassword: "12345",
           useXRefTable: true
@@ -215,7 +215,7 @@ describe("StandardEncryptionHandler", () => {
       {
         name: "AES256 U:12345, O:54321",
         params: {
-          file: "aes256_u12345_o54321",
+          // file: "aes256_u12345_o54321",
           algorithm: CryptoFilterMethods.AES256,
           userPassword: "12345",
           ownerPassword: "54321"
