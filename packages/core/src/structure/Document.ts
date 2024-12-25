@@ -33,6 +33,15 @@ const defaultOptions: DocumentOptions = {
 };
 
 export class PDFDocument {
+  /**
+   * Indicates whether the PDF file has an incorrect structure.
+   *
+   * Set to true when:
+   *   1. An update section's startXref is smaller than the previous update section's startXref
+   *   2. The xref table/stream appears after any of the objects it refers to in an update section
+   *
+   * These conditions violate PDF specification requirements for file structure
+   */
   public wrongStructure = false;
 
   public static fromPDF(reader: ViewReader): Promise<PDFDocument>;
