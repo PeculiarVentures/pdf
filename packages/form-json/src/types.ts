@@ -4,8 +4,8 @@ import { FormComponentType } from "@peculiarventures/pdf-doc";
 /**
  * Type representing a constructor for an IComponent instance.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type IComponentConstructor<T extends pdfDoc.IComponent> = new (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   target: any,
   doc: pdfDoc.PDFDocument
 ) => T;
