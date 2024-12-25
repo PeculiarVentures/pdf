@@ -287,6 +287,13 @@ export class PDFPage extends WrapContentObject<core.PageObjectDictionary> {
 
     this.target.addAnnot(widget);
 
+    // Enable signature flags if not enabled
+    const acroForm = this.document.target.catalog.AcroForm.get();
+    if (!acroForm.has("SigFlags")) {
+      this.document.target.catalog.AcroForm.get().SigFlags =
+        core.SignatureFlags.signaturesExist | core.SignatureFlags.appendOnly;
+    }
+
     return new forms.SignatureBox(widget, this.document);
   }
 
