@@ -28,7 +28,6 @@ import {
 import {
   createPdfWithPage,
   getTimeStampToken,
-  PdfRenderingHelper,
   RootCertificateStorageHandler
 } from "@peculiarventures/pdf-tests";
 import { BufferSourceConverter, Convert } from "pvtsutils";
