@@ -1,4 +1,4 @@
-import { PDFDocument, XrefStructure } from "../structure";
+import { PDFDocument } from "../structure";
 import { ViewWriter } from "../ViewWriter";
 import { PDFArray } from "./Array";
 import { PDFBoolean } from "./Boolean";
