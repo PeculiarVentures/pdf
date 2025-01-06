@@ -1,8 +1,7 @@
-import * as assert from "node:assert";
 import { PDFDocument } from "@peculiarventures/pdf-doc";
 import { PDFRepair, globalRepairRegistry } from "@peculiarventures/pdf-repair";
 
-context("PDFRepair:RemoveNeedAppearances", () => {
+describe("PDFRepair:RemoveNeedAppearances", () => {
   it("should remove NeedAppearances flag", async () => {
     const doc = await PDFDocument.create();
     doc.pages.create();
@@ -14,15 +13,14 @@ context("PDFRepair:RemoveNeedAppearances", () => {
       globalRepairRegistry.filter((o) => o.id === "removeNeedAppearances")
     );
     const notes = await repair.repairDocument(doc);
-    assert.strictEqual(Object.keys(notes).length, 1);
-    assert.strictEqual(
-      notes.removeNeedAppearances[0],
+    expect(Object.keys(notes).length).toBe(1);
+    expect(notes.removeNeedAppearances[0]).toBe(
       "Removed NeedAppearances from AcroForm."
     );
-    assert.strictEqual(acroForm.has("NeedAppearances"), false);
+    expect(acroForm.has("NeedAppearances")).toBe(false);
   });
 
-  context("should not remove NeedAppearances flag", async () => {
+  describe("should not remove NeedAppearances flag", () => {
     it("if it is set and equal to `false`", async () => {
       const doc = await PDFDocument.create();
       doc.pages.create();
@@ -34,7 +32,7 @@ context("PDFRepair:RemoveNeedAppearances", () => {
         globalRepairRegistry.filter((o) => o.id === "removeNeedAppearances")
       );
       const notes = await repair.repairDocument(doc);
-      assert.strictEqual(Object.keys(notes).length, 0);
+      expect(Object.keys(notes).length).toBe(0);
     });
 
     it("if it is not set", async () => {
@@ -45,7 +43,7 @@ context("PDFRepair:RemoveNeedAppearances", () => {
         globalRepairRegistry.filter((o) => o.id === "removeNeedAppearances")
       );
       const notes = await repair.repairDocument(doc);
-      assert.strictEqual(Object.keys(notes).length, 0);
+      expect(Object.keys(notes).length).toBe(0);
     });
 
     it("if AcroForm is not set", async () => {
@@ -56,7 +54,7 @@ context("PDFRepair:RemoveNeedAppearances", () => {
         globalRepairRegistry.filter((o) => o.id === "removeNeedAppearances")
       );
       const notes = await repair.repairDocument(doc);
-      assert.strictEqual(Object.keys(notes).length, 0);
+      expect(Object.keys(notes).length).toBe(0);
     });
   });
 });
