@@ -16,6 +16,7 @@
   "types": "build/index.d.ts",
   "files": [
     "build",
+    "LICENSE",
     "README.md"
   ],
   "repository": {
