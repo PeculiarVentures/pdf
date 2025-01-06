@@ -2,7 +2,7 @@ import * as core from "@peculiarventures/pdf-core";
 import { DefaultFonts } from "@peculiarventures/pdf-font";
 import { PDFDocument, PDFDocumentCreateParameters } from "./Document";
 import { PDFVersion } from "./Version";
-import { writeFile } from "./Document.spec";
+import { PdfRenderingHelper } from "@peculiarventures/pdf-tests";
 import { TextAlignment } from "./Font";
 
 const options: PDFDocumentCreateParameters = {
@@ -32,7 +32,7 @@ const options: PDFDocumentCreateParameters = {
 //   rows: TableRow[];
 // }
 
-context("Examples", () => {
+describe("Examples", () => {
   //   it("audit", async () => {
   //     function addLink(rect: TextRectangle, uri: string, page: PDFPage) {
   //       const doc = page.document.target;
@@ -56,7 +56,6 @@ context("Examples", () => {
   //       return annot;
   //     }
 
-  //     console.time("PDF creation");
   //     const doc = await PDFDocument.create(options);
 
   //     const template = {
@@ -407,8 +406,6 @@ context("Examples", () => {
 
   //     const pdf = await doc.save();
 
-  //     console.timeEnd("PDF creation");
-
   //     writeFile(pdf);
 
   //   });
@@ -568,7 +565,6 @@ context("Examples", () => {
     const whiteColor: core.Colors = 1;
     const padding = 43;
     const leftSide = padding;
-    console.time("add fonts");
 
     // const fontHelv = doc.addFont(fs.readFileSync(path.join(__dirname, "..", "..", "font", "fonts", "Helvetica.ttf")));
     // const fontHelvBold = doc.addFont(fs.readFileSync(path.join(__dirname, "..", "..", "font", "fonts", "HelveticaBold.ttf")));
@@ -576,7 +572,6 @@ context("Examples", () => {
     const fontHelv = doc.addFont(DefaultFonts.Helvetica);
     const fontHelvBold = doc.addFont(DefaultFonts.HelveticaBold);
     const fontHelvBoldOblique = doc.addFont(DefaultFonts.HelveticaBoldOblique);
-    console.timeEnd("add fonts");
 
     const page = doc.pages.create();
     const mediaWidth = page.width - padding * 2;
@@ -728,12 +723,15 @@ context("Examples", () => {
             }
           },
           {
-            text: new Date().toLocaleDateString("en-US", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric"
-            }),
+            text: new Date("2025-01-06T00:00:00.000Z").toLocaleDateString(
+              "en-US",
+              {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+              }
+            ),
             font: fontHelv,
             style: {
               color: grayColor,
@@ -749,7 +747,6 @@ context("Examples", () => {
     let currentTop = 292;
 
     // Draw table
-    console.time("draw table");
     if (template.table && template.table.items.length) {
       const tableGraphics = page.graphics();
 
@@ -931,7 +928,6 @@ context("Examples", () => {
 
       currentTop += cellPadding;
     }
-    console.timeEnd("draw table");
 
     const thankYouTop = currentTop + 80;
     graphics
@@ -958,9 +954,10 @@ context("Examples", () => {
       thankYouTop + 10
     );
 
-    console.time("serialize pdf");
     const pdf = await doc.save();
-    console.timeEnd("serialize pdf");
-    writeFile(pdf);
+    const hash = await PdfRenderingHelper.getPageHash(pdf, 1, true);
+    expect(hash).toEqual(
+      "c349c894252d13a6b733772f7f994c46399acaa94c169e6bc1c3e1eb4e5d9ff0"
+    );
   });
 });
