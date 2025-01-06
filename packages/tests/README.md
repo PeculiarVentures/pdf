@@ -1,4 +1,4 @@
-# `@peculiarventures/pdf-tests`
+# `@peculiar/pdf-tests`
 
 This package contains test utilities and helper tools for the PDF project. It is intended **exclusively for development purposes**.
 

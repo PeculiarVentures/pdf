@@ -1,4 +1,4 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { TextEditorDrawParameters } from "./TextEditor.Handler";
 import { FormObject } from "../FormObject";
 import { Resource, ResourceManager } from "../ResourceManager";

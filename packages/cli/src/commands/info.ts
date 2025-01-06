@@ -1,4 +1,4 @@
-import { PDFDocument } from "@peculiarventures/pdf-doc";
+import { PDFDocument } from "@peculiar/pdf-doc";
 import { Command } from "commander";
 import * as fs from "fs";
 

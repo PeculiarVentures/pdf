@@ -1,6 +1,6 @@
-import * as core from "@peculiarventures/pdf-core";
-import { PageFilter } from "@peculiarventures/pdf-copy";
-import { PdfRenderingHelper } from "@peculiarventures/pdf-tests";
+import * as core from "@peculiar/pdf-core";
+import { PageFilter } from "@peculiar/pdf-copy";
+import { PdfRenderingHelper } from "@peculiar/pdf-tests";
 
 import { PDFDocument } from "./Document";
 import { PDFVersion } from "./Version";

@@ -1,4 +1,4 @@
-import { PDFDocumentCreateParameters } from "@peculiarventures/pdf-doc";
+import { PDFDocumentCreateParameters } from "@peculiar/pdf-doc";
 
 export const xrefTableOptions: PDFDocumentCreateParameters = {
   useXrefTable: true,

@@ -1,5 +1,5 @@
-import * as core from "@peculiarventures/pdf-core";
-import * as fonts from "@peculiarventures/pdf-font";
+import * as core from "@peculiar/pdf-core";
+import * as fonts from "@peculiar/pdf-font";
 import { ResourceManager } from "./ResourceManager";
 import { FontComponent } from "./Font";
 import { Watermark } from "./Watermark";

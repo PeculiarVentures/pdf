@@ -1,11 +1,13 @@
-# `@peculiarventures/pdf-repair`
+# `@peculiar/pdf-repair`
 
 ## Description
-`@peculiarventures/pdf-repair` is an intuitive Node.js module, created to diagnose and correct issues within PDF documents. This module uses a suite of predefined rules to validate PDFs, address erroneous objects, insert missing mandatory fields in objects, and assure overall PDF coherence and compliance.
+
+`@peculiar/pdf-repair` is an intuitive Node.js module, created to diagnose and correct issues within PDF documents. This module uses a suite of predefined rules to validate PDFs, address erroneous objects, insert missing mandatory fields in objects, and assure overall PDF coherence and compliance.
 
 ## Installation
+
 ```bash
-npm install @peculiarventures/pdf-repair
+npm install @peculiar/pdf-repair
 ```
 
 ## Features
@@ -17,12 +19,12 @@ npm install @peculiarventures/pdf-repair
 
 ## Usage
 
-Example usage of `@peculiarventures/pdf-repair`:
+Example usage of `@peculiar/pdf-repair`:
 
 ```javascript
-const fs = require('fs');
-const { PDFDocument } = require('@peculiarventures/pdf-doc');
-const PDFRepair = require('@peculiarventures/pdf-repair');
+const fs = require("fs");
+const { PDFDocument } = require("@peculiar/pdf-doc");
+const PDFRepair = require("@peculiar/pdf-repair");
 
 const data = fs.readFileSync("file.pdf");
 const doc = PDFDocument.load(data);

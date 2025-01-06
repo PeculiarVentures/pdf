@@ -1,8 +1,8 @@
-import * as core from "@peculiarventures/pdf-core";
-import { DefaultFonts } from "@peculiarventures/pdf-font";
+import * as core from "@peculiar/pdf-core";
+import { DefaultFonts } from "@peculiar/pdf-font";
 import { PDFDocument, PDFDocumentCreateParameters } from "./Document";
 import { PDFVersion } from "./Version";
-import { PdfRenderingHelper } from "@peculiarventures/pdf-tests";
+import { PdfRenderingHelper } from "@peculiar/pdf-tests";
 import { TextAlignment } from "./Font";
 
 const options: PDFDocumentCreateParameters = {

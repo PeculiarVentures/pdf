@@ -1,9 +1,6 @@
-import * as core from "@peculiarventures/pdf-core";
-import {
-  createPdfWithPage,
-  reopenPdfDocument
-} from "@peculiarventures/pdf-tests";
-import { SignatureBox, SignatureBoxGroup } from "@peculiarventures/pdf-doc";
+import * as core from "@peculiar/pdf-core";
+import { createPdfWithPage, reopenPdfDocument } from "@peculiar/pdf-tests";
+import { SignatureBox, SignatureBoxGroup } from "@peculiar/pdf-doc";
 import * as pkijs from "pkijs";
 
 describe("SignatureBox", () => {

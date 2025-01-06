@@ -1,5 +1,5 @@
 import * as x509 from "@peculiar/x509";
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import {
   AdobeRevocationInfoArchival,
   CertificateID,
@@ -24,12 +24,12 @@ import {
   SigningTimeState,
   TimeStampToken,
   TimeStampTokenAttribute
-} from "@peculiarventures/pdf-doc";
+} from "@peculiar/pdf-doc";
 import {
   createPdfWithPage,
   getTimeStampToken,
   RootCertificateStorageHandler
-} from "@peculiarventures/pdf-tests";
+} from "@peculiar/pdf-tests";
 import { BufferSourceConverter, Convert } from "pvtsutils";
 import * as pkijs from "pkijs";
 

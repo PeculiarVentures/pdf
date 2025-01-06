@@ -1,5 +1,5 @@
 import { AsnConvert } from "@peculiar/asn1-schema";
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { Convert } from "pvtsutils";
 import * as pkijs from "pkijs";
 import * as cms from "../cms";

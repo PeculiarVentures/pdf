@@ -1,4 +1,4 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { IFormComponentCreateParameters } from "./FormComponent.Handler";
 import { PDFDocument } from "../Document";
 import { FontComponent } from "../Font";

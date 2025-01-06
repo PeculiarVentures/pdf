@@ -1,9 +1,6 @@
-import { PDFDocument } from "@peculiarventures/pdf-doc";
-import {
-  createPdfWithPage,
-  PdfRenderingHelper
-} from "@peculiarventures/pdf-tests";
-import { DefaultFonts } from "@peculiarventures/pdf-font";
+import { PDFDocument } from "@peculiar/pdf-doc";
+import { createPdfWithPage, PdfRenderingHelper } from "@peculiar/pdf-tests";
+import { DefaultFonts } from "@peculiar/pdf-font";
 import { globalFormConverter } from "./registry";
 
 describe("FormConverter", () => {

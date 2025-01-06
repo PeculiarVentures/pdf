@@ -1,11 +1,25 @@
-# `@peculiarventures/pdf-cli`
+# `@peculiar/pdf-cli`
 
-> TODO: description
+Command-line interface for PDF document manipulation and analysis.
 
-## Usage
+## Installation
 
+```bash
+npm install -g @peculiar/pdf-cli
 ```
-const pdfCli = require('@peculiarventures/pdf-cli');
 
-// TODO: DEMONSTRATE API
+## Commands
+
+### info
+
+Displays detailed information about a PDF document.
+
+```bash
+pvpdf info <pdf-file>
+```
+
+Example:
+
+```bash
+pvpdf info document.pdf
 ```

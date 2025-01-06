@@ -1,5 +1,5 @@
 {
-  "name": "@peculiarventures/pdf-tests",
+  "name": "@peculiar/pdf-tests",
   "version": "1.16.0",
   "description": "Test suite for PDF - Utilities and helper tools for testing purposes",
   "keywords": [],

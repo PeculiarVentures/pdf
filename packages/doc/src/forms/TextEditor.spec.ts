@@ -1,9 +1,6 @@
-import {
-  PdfRenderingHelper,
-  xrefTableOptions
-} from "@peculiarventures/pdf-tests";
-import { PDFDocument, TextEditor } from "@peculiarventures/pdf-doc";
-import { DefaultFonts } from "@peculiarventures/pdf-font";
+import { PdfRenderingHelper, xrefTableOptions } from "@peculiar/pdf-tests";
+import { PDFDocument, TextEditor } from "@peculiar/pdf-doc";
+import { DefaultFonts } from "@peculiar/pdf-font";
 
 describe("TextEditor", () => {
   let docRaw: ArrayBuffer;

@@ -1,8 +1,5 @@
-import {
-  PdfRenderingHelper,
-  xrefTableOptions
-} from "@peculiarventures/pdf-tests";
-import { PDFDocument, RadioButtonGroup } from "@peculiarventures/pdf-doc";
+import { PdfRenderingHelper, xrefTableOptions } from "@peculiar/pdf-tests";
+import { PDFDocument, RadioButtonGroup } from "@peculiar/pdf-doc";
 
 describe("RadioButton", () => {
   let docRaw: ArrayBuffer;

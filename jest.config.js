@@ -6,6 +6,6 @@ module.exports = {
   roots: ['<rootDir>/packages'],
   testMatch: ['**/*.spec.ts'],
   moduleNameMapper: {
-    '^@peculiarventures/pdf-(.*)$': '<rootDir>/packages/$1/src'
+    '^@peculiar/pdf-(.*)$': '<rootDir>/packages/$1/src'
   }
 };

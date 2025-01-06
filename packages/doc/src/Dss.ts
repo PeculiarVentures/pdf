@@ -1,4 +1,4 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { X509Certificate } from "@peculiar/x509";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
 

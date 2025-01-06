@@ -1,5 +1,5 @@
-import * as core from "@peculiarventures/pdf-core";
-import * as pdfFont from "@peculiarventures/pdf-font";
+import * as core from "@peculiar/pdf-core";
+import * as pdfFont from "@peculiar/pdf-font";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
 import { type PDFDocument } from "./Document";
 import { TextEncoding, TextEncodingEnum } from "./TextEncoding";

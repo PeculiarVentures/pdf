@@ -1,4 +1,4 @@
-import { createPdfWithPage } from "@peculiarventures/pdf-tests";
+import { createPdfWithPage } from "@peculiar/pdf-tests";
 import { PDFPageOrientation } from "./Pages";
 
 describe("Pages", () => {

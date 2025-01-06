@@ -6,28 +6,28 @@
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
-      "@peculiarventures/pdf-core": [
+      "@peculiar/pdf-core": [
         "./packages/core/src"
       ],
-      "@peculiarventures/pdf-cli": [
+      "@peculiar/pdf-cli": [
         "./packages/cli/src"
       ],
-      "@peculiarventures/pdf-doc": [
+      "@peculiar/pdf-doc": [
         "./packages/doc/src"
       ],
-      "@peculiarventures/pdf-font": [
+      "@peculiar/pdf-font": [
         "./packages/font/src"
       ],
-      "@peculiarventures/pdf-copy": [
+      "@peculiar/pdf-copy": [
         "./packages/copy/src"
       ],
-      "@peculiarventures/pdf-form-json": [
+      "@peculiar/pdf-form-json": [
         "./packages/form-json/src"
       ],
-      "@peculiarventures/pdf-repair": [
+      "@peculiar/pdf-repair": [
         "./packages/repair/src"
       ],
-      "@peculiarventures/pdf-tests": [
+      "@peculiar/pdf-tests": [
         "./packages/tests/src"
       ],
     }

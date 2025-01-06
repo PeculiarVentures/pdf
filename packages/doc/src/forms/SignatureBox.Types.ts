@@ -1,4 +1,4 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { TSTInfo } from "@peculiar/asn1-tsp";
 import { X509Certificate, X509Certificates } from "@peculiar/x509";
 import * as cms from "../cms";

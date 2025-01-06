@@ -1,8 +1,15 @@
 {
-  "name": "@peculiarventures/pdf-font",
+  "name": "@peculiar/pdf-font",
   "version": "1.16.0",
-  "description": "",
-  "keywords": [],
+  "description": "Font handling library for PDF document generation",
+  "keywords": [
+    "pdf",
+    "font",
+    "truetype",
+    "opentype",
+    "font-metrics",
+    "typography"
+  ],
   "author": "microshine <microshine@mail.ru>",
   "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/pdf-font#readme",
   "license": "AGPL",
@@ -13,9 +20,6 @@
     "build",
     "README.md"
   ],
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/PeculiarVentures/pdf.git"

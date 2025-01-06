@@ -1,8 +1,5 @@
-import {
-  PdfRenderingHelper,
-  xrefTableOptions
-} from "@peculiarventures/pdf-tests";
-import { CheckBox, PDFDocument } from "@peculiarventures/pdf-doc";
+import { PdfRenderingHelper, xrefTableOptions } from "@peculiar/pdf-tests";
+import { CheckBox, PDFDocument } from "@peculiar/pdf-doc";
 
 describe("CheckBox", () => {
   let docRaw: ArrayBuffer;

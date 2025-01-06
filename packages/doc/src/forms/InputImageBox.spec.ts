@@ -2,8 +2,8 @@ import {
   jpegImage,
   PdfRenderingHelper,
   xrefTableOptions
-} from "@peculiarventures/pdf-tests";
-import { InputImageBox, PDFDocument } from "@peculiarventures/pdf-doc";
+} from "@peculiar/pdf-tests";
+import { InputImageBox, PDFDocument } from "@peculiar/pdf-doc";
 
 describe("InputImageBox", () => {
   let docRaw: ArrayBuffer;

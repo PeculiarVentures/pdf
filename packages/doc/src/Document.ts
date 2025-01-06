@@ -1,6 +1,6 @@
-import * as core from "@peculiarventures/pdf-core";
-import * as font from "@peculiarventures/pdf-font";
-import * as copy from "@peculiarventures/pdf-copy";
+import * as core from "@peculiar/pdf-core";
+import * as font from "@peculiar/pdf-font";
+import * as copy from "@peculiar/pdf-copy";
 import { X509Certificate } from "@peculiar/x509";
 import { BufferSource, Convert } from "pvtsutils";
 import * as pkijs from "pkijs";

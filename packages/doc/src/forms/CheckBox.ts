@@ -1,4 +1,4 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { ICheckBoxHandler } from "./CheckBox.Handler";
 import { IFormComponentParameters } from "./FormComponent.Handler";
 import { FormObject } from "../FormObject";

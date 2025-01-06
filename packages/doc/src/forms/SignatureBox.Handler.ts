@@ -1,4 +1,4 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { SignatureBoxGroup } from "./SignatureBox.Group";
 import { PDFDocument } from "../Document";
 import {

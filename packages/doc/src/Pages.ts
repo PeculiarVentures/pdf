@@ -1,5 +1,5 @@
-import * as copy from "@peculiarventures/pdf-copy";
-import * as core from "@peculiarventures/pdf-core";
+import * as copy from "@peculiar/pdf-copy";
+import * as core from "@peculiar/pdf-core";
 import { type PDFDocument } from "./Document";
 import { PDFPage } from "./Page";
 import { WrapObject } from "./WrapObject";

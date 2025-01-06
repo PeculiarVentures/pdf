@@ -1,5 +1,5 @@
-import { PDFDocument } from "@peculiarventures/pdf-doc";
-import { PDFRepair, globalRepairRegistry } from "@peculiarventures/pdf-repair";
+import { PDFDocument } from "@peculiar/pdf-doc";
+import { PDFRepair, globalRepairRegistry } from "@peculiar/pdf-repair";
 
 describe("PDFRepair:RemoveNeedAppearances", () => {
   it("should remove NeedAppearances flag", async () => {

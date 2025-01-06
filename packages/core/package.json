@@ -1,8 +1,19 @@
 {
-  "name": "@peculiarventures/pdf-core",
+  "name": "@peculiar/pdf-core",
   "version": "1.16.0",
-  "description": "Now I’m the model of a modern major general / The venerated Virginian veteran whose men are all / Lining up, to put me up on a pedestal / Writin’ letters to relatives / Embellishin’ my elegance and eloquence / But the elephant is in the room / The truth is in ya face when ya hear the British cannons go / BOOM",
-  "keywords": [],
+  "description": "Core functionality library for PDF document processing and manipulation",
+  "keywords": [
+    "pdf",
+    "pdf-library",
+    "pdf-manipulation",
+    "pdf-generation",
+    "pdf-parsing",
+    "encryption",
+    "digital-signatures",
+    "incremental-updates",
+    "xref",
+    "pdf-objects"
+  ],
   "author": "microshine <microshine@mail.ru>",
   "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/pdf-ll#readme",
   "license": "AGPL",
@@ -13,9 +24,6 @@
     "build",
     "README.md"
   ],
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/PeculiarVentures/pdf.git"

@@ -1,6 +1,6 @@
-import { PDFDocument } from "@peculiarventures/pdf-doc";
+import { PDFDocument } from "@peculiar/pdf-doc";
 import { globalRepairRegistry } from "../PDFRepairRegistry";
-import { PDFDictionary } from "@peculiarventures/pdf-core";
+import { PDFDictionary } from "@peculiar/pdf-core";
 
 globalRepairRegistry.addRule({
   id: "annotationHasPage",

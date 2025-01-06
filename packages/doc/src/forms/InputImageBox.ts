@@ -1,4 +1,4 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { Image } from "../Image";
 import { ResourceManager } from "../ResourceManager";
 import { FormComponent } from "./FormComponent";

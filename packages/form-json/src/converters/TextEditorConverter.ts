@@ -1,4 +1,4 @@
-import * as pdfDoc from "@peculiarventures/pdf-doc";
+import * as pdfDoc from "@peculiar/pdf-doc";
 import { JsonTextEditorUpdate } from "../types";
 import { WidgetConverter } from "./WidgetConverter";
 

@@ -1,4 +1,4 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { BufferSourceConverter } from "pvtsutils";
 import { WrapObject } from "../WrapObject";
 import { EmbeddedFile } from "./EmbeddedFile";

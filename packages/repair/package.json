@@ -1,8 +1,12 @@
 {
-  "name": "@peculiarventures/pdf-repair",
+  "name": "@peculiar/pdf-repair",
   "version": "1.16.0",
   "description": "A comprehensive PDF repair module for Node.js, providing automated diagnosis and correction of PDF documents.",
-  "keywords": [],
+  "keywords": [
+    "pdf",
+    "repair",
+    "document"
+  ],
   "author": "microshine <microshine@mail.ru>",
   "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/repair#readme",
   "license": "AGPL",
@@ -13,9 +17,6 @@
     "build",
     "README.md"
   ],
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/PeculiarVentures/pdf.git"
@@ -31,8 +32,8 @@
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
   "dependencies": {
-    "@peculiarventures/pdf-core": "^1.16.0",
-    "@peculiarventures/pdf-doc": "^1.16.0",
+    "@peculiar/pdf-core": "^1.16.0",
+    "@peculiar/pdf-doc": "^1.16.0",
     "tslib": "^2.8.1"
   }
 }

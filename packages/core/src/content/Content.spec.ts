@@ -4,7 +4,7 @@ import { PDFContent } from "./Content";
 describe("Content", () => {
   it("simple text", () => {
     const text =
-      "BT\n/F13 12 Tf\n288 720 Td\n(Hello from @peculiarventures/pdf module) Tj\nET";
+      "BT\n/F13 12 Tf\n288 720 Td\n(Hello from @peculiar/pdf module) Tj\nET";
 
     const content = PDFContent.fromString(text);
 

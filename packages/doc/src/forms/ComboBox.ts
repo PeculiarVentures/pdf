@@ -1,4 +1,4 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { FormObject } from "../FormObject";
 import { ResourceManager } from "../ResourceManager";
 import { FontComponent } from "../Font";

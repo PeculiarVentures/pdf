@@ -1,7 +1,4 @@
-import {
-  PDFDocument,
-  PDFDocumentLoadParameters
-} from "@peculiarventures/pdf-doc";
+import { PDFDocument, PDFDocumentLoadParameters } from "@peculiar/pdf-doc";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { BufferSourceConverter } from "pvtsutils";

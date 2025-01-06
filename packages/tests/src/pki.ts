@@ -15,7 +15,7 @@ import {
   OCSP,
   RevocationType,
   TimeStampToken
-} from "@peculiarventures/pdf-doc";
+} from "@peculiar/pdf-doc";
 
 interface RootCertificateStorageHandlerParams {
   trustedCertificates?: x509.X509Certificate[];

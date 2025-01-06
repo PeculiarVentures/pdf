@@ -1,4 +1,4 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { type PDFDocument } from "./Document";
 import { FormObject } from "./FormObject";
 import { Image } from "./Image";
