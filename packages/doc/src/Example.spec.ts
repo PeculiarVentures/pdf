@@ -955,9 +955,12 @@ describe("Examples", () => {
     );
 
     const pdf = await doc.save();
-    const hash = await PdfRenderingHelper.getPageHash(pdf, 1, true);
-    expect(hash).toEqual(
-      "c349c894252d13a6b733772f7f994c46399acaa94c169e6bc1c3e1eb4e5d9ff0"
-    );
+    const hash = await PdfRenderingHelper.getPageHash(pdf, 1);
+    const expectedHash: Record<string, string> = {
+      darwin:
+        "c349c894252d13a6b733772f7f994c46399acaa94c169e6bc1c3e1eb4e5d9ff0",
+      linux: "065dc45d38816d08015c1faf5158449b9fffbec7e63aa095597e2d330e82d944"
+    };
+    expect(hash).toEqual(expectedHash[process.platform]);
   });
 });

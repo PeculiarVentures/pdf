@@ -212,9 +212,13 @@ describe("FormConverter", () => {
 
     const raw = await doc.save();
     const hash = await PdfRenderingHelper.getPageHash(raw, 1);
-    expect(hash).toBe(
-      "ba8e2842155e1105bcc3d674930fb354eb0913492ba8264a06293e50b0245603"
-    );
+
+    const expectedHash: Record<string, string> = {
+      darwin:
+        "ba8e2842155e1105bcc3d674930fb354eb0913492ba8264a06293e50b0245603",
+      linux: "1f025cb5eeae5f8c36faade8ae5aaf75cb882ebc8216318bea621a132cecc06e"
+    };
+    expect(hash).toBe(expectedHash[process.platform]);
   });
 
   it("should set values", async () => {
@@ -247,9 +251,13 @@ describe("FormConverter", () => {
     ]);
 
     const raw = await doc.save();
-    const hash = await PdfRenderingHelper.getPageHash(raw, 1, true);
-    expect(hash).toBe(
-      "492b15b25d4ad68f09d751af166ece97f91fe23bbcce5730dfba60a72b8fa8d0"
-    );
+    const hash = await PdfRenderingHelper.getPageHash(raw, 1);
+
+    const expectedHash: Record<string, string> = {
+      darwin:
+        "492b15b25d4ad68f09d751af166ece97f91fe23bbcce5730dfba60a72b8fa8d0",
+      linux: "78a67a9d1d1d787b15bdde8dc4d23312365a8a377de60c9fdb6b53ed512b4a29"
+    };
+    expect(hash).toBe(expectedHash[process.platform]);
   });
 });

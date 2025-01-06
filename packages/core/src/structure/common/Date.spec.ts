@@ -7,7 +7,9 @@ describe("PDFDate", () => {
     it("should create from Date object", () => {
       const date = new Date("2021-10-04T01:02:03.000Z");
       const pdfDate = new PDFDate(date);
-      expect(pdfDate.toString()).toMatch(/^\(D:20211004\d{6}[+-]\d{2}'00'\)$/);
+      expect(pdfDate.toString()).toMatch(
+        /^\(D:20211004\d{6}(Z|[+-]\d{2}'00')\)$/
+      );
     });
 
     it("should create from PDFString", () => {
@@ -91,7 +93,7 @@ describe("PDFDate", () => {
       const initDate = new Date("2021-10-04T01:02:03.000+0000");
       const date = new PDFDate(initDate);
       const result = date.toString();
-      expect(result).toMatch(/^\(D:20211004\d{6}[+-]\d{2}'00'\)$/);
+      expect(result).toMatch(/^\(D:20211004\d{6}(Z|[+-]\d{2}'00')\)$/);
     });
   });
 

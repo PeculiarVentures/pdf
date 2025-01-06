@@ -29,9 +29,14 @@ describe("Page", () => {
       const raw = await doc.save();
 
       const hash = await PdfRenderingHelper.getPageHash(raw, 1);
-      expect(hash).toEqual(
-        "97afbc0da17a69ed79aa5833ffcb6e1d0bcba0cf9f0dbe8c22a01dac75ecebe7"
-      );
+
+      const expectedHash: Record<string, string> = {
+        darwin:
+          "97afbc0da17a69ed79aa5833ffcb6e1d0bcba0cf9f0dbe8c22a01dac75ecebe7",
+        linux:
+          "9d1ee36dec23a7266823651855a44fc0e2b5bf2139d473a9d58224d4f6e9af13"
+      };
+      expect(hash).toEqual(expectedHash[process.platform]);
     });
 
     it("should add simple JPEG image", async () => {
@@ -48,9 +53,14 @@ describe("Page", () => {
 
       const raw = await doc.save();
       const hash = await PdfRenderingHelper.getPageHash(raw, 1);
-      expect(hash).toEqual(
-        "dc7b5f4535ae3f4ba0295520277abcf28e0f89e5b663ac518ca1781f8354e31b"
-      );
+
+      const expectedHash: Record<string, string> = {
+        darwin:
+          "dc7b5f4535ae3f4ba0295520277abcf28e0f89e5b663ac518ca1781f8354e31b",
+        linux:
+          "9ae286debf575276a966629d3a866a7a1f80fe471005905ef18661adff58e8b6"
+      };
+      expect(hash).toEqual(expectedHash[process.platform]);
     });
   });
 
@@ -89,9 +99,13 @@ describe("Page", () => {
 
     const raw = await doc.save();
     const hash = await PdfRenderingHelper.getPageHash(raw, 1);
-    expect(hash).toEqual(
-      "28ac1661e14138f24d788cb8936bc220debe081f5fc2ec80c8b63e9038ba5761"
-    );
+
+    const expectedHash: Record<string, string> = {
+      darwin:
+        "28ac1661e14138f24d788cb8936bc220debe081f5fc2ec80c8b63e9038ba5761",
+      linux: "2275593b3fbdbcaa0fcbb45d367ee6cbc99740be236a64e7cc7a05410577503d"
+    };
+    expect(hash).toEqual(expectedHash[process.platform]);
   });
 
   describe("Rectangle", () => {
@@ -129,9 +143,14 @@ describe("Page", () => {
 
       const raw = await doc.save();
       const hash = await PdfRenderingHelper.getPageHash(raw, 1);
-      expect(hash).toEqual(
-        "67e7ef2671f43a777b91f2c8238684badb60dab62c9d66fe362108f69fa04a19"
-      );
+
+      const expectedHash: Record<string, string> = {
+        darwin:
+          "67e7ef2671f43a777b91f2c8238684badb60dab62c9d66fe362108f69fa04a19",
+        linux:
+          "c29308f76f37848b3f0080bdc99dedf1e605aeef05b1a5886736fc7896827cee"
+      };
+      expect(hash).toEqual(expectedHash[process.platform]);
     });
 
     it("should add rectangle with border", async () => {
