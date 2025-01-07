@@ -2,7 +2,7 @@ name: repo-init
 description: Prepares the repository
 inputs:
   token:
-    description: GitHub token
+    description: NPM token
     required: true
 
 runs:
@@ -19,13 +19,13 @@ runs:
       run: |
         npm set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
       env:
-        NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+        NODE_AUTH_TOKEN: ${{ inputs.token }}
 
     - name: Ensure access
       shell: bash
       run: npm whoami --registry https://registry.npmjs.org/
       env:
-        NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+        NODE_AUTH_TOKEN: ${{ inputs.token }}
 
     - name: Config git user
       shell: bash
