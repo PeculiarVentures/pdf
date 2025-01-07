@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.17.0](https://github.com/PeculiarVentures/pdf/compare/v1.16.0...v1.17.0) (2025-01-07)
+
+
+### Bug Fixes
+
+* **cms:** improve signing algorithm handling in OCSP response ([6ddfbaf](https://github.com/PeculiarVentures/pdf/commit/6ddfbaf3cb0d7b9b008bc2040f52fba7a26adcf6))
+* **doc:** improve wording for identity verification and document structure warnings ([52cb7af](https://github.com/PeculiarVentures/pdf/commit/52cb7afdfc69197f6f9e42971d545d2f765bd2af))
+* **doc:** update default xref option to 0 for XRef Stream ([cf115bc](https://github.com/PeculiarVentures/pdf/commit/cf115bc9764562f99f0d2eb7b007952568676cff))
+* **forms:** implement paint call on border and color change events ([9b98eee](https://github.com/PeculiarVentures/pdf/commit/9b98eee3bd90d299ce07cbc74f126455a751ec02))
+* implement Registry class for managing circular dependencies and enhance CMS imports ([c5cd79b](https://github.com/PeculiarVentures/pdf/commit/c5cd79b0364a1b198ae128799d81688410dd40a1))
+* update repo-init action to use NPM token instead of GitHub token ([7267dc2](https://github.com/PeculiarVentures/pdf/commit/7267dc2c0bb977fd2bb174f48ee67848fcff869d))
+
+
+### Features
+
+* **doc:** add catalog getter with error handling in PDFDocument ([7a1e043](https://github.com/PeculiarVentures/pdf/commit/7a1e0435814d8136f453514b8cafe835b3c4fecc))
+* **doc:** enable signature flags in AcroForm for PDFPage ([ad910e7](https://github.com/PeculiarVentures/pdf/commit/ad910e757d0b036cf5172e2f5977451df6da0495))
+* **forms:** add name parameter to IFormComponentParameters and improve FormComponent structure ([9822cde](https://github.com/PeculiarVentures/pdf/commit/9822cde2acf80072d074dd935b5ed3f525208caa))
+* **tests:** add password parameter to PdfRenderingHelper load and getPageHash methods ([1acc968](https://github.com/PeculiarVentures/pdf/commit/1acc968473de1569c6ec4f7bf33ab5c73207face))
+* **tests:** add PDF testing utilities and helpers ([8911ac5](https://github.com/PeculiarVentures/pdf/commit/8911ac5e2c87661a122b1a8d11148cea235e8268))
+* **tests:** add PKI handling and PDF file writing utilities ([d088f1c](https://github.com/PeculiarVentures/pdf/commit/d088f1c54710d7d598b0df4ee2ea601db20f9b37))
+* **tests:** enhance PdfRenderingHelper and add resource handling ([f3c41b7](https://github.com/PeculiarVentures/pdf/commit/f3c41b78f3701344e1b2d3c34b3048a427d4bc9d))
+* **ViewWriter:** add toString method to convert buffer to binary string ([c471b75](https://github.com/PeculiarVentures/pdf/commit/c471b759415e049d96bb760bb72f1cb8ee8a6b9e))
+
+
+
+
+
 # [1.16.0](https://github.com/PeculiarVentures/pdf/compare/v1.15.0...v1.16.0) (2024-07-22)
 
 

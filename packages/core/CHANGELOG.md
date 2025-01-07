@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.17.0](https://github.com/PeculiarVentures/pdf/compare/v1.16.0...v1.17.0) (2025-01-07)
+
+
+### Bug Fixes
+
+* **doc:** update default xref option to 0 for XRef Stream ([cf115bc](https://github.com/PeculiarVentures/pdf/commit/cf115bc9764562f99f0d2eb7b007952568676cff))
+
+
+### Features
+
+* **doc:** add catalog getter with error handling in PDFDocument ([7a1e043](https://github.com/PeculiarVentures/pdf/commit/7a1e0435814d8136f453514b8cafe835b3c4fecc))
+* **ViewWriter:** add toString method to convert buffer to binary string ([c471b75](https://github.com/PeculiarVentures/pdf/commit/c471b759415e049d96bb760bb72f1cb8ee8a6b9e))
+
+
+
+
+
 # [1.16.0](https://github.com/PeculiarVentures/pdf/compare/v1.15.0...v1.16.0) (2024-07-22)
 
 **Note:** Version bump only for package @peculiarventures/pdf-core

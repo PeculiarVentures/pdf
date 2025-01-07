@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.17.0](https://github.com/PeculiarVentures/pdf/compare/v1.16.0...v1.17.0) (2025-01-07)
+
+
+### Bug Fixes
+
+* **cms:** improve signing algorithm handling in OCSP response ([6ddfbaf](https://github.com/PeculiarVentures/pdf/commit/6ddfbaf3cb0d7b9b008bc2040f52fba7a26adcf6))
+* **doc:** improve wording for identity verification and document structure warnings ([52cb7af](https://github.com/PeculiarVentures/pdf/commit/52cb7afdfc69197f6f9e42971d545d2f765bd2af))
+* **forms:** implement paint call on border and color change events ([9b98eee](https://github.com/PeculiarVentures/pdf/commit/9b98eee3bd90d299ce07cbc74f126455a751ec02))
+* implement Registry class for managing circular dependencies and enhance CMS imports ([c5cd79b](https://github.com/PeculiarVentures/pdf/commit/c5cd79b0364a1b198ae128799d81688410dd40a1))
+
+
+### Features
+
+* **doc:** enable signature flags in AcroForm for PDFPage ([ad910e7](https://github.com/PeculiarVentures/pdf/commit/ad910e757d0b036cf5172e2f5977451df6da0495))
+* **forms:** add name parameter to IFormComponentParameters and improve FormComponent structure ([9822cde](https://github.com/PeculiarVentures/pdf/commit/9822cde2acf80072d074dd935b5ed3f525208caa))
+
+
+
+
+
 # [1.16.0](https://github.com/PeculiarVentures/pdf/compare/v1.15.0...v1.16.0) (2024-07-22)
 
 
