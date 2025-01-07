@@ -30,7 +30,7 @@ jobs:
       - name: Initialize the repository
         uses: ./.github/actions/repo-init
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.NODE_AUTH_TOKEN }}
 
       - name: Build
         run: npm run build
