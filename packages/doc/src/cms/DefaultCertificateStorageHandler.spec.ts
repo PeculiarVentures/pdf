@@ -1,17 +1,16 @@
 import * as x509 from "@peculiar/x509";
 import * as pkijs from "pkijs";
-import "./algorithms";
-import { CRL } from "./CRL";
-import { DefaultCertificateStorageHandler } from "./DefaultCertificateStorageHandler";
+import { Convert } from "pvtsutils";
 import {
+  CertificateID,
+  CRL,
+  DefaultCertificateStorageHandler,
   ICertificateStorageHandler,
   IResult,
   IsTrustedResult,
+  OCSP,
   RevocationType
-} from "./ICertificateStorageHandler";
-import { OCSP } from "./OCSP";
-import { Convert } from "pvtsutils";
-import { CertificateID } from "./CertID";
+} from "@peculiar/pdf-doc";
 
 describe("DefaultCertificateStorageHandler", () => {
   beforeAll(() => {
