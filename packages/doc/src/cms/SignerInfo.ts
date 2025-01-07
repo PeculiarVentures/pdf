@@ -79,8 +79,8 @@ export enum CMSAttributeTypes {
 export class CMSSignerInfo extends AsnEncoded<pkijs.SignerInfo> {
   public parent: CMSSignedData | null = null;
 
-  public signedAttributes: ReadonlyArray<attributes.CmsAttribute> = [];
-  public unsignedAttributes: attributes.CmsAttribute[] = [];
+  public signedAttributes: ReadonlyArray<CmsAttribute> = [];
+  public unsignedAttributes: CmsAttribute[] = [];
 
   constructor() {
     super();
@@ -111,13 +111,11 @@ export class CMSSignerInfo extends AsnEncoded<pkijs.SignerInfo> {
     return result;
   }
 
-  protected readAttributes(
-    attrs?: pkijs.Attribute[]
-  ): attributes.CmsAttribute[] {
-    const res: attributes.CmsAttribute[] = [];
+  protected readAttributes(attrs?: pkijs.Attribute[]): CmsAttribute[] {
+    const res: CmsAttribute[] = [];
     if (attrs) {
       for (const attr of attrs) {
-        const attrConst = attributes.CmsAttributeFactory.get(attr.type);
+        const attrConst = CmsAttributeFactory.get(attr.type);
         const cmsAttr = new attrConst();
         cmsAttr.fromBER(attr.toSchema().toBER());
 
@@ -204,7 +202,8 @@ export class CMSSignerInfo extends AsnEncoded<pkijs.SignerInfo> {
   }
 }
 
-import * as attributes from "./attributes";
+import { CmsAttribute } from "./attributes/Attribute";
+import { CmsAttributeFactory } from "./attributes/AttributeFactory";
 import { AlgorithmFactory } from "./AlgorithmFactory";
 
 import type { CMSSignedData } from "./SignedData";

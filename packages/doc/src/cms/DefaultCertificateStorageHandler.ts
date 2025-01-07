@@ -331,8 +331,9 @@ export class DefaultCertificateStorageHandler
     try {
       const raw = await this.requestCRL(uri);
 
+      const crl = Registry.getInstance().get("CRL");
       return {
-        result: CRL.fromBER(raw),
+        result: crl.fromBER(raw),
         target: this
       };
     } catch (e) {
@@ -462,8 +463,9 @@ export class DefaultCertificateStorageHandler
                 };
               }
 
+              const ocsp = Registry.getInstance().get("OCSP");
               return {
-                result: OCSP.fromBER(ocspResp.responseBytes!.response),
+                result: ocsp.fromBER(ocspResp.responseBytes!.response),
                 target: this
               };
             }
@@ -539,8 +541,8 @@ export class DefaultCertificateStorageHandler
   }
 }
 
-import { CRL } from "./CRL";
-import { OCSP } from "./OCSP";
+import type { CRL } from "./CRL";
+import type { OCSP } from "./OCSP";
 import { CertificateID } from "./CertID";
 import { PKIUtils } from "./PKIUtils";
 
@@ -550,3 +552,4 @@ import type {
   IsTrustedResult,
   RevocationType
 } from "./ICertificateStorageHandler";
+import { Registry } from "../Registry";

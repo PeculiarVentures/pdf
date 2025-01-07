@@ -8,7 +8,8 @@ import {
   AsnTypeTypes
 } from "@peculiar/asn1-schema";
 import * as asn1js from "asn1js";
-import { CmsAttribute, CmsAttributeFactory } from "./attributes";
+import { CmsAttribute } from "./attributes/Attribute";
+import { CmsAttributeFactory } from "./attributes/AttributeFactory";
 import { CRL } from "./CRL";
 import { OCSP } from "./OCSP";
 
