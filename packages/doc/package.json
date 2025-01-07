@@ -9,6 +9,10 @@
   "main": "build/peculiar.pdf.doc.js",
   "module": "build/peculiar.pdf.doc.es.js",
   "types": "build/index.d.ts",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "files": [
     "build",
     "LICENSE",

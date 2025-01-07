@@ -14,6 +14,10 @@
   "main": "build/peculiar.pdf.form.js",
   "module": "build/peculiar.pdf.form.es.js",
   "types": "build/index.d.ts",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "files": [
     "build",
     "LICENSE",

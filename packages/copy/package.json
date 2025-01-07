@@ -16,6 +16,10 @@
   "main": "build/peculiar.pdf.copy.js",
   "module": "build/peculiar.pdf.copy.es.js",
   "types": "build/index.d.ts",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "files": [
     "build",
     "LICENSE",
