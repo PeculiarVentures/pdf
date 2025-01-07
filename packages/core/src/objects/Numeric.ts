@@ -7,16 +7,22 @@ import { ParsingError } from "../errors";
 import { isDigit, ObjectTypeEnum } from "./internal";
 import { PDFObject } from "./Object";
 
+/**
+ * Represents a numeric object in a PDF document.
+ * Numeric objects are used to represent integers or real numbers.
+ */
 export class PDFNumeric extends PDFObject {
-
   public static readonly NAME = ObjectTypeEnum.Numeric;
 
-  public static assertPositiveInteger(number: PDFNumeric): asserts number is PDFNumeric {
+  public static assertPositiveInteger(
+    number: PDFNumeric
+  ): asserts number is PDFNumeric {
     if (!(number.value >>> 0 === parseFloat(number.value.toString()))) {
       throw new Error("Number is not a positive integer");
     }
   }
 
+  /** The value of the numeric object */
   public value;
 
   public constructor(value?: number) {
@@ -25,16 +31,18 @@ export class PDFNumeric extends PDFObject {
     this.value = value ?? 0;
   }
 
-
   protected onWritePDF(writer: ViewWriter): void {
     writer.writeString(this.toString());
   }
 
   protected onFromPDF(reader: ViewReader): void {
-    const view = reader.read(c => !isDigit(c));
+    const view = reader.read((c) => !isDigit(c));
 
     if (!view.length) {
-      throw new ParsingError(`Numeric sequence not found at position ${reader.position}`, reader.position);
+      throw new ParsingError(
+        `Numeric sequence not found at position ${reader.position}`,
+        reader.position
+      );
     }
 
     const value = new Number(Convert.ToUtf8String(view));
@@ -60,8 +68,6 @@ export class PDFNumeric extends PDFObject {
   }
 
   protected onEqual(target: PDFObject): boolean {
-    return target instanceof PDFNumeric &&
-      target.value === this.value;
+    return target instanceof PDFNumeric && target.value === this.value;
   }
-
 }

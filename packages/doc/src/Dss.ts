@@ -1,4 +1,4 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { X509Certificate } from "@peculiar/x509";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
 
@@ -8,12 +8,14 @@ import { PDFVersion } from "./Version";
 import { WrapObject } from "./WrapObject";
 
 export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
-
   #certs: X509Certificate[] = [];
   #crls: cms.CRL[] = [];
   #ocsps: cms.OCSP[] = [];
 
-  constructor(target: core.DocumentSecurityStoreDictionary, document: PDFDocument) {
+  constructor(
+    target: core.DocumentSecurityStoreDictionary,
+    document: PDFDocument
+  ) {
     super(target, document);
 
     if (target.Certs.has()) {
@@ -71,7 +73,9 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
     if (catalog && catalog.DSS) {
       return new Dss(catalog.DSS, document);
     }
-    const dss = core.DocumentSecurityStoreDictionary.create(document.target.update);
+    const dss = core.DocumentSecurityStoreDictionary.create(
+      document.target.update
+    );
 
     return new Dss(dss, document);
   }
@@ -92,7 +96,10 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
     }
   }
 
-  public add(view: BufferSource | X509Certificate | cms.CRL | cms.OCSP, vri?: string): void {
+  public add(
+    view: BufferSource | X509Certificate | cms.CRL | cms.OCSP,
+    vri?: string
+  ): void {
     this.addToCatalog();
 
     if (BufferSourceConverter.isBufferSource(view)) {
@@ -121,28 +128,41 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
     }
   }
 
-  public addTimeStamp(token: cms.TimeStampToken | BufferSource, signatureThumbprint: string): void {
+  public addTimeStamp(
+    token: cms.TimeStampToken | BufferSource,
+    signatureThumbprint: string
+  ): void {
     signatureThumbprint = signatureThumbprint.toUpperCase();
 
     if (BufferSourceConverter.isBufferSource(token)) {
-      return this.addTimeStamp(cms.TimeStampToken.fromBER(token), signatureThumbprint);
+      return this.addTimeStamp(
+        cms.TimeStampToken.fromBER(token),
+        signatureThumbprint
+      );
     }
 
     this.addToCatalog();
     let vri = this.findVri(signatureThumbprint);
     if (!vri) {
-      vri = core.ValidationRelatedInformationDictionary.create(this.document.target);
+      vri = core.ValidationRelatedInformationDictionary.create(
+        this.document.target
+      );
       this.target.VRI.get().set(signatureThumbprint, vri);
     }
 
     vri.TS = this.document.target.createStream(token.toBER());
   }
 
-  public findVri(signatureThumbprint: string): core.ValidationRelatedInformationDictionary | null {
+  public findVri(
+    signatureThumbprint: string
+  ): core.ValidationRelatedInformationDictionary | null {
     if (this.document.dss.target.VRI.has()) {
       const vri = this.document.dss.target.VRI.get();
       if (vri.has(signatureThumbprint)) {
-        return vri.get(signatureThumbprint, core.ValidationRelatedInformationDictionary);
+        return vri.get(
+          signatureThumbprint,
+          core.ValidationRelatedInformationDictionary
+        );
       }
     }
 
@@ -160,7 +180,10 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
     let stream: core.PDFStream | null = null;
     const certsArray = this.target.Certs.get();
     for (const item of certsArray) {
-      if (item instanceof core.PDFStream && BufferSourceConverter.isEqual(item.decodeSync(), cert.rawData)) {
+      if (
+        item instanceof core.PDFStream &&
+        BufferSourceConverter.isEqual(item.decodeSync(), cert.rawData)
+      ) {
         stream = item;
         break;
       }
@@ -175,9 +198,11 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
     if (vri) {
       vri = vri.toUpperCase();
       const vriDict = this.target.VRI.get();
-      const vriItemDict = (vriDict.has(vri))
+      const vriItemDict = vriDict.has(vri)
         ? vriDict.get(vri, core.ValidationRelatedInformationDictionary, true)
-        : core.ValidationRelatedInformationDictionary.create(this.document.target.update);
+        : core.ValidationRelatedInformationDictionary.create(
+            this.document.target.update
+          );
       // TODO Dont push the same values
       vriItemDict.Cert.get().push(stream);
 
@@ -191,7 +216,10 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
     let stream: core.PDFStream | null = null;
     const crlArray = this.target.CRLs.get();
     for (const item of crlArray) {
-      if (item instanceof core.PDFStream && BufferSourceConverter.isEqual(item.decodeSync(), crl.toBER())) {
+      if (
+        item instanceof core.PDFStream &&
+        BufferSourceConverter.isEqual(item.decodeSync(), crl.toBER())
+      ) {
         stream = item;
         break;
       }
@@ -206,9 +234,11 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
     if (vri) {
       vri = vri.toUpperCase();
       const vriDict = this.target.VRI.get();
-      const vriItemDict = (vriDict.has(vri))
+      const vriItemDict = vriDict.has(vri)
         ? vriDict.get(vri, core.ValidationRelatedInformationDictionary, true)
-        : core.ValidationRelatedInformationDictionary.create(this.document.target.update);
+        : core.ValidationRelatedInformationDictionary.create(
+            this.document.target.update
+          );
       vriItemDict.CRL.get().push(stream);
 
       vriDict.set(vri, vriItemDict);
@@ -222,7 +252,10 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
     const ocspArray = this.target.OCSPs.get();
     const ocspResp = ocsp.toOCSPResponse();
     for (const item of ocspArray) {
-      if (item instanceof core.PDFStream && BufferSourceConverter.isEqual(item.decodeSync(), ocspResp)) {
+      if (
+        item instanceof core.PDFStream &&
+        BufferSourceConverter.isEqual(item.decodeSync(), ocspResp)
+      ) {
         stream = item;
         break;
       }
@@ -238,9 +271,11 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
     if (vri) {
       vri = vri.toUpperCase();
       const vriDict = this.target.VRI.get();
-      const vriItemDict = (vriDict.has(vri))
+      const vriItemDict = vriDict.has(vri)
         ? vriDict.get(vri, core.ValidationRelatedInformationDictionary, true)
-        : core.ValidationRelatedInformationDictionary.create(this.document.target.update);
+        : core.ValidationRelatedInformationDictionary.create(
+            this.document.target.update
+          );
       vriItemDict.OCSP.get().push(stream);
 
       vriDict.set(vri, vriItemDict);

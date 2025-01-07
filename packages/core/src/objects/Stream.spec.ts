@@ -1,59 +1,58 @@
-import * as assert from "assert";
-
 import { PDFStream } from "./Stream";
+import "./register";
 
-context("Stream", () => {
-  context("fromPDF", () => {
+describe("Stream", () => {
+  describe("fromPDF", () => {
     const vector: [string, number][] = [
       [
         `<</Length 0>>stream
 endstream`,
-        0,
+        0
       ],
       [
         `<</Length 1>>stream
 1
 endstream`,
-        1,
+        1
       ],
       [
         `<</Length 1>>
 stream
 1
 endstream`,
-        1,
+        1
       ],
       [
         `<</Length 5>>
 stream
 12345
 endstream`,
-        5,
+        5
       ],
       [
         `<</Length 10>>
 stream
 12345
 endstream`,
-        5,
+        5
       ],
       [
         `<</Length 1>>
 stream
 12345
 endstream`,
-        5,
-      ],
+        5
+      ]
     ];
     vector.forEach(([i, o]) => {
       it(JSON.stringify(i), () => {
         const parsedItem = PDFStream.fromPDF(i);
-        assert.strictEqual(parsedItem.stream.length, o);
+        expect(parsedItem.stream.length).toBe(o);
       });
     });
   });
 
-  context("toPDF", () => {
+  describe("toPDF", () => {
     const vector: [Uint8Array, string][] = [
       [
         Buffer.from("sd"),
@@ -62,20 +61,19 @@ endstream`,
 >>
 stream
 sd
-endstream`,
-      ],
+endstream`
+      ]
     ];
     vector.forEach(([i, o]) => {
       it(i.toString(), () => {
         const parsedItem = new PDFStream(i);
         const view = parsedItem.toPDF();
-        assert.strictEqual(Buffer.from(view).toString(), o);
+        expect(Buffer.from(view).toString()).toBe(o);
       });
     });
-
   });
 
-  // context("Filters", () => {
+  // describe("Filters", () => {
   //   it("create/decode", async () => {
   //     const data = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 0]);
   //     const stream = await pdf.Stream.createAsync(data, [new pdf.ASCIIHexFilter(), new pdf.ASCIIHexFilter()], {
@@ -88,6 +86,9 @@ endstream`,
   //     const parsedStream = new pdf.Stream();
   //     parsedStream.fromPDF(outStream);
   //     const decodedStream = await parsedStream.decode();
+  //     expect(new Uint8Array(decodedStream).toString()).toBe(data.toString());
+  //   });
+  //   it("Flate", async () => {
   //     assert.strictEqual(new Uint8Array(decodedStream).toString(), data.toString());
   //   });
   //   it("Flate", async () => {
@@ -99,5 +100,4 @@ endstream`,
   //     // console.log(Buffer.from(decoded).toString());
   //   })
   // });
-
 });

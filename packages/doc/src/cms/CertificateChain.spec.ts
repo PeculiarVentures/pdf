@@ -1,24 +1,638 @@
-import * as assert from "assert";
-import { Convert } from "pvtsutils";
-import { Crypto } from "@peculiar/webcrypto";
 import * as x509 from "@peculiar/x509";
-import { CertificateChain } from "./CertificateChain";
-import { CMSSignedData } from "./SignedData";
+import * as pkijs from "pkijs";
+import "./algorithms";
+import {
+  CertificateChain,
+  CertificateChainStatusCode
+} from "./CertificateChain";
+import { DefaultCertificateStorageHandler } from "./DefaultCertificateStorageHandler";
+import {
+  IResult,
+  IsTrustedResult,
+  RevocationType
+} from "./ICertificateStorageHandler";
+import { CRL } from "./CRL";
+import { OCSP } from "./OCSP";
+import { CertificateID } from "./CertID";
 
-x509.cryptoProvider.set(new Crypto() as globalThis.Crypto);
+/**
+ * Test implementation of ICertificateStorageHandler that mocks a root certificate storage.
+ */
+class RootCertificateStorageHandler extends DefaultCertificateStorageHandler {
+  constructor(
+    private trustedCertificate: x509.X509Certificate,
+    private revocations: Record<string, CRL | OCSP> = {}
+  ) {
+    super();
+  }
+  public override async isTrusted(
+    cert: x509.X509Certificate
+  ): Promise<IsTrustedResult> {
+    if (this.trustedCertificate.equal(cert)) {
+      return {
+        result: true,
+        target: this,
+        source: "RootCertificateStorageHandler"
+      };
+    }
 
-context("CertificateChain", () => {
+    return {
+      result: false,
+      target: this,
+      source: "RootCertificateStorageHandler"
+    };
+  }
 
-  const cmsHex = "30820b9b06092a864886f70d010702a0820b8c30820b88020100310030020600a0820b79308202c0308201a8a003020102020101300d06092a864886f70d01010b050030123110300e06035504031307526f6f74204341301e170d3139313233313231303030305a170d3230303130313231303030305a30123110300e06035504031307526f6f7420434130820122300d06092a864886f70d01010105000382010f003082010a0282010100d1a950bd421439591989ee91aeb51817bb339d0899eecc49cdd3b2f00d086a48b2859bb06d23ccb216fee8998b1a4cd60bda4e4ac2e28ffa591b4f2c59b25eede34af2a786efa2efaeafbc6d17edab1f16ab149198d947ed58f14f30638e38326ab5b2fa8b6b5740862f21d6103df3798c41b89c7fdccd57c57f7230a098dc822f698a89bde6df250eef037fbc2c7119e2e02b28104c7b97915fe744a3cc761da64aabef05952095140db2848108d2e22585e1b563e40496120597c562c2516d0e406204e856935c381bb3b029e91405af628e08342b6d3dcfed398ca6fd8c685a4743b180a2e5c5afb77dc2b328be245ef92a4a558ea40aa2297ea47a9ef65f0203010001a321301f301d0603551d0e041604141d74d2aa94b5e769a890703e79ab2cfbb73d1ec5300d06092a864886f70d01010b05000382010100764a20f3c1cc56e9a1c2d62175f88834397b27a1b636c5195bce405d0425ed10ef0cc01a0008427ed9dc1fa60e5e18aeaf8ec3b5c44c4f7f4522df7d750952a9f7ced5824ddc04d2ef1c983af9363bc3725087525d13048795480b91b5e434408de80280af95670376ac11be8747b665a7c65c8a65fbf2ea8667a7179a48d2bff7b57cb212df562612b3a76fe4c77a083866bd676696905eed74446b3306ad132570c31b7da6cc302b5b4e9ad32edd9023ad77fcd4298dedf530dc79edf24e12d192b13b0a6eea0d5df8bea08c14e0784f6c0f288d3e175c5780e09f47df44129d9ae99e3185929731c7df9529741d54ee251aecd804b2303f87e544f13816a5308202ec308201d4a003020102020101300d06092a864886f70d01010b050030123110300e06035504031307526f6f74204341301e170d3139313233313231303030305a170d3230303130313231303030305a301d311b301906035504031312496e7465726d65646961746520434120233130820122300d06092a864886f70d01010105000382010f003082010a0282010100ece0d39f3cf2b32b0a7721f016cf7df11e45552232e7896c871054b48b9349b833ba942b85e96ecf11641c265f85c4cadc27c5a5478bcbf591ef724649f65ddd4d5655cecc287ea0d8a72e85e5fa06a854b3a91ca96bdbf56f7836ecc489d877d7d8d655fd2f0251a0fd9302751c0cdbe5afcbcb427ca3c9108973b1765deed18cda00db91648e0982f41bb01ec0a8c45a402b5532161eb0c13230fa2e9f7a2b4a022264a40a40f361c11128655be9d46d2ee5e97512d86d8026cf6c50dd7d29793d127c9977ebd55aacfbcff3589acff48211803cc1016191fe8b99f99560f4a24486f4fcfb37fdad396efff08a39387d320288a251460705a30ec8821a762b0203010001a3423040301d0603551d0e04160414a6341939b96ae23f1ac4d543862c23305e921405301f0603551d230418301680141d74d2aa94b5e769a890703e79ab2cfbb73d1ec5300d06092a864886f70d01010b0500038201010035517ff518f6f4cd0ed57b8ec47ce3dbe7466c541d62336c3a66d3313902bbc9499a2b1e468cb3e63b45cc3e9d01576037cd9419bfe1d1e8ccba92340682e0d75ab203f7a150ff4f409ed645bd8cdf18230b3a6482e0608b4da9f417a1e845115365f3d6d4e57816886c59098b7b0569fb92e0168b44467446976f0b908043d80bba28eb20bc1d4ea129070ae4d0f961757db56dad52360c2584e31c96a0c683494277cd6fc0acba004484ec3b3bf8be69b10cbac89f5bbd0aed617c2c94093285fd30eb5a314eed2485f7632f81a0a7dafced46975ac77c88324c207b9b0a783f38721efb6a0ddf60dafbe6bed7d3730cdcc39150ebdffb0c22d33146047c39308202f9308201e1a003020102020101300d06092a864886f70d01010b0500301d311b301906035504031312496e7465726d656469617465204341202331301e170d3139313233313231303030305a170d3230303130313231303030305a301f311d301b06035504031314496e7465726d6564696174652043412023312e3130820122300d06092a864886f70d01010105000382010f003082010a0282010100d7bf8c90b888b5e83c7915ee34271f6f866edb08b7ba4345ab2485dfc924a349d9df0f0797d69479a329ca6e9ae9f64aa3108d6e7df6f7d69dcefbcb35f5d7924d993b4f8630a41facbce4d45fb8bd6b6dca2fe8aa6881f46e5e8ccf55656edab321e07835adaf72ffe1dea35731041400d5c395e56d5199d81f409ab4fcbc47419492b6a71597fbddc303de9d5740c163e06448af3a790abe8936bc9e4de6aa7bba1ebed3be405f2f9cb298b058bb5f2389bcf98bf5dcbae6f5d1e500224705600efc81560064188f6132790f72b23609eb70cdbfc6c1a5e3c89ba5589ab1bf885195e0958f98bcb1dab024dc26eab9cf3fd79ac8ce1b8dcfb04a1d16be02250203010001a3423040301d0603551d0e041604146e801b7d4fe868315bc7f5c3cfabceb13f950e3a301f0603551d23041830168014a6341939b96ae23f1ac4d543862c23305e921405300d06092a864886f70d01010b0500038201010063f82929b4ba1057fbaa75a7c135cc78f875edcce897a2e544c0a9ee1380800bd164d5f8f36279477f1c8fef4d9ef8c97b0ec2c374ce124ab67b01cfea81cd9594ee0f0e82a1e2bd4930425d36e36c75496604660874ef8d8d7a36a5939a1c4f9d3a2df4d66c67659a6986034795411b3501488ddc69af7bf6442735695bdc3db7146ea1fe1314e0056329cb4bd834939c245337d7061ceadca7af44c578f15156edbd6aac776740bae28acbd1a1aa0973fcea2762bea899dacae5c9f0bfe3258f0c331466402c5de40222a73b2db5a1277aa4910107f8c63d9680dfc49002b451617879aaa46a5bce9dca9b11683866378a2a82a5d65723283f13cceff3d5df308202c4308201aca003020102020101300d06092a864886f70d01010b050030143112301006035504031309436c69656e74202332301e170d3139313233313231303030305a170d3230303130313231303030305a30143112301006035504031309436c69656e7420233230820122300d06092a864886f70d01010105000382010f003082010a0282010100ad9b306037b41ffbdbca8118f7a6f23a6f5753f22f02e30df03ba5d227f912c6907ab87ba67219c30c0851ef92bcd0ae711b9e5c5c35f8a760a6e94c3da07bb8746665d0b3dca176e59f466a4796b14a9e7839991aac93453520c7667af92a6c8da0f3e9f391e6047878562dd8d814c492e33b675688fcb7ef6fa6c82abe8ddb9fa3da6c67dc575765a5431bd33f9ba4885339b042f723748cb529df3fb578cb12878471ce27ebc15310a38dd2acdfa3c3424b635f575368c67b928afb9eff2c9b9d56e545ecc521f5f189d22e55884183e4384f5cddd5bdee1903146e49eae35b7abb0319ef1e91134f64801623dcc0e4d355caddee41a1af080af4728348390203010001a321301f301d0603551d0e041604142d46d36ad331b4785ff0cf07084ca97433207eec300d06092a864886f70d01010b0500038201010083d831c5652c6b4f1403495d59f8beb31bdb985f897bb77f49bcb0f9a0212464f4e6add2d04bd84ed832603d0a15a3772e371aa9a06883313aec1898f1a6058fe69ca9e13c120c32b0d22c00640ee16e4fde6b80cf65b77b94105a2cdcc385d8a9e485724074531f17a4fb55f4073e9f424769a4721fe63d31b5bc7cff81eb845ef469df8fc78b9e229083927fce6e79c4ed00cf2e2fbb49d787656d5dc992f9087088afd0a4363b2e97a76085652f0fa5b98f3fab0b39e4f653cb0f6b145b247a94e913793e52d718a8478fb87aacceba83610ef6eff4bbae71e2b3e65a7280ee48cd39cc90056d66771ddfaaaea4bc6591c37b3c133c68f189cddb4b49ecbc3100";
-  const cms = Convert.FromHex(cmsHex);
+  public override async fetchRevocation(
+    type: "crl",
+    cert: x509.X509Certificate
+  ): Promise<IResult<CRL | null>>;
+  public override async fetchRevocation(
+    type: "ocsp",
+    cert: x509.X509Certificate
+  ): Promise<IResult<OCSP | null>>;
+  public override async fetchRevocation(
+    type: RevocationType,
+    cert: x509.X509Certificate
+  ): Promise<IResult<CRL | OCSP | null>> {
+    if (type === "crl") {
+      const crlDistriPoints = cert.getExtension(
+        x509.CRLDistributionPointsExtension
+      );
+      if (crlDistriPoints) {
+        for (const point of crlDistriPoints.distributionPoints) {
+          const url =
+            point.distributionPoint?.fullName?.[0].uniformResourceIdentifier;
+          if (url && this.revocations[url]) {
+            return {
+              result: this.revocations[url] as CRL,
+              target: this
+            };
+          }
+        }
+      }
+    } else if (type === "ocsp") {
+      const aia = cert.getExtension(x509.AuthorityInfoAccessExtension);
+      if (aia) {
+        for (const ocsp of aia.ocsp) {
+          const url = ocsp.type === "url" ? ocsp.value : null;
+          if (url && this.revocations[url]) {
+            return {
+              result: this.revocations[url] as OCSP,
+              target: this
+            };
+          }
+        }
+      }
+    }
+    return {
+      result: null,
+      target: this
+    };
+  }
+}
 
-  it("verify", async () => {
-    const signedData = CMSSignedData.fromBER(cms);
+describe("CertificateChain", () => {
+  let algorithm: EcKeyGenParams;
+  let signingAlgorithm: EcdsaParams;
+  let rootCert: x509.X509Certificate;
+  let intermediateCert1: x509.X509Certificate;
+  let intermediateCert2: x509.X509Certificate;
+  let leafCert: x509.X509Certificate;
+  const now = new Date();
 
-    const chain = new CertificateChain();
-    chain.certificateHandler = signedData.certificateHandler;
-    const res = await chain.build(signedData.certificates[3], { checkDate: new Date("2020-01-01 12:00:00") });
-    assert.strictEqual(res.result, false);
+  beforeAll(async () => {
+    // Set engine
+    pkijs.setEngine(
+      "newEngine",
+      new pkijs.CryptoEngine({ name: "nodejs", crypto })
+    );
+    x509.cryptoProvider.set(crypto);
+
+    algorithm = {
+      name: "ECDSA",
+      namedCurve: "P-256"
+    };
+    signingAlgorithm = {
+      name: "ECDSA",
+      hash: "SHA-256"
+    };
+
+    // Create root certificate
+    const rootKeys = await crypto.subtle.generateKey(algorithm, false, [
+      "sign",
+      "verify"
+    ]);
+    rootCert = await x509.X509CertificateGenerator.createSelfSigned({
+      name: "CN=Root Test",
+      keys: rootKeys,
+      signingAlgorithm,
+      notBefore: now,
+      notAfter: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 365), // 1 year
+      extensions: [
+        new x509.BasicConstraintsExtension(true, undefined, true),
+        new x509.KeyUsagesExtension(
+          x509.KeyUsageFlags.keyCertSign | x509.KeyUsageFlags.cRLSign,
+          true
+        ),
+        await x509.SubjectKeyIdentifierExtension.create(rootKeys.publicKey),
+        await x509.AuthorityKeyIdentifierExtension.create(rootKeys.publicKey)
+      ]
+    });
+    rootCert.privateKey = rootKeys.privateKey;
+
+    // Create intermediate certificate 1
+    const intermediateKeys1 = await crypto.subtle.generateKey(
+      algorithm,
+      false,
+      ["sign", "verify"]
+    );
+    intermediateCert1 = await x509.X509CertificateGenerator.create({
+      notBefore: now,
+      notAfter: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 30 * 10), // 10 months
+      subject: "CN=Intermediate 1 Test",
+      issuer: rootCert.subject,
+      publicKey: intermediateKeys1.publicKey,
+      signingKey: rootCert.privateKey,
+      signingAlgorithm,
+      extensions: [
+        new x509.BasicConstraintsExtension(true, undefined, true),
+        new x509.KeyUsagesExtension(
+          x509.KeyUsageFlags.keyCertSign | x509.KeyUsageFlags.cRLSign,
+          true
+        ),
+        await x509.SubjectKeyIdentifierExtension.create(
+          intermediateKeys1.publicKey
+        ),
+        await x509.AuthorityKeyIdentifierExtension.create(rootKeys.publicKey),
+        new x509.CRLDistributionPointsExtension(["http://intermediate1.crl"])
+      ]
+    });
+    intermediateCert1.privateKey = intermediateKeys1.privateKey;
+
+    // Create intermediate certificate 2
+    const intermediateKeys2 = await crypto.subtle.generateKey(
+      algorithm,
+      false,
+      ["sign", "verify"]
+    );
+    intermediateCert2 = await x509.X509CertificateGenerator.create({
+      notBefore: now,
+      notAfter: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 30 * 5), // 5 months
+      subject: "CN=Intermediate 2 Test",
+      issuer: intermediateCert1.subject,
+      publicKey: intermediateKeys2.publicKey,
+      signingKey: intermediateCert1.privateKey,
+      signingAlgorithm,
+      extensions: [
+        new x509.BasicConstraintsExtension(true, undefined, true),
+        new x509.KeyUsagesExtension(
+          x509.KeyUsageFlags.keyCertSign | x509.KeyUsageFlags.cRLSign,
+          true
+        ),
+        await x509.SubjectKeyIdentifierExtension.create(
+          intermediateKeys2.publicKey
+        ),
+        await x509.AuthorityKeyIdentifierExtension.create(
+          intermediateKeys1.publicKey
+        ),
+        new x509.AuthorityInfoAccessExtension({
+          ocsp: ["http://intermediate2.ocsp"]
+        })
+      ]
+    });
+    intermediateCert2.privateKey = intermediateKeys2.privateKey;
+
+    // Create leaf certificate
+    const leafKeys = await crypto.subtle.generateKey(algorithm, false, [
+      "sign",
+      "verify"
+    ]);
+    leafCert = await x509.X509CertificateGenerator.create({
+      notBefore: now,
+      notAfter: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 30), // 1 month
+      subject: "CN=Leaf Test",
+      issuer: intermediateCert2.subject,
+      publicKey: leafKeys.publicKey,
+      signingKey: intermediateCert2.privateKey,
+      signingAlgorithm,
+      extensions: [
+        new x509.BasicConstraintsExtension(false, undefined, true),
+        new x509.KeyUsagesExtension(x509.KeyUsageFlags.digitalSignature, true),
+        await x509.SubjectKeyIdentifierExtension.create(leafKeys.publicKey),
+        await x509.AuthorityKeyIdentifierExtension.create(
+          intermediateKeys2.publicKey
+        ),
+        new x509.CRLDistributionPointsExtension(["http://leaf.crl"]),
+        new x509.AuthorityInfoAccessExtension({
+          ocsp: ["http://leaf.ocsp"]
+        })
+      ]
+    });
   });
 
+  it("should build certificate chain", async () => {
+    const chain = new CertificateChain();
+    chain.certificateHandler.certificates.push(rootCert);
+    chain.certificateHandler.certificates.push(intermediateCert1);
+    chain.certificateHandler.certificates.push(intermediateCert2);
+    chain.certificateHandler.parent = new RootCertificateStorageHandler(
+      rootCert
+    );
+
+    const result = await chain.build(leafCert);
+    expect(result.result).toBe(true);
+    expect(result.resultCode).toBe(CertificateChainStatusCode.success);
+    expect(result.chain.length).toBe(4);
+  });
+
+  describe("trusted", () => {
+    it("should build certificate chain with trusted intermediate certificate", async () => {
+      const chain = new CertificateChain();
+      chain.certificateHandler.certificates.push(rootCert);
+      chain.certificateHandler.certificates.push(intermediateCert1);
+      chain.certificateHandler.certificates.push(intermediateCert2);
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(
+        intermediateCert1
+      );
+
+      const result = await chain.build(leafCert);
+      expect(result.result).toBe(true);
+      expect(result.resultCode).toBe(CertificateChainStatusCode.success);
+      expect(result.chain.length).toBe(3);
+    });
+
+    it("should return error if no trusted certificate", async () => {
+      const chain = new CertificateChain();
+      chain.certificateHandler.certificates.push(rootCert);
+      chain.certificateHandler.certificates.push(intermediateCert1);
+      chain.certificateHandler.certificates.push(intermediateCert2);
+
+      const result = await chain.build(leafCert);
+      expect(result.result).toBe(false);
+      expect(result.resultCode).toBe(CertificateChainStatusCode.badPath);
+    });
+  });
+
+  describe("badDate", () => {
+    it("should return error if certificate is not yet valid", async () => {
+      const chain = new CertificateChain();
+      chain.certificateHandler.certificates.push(rootCert);
+      chain.certificateHandler.certificates.push(intermediateCert1);
+      chain.certificateHandler.certificates.push(intermediateCert2);
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(
+        rootCert
+      );
+
+      const result = await chain.build(leafCert, {
+        checkDate: new Date(now.getTime() - 1000)
+      });
+      expect(result.result).toBe(false);
+      expect(result.resultCode).toBe(CertificateChainStatusCode.badDate);
+    });
+
+    it("should return error if certificate is expired", async () => {
+      const chain = new CertificateChain();
+      chain.certificateHandler.certificates.push(rootCert);
+      chain.certificateHandler.certificates.push(intermediateCert1);
+      chain.certificateHandler.certificates.push(intermediateCert2);
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(
+        rootCert
+      );
+
+      const result = await chain.build(leafCert, {
+        checkDate: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 31)
+      });
+      expect(result.result).toBe(false);
+      expect(result.resultCode).toBe(CertificateChainStatusCode.badDate);
+    });
+  });
+
+  describe("revocations", () => {
+    let crlLeaf: CRL;
+    let ocspLeaf: OCSP;
+    let ocspIntermediate2: OCSP;
+    let crlIntermediate1: CRL;
+
+    beforeAll(async () => {
+      // Create Leaf CRL
+      const x509Crl = await x509.X509CrlGenerator.create({
+        issuer: intermediateCert2.subject,
+        thisUpdate: new Date(),
+        nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
+        signingKey: intermediateCert2.privateKey!,
+        signingAlgorithm
+      });
+      crlLeaf = CRL.fromBER(x509Crl.rawData);
+
+      // Create Leaf OCSP
+      ocspLeaf = await OCSP.create({
+        issuer: intermediateCert2,
+        responses: [
+          {
+            certId: await CertificateID.create(
+              "SHA-256",
+              leafCert,
+              intermediateCert2
+            ),
+            status: {
+              type: "good"
+            },
+            thisUpdate: new Date(),
+            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24) // 1 day
+          }
+        ],
+        producedAt: new Date(),
+        signingAlgorithm,
+        signingKey: intermediateCert2.privateKey!
+      });
+
+      // Create Intermediate 2 OCSP
+      ocspIntermediate2 = await OCSP.create({
+        issuer: intermediateCert1,
+        responses: [
+          {
+            certId: await CertificateID.create(
+              "SHA-256",
+              intermediateCert2,
+              intermediateCert1
+            ),
+            status: {
+              type: "good"
+            },
+            thisUpdate: new Date(),
+            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24) // 1 day
+          }
+        ],
+        producedAt: new Date(),
+        signingAlgorithm,
+        signingKey: intermediateCert1.privateKey!
+      });
+
+      // Create Intermediate 1 CRL
+      const x509CrlIntermediate1 = await x509.X509CrlGenerator.create({
+        issuer: rootCert.subject,
+        thisUpdate: new Date(),
+        nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
+        signingKey: rootCert.privateKey!,
+        signingAlgorithm
+      });
+      crlIntermediate1 = CRL.fromBER(x509CrlIntermediate1.rawData);
+    });
+
+    it("should build certificate chain with revocation check", async () => {
+      const chain = new CertificateChain();
+      chain.certificateHandler.certificates.push(rootCert);
+      chain.certificateHandler.certificates.push(intermediateCert1);
+      chain.certificateHandler.certificates.push(intermediateCert2);
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(
+        rootCert,
+        {
+          "http://leaf.crl": crlLeaf,
+          "http://leaf.ocsp": ocspLeaf,
+          "http://intermediate2.ocsp": ocspIntermediate2,
+          "http://intermediate1.crl": crlIntermediate1
+        }
+      );
+
+      const result = await chain.build(leafCert, {
+        revocationMode: "online"
+      });
+      expect(result.result).toBe(true);
+      expect(result.resultCode).toBe(CertificateChainStatusCode.success);
+      expect(result.chain.length).toBe(4);
+      expect(result.revocationMode).toBe("online");
+      expect(result.revocations?.length).toBe(3);
+    });
+
+    it("should build certificate chain with revocation check offline", async () => {
+      const chain = new CertificateChain();
+      chain.certificateHandler.certificates.push(rootCert);
+      chain.certificateHandler.certificates.push(intermediateCert1);
+      chain.certificateHandler.certificates.push(intermediateCert2);
+      chain.certificateHandler.crls.push(crlLeaf);
+      chain.certificateHandler.crls.push(crlIntermediate1);
+      chain.certificateHandler.ocsps.push(ocspLeaf);
+      chain.certificateHandler.ocsps.push(ocspIntermediate2);
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(
+        rootCert
+      );
+
+      const result = await chain.build(leafCert, {
+        revocationMode: "offline"
+      });
+      expect(result.result).toBe(true);
+      expect(result.resultCode).toBe(CertificateChainStatusCode.success);
+      expect(result.chain.length).toBe(4);
+      expect(result.revocationMode).toBe("offline");
+      expect(result.revocations?.length).toBe(3);
+    });
+
+    // preferCRL
+    it("should prefer CRL over OCSP", async () => {
+      const chain = new CertificateChain();
+      chain.certificateHandler.certificates.push(rootCert);
+      chain.certificateHandler.certificates.push(intermediateCert1);
+      chain.certificateHandler.certificates.push(intermediateCert2);
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(
+        rootCert,
+        {
+          "http://leaf.crl": crlLeaf,
+          "http://leaf.ocsp": ocspLeaf,
+          "http://intermediate2.ocsp": ocspIntermediate2,
+          "http://intermediate1.crl": crlIntermediate1
+        }
+      );
+
+      const result = await chain.build(leafCert, {
+        revocationMode: "online",
+        preferCRL: true
+      });
+      expect(result.result).toBe(true);
+      expect(result.resultCode).toBe(CertificateChainStatusCode.success);
+      expect(result.chain.length).toBe(4);
+      expect(result.revocationMode).toBe("online");
+      expect(result.revocations?.length).toBe(3);
+      expect(result.revocations?.[0]).toBeInstanceOf(CRL);
+      expect(result.revocations?.[1]).toBeInstanceOf(OCSP);
+      expect(result.revocations?.[2]).toBeInstanceOf(CRL);
+
+      const result2 = await chain.build(leafCert, {
+        revocationMode: "online",
+        preferCRL: false
+      });
+      expect(result2.result).toBe(true);
+      expect(result2.resultCode).toBe(CertificateChainStatusCode.success);
+      expect(result2.chain.length).toBe(4);
+      expect(result2.revocationMode).toBe("online");
+      expect(result2.revocations?.length).toBe(3);
+      expect(result2.revocations?.[0]).toBeInstanceOf(OCSP);
+      expect(result2.revocations?.[1]).toBeInstanceOf(OCSP);
+      expect(result2.revocations?.[2]).toBeInstanceOf(CRL);
+    });
+
+    it("should return error if leaf certificate is revoked by CRL", async () => {
+      const x509RevokedCrl = await x509.X509CrlGenerator.create({
+        issuer: intermediateCert2.subject,
+        thisUpdate: new Date(),
+        nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
+        signingKey: intermediateCert2.privateKey!,
+        signingAlgorithm,
+        entries: [
+          {
+            serialNumber: leafCert.serialNumber,
+            revocationDate: new Date(),
+            reason: x509.X509CrlReason.privilegeWithdrawn
+          }
+        ]
+      });
+      const crlRevoked = CRL.fromBER(x509RevokedCrl.rawData);
+
+      const chain = new CertificateChain();
+      chain.certificateHandler.certificates.push(rootCert);
+      chain.certificateHandler.certificates.push(intermediateCert1);
+      chain.certificateHandler.certificates.push(intermediateCert2);
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(
+        rootCert,
+        {
+          "http://leaf.crl": crlRevoked,
+          "http://intermediate2.ocsp": ocspIntermediate2,
+          "http://intermediate1.crl": crlIntermediate1
+        }
+      );
+
+      const result = await chain.build(leafCert, {
+        revocationMode: "online"
+      });
+      expect(result.result).toBe(false);
+      expect(result.resultCode).toBe(CertificateChainStatusCode.revokedOCSP);
+    });
+
+    it("should return error if leaf certificate is revoked by OCSP", async () => {
+      const ocspRevoked = await OCSP.create({
+        issuer: intermediateCert2,
+        responses: [
+          {
+            certId: await CertificateID.create(
+              "SHA-256",
+              leafCert,
+              intermediateCert2
+            ),
+            status: {
+              type: "revoked",
+              revocationTime: new Date(),
+              reason: "privilegeWithdrawn"
+            },
+            thisUpdate: new Date(),
+            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24) // 1 day
+          }
+        ],
+        producedAt: new Date(),
+        signingAlgorithm,
+        signingKey: intermediateCert2.privateKey!
+      });
+
+      const chain = new CertificateChain();
+      chain.certificateHandler.certificates.push(rootCert);
+      chain.certificateHandler.certificates.push(intermediateCert1);
+      chain.certificateHandler.certificates.push(intermediateCert2);
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(
+        rootCert,
+        {
+          "http://leaf.ocsp": ocspRevoked,
+          "http://intermediate2.ocsp": ocspIntermediate2,
+          "http://intermediate1.crl": crlIntermediate1
+        }
+      );
+
+      const result = await chain.build(leafCert, {
+        revocationMode: "online"
+      });
+      expect(result.result).toBe(false);
+      expect(result.resultCode).toBe(CertificateChainStatusCode.revokedOCSP);
+    });
+
+    it("should return error if intermediate certificate is revoked by CRL", async () => {
+      const x509RevokedCrl = await x509.X509CrlGenerator.create({
+        issuer: rootCert.subject,
+        thisUpdate: new Date(),
+        nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
+        signingKey: rootCert.privateKey!,
+        signingAlgorithm,
+        entries: [
+          {
+            serialNumber: intermediateCert1.serialNumber,
+            revocationDate: new Date(),
+            reason: x509.X509CrlReason.privilegeWithdrawn
+          }
+        ]
+      });
+      const crlRevoked = CRL.fromBER(x509RevokedCrl.rawData);
+
+      const chain = new CertificateChain();
+      chain.certificateHandler.certificates.push(rootCert);
+      chain.certificateHandler.certificates.push(intermediateCert1);
+      chain.certificateHandler.certificates.push(intermediateCert2);
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(
+        rootCert,
+        {
+          "http://leaf.crl": crlLeaf,
+          "http://leaf.ocsp": ocspLeaf,
+          "http://intermediate2.ocsp": ocspIntermediate2,
+          "http://intermediate1.crl": crlRevoked
+        }
+      );
+
+      const result = await chain.build(leafCert, {
+        revocationMode: "online"
+      });
+      expect(result.result).toBe(false);
+      expect(result.resultCode).toBe(CertificateChainStatusCode.revokedOCSP);
+    });
+
+    it("should return error if intermediate certificate is revoked by OCSP", async () => {
+      const ocspRevoked = await OCSP.create({
+        issuer: intermediateCert1,
+        responses: [
+          {
+            certId: await CertificateID.create(
+              "SHA-256",
+              intermediateCert2,
+              intermediateCert1
+            ),
+            status: {
+              type: "revoked",
+              revocationTime: new Date(),
+              reason: "privilegeWithdrawn"
+            },
+            thisUpdate: new Date(),
+            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24) // 1 day
+          }
+        ],
+        producedAt: new Date(),
+        signingAlgorithm,
+        signingKey: intermediateCert1.privateKey!
+      });
+
+      const chain = new CertificateChain();
+      chain.certificateHandler.certificates.push(rootCert);
+      chain.certificateHandler.certificates.push(intermediateCert1);
+      chain.certificateHandler.certificates.push(intermediateCert2);
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(
+        rootCert,
+        {
+          "http://leaf.crl": crlLeaf,
+          "http://leaf.ocsp": ocspLeaf,
+          "http://intermediate2.ocsp": ocspRevoked,
+          "http://intermediate1.crl": crlIntermediate1
+        }
+      );
+
+      const result = await chain.build(leafCert, {
+        revocationMode: "online"
+      });
+      expect(result.result).toBe(false);
+      expect(result.resultCode).toBe(CertificateChainStatusCode.revokedOCSP);
+    });
+  });
 });

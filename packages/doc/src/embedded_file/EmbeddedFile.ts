@@ -1,11 +1,10 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { WrapObject } from "../WrapObject";
 
 /**
  * Representing an embedded file in a PDF document.
  */
 export class EmbeddedFile extends WrapObject<core.FileSpecificationDictionary> {
-
   /**
    * The name of the embedded file.
    */
@@ -43,7 +42,6 @@ export class EmbeddedFile extends WrapObject<core.FileSpecificationDictionary> {
     if (!res) {
       throw new Error("Cannot retrieve the embedded file stream.");
     }
-
 
     return res;
   }

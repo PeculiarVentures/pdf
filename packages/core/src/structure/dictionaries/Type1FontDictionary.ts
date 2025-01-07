@@ -1,4 +1,13 @@
-import { PDFArray, PDFArrayField, PDFDictionary, PDFDictionaryField, PDFName, PDFNameField, PDFNumberField, PDFStream } from "../../objects";
+import {
+  PDFArray,
+  PDFArrayField,
+  PDFDictionary,
+  PDFDictionaryField,
+  PDFName,
+  PDFNameField,
+  PDFNumberField,
+  PDFStream
+} from "../../objects";
 import { FontDictionary } from "./FontDictionary";
 
 export class Type1FontDictionary extends FontDictionary {
@@ -64,7 +73,7 @@ export class Type1FontDictionary extends FontDictionary {
    */
   @PDFDictionaryField({
     name: "Encoding",
-    optional: true,
+    optional: true
   })
   public Encoding!: PDFDictionary | PDFName | null;
 
@@ -75,7 +84,7 @@ export class Type1FontDictionary extends FontDictionary {
   @PDFDictionaryField({
     name: "ToUnicode",
     type: PDFStream,
-    optional: true,
+    optional: true
   })
   public ToUnicode!: PDFStream | null;
 

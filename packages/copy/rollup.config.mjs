@@ -5,6 +5,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import typescript from "rollup-plugin-typescript2";
 import dts from "rollup-plugin-dts";
 import pkg from "./package.json" assert { type: "json" };
+import { ScriptTarget } from "typescript";
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -52,6 +53,7 @@ export default [
       dts({
         tsconfig: path.resolve(__dirname, "./tsconfig.compile.json"),
         compilerOptions: {
+          target: ScriptTarget.ES2022,
           removeComments: false,
         }
       })

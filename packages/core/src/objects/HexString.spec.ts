@@ -1,31 +1,30 @@
-import * as assert from "assert";
-
 import { PDFHexString } from "./HexString";
 
-context("HexString", () => {
-
-  context("to/from PDF", () => {
+describe("HexString", () => {
+  describe("to/from PDF", () => {
     [
-      [
-        "<901FA3>",
-        "901FA3",
-      ],
-      [
-        "<901FA>",
-        "901FA0",
-      ],
+      ["<901FA3>", "901FA3"],
+      ["<901FA>", "901FA0"]
     ].forEach(([i, o]) => {
       it(i, () => {
         const parsedItem = PDFHexString.fromPDF(i);
-        const valueLength = parsedItem.text.length;
-        assert.strictEqual(parsedItem.text.padEnd(valueLength + (valueLength % 2), "0"), o);
+        expect(Buffer.from(parsedItem.text, "binary").toString("hex")).toBe(
+          o.toLowerCase()
+        );
+
+        // check data field
+        expect(Buffer.from(parsedItem.data).toString("hex")).toBe(
+          o.toLowerCase()
+        );
 
         const out = parsedItem.toPDF();
-        assert.strictEqual(Buffer.from(out).toString(), i);
+        expect(Buffer.from(out).toString("binary").toUpperCase()).toBe(
+          `<${o}>`
+        );
+
+        // check toString
+        expect(parsedItem.toString()).toBe(`<${o.toLowerCase()}>`);
       });
     });
-
   });
-
 });
-

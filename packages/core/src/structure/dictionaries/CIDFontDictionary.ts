@@ -28,7 +28,7 @@ export class CIDFontDictionary extends FontDictionary {
    */
   @objects.PDFDictionaryField({
     name: "CIDSystemInfo",
-    type: CIDSystemInfoDictionary,
+    type: CIDSystemInfoDictionary
   })
   public CIDSystemInfo!: CIDSystemInfoDictionary;
 
@@ -75,7 +75,7 @@ export class CIDFontDictionary extends FontDictionary {
    */
   @objects.PDFDictionaryField({
     name: "CIDToGIDMap",
-    optional: true,
+    optional: true
   })
   public CIDToGIDMap!: objects.PDFStream | objects.PDFName | null;
 
@@ -84,5 +84,4 @@ export class CIDFontDictionary extends FontDictionary {
 
     this.subtype = CIDFontDictionary.SUBTYPE;
   }
-
 }

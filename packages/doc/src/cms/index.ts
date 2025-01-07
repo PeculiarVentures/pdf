@@ -12,6 +12,7 @@ export * from "./SignedData";
 export * from "./SignerInfo";
 export * from "./TimeStampToken";
 export * from "./CRL";
+export * from "./OCSPCertificateStorageHandler";
 export * from "./OCSP";
 export * from "./PKIUtils";
 export * from "./AdobeRevocationInfoArchival";

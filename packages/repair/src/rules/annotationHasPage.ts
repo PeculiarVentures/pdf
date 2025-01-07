@@ -1,6 +1,6 @@
-import { PDFDocument } from "@peculiarventures/pdf-doc";
+import { PDFDocument } from "@peculiar/pdf-doc";
 import { globalRepairRegistry } from "../PDFRepairRegistry";
-import { PDFDictionary } from "@peculiarventures/pdf-core";
+import { PDFDictionary } from "@peculiar/pdf-core";
 
 globalRepairRegistry.addRule({
   id: "annotationHasPage",
@@ -18,11 +18,13 @@ globalRepairRegistry.addRule({
           const pageRef = page.target.getIndirect();
           annot.set("P", page.target);
 
-          notes.push(`Annotation '${objRef.id} ${objRef.generation} R' has no P. Set P to page '${pageRef.id} ${pageRef.generation} R'`);
+          notes.push(
+            `Annotation '${objRef.id} ${objRef.generation} R' has no P. Set P to page '${pageRef.id} ${pageRef.generation} R'`
+          );
         }
       }
     }
 
     return notes;
-  },
+  }
 });

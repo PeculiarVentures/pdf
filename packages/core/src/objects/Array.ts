@@ -8,7 +8,6 @@ const leftSquareBracketChar = 0x5b;
 const rightSquareBracketChar = 0x5d;
 
 export class PDFArray extends PDFObject implements Iterable<PDFObject> {
-
   public static readonly NAME = ObjectTypeEnum.Array;
 
   [Symbol.iterator](): Iterator<PDFObject, unknown, undefined> {
@@ -51,17 +50,42 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
     }
   }
 
+  /**
+   * The number of items in the array.
+   */
   public get length(): number {
     return this.items.length;
   }
 
-  public find(index: number): PDFObjectTypes;
-  public find<T extends PDFObject>(index: number, type: abstract new () => T, replace?: boolean): T;
-  public find(index: number, type?: abstract new () => PDFObject, replace = false): PDFObject | null {
+  /**
+   * Retrieves an item from the array at the specified index.
+   * @param index - The index of the item to retrieve.
+   * @returns The item at the specified index, or `null` if the index is out of bounds.
+   */
+  public find(index: number): PDFObjectTypes | null;
+  /**
+   * Retrieves an item from the array at the specified index.
+   *
+   * @param index - The index of the item to retrieve.
+   * @param type - An optional constructor for the expected type of the item.
+   * @param replace - An optional flag indicating whether to convert and replace the item
+   * if it is not of the expected type.
+   * @returns The item at the specified index, or `null` if the index is out of bounds.
+   */
+  public find<T extends PDFObject>(
+    index: number,
+    type: abstract new () => T,
+    replace?: boolean
+  ): T | null;
+  public find(
+    index: number,
+    type?: abstract new () => PDFObject,
+    replace = false
+  ): PDFObject | null {
     const item = this.items[index];
 
     if (item) {
-      const res = (typeOf(item, ObjectTypeEnum.IndirectReference))
+      const res = typeOf(item, ObjectTypeEnum.IndirectReference)
         ? item.getValue()
         : item;
 
@@ -78,12 +102,33 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
     return null;
   }
 
+  /**
+   * Retrieves an item from the array at the specified index.
+   * @param index - The index of the item to retrieve.
+   * @returns The item at the specified index.
+   * @throws RangeError - If the index is out of bounds.
+   */
   public get(index: number): PDFObjectTypes;
-  public get<T extends PDFObject>(index: number, type: abstract new () => T, replace?: boolean): T;
-  public get(index: number, type?: abstract new () => PDFObject, replace = false): PDFObject {
-    const item = type
-      ? this.find(index, type, replace)
-      : this.find(index);
+  /**
+   * Retrieves an item from the array at the specified index.
+   *
+   * @param index - The index of the item to retrieve.
+   * @param type - An optional constructor for the expected type of the item.
+   * @param replace - An optional flag indicating whether to replace the item if it is not found.
+   * @returns The item at the specified index.
+   * @throws RangeError - If the index is out of bounds.
+   */
+  public get<T extends PDFObject>(
+    index: number,
+    type: abstract new () => T,
+    replace?: boolean
+  ): T;
+  public get(
+    index: number,
+    type?: abstract new () => PDFObject,
+    replace = false
+  ): PDFObject {
+    const item = type ? this.find(index, type, replace) : this.find(index);
 
     if (!item) {
       throw new RangeError("Array index is out of bounds");
@@ -92,6 +137,19 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
     return item;
   }
 
+  /**
+   * Adds one or more items to the end of the array.
+   *
+   * @param items - The items to be added to the array. Each item must be of type `PDFObjectTypes`.
+   *
+   * @remarks
+   * - If an item is of type `Stream`, it will be made indirect.
+   * - If an item is not indirect, its `ownerElement` will be set to this array.
+   * - If the array has a `documentUpdate` and the item does not, the item's `documentUpdate`
+   * will be set to the array's `documentUpdate`.
+   *
+   * @returns void
+   */
   public push(...items: PDFObjectTypes[]): void {
     this.modify();
 
@@ -111,11 +169,20 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
     }
   }
 
+  /**
+   * Returns the index of the specified item in the array.
+   *
+   * @param item - The item to locate in the array.
+   * @returns The index of the item if found; otherwise, -1.
+   */
   public indexOf(item: PDFObjectTypes): number {
     for (let index = 0; index < this.items.length; index++) {
       const element = this.items[index];
-      if (item.equal(element)
-        || (typeOf(element, ObjectTypeEnum.IndirectReference) && item.ownerElement?.equal(element))) {
+      if (
+        item.equal(element) ||
+        (typeOf(element, ObjectTypeEnum.IndirectReference) &&
+          item.ownerElement?.equal(element))
+      ) {
         return index;
       }
     }
@@ -123,12 +190,27 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
     return -1;
   }
 
+  /**
+   * Checks if the specified item is present in the array.
+   *
+   * @param item - The item to search for in the array.
+   * @returns `true` if the item is found in the array, otherwise `false`.
+   */
   public includes(item: PDFObjectTypes): boolean {
     return this.indexOf(item) !== -1;
   }
 
+  /**
+   * Removes elements from an array and, if necessary, inserts new elements in their place,
+   * returning the deleted elements.
+   * This method modifies the array and triggers the `modify` method if any elements are removed.
+   *
+   * @param start - The zero-based index at which to start changing the array.
+   * @param deleteCount - The number of elements to remove from the array. If not specified,
+   * all elements from the start index to the end of the array will be removed.
+   * @returns An array containing the deleted elements.
+   */
   public splice(start: number, deleteCount?: number): PDFObjectTypes[] {
-
     const res = this.items.splice(start, deleteCount);
     if (res.length) {
       this.modify();
@@ -142,8 +224,13 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
     for (const item of this.items) {
       if (item.isIndirect()) {
         const indirect = item.getIndirect();
-        const PDFIndirectReferenceConstructor = PDFObjectReader.get(ObjectTypeEnum.IndirectReference);
-        const indirectRef = new PDFIndirectReferenceConstructor(indirect.id, indirect.generation);
+        const PDFIndirectReferenceConstructor = PDFObjectReader.get(
+          ObjectTypeEnum.IndirectReference
+        );
+        const indirectRef = new PDFIndirectReferenceConstructor(
+          indirect.id,
+          indirect.generation
+        );
         indirectRef.writePDF(writer);
       } else {
         item.writePDF(writer);
@@ -153,7 +240,7 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
     writer.writeString("]");
   }
 
-  protected onFromPDF(reader: ViewReader): void {
+  protected override onFromPDF(reader: ViewReader): void {
     // clear items
     if (this.items.length) {
       this.items = [];
@@ -187,21 +274,24 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
   }
 
   public override toString(): string {
-    return `[ ${this.items.map(o => {
-      if (o.isIndirect()) {
-        const ref = o.getIndirect();
+    return `[ ${this.items
+      .map((o) => {
+        if (o.isIndirect()) {
+          const ref = o.getIndirect();
 
-        return `${ref.id} ${ref.generation} R`;
-      }
+          return `${ref.id} ${ref.generation} R`;
+        }
 
-      return o.toString();
-    }).join(", ")} ]`;
+        return o.toString();
+      })
+      .join(", ")} ]`;
   }
 
   protected onEqual(target: PDFObject): boolean {
-    if (target instanceof PDFArray &&
-      target.items.length === this.items.length) {
-
+    if (
+      target instanceof PDFArray &&
+      target.items.length === this.items.length
+    ) {
       for (let i = 0; i < target.length; i++) {
         const item = target.items[i];
 
@@ -211,6 +301,8 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
 
         return false;
       }
+
+      return true;
     }
 
     return false;
@@ -221,7 +313,6 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
 
     return this.modify();
   }
-
 }
 
 import { PDFTypeConverter } from "./TypeConverter";

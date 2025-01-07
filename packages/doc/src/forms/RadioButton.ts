@@ -1,19 +1,16 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { IRadioButtonHandler } from "./RadioButton.Handler";
 import { CheckBox } from "./CheckBox";
 import { RadioButtonGroup } from "./RadioButton.Group";
 import { IFormGroupedComponent } from "./FormComponent.Group";
 
-
 export class RadioButton extends CheckBox implements IFormGroupedComponent {
-
   public override get checked(): boolean {
     return super.checked;
   }
 
   public override set checked(v: boolean) {
     if (v !== this.checked) {
-
       const group = this.findGroup();
 
       // Change Widget appearance state
@@ -33,9 +30,7 @@ export class RadioButton extends CheckBox implements IFormGroupedComponent {
 
       if (group) {
         // change value
-        group.target.V = v
-          ? this.document.target.createName(stateName)
-          : null;
+        group.target.V = v ? this.document.target.createName(stateName) : null;
       }
     }
   }
@@ -47,9 +42,7 @@ export class RadioButton extends CheckBox implements IFormGroupedComponent {
   public get groupName(): string | null {
     const group = this.findGroup();
 
-    return group
-      ? group.name
-      : null;
+    return group ? group.name : null;
   }
 
   public set groupName(v: string | null) {
@@ -68,5 +61,4 @@ export class RadioButton extends CheckBox implements IFormGroupedComponent {
 
     return null;
   }
-
 }

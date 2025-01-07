@@ -2,7 +2,6 @@ import * as objects from "../../objects";
 import { EmbeddedFileParams } from "./EmbeddedFileParams";
 
 export class EmbeddedFileStream extends objects.PDFStream {
-
   public static TYPE = "EmbeddedFile";
 
   /**
@@ -36,5 +35,4 @@ export class EmbeddedFileStream extends objects.PDFStream {
    */
   @objects.PDFMaybeField("Params", EmbeddedFileParams)
   public Params!: objects.Maybe<EmbeddedFileParams>;
-
 }

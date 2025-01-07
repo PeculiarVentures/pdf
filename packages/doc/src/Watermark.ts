@@ -1,4 +1,4 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { type PDFDocument } from "./Document";
 import { FormObject } from "./FormObject";
 import { Image } from "./Image";
@@ -59,20 +59,29 @@ export interface TextAppearance extends WatermarkAppearance {
 export class Watermark extends WrapObject<core.WatermarkDictionary> {
   static DEFAULT_0 = 0;
 
-  public static create(params: WatermarkParams, document: PDFDocument): Watermark {
-    params.top = core.TypographyConverter.toPoint(params.pageHeight) - core.TypographyConverter.toPoint(params.top || this.DEFAULT_0);
+  public static create(
+    params: WatermarkParams,
+    document: PDFDocument
+  ): Watermark {
+    params.top =
+      core.TypographyConverter.toPoint(params.pageHeight) -
+      core.TypographyConverter.toPoint(params.top || this.DEFAULT_0);
 
     const watermark = core.WatermarkDictionary.create(document.target.update);
 
     // count position
     const positionX = core.TypographyConverter.toPoint(params.left ?? 0);
-    const positionY = core.TypographyConverter.toPoint(params.top ?? params.appearance.height) - params.appearance.height;
+    const positionY =
+      core.TypographyConverter.toPoint(params.top ?? params.appearance.height) -
+      params.appearance.height;
 
     watermark.AP.get().N = params.appearance.target.makeIndirect();
 
     // add fixedPrint
     if (params.v || params.h || params.matrix) {
-      const fixedPrint = core.FixedPrintDictionary.create(document.target.update);
+      const fixedPrint = core.FixedPrintDictionary.create(
+        document.target.update
+      );
       if (params.v) {
         fixedPrint.V = params.v;
       }

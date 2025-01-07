@@ -8,7 +8,6 @@ import { PDFTextString } from "./TextString";
 import { ObjectTypeEnum } from "./internal";
 
 export class PDFHexString extends PDFTextString {
-
   public static readonly NAME = ObjectTypeEnum.HexString;
 
   protected onWritePDF(writer: ViewWriter): void {
@@ -25,11 +24,15 @@ export class PDFHexString extends PDFTextString {
     // Get all hexadecimal chars till the >
     const hexStrings: number[] = [];
     reader.read((c) => {
-      if (c === CharSet.greaterThanChar) { // >
+      if (c === CharSet.greaterThanChar) {
+        // >
         return true;
-      } if (CharSet.hexadecimalChars.includes(c)) { // use hexadecimal chars only
+      }
+      if (CharSet.hexadecimalChars.includes(c)) {
+        // use hexadecimal chars only
         hexStrings.push(c);
-      } else if (!CharSet.whiteSpaceChars.includes(c)) { // skip white spaces
+      } else if (!CharSet.whiteSpaceChars.includes(c)) {
+        // skip white spaces
         throw new BadCharError(reader.position);
       }
 
@@ -38,7 +41,9 @@ export class PDFHexString extends PDFTextString {
 
     // Set values
     const hexString = Convert.ToBinary(new Uint8Array(hexStrings));
-    const hexView = Convert.FromHex(hexString);
+    // If odd length, append '0'
+    const hexText = hexString + (hexString.length % 2 ? "0" : "");
+    const hexView = Convert.FromHex(hexText);
     this.text = TextEncoder.from(Convert.ToBinary(hexView));
 
     reader.readByte(); // >
@@ -51,5 +56,4 @@ export class PDFHexString extends PDFTextString {
   public override toString(): string {
     return `<${Convert.ToHex(this.toUint8Array())}>`;
   }
-
 }

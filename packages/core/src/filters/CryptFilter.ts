@@ -2,7 +2,6 @@ import { BufferSource, BufferSourceConverter } from "pvtsutils";
 import { Filter } from "./Filter";
 
 export class CryptFilter extends Filter {
-
   public static readonly NAME = "Crypt";
   public name = CryptFilter.NAME;
 

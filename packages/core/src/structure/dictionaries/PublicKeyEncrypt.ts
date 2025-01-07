@@ -44,11 +44,10 @@ export enum PublicKeyPermissionFlags {
    * is set), printing shall be limited to a low-level representation of the
    * appearance, possibly of degraded quality.
    */
-  printRepresentation = 1 << 11,
+  printRepresentation = 1 << 11
 }
 
 export class PublicKeyEncryptDictionary extends EncryptDictionary {
-
   /**
    * An array of byte-strings, where each string is a PKCS#7 object listing recipients
    * who have been granted equal access rights to the document.
@@ -66,5 +65,4 @@ export class PublicKeyEncryptDictionary extends EncryptDictionary {
    */
   @PDFNumberField("P")
   public P!: PublicKeyPermissionFlags;
-
 }

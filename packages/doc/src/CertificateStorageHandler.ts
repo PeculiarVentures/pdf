@@ -1,15 +1,22 @@
-import * as core from "@peculiarventures/pdf-core";
-import { CMSSignedData, DefaultCertificateStorageHandler, ICertificateStorageHandler } from "./cms";
+import * as core from "@peculiar/pdf-core";
+import {
+  CMSSignedData,
+  DefaultCertificateStorageHandler,
+  ICertificateStorageHandler
+} from "./cms";
 import { type PDFDocument } from "./Document";
 import { X509Certificate, X509Certificates } from "@peculiar/x509";
 
-export interface IPdfCertificateStorageHandler extends ICertificateStorageHandler {
+export interface IPdfCertificateStorageHandler
+  extends ICertificateStorageHandler {
   document: PDFDocument;
   load(): Promise<void>;
 }
 
-export class PDFCertificateStorageHandler extends DefaultCertificateStorageHandler implements IPdfCertificateStorageHandler {
-
+export class PDFCertificateStorageHandler
+  extends DefaultCertificateStorageHandler
+  implements IPdfCertificateStorageHandler
+{
   constructor(public document: PDFDocument) {
     super();
   }
@@ -22,8 +29,8 @@ export class PDFCertificateStorageHandler extends DefaultCertificateStorageHandl
 
   protected findDSS(): core.DocumentSecurityStoreDictionary | null {
     const update = this.document.target.update;
-    if (update.catalog
-      && update.catalog.DSS) { // TODO Check version of PDF. Must be 2.0
+    if (update.catalog && update.catalog.DSS) {
+      // TODO Check version of PDF. Must be 2.0
       return update.catalog.DSS;
     }
 
@@ -82,5 +89,4 @@ export class PDFCertificateStorageHandler extends DefaultCertificateStorageHandl
   protected async loadOCSPs(): Promise<void> {
     this.ocsps = [...this.document.dss.ocsps];
   }
-
 }

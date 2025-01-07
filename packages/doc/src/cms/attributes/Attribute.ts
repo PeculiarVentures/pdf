@@ -5,17 +5,18 @@ import * as pkijs from "pkijs";
 import { AsnEncoded } from "../AsnEncoded";
 
 export interface CmsAttributeConstructor {
-  new(): CmsAttribute;
+  new (): CmsAttribute;
 }
 
 export class CmsAttribute extends AsnEncoded<pkijs.Attribute> {
-
   public get type(): string {
     return this.asn.type;
   }
 
   public get values(): ReadonlyArray<ArrayBuffer> {
-    return this.asn.values.map((o: any) => o.toBER ? o.toBER() : o.toSchema().toBER());
+    return this.asn.values.map((o) =>
+      o.toBER ? o.toBER() : o.toSchema().toBER()
+    );
   }
 
   public constructor();
@@ -26,7 +27,7 @@ export class CmsAttribute extends AsnEncoded<pkijs.Attribute> {
     this.asn = new pkijs.Attribute();
     if (type && values) {
       this.asn.type = type;
-      this.asn.values = values.map(o => {
+      this.asn.values = values.map((o) => {
         const raw = BufferSourceConverter.toArrayBuffer(o);
         const asn = asn1js.fromBER(raw);
         if (asn.offset === -1) {
@@ -38,8 +39,7 @@ export class CmsAttribute extends AsnEncoded<pkijs.Attribute> {
     }
   }
 
-  protected onFromSchema(schema: any): any {
+  protected onFromSchema(schema: pkijs.SchemaType): pkijs.Attribute {
     return new pkijs.Attribute({ schema });
   }
-
 }

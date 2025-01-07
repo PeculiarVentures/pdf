@@ -1,4 +1,8 @@
-import { PDFBooleanField, PDFNumberField, PDFTextStringField } from "../../objects";
+import {
+  PDFBooleanField,
+  PDFNumberField,
+  PDFTextStringField
+} from "../../objects";
 import { PDFTextString } from "../../objects/TextString";
 import { EncryptDictionary } from "./Encrypt";
 
@@ -9,15 +13,15 @@ export enum UserAccessPermissionFlags {
    */
   printDocument = 1 << 2,
   /**
-   * Modify the contents of the document by operations other than 
-   * those controlled by bits {@link annots}, {@link fillForms}, and {@link assembleDocument}. 
+   * Modify the contents of the document by operations other than
+   * those controlled by bits {@link annots}, {@link fillForms}, and {@link assembleDocument}.
    */
   modifyContent = 1 << 3,
   /**
    * Copy or otherwise extract text and graphics from the document.
    * However, for the limited purpose of providing this content to
    * assistive technology, a PDF reader should behave as if this bit
-   * was set to {@link printDocument}. 
+   * was set to {@link printDocument}.
    */
   copy = 1 << 4,
   /**
@@ -27,8 +31,8 @@ export enum UserAccessPermissionFlags {
    */
   annots = 1 << 5,
   /**
-   * Fill in existing interactive form fields (including signature fields), 
-   * even if bit {@link annots} is clear. 
+   * Fill in existing interactive form fields (including signature fields),
+   * even if bit {@link annots} is clear.
    * @remarks Security handlers of revision 3 or greater
    */
   fillForms = 1 << 8,
@@ -38,12 +42,12 @@ export enum UserAccessPermissionFlags {
    * however, that restriction has been deprecated in PDF 2.0. PDF
    * readers shall ignore this bit and PDF writers shall always set this
    * bit to 1 to ensure compatibility with PDF readers following
-   * earlier specifications. 
+   * earlier specifications.
    */
   notUsed = 1 << 9,
   /**
    * Assemble the document (insert, rotate, or delete pages and create document
-   * outline items or thumbnail images), even if bit {@link modifyContent} is clear. 
+   * outline items or thumbnail images), even if bit {@link modifyContent} is clear.
    * @remarks Security handlers of revision 3 or greater
    */
   assembleDocument = 1 << 10,
@@ -52,14 +56,13 @@ export enum UserAccessPermissionFlags {
    * content could be generated, based on an implementation
    * dependent algorithm. When this bit is clear (and bit {@link printDocument} is set),
    * printing shall be limited to a low-level representation of the
-   * appearance, possibly of degraded quality. 
+   * appearance, possibly of degraded quality.
    * @remarks Security handlers of revision 3 or greater
    */
-  printRepresentation = 1 << 11,
+  printRepresentation = 1 << 11
 }
 
 export class StandardEncryptDictionary extends EncryptDictionary {
-
   /**
    * A number specifying which revision of the standard security handler shall be used to interpret this dictionary:
    * 2 if the document is encrypted with a V value less than 2 (see Table 20) and does not have any of the access permissions
@@ -119,5 +122,4 @@ export class StandardEncryptDictionary extends EncryptDictionary {
    */
   @PDFBooleanField("EncryptMetadata", true, true)
   public EncryptMetadata!: boolean;
-
 }

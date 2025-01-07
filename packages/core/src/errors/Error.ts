@@ -1,5 +1,4 @@
 export class PDFError extends Error {
-
   public static readonly NAME: string = "PDFError";
 
   public inner?: Error;
@@ -12,5 +11,4 @@ export class PDFError extends Error {
       this.inner = cause;
     }
   }
-
 }

@@ -12,18 +12,18 @@ export enum TextFieldFlags {
    * characters.
    * @note To protect password confidentiality, it is imperative that
    * interactive PDF processors never store the value of the text
-   * field in the PDF file if this flag is set. 
+   * field in the PDF file if this flag is set.
    */
   password = 1 << 13,
 
   /**
    * (PDF 1.4) If set, the text entered in the field represents the pathname of a
-   * file whose contents shall be submitted as the value of the field. 
+   * file whose contents shall be submitted as the value of the field.
    */
   fileSelect = 1 << 20,
 
   /**
-   * (PDF 1.4) If set, text entered in the field shall not be spell-checked. 
+   * (PDF 1.4) If set, text entered in the field shall not be spell-checked.
    */
   doNotSpellCheck = 1 << 22,
 
@@ -33,7 +33,7 @@ export enum TextFieldFlags {
    * fits within its annotation rectangle. Once the field is full, no further text
    * shall be accepted for interactive form filling; for non-interactive form
    * filling, the filler should take care not to add more character than will
-   * visibly fit in the defined area. 
+   * visibly fit in the defined area.
    */
   doNotScroll = 1 << 23,
 
@@ -50,8 +50,7 @@ export enum TextFieldFlags {
    * (PDF 1.5) If set, the value of this field shall be a rich text string (see Annex
    * M, "Rich Text Reference"). If the field has a value, the RV entry of the field
    * dictionary ("Table 228: Additional entries common to all fields
-   * containing variable text") shall specify the rich text string. 
+   * containing variable text") shall specify the rich text string.
    */
-  richText = 1 << 25,
+  richText = 1 << 25
 }
-

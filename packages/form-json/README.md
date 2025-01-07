@@ -1,19 +1,19 @@
-# `@peculiarventures/pdf-form-json`
+# `@peculiar/pdf-form-json`
 
-`@peculiarventures/pdf-form-json` is a library for working with PDF form data in JSON format. This library provides a FormConverter class that can convert a PDF document with form data into a JSON representation of that data, and also set values on form components based on a JSON payload.
+`@peculiar/pdf-form-json` is a library for working with PDF form data in JSON format. This library provides a FormConverter class that can convert a PDF document with form data into a JSON representation of that data, and also set values on form components based on a JSON payload.
 
 ## Installation
 
 Using npm:
 
 ```bash
-npm install @peculiarventures/pdf-form-json
+npm install @peculiar/pdf-form-json
 ```
 
 Using yarn:
 
 ```bash
-yarn add @peculiarventures/pdf-form-json
+yarn add @peculiar/pdf-form-json
 ```
 
 ## Usage
@@ -21,10 +21,11 @@ yarn add @peculiarventures/pdf-form-json
 ### Import
 
 ```typescript
-import { FormConverter } from "@peculiarventures/pdf-form-json";
+import { FormConverter } from "@peculiar/pdf-form-json";
 ```
 
 ### Export Form Data to JSON
+
 The export method of the `FormConverter` class can be used to convert a PDF document with form data into a JSON representation of that data. The returned JSON will be of the format:
 
 ```typescript
@@ -64,8 +65,8 @@ The export method of the `FormConverter` class can be used to convert a PDF docu
 
 ```typescript
 import fs from "fs";
-import { PDFDocument } from ("@peculiarventures/pdf-doc");
-import { globalFormConverter } from ("@peculiarventures/pdf-form-json");
+import { PDFDocument } from ("@peculiar/pdf-doc");
+import { globalFormConverter } from ("@peculiar/pdf-form-json");
 
 // Load PDF document
 const pdfBytes = fs.readFileSync("input.pdf");
@@ -88,8 +89,8 @@ The setValue method of the FormConverter class can be used to set values on form
 
 ```typescript
 import fs from "fs";
-import { PDFDocument } from ("@peculiarventures/pdf-doc");
-import { globalFormConverter } from ("@peculiarventures/pdf-form-json");
+import { PDFDocument } from ("@peculiar/pdf-doc");
+import { globalFormConverter } from ("@peculiar/pdf-form-json");
 
 // Load PDF document
 const pdfBytes = fs.readFileSync("input.pdf");
@@ -128,3 +129,20 @@ globalFormConverter.setValue(doc, [
 const pdfRaw = await pdfDoc.save();
 fs.writeFileSync("output.pdf", pdfRaw, {flags: "w+"})
 ```
+
+## License
+
+This project is dual-licensed under the AGPL-3.0 and a Commercial License:
+
+### AGPL-3.0
+
+The library is open-source and freely available under the terms of the Affero General Public License (AGPL-3.0). This ensures that modifications and usage in network-based applications (e.g., SaaS) must be shared under the same license.
+
+You can use the library under AGPL-3.0 if:
+
+- Your project is open-source and distributed under a compatible license
+- Your use complies with the AGPL-3.0 requirements
+
+### Commercial License
+
+For use in proprietary, closed-source, or commercial projects where the AGPL is not suitable, a commercial license is available. This allows you to use the library without the AGPL's obligations.

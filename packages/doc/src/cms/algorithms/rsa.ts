@@ -1,10 +1,24 @@
-import { RsaSaPssParams, sha1, sha256, sha384, sha512, id_sha1, id_sha256, id_sha384, id_sha512 } from "@peculiar/asn1-rsa";
+import {
+  RsaSaPssParams,
+  sha1,
+  sha256,
+  sha384,
+  sha512,
+  id_sha1,
+  id_sha256,
+  id_sha384,
+  id_sha512
+} from "@peculiar/asn1-rsa";
 import { AlgorithmIdentifier } from "@peculiar/asn1-x509";
 import { AsnConvert } from "@peculiar/asn1-schema";
 import * as asn1js from "asn1js";
 import * as pkijs from "pkijs";
 import { Convert } from "pvtsutils";
-import { AlgorithmFactory, AlgorithmConverter, HashedAlgorithm } from "../AlgorithmFactory";
+import {
+  AlgorithmFactory,
+  AlgorithmConverter,
+  HashedAlgorithm
+} from "../AlgorithmFactory";
 
 const id_pkcs_1 = "1.2.840.113549.1.1";
 const id_rsaEncryption = `${id_pkcs_1}.1`;
@@ -16,12 +30,22 @@ const id_rsaPSS = `${id_pkcs_1}.10`;
 const id_mgf1 = `${id_pkcs_1}.8`;
 
 const ber_rsaEncryption = Convert.FromHex("300d06092a864886f70d0101010500");
-const ber_sha1WithRSAEncryption = Convert.FromHex("300d06092a864886f70d0101050500");
-const ber_sha256WithRSAEncryption = Convert.FromHex("300d06092a864886f70d01010b0500");
-const ber_sha384WithRSAEncryption = Convert.FromHex("300d06092a864886f70d01010c0500");
-const ber_sha512WithRSAEncryption = Convert.FromHex("300d06092a864886f70d01010d0500");
+const ber_sha1WithRSAEncryption = Convert.FromHex(
+  "300d06092a864886f70d0101050500"
+);
+const ber_sha256WithRSAEncryption = Convert.FromHex(
+  "300d06092a864886f70d01010b0500"
+);
+const ber_sha384WithRSAEncryption = Convert.FromHex(
+  "300d06092a864886f70d01010c0500"
+);
+const ber_sha512WithRSAEncryption = Convert.FromHex(
+  "300d06092a864886f70d01010d0500"
+);
 
-function getHashAlgorithmIdentifier(hashAlgorithmName: string): AlgorithmIdentifier {
+function getHashAlgorithmIdentifier(
+  hashAlgorithmName: string
+): AlgorithmIdentifier {
   switch (hashAlgorithmName.toUpperCase()) {
     case "SHA-1":
       return sha1;
@@ -54,7 +78,7 @@ function prepareRsaSsaParams(algorithm: HashedAlgorithm): ArrayBuffer {
 function prepareRsaPssParams(algorithm: HashedAlgorithm): ArrayBuffer {
   const params = new RsaSaPssParams();
   const algorithmIdentifier = new AlgorithmIdentifier({
-    algorithm: id_rsaPSS,
+    algorithm: id_rsaPSS
   });
 
   if ("saltLength" in algorithm && typeof algorithm.saltLength === "number") {
@@ -67,7 +91,7 @@ function prepareRsaPssParams(algorithm: HashedAlgorithm): ArrayBuffer {
       params.hashAlgorithm = hashAlgorithm;
       params.maskGenAlgorithm = new AlgorithmIdentifier({
         algorithm: id_mgf1,
-        parameters: AsnConvert.serialize(hashAlgorithm),
+        parameters: AsnConvert.serialize(hashAlgorithm)
       });
     }
   }
@@ -91,7 +115,9 @@ export const rsaAlgorithmConverter: AlgorithmConverter = {
   },
   fromBER(raw: ArrayBuffer): Algorithm | HashedAlgorithm | RsaPssParams | null {
     const asn = asn1js.fromBER(raw);
-    const algorithmIdentifier = new pkijs.AlgorithmIdentifier({ schema: asn.result });
+    const algorithmIdentifier = new pkijs.AlgorithmIdentifier({
+      schema: asn.result
+    });
 
     switch (algorithmIdentifier.algorithmId) {
       case id_rsaEncryption:
@@ -108,9 +134,13 @@ export const rsaAlgorithmConverter: AlgorithmConverter = {
         if (!algorithmIdentifier.algorithmParams) {
           return { name: "RSA-PSS" };
         }
-        const rsaPssParams = AsnConvert.parse(algorithmIdentifier.algorithmParams.valueBeforeDecode, RsaSaPssParams);
+        const rsaPssParams = AsnConvert.parse(
+          algorithmIdentifier.algorithmParams.valueBeforeDecode,
+          RsaSaPssParams
+        );
         const hashAlgorithm = rsaPssParams.hashAlgorithm.algorithm;
         const saltLength = rsaPssParams.saltLength;
+
         switch (hashAlgorithm) {
           case id_sha1:
             return { name: "RSA-PSS", hash: { name: "SHA-1" }, saltLength };

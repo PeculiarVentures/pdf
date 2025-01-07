@@ -8,9 +8,9 @@ import { BorderStyleDictionary } from "./BorderStyleDictionary";
 
 export interface WidgetOptions {
   coordinate: {
-    x: number,
-    y: number,
-  }
+    x: number;
+    y: number;
+  };
 }
 
 export enum WidgetHighlightingMode {
@@ -25,7 +25,7 @@ export enum WidgetHighlightingMode {
   /**
    * Stroke the colours used to display the annotation border. That
    * is, for each colour channel in the colour space used for display of the
-   * annotation value, colour values shall be transformed by the function 
+   * annotation value, colour values shall be transformed by the function
    * `𝑓(𝑥) = 1 – 𝑥` for display.
    */
   outline = "O",
@@ -39,11 +39,10 @@ export enum WidgetHighlightingMode {
   /**
    * Same as P (which is preferred).
    */
-  toggle = "T",
+  toggle = "T"
 }
 
 export class WidgetDictionary extends AnnotationDictionary {
-
   public static readonly SUBTYPE = "Widget";
 
   /**
@@ -56,7 +55,7 @@ export class WidgetDictionary extends AnnotationDictionary {
   /**
    * The annotation’s highlighting mode, the visual effect that shall be
    * used when the mouse button is pressed or held down inside its active area.
-   * 
+   *
    * A highlighting mode other than P shall override any down appearance
    * defined for the annotation. Default value: I
    */
@@ -67,34 +66,34 @@ export class WidgetDictionary extends AnnotationDictionary {
    * An appearance characteristics dictionary (see {@link AppearanceCharacteristicsDictionary}) that shall be used in
    * constructing a dynamic appearance stream specifying the annotation’s visual
    * presentation on the page.
-   * 
+   *
    * The name MK for this entry is of historical significance only and has no direct
    * meaning
    */
-  @objects.PDFMaybeField("MK",AppearanceCharacteristicsDictionary)
+  @objects.PDFMaybeField("MK", AppearanceCharacteristicsDictionary)
   public MK!: objects.Maybe<AppearanceCharacteristicsDictionary>;
 
   /**
    * An action that shall be performed when the annotation is activated
    * @remarks PDF 1.1
    */
-  @objects.PDFMaybeField("A",ActionDictionary)
+  @objects.PDFMaybeField("A", ActionDictionary)
   public A!: objects.Maybe<ActionDictionary>;
 
   /**
-   * An additional-actions dictionary defining the annotation’s behavior in response 
-   * to various trigger events (see {@link AdditionalActionsDictionary}). 
+   * An additional-actions dictionary defining the annotation’s behavior in response
+   * to various trigger events (see {@link AdditionalActionsDictionary}).
    * @remarks PDF 1.2
    */
   @objects.PDFDictionaryField({
     name: "AA",
     optional: true,
-    type: AdditionalActionsDictionary,
+    type: AdditionalActionsDictionary
   })
   public aa!: AdditionalActionsDictionary | null;
 
   /**
-   * A border style dictionary (see {@link BorderStyleDictionary}") 
+   * A border style dictionary (see {@link BorderStyleDictionary}")
    * specifying the width and dash pattern that shall be used in drawing the annotation’s border.
    * The annotation dictionary’s AP entry, if present, shall take precedence over the BS entry.
    * @remarks PDF 1.2
@@ -103,8 +102,8 @@ export class WidgetDictionary extends AnnotationDictionary {
   public BS!: objects.Maybe<BorderStyleDictionary>;
 
   /**
-   * An indirect reference to the widget annotation’s parent field. 
-   * A widget annotation may have at most one parent; that is, it can be included 
+   * An indirect reference to the widget annotation’s parent field.
+   * A widget annotation may have at most one parent; that is, it can be included
    * in the Kids array of at most one field
    * @remarks Required if this widget annotation is one of multiple children in a field; optional otherwise
    */
@@ -112,7 +111,7 @@ export class WidgetDictionary extends AnnotationDictionary {
     name: "Parent",
     optional: true,
     type: PDFField,
-    indirect: true,
+    indirect: true
   })
   public Parent!: PDFField | null;
 
@@ -123,8 +122,10 @@ export class WidgetDictionary extends AnnotationDictionary {
   }
 }
 
-export class SingleWidgetDictionary extends WidgetDictionary implements IFieldDictionary {
-
+export class SingleWidgetDictionary
+  extends WidgetDictionary
+  implements IFieldDictionary
+{
   @objects.PDFNameField("FT")
   public ft!: string;
 
@@ -137,14 +138,14 @@ export class SingleWidgetDictionary extends WidgetDictionary implements IFieldDi
   @objects.PDFDictionaryField({
     name: "TU",
     type: objects.PDFLiteralString,
-    optional: true,
+    optional: true
   })
   public TU!: objects.PDFLiteralString | null;
 
   @objects.PDFDictionaryField({
     name: "TM",
     type: objects.PDFLiteralString,
-    optional: true,
+    optional: true
   })
   public tm!: objects.PDFLiteralString | null;
 
@@ -153,14 +154,13 @@ export class SingleWidgetDictionary extends WidgetDictionary implements IFieldDi
 
   @objects.PDFDictionaryField({
     name: "V",
-    optional: true,
+    optional: true
   })
   public V!: objects.PDFObjectTypes | null;
 
   @objects.PDFDictionaryField({
     name: "DV",
-    optional: true,
+    optional: true
   })
   public dv!: objects.PDFObjectTypes | null;
- 
 }

@@ -8,7 +8,6 @@ import { ObjectTypeEnum } from "./internal";
 import { PDFIndirect } from "./Indirect";
 
 export class PDFIndirectReference extends PDFIndirect {
-
   public static readonly NAME = ObjectTypeEnum.IndirectReference;
 
   protected onWritePDF(writer: ViewWriter): void {
@@ -21,18 +20,22 @@ export class PDFIndirectReference extends PDFIndirect {
   protected override onFromPDF(reader: ViewReader): void {
     super.onFromPDF(reader);
 
-    if (reader.readByte() !== 0x52) { // R
+    if (reader.readByte() !== 0x52) {
+      // R
       throw new BadCharError(reader.position - 1);
     }
   }
 
   public getValue(): PDFObjectTypes;
   public getValue<T extends PDFObject>(type: abstract new () => T): T;
-  public getValue(type?: any): any {
+  public getValue(type?: abstract new () => PDFObject): PDFObjectTypes {
     if (this.documentUpdate) {
       const value = this.documentUpdate.document.getObject(this).value;
 
-      return PDFTypeConverter.convert(value, type);
+      return PDFTypeConverter.convert(
+        value,
+        type as new () => PDFObject
+      ) as PDFObjectTypes;
     }
 
     throw new Error("IndirectReference is not assigned to DocumentUpdate");
@@ -41,7 +44,6 @@ export class PDFIndirectReference extends PDFIndirect {
   public override toString(): string {
     return `${this.id} ${this.generation} R`;
   }
-
 }
 
 import { PDFNumeric } from "./Numeric";

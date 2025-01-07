@@ -1,5 +1,12 @@
 import { BufferSourceConverter } from "pvtsutils";
-import { PDFDictionaryField, PDFName, PDFNumeric, PDFObjectReader, PDFObjectTypes, PDFStream } from "../objects";
+import {
+  PDFDictionaryField,
+  PDFName,
+  PDFNumeric,
+  PDFObjectReader,
+  PDFObjectTypes,
+  PDFStream
+} from "../objects";
 import { ViewReader } from "../ViewReader";
 import { ViewWriter } from "../ViewWriter";
 
@@ -15,7 +22,6 @@ interface CompressedObjectRef {
 }
 
 export class CompressedObject extends PDFStream {
-
   public static readonly TYPE = "ObjStm";
 
   protected override onCreate(): void {
@@ -33,8 +39,8 @@ export class CompressedObject extends PDFStream {
   @PDFDictionaryField({
     name: "Type",
     type: PDFName,
-    get: o => o.text,
-    set: v => new PDFName(v),
+    get: (o) => o.text,
+    set: (v) => new PDFName(v)
   })
   public type!: string;
 
@@ -44,9 +50,9 @@ export class CompressedObject extends PDFStream {
   @PDFDictionaryField({
     name: "N",
     type: PDFNumeric,
-    get: o => o.value,
-    set: v => new PDFNumeric(v),
-    defaultValue: 0,
+    get: (o) => o.value,
+    set: (v) => new PDFNumeric(v),
+    defaultValue: 0
   })
   public n!: number;
 
@@ -56,9 +62,9 @@ export class CompressedObject extends PDFStream {
   @PDFDictionaryField({
     name: "First",
     type: PDFNumeric,
-    get: o => o.value,
-    set: v => new PDFNumeric(v),
-    defaultValue: 0,
+    get: (o) => o.value,
+    set: (v) => new PDFNumeric(v),
+    defaultValue: 0
   })
   public first!: number;
 
@@ -67,7 +73,7 @@ export class CompressedObject extends PDFStream {
    */
   @PDFDictionaryField({
     name: "Extends",
-    type: CompressedObject,
+    type: CompressedObject
   })
   public extends?: CompressedObject | null;
 
@@ -81,7 +87,9 @@ export class CompressedObject extends PDFStream {
     this.decodeSync();
 
     if (!this.#decodedValue) {
-      throw new Error("Compressed stream in not decoded call 'decode' method first");
+      throw new Error(
+        "Compressed stream in not decoded call 'decode' method first"
+      );
     }
 
     return this.#decodedValue;
@@ -163,7 +171,7 @@ export class CompressedObject extends PDFStream {
   public setValue(id: number): void {
     this.#refTable.push({
       id,
-      offset: -1, // Use -1 for not serialized values. Must be updated in `encode` method
+      offset: -1 // Use -1 for not serialized values. Must be updated in `encode` method
     });
 
     this.n++;
@@ -171,13 +179,17 @@ export class CompressedObject extends PDFStream {
 
   public getValue(index: number): PDFObjectTypes {
     if (index >= this.#refTable.length) {
-      throw new RangeError("Argument 'index' is greater than amount of indirect objects in the Compressed Object");
+      throw new RangeError(
+        "Argument 'index' is greater than amount of indirect objects in the Compressed Object"
+      );
     }
 
     const item = this.#refTable[index];
     const offset = item.offset + this.first;
 
-    return PDFObjectReader.read(new ViewReader(this.decodedValue.subarray(offset)), this.documentUpdate);
+    return PDFObjectReader.read(
+      new ViewReader(this.decodedValue.subarray(offset)),
+      this.documentUpdate
+    );
   }
-
 }

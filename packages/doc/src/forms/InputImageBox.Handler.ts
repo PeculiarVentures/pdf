@@ -1,4 +1,4 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { PDFDocument } from "../Document";
 import { Image } from "../Image";
 
@@ -9,6 +9,7 @@ export interface InputImageBoxCreateParameters {
   height?: core.TypographySize;
   image?: Image;
   alt?: string;
+  name?: string;
 }
 
 export interface IInputImageHandler {
@@ -17,8 +18,7 @@ export interface IInputImageHandler {
 }
 
 export class InputImageBoxHandler implements IInputImageHandler {
-
-  public constructor(public document: PDFDocument) { }
+  public constructor(public document: PDFDocument) {}
 
   public create(params: InputImageBoxCreateParameters): core.WidgetDictionary {
     const update = this.document.target.update;
@@ -31,7 +31,9 @@ export class InputImageBoxHandler implements IInputImageHandler {
     const widget = core.SingleWidgetDictionary.create(update);
     widget.ft = "Btn";
     widget.ff = core.ButtonFlags.pushbutton;
-    widget.t = this.document.target.createString(core.UUID.generate());
+    widget.t = this.document.target.createString(
+      params.name || core.UUID.generate()
+    );
     widget.rect.llX = x;
     widget.rect.llY = y;
     widget.rect.urX = x + width;
@@ -57,7 +59,10 @@ export class InputImageBoxHandler implements IInputImageHandler {
     }
     const a = widget.A.get();
     a.s = "JavaScript";
-    a.set("JS", this.document.target.createString("event.target.buttonImportIcon();"));
+    a.set(
+      "JS",
+      this.document.target.createString("event.target.buttonImportIcon();")
+    );
 
     const acroForm = update.catalog!.AcroForm.get();
 
@@ -65,5 +70,4 @@ export class InputImageBoxHandler implements IInputImageHandler {
 
     return widget;
   }
-
 }

@@ -7,12 +7,15 @@ const objChars = new Uint8Array([0x6f, 0x62, 0x6a]); // obj
 const endobjChars = new Uint8Array([0x65, 0x6e, 0x64, 0x6f, 0x62, 0x6a]); // endobj
 
 export class PDFIndirectObject extends PDFIndirect {
-
   public value: PDFObject;
 
   public constructor();
   public constructor(id?: number, generation?: number, value?: PDFObject);
-  public constructor(id?: number, generation = 0, value: PDFObject = new PDFNull()) {
+  public constructor(
+    id?: number,
+    generation = 0,
+    value: PDFObject = new PDFNull()
+  ) {
     if (id === undefined) {
       super();
     } else {
@@ -36,7 +39,7 @@ export class PDFIndirectObject extends PDFIndirect {
     super.onFromPDF(reader);
 
     // obj
-    if (!objChars.every((c => c === reader.readByte()))) {
+    if (!objChars.every((c) => c === reader.readByte())) {
       throw new BadCharError(reader.position - 1);
     }
 
@@ -46,7 +49,7 @@ export class PDFIndirectObject extends PDFIndirect {
     PDFObjectReader.skip(reader);
 
     // endobj
-    if (!endobjChars.every((c => c === reader.readByte()))) {
+    if (!endobjChars.every((c) => c === reader.readByte())) {
       throw new BadCharError(reader.position - 1);
     }
   }
@@ -65,7 +68,6 @@ export class PDFIndirectObject extends PDFIndirect {
   public override toString(): string {
     return `${this.id} ${this.generation} obj\n${this.value.toString()}\nendobj`;
   }
-
 }
 
 import type { PDFObject } from "./Object";

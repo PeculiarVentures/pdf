@@ -1,10 +1,11 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { RadioButton } from "./RadioButton";
 import { FormComponentGroup } from "./FormComponent.Group";
 
-
-export class RadioButtonGroup extends FormComponentGroup<core.ButtonDictionary, RadioButton> {
-
+export class RadioButtonGroup extends FormComponentGroup<
+  core.ButtonDictionary,
+  RadioButton
+> {
   public override get(index: number): RadioButton;
   public override get(name: string): RadioButton;
   public override get(id: number | string): RadioButton {
@@ -55,5 +56,4 @@ export class RadioButtonGroup extends FormComponentGroup<core.ButtonDictionary, 
       }
     }
   }
-
 }

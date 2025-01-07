@@ -9,6 +9,14 @@ import type { PDFNull } from "./Null";
 import type { PDFNumeric } from "./Numeric";
 import type { PDFTextString } from "./TextString";
 
-export type PDFObjectTypes = PDFNull |
-  PDFBoolean | PDFNumeric | PDFLiteralString | PDFHexString | PDFName |
-  PDFDictionary | PDFArray | PDFIndirectReference | PDFTextString;
+export type PDFObjectTypes =
+  | PDFNull
+  | PDFBoolean
+  | PDFNumeric
+  | PDFLiteralString
+  | PDFHexString
+  | PDFName
+  | PDFDictionary
+  | PDFArray
+  | PDFIndirectReference
+  | PDFTextString;

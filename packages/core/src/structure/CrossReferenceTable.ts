@@ -10,14 +10,16 @@ import { PDFDocumentObject, PDFDocumentObjectTypes } from "./DocumentObject";
 import { PDFDocumentObjectGrouper } from "./DocumentObjectGrouper";
 import type { CrossReferenceStream } from "./CrossReferenceStream";
 
-export class CrossReferenceTable extends TrailerDictionary implements CrossReference {
-
+export class CrossReferenceTable
+  extends TrailerDictionary
+  implements CrossReference
+{
   public objects: PDFDocumentObject[] = [];
   public xrefStream?: CrossReferenceStream;
 
   protected override onFromPDF(reader: ViewReader): void {
-    reader.findIndex(c => !CharSet.whiteSpaceChars.includes(c));
-    if (!CharSet.xrefChars.every(c => c === reader.readByte())) {
+    reader.findIndex((c) => !CharSet.whiteSpaceChars.includes(c));
+    if (!CharSet.xrefChars.every((c) => c === reader.readByte())) {
       throw new BadCharError(reader.position - 1);
     }
 
@@ -41,7 +43,7 @@ export class CrossReferenceTable extends TrailerDictionary implements CrossRefer
 
         const view = reader.view.subarray(reader.position);
         const charCode = view[1];
-        if (charCode === 0x0D || charCode === 0x0A || charCode === 0x20) {
+        if (charCode === 0x0d || charCode === 0x0a || charCode === 0x20) {
           // In some cases eol can include odd characters, so we need to skip them
           reader.read(2);
         } else {
@@ -52,11 +54,16 @@ export class CrossReferenceTable extends TrailerDictionary implements CrossRefer
         const matches = /([0-9]{10}) ([0-9]{5}) ([fn])/.exec(line);
         if (!matches) {
           const offset = reader.view.byteOffset + reader.position;
-          throw new ParsingError("Cross-reference entity doesn't match to required structure", offset);
+          throw new ParsingError(
+            "Cross-reference entity doesn't match to required structure",
+            offset
+          );
         }
 
         if (!this.documentUpdate) {
-          throw new Error("PDF DocumentUpdate must be assigned to the CrossReferenceTable");
+          throw new Error(
+            "PDF DocumentUpdate must be assigned to the CrossReferenceTable"
+          );
         }
 
         const offset = parseInt(matches[1], 10);
@@ -68,21 +75,24 @@ export class CrossReferenceTable extends TrailerDictionary implements CrossRefer
           continue;
         }
 
-        items.push(new PDFDocumentObject({
-          documentUpdate: this.documentUpdate,
-          id,
-          generation,
-          offset,
-          type: status,
-        }));
+        items.push(
+          new PDFDocumentObject({
+            documentUpdate: this.documentUpdate,
+            id,
+            generation,
+            offset,
+            type: status
+          })
+        );
       }
 
       this.objects.push(...items);
 
       PDFObjectReader.skip(reader);
-      if (reader.view[reader.position] === 0x74) { // t
+      if (reader.view[reader.position] === 0x74) {
+        // t
         // Read 'trailer'
-        if (!CharSet.trailerChars.every(c => c === reader.readByte())) {
+        if (!CharSet.trailerChars.every((c) => c === reader.readByte())) {
           throw new BadCharError(reader.position - 1);
         }
 
@@ -93,7 +103,6 @@ export class CrossReferenceTable extends TrailerDictionary implements CrossRefer
         break;
       }
     }
-
   }
 
   protected override onWritePDF(writer: ViewWriter): void {
@@ -123,9 +132,7 @@ export class CrossReferenceTable extends TrailerDictionary implements CrossRefer
   }
 
   public override toString(): string {
-    const res: string[] = [
-      "xref",
-    ];
+    const res: string[] = ["xref"];
 
     const groups = PDFDocumentObjectGrouper.group(this.objects);
 
@@ -149,5 +156,4 @@ export class CrossReferenceTable extends TrailerDictionary implements CrossRefer
   public addObject(obj: PDFDocumentObject): void {
     this.objects.push(obj);
   }
-
 }

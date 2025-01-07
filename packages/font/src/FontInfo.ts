@@ -6,9 +6,13 @@ import { FontOS2 } from "./FontOS2";
 import { FontPost } from "./FontPost";
 import { IFontInfo } from "./IFontInfo";
 
+/**
+ * Implementation of IFontInfo interface that provides comprehensive information about a font.
+ * Contains font metrics, glyph data, and various font properties from different font tables
+ * (name, head, OS/2, post).
+ */
 @asn.AsnType({ type: asn.AsnTypeTypes.Sequence })
 export class FontInfo implements IFontInfo {
-
   @asn.AsnProp({ type: FontName })
   public name = new FontName();
 
@@ -49,9 +53,10 @@ export class FontInfo implements IFontInfo {
   }
 
   /**
-   * Returns the list of GLYPH for specified string
-   * @param text string
-   * @returns
+   * Returns a list of unique glyphs for all characters in the specified text.
+   * The glyphs are sorted by their index in ascending order.
+   * @param text - The input text to get glyphs for
+   * @returns Array of FontGlyph objects corresponding to unique characters in the text
    */
   public getGlyphs(text: string): FontGlyph[] {
     const res: FontGlyph[] = [];
@@ -74,6 +79,13 @@ export class FontInfo implements IFontInfo {
     return res;
   }
 
+  /**
+   * Compares two FontGlyph objects by their index for sorting purposes.
+   * @param a - First FontGlyph to compare
+   * @param b - Second FontGlyph to compare
+   * @returns -1 if a < b, 1 if a > b, 0 if equal
+   * @private
+   */
   private static sortByIndex(a: FontGlyph, b: FontGlyph): number {
     if (a.index < b.index) {
       return -1;
@@ -84,5 +96,4 @@ export class FontInfo implements IFontInfo {
 
     return 0;
   }
-
 }

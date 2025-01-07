@@ -7,13 +7,13 @@ export enum CertificateSeedValueFlags {
   subjectDN = 0x08,
   reserved = 0x10,
   keyUsage = 0x20,
-  url = 0x40,
+  url = 0x40
 }
 
 export enum KeyUsageState {
   notShallBe,
   shallBe,
-  notMatter,
+  notMatter
 }
 
 export interface CertificateSeedValueKeyUsages {
@@ -39,11 +39,16 @@ function getKeyUsageState(char?: string) {
   }
 }
 
-function getKeyUsageHandler(this: CertificateSeedValueDictionary, o: objects.PDFArray) {
+function getKeyUsageHandler(
+  this: CertificateSeedValueDictionary,
+  o: objects.PDFArray
+) {
   const res: CertificateSeedValueKeyUsages[] = [];
   for (const item of o.items) {
     if (!(item instanceof objects.PDFLiteralString)) {
-      throw new TypeError("Wrong type of KeyUsage item. Must be PDF literal string");
+      throw new TypeError(
+        "Wrong type of KeyUsage item. Must be PDF literal string"
+      );
     }
 
     res.push({
@@ -55,34 +60,32 @@ function getKeyUsageHandler(this: CertificateSeedValueDictionary, o: objects.PDF
       keyCertSign: getKeyUsageState(item.text[5]),
       cRLSign: getKeyUsageState(item.text[6]),
       encipherOnly: getKeyUsageState(item.text[7]),
-      decipherOnly: getKeyUsageState(item.text[8]),
+      decipherOnly: getKeyUsageState(item.text[8])
     });
-
   }
 
   return res;
 }
 
 export class CertificateSeedValueDictionary extends objects.PDFDictionary {
-
   /**
    * The type of PDF object that this dictionary describes
-   * 
+   *
    * if present, shall be SVCert for a certificate seed value dictionary
    */
   @objects.PDFDictionaryField({
     name: "Type",
     type: objects.PDFName,
-    optional: true,
+    optional: true
   })
   public type!: objects.PDFName | null;
 
   /**
    * A set of bit flags specifying the interpretation of specific
-   * entries in this dictionary. 
-   * 
-   * A value of 1 for the flag means that a signer shall be required 
-   * to use only the specified values for the entry. 
+   * entries in this dictionary.
+   *
+   * A value of 1 for the flag means that a signer shall be required
+   * to use only the specified values for the entry.
    * A value of 0 means that other values are permissible.
    */
   @objects.PDFDictionaryField({
@@ -90,7 +93,7 @@ export class CertificateSeedValueDictionary extends objects.PDFDictionary {
     type: objects.PDFNumeric,
     optional: true,
     defaultValue: 0,
-    get: o => o.value,
+    get: (o) => o.value
   })
   public ff!: CertificateSeedValueFlags;
 
@@ -101,23 +104,23 @@ export class CertificateSeedValueDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Subject",
     type: objects.PDFArray,
-    optional: true,
+    optional: true
   })
   public subject!: objects.PDFArray | null;
 
   /**
-   * An array of dictionaries, each specifying a Subject Distinguished Name (DN) 
+   * An array of dictionaries, each specifying a Subject Distinguished Name (DN)
    * that shall be present within the certificate for it to be acceptable for signing
    */
   @objects.PDFDictionaryField({
     name: "SubjectDN",
     type: objects.PDFArray,
-    optional: true,
+    optional: true
   })
   public subjectDN!: objects.PDFArray | null;
 
   /**
-   * An array of ASCII strings, where each string specifies an acceptable 
+   * An array of ASCII strings, where each string specifies an acceptable
    * key-usage extension that shall be present in the signing certificate
    */
   @objects.PDFDictionaryField({
@@ -125,18 +128,18 @@ export class CertificateSeedValueDictionary extends objects.PDFDictionary {
     type: objects.PDFArray,
     optional: true,
     cache: true,
-    get: getKeyUsageHandler,
+    get: getKeyUsageHandler
   })
   public keyUsage!: CertificateSeedValueKeyUsages[] | null;
 
   /**
-   * An array of byte strings containing DER-encoded X.509v3 certificates 
+   * An array of byte strings containing DER-encoded X.509v3 certificates
    * of acceptable issuers
    */
   @objects.PDFDictionaryField({
     name: "Issuer",
     type: objects.PDFArray,
-    optional: true,
+    optional: true
   })
   public issuer!: objects.PDFArray | null;
 
@@ -144,13 +147,16 @@ export class CertificateSeedValueDictionary extends objects.PDFDictionary {
     name: "OID",
     type: objects.PDFArray,
     optional: true,
-    get: o => o.items.map(item => {
-      if (!(item instanceof objects.PDFLiteralString)) {
-        throw new TypeError("Wrong type of OID item. Must be PDF literal string");
-      }
+    get: (o) =>
+      o.items.map((item) => {
+        if (!(item instanceof objects.PDFLiteralString)) {
+          throw new TypeError(
+            "Wrong type of OID item. Must be PDF literal string"
+          );
+        }
 
-      return item;
-    })
+        return item;
+      })
   })
   public oid!: objects.PDFLiteralString[] | null;
 
@@ -160,19 +166,18 @@ export class CertificateSeedValueDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "URL",
     type: objects.PDFLiteralString,
-    optional: true,
+    optional: true
   })
-  public url!: objects.PDFLiteralString | null;  
-  
+  public url!: objects.PDFLiteralString | null;
+
   /**
    * A name indicating the usage of the URL entry
    */
-   @objects.PDFDictionaryField({
+  @objects.PDFDictionaryField({
     name: "URLType",
     type: objects.PDFName,
     optional: true,
-    get: o => o.text,
+    get: (o) => o.text
   })
-  public urlType!: string | null;  
-
+  public urlType!: string | null;
 }

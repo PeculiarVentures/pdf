@@ -1,4 +1,4 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
 import * as fastPng from "fast-png";
 import { type PDFDocument } from "./Document";
@@ -15,11 +15,7 @@ export interface ImageCreateParameters {
   height: core.TypographySize;
 }
 
-function RGB(
-  data: Uint8Array,
-  depth: number,
-  palette: fastPng.IndexedColors,
-) {
+function RGB(data: Uint8Array, depth: number, palette: fastPng.IndexedColors) {
   const indexSize = data.length * (8 / depth);
   const resSize = indexSize * 3;
   const res = new Uint8Array(resSize);
@@ -69,7 +65,6 @@ function RGB(
 }
 
 export class Image extends WrapObject<core.ImageDictionary> {
-
   /**
    * Gets width of the image
    */
@@ -109,12 +104,13 @@ export class Image extends WrapObject<core.ImageDictionary> {
       }
 
       throw new Error("Unknown type of the image.");
-    } catch (e: any) {
-      e.message = `Cannot create PDF Image. ${e.message}`;
+    } catch (e) {
+      if (e instanceof Error) {
+        e.message = `Cannot create PDF Image. ${e.message}`;
+      }
 
       throw e;
     }
-
   }
 
   protected static createPNG(raw: BufferSource, document: PDFDocument): Image {
@@ -160,7 +156,9 @@ export class Image extends WrapObject<core.ImageDictionary> {
 
       imageDict.stream = rgbView;
 
-      const sMaskDict = imageDict.SMask = core.ImageDictionary.create(document.target.update).makeIndirect();
+      const sMaskDict = (imageDict.SMask = core.ImageDictionary.create(
+        document.target.update
+      ).makeIndirect());
       sMaskDict.Width = png.width;
       sMaskDict.Height = png.height;
       sMaskDict.ColorSpace = document.target.createName("DeviceGray");
@@ -180,12 +178,14 @@ export class Image extends WrapObject<core.ImageDictionary> {
         offset += color.length;
       }
 
-      const colorSpaces = document.target.createArray(
-        document.target.createName("Indexed"), // type
-        document.target.createName("DeviceRGB"), // base
-        document.target.createNumber(255), // hival
-        document.target.createStream(lookup).makeIndirect(), // lookup
-      ).makeIndirect();
+      const colorSpaces = document.target
+        .createArray(
+          document.target.createName("Indexed"), // type
+          document.target.createName("DeviceRGB"), // base
+          document.target.createNumber(255), // hival
+          document.target.createStream(lookup).makeIndirect() // lookup
+        )
+        .makeIndirect();
 
       imageDict.ColorSpace = colorSpaces;
     } else {
@@ -228,8 +228,13 @@ export class Image extends WrapObject<core.ImageDictionary> {
   public async export(): Promise<ImageExport> {
     const filter = this.target.filter;
     const data = await this.target.decode();
-    if ((filter instanceof core.PDFName && filter.text === core.DCTFilter.NAME) ||
-      (filter instanceof core.PDFArray && filter.items.some((o, i) => filter.get(i, core.PDFName).text === core.DCTFilter.NAME))) {
+    if (
+      (filter instanceof core.PDFName && filter.text === core.DCTFilter.NAME) ||
+      (filter instanceof core.PDFArray &&
+        filter.items.some(
+          (o, i) => filter.get(i, core.PDFName).text === core.DCTFilter.NAME
+        ))
+    ) {
       return {
         type: "jpeg",
         data
@@ -267,18 +272,22 @@ export class Image extends WrapObject<core.ImageDictionary> {
           throw new Error("Unsupported type ColorSpace");
         }
 
-        const rgb = RGB(new Uint8Array(data), this.target.BitsPerComponent || 1, palette);
+        const rgb = RGB(
+          new Uint8Array(data),
+          this.target.BitsPerComponent || 1,
+          palette
+        );
         const img = fastPng.encode({
           data: rgb,
           height: this.target.Height,
           width: this.target.Width,
           channels: 3,
-          depth: 8,
+          depth: 8
         });
 
         return {
           type: "png",
-          data: img.buffer,
+          data: img.buffer
         };
       }
 
@@ -304,7 +313,9 @@ export class Image extends WrapObject<core.ImageDictionary> {
 
           const alpha = await this.target.SMask.decode();
           const alphaView = new Uint8Array(alpha);
-          const pixelsAlpha = new Uint8Array(data.byteLength + alpha.byteLength);
+          const pixelsAlpha = new Uint8Array(
+            data.byteLength + alpha.byteLength
+          );
 
           let alphaOffset = 0;
           let offset = 0;
@@ -328,17 +339,16 @@ export class Image extends WrapObject<core.ImageDictionary> {
           height: this.target.Height,
           width: this.target.Width,
           channels,
-          depth: this.target.BitsPerComponent as fastPng.BitDepth,
+          depth: this.target.BitsPerComponent as fastPng.BitDepth
         });
 
         return {
           type: "png",
-          data: img.buffer,
+          data: img.buffer
         };
       }
 
       throw new Error("ColorSpace is empty");
     }
   }
-
 }

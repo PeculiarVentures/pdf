@@ -78,7 +78,7 @@ export enum CertificateChainStatusCode {
   /**
    * Parent certificates are not included in trusted list
    */
-  untrusted = 97,
+  untrusted = 97
 }
 
 export interface CertificateChainResult {
@@ -87,6 +87,8 @@ export interface CertificateChainResult {
   chain: X509Certificates;
   trustListSource?: string;
   resultMessage: string;
+  revocationMode?: ChainRevocationMode;
+  revocations?: (CRL | OCSP)[];
 }
 
 export type RevocationMode = "no" | "online" | "offline";
@@ -99,11 +101,13 @@ export interface ChainBuildParams {
 export type ChainRevocationMode = "no" | "online" | "offline" | "all";
 
 export class CertificateChain implements storageHandler.ICertificateStorage {
+  public certificateHandler: storageHandler.ICertificateStorageHandler =
+    new DefaultCertificateStorageHandler();
 
-  public certificateHandler: storageHandler.ICertificateStorageHandler = new DefaultCertificateStorageHandler();
-
-  protected async buildChainNoCheck(cert: X509Certificate): Promise<X509Certificates> {
-    const chain = new X509Certificates;
+  protected async buildChainNoCheck(
+    cert: X509Certificate
+  ): Promise<X509Certificates> {
+    const chain = new X509Certificates();
     let lastCert: X509Certificate | null = cert;
     let isTrusted: storageHandler.IsTrustedResult | null = null;
     while (lastCert) {
@@ -120,10 +124,21 @@ export class CertificateChain implements storageHandler.ICertificateStorage {
     return chain;
   }
 
-  public async build(cert: X509Certificate, params: ChainBuildParams = {}): Promise<CertificateChainResult> {
-    params = Object.assign<ChainBuildParams, ChainBuildParams>({ revocationMode: "no" }, params);
+  public async build(
+    cert: X509Certificate,
+    params: ChainBuildParams = {}
+  ): Promise<CertificateChainResult> {
+    // Set default parameters
+    params = Object.assign<ChainBuildParams, ChainBuildParams>(
+      { revocationMode: "no" },
+      params
+    );
+
+    //
     const chain = await this.buildChainNoCheck(cert);
-    const trustedChain = await this.certificateHandler.isTrusted(chain[chain.length - 1]);
+    const trustedChain = await this.certificateHandler.isTrusted(
+      chain[chain.length - 1]
+    );
     if (!trustedChain.result) {
       return {
         chain,
@@ -133,29 +148,27 @@ export class CertificateChain implements storageHandler.ICertificateStorage {
       };
     }
 
-    const checkDate = params.checkDate || null;
-    if (!checkDate) {
-      return {
-        chain,
-        result: true,
-        resultCode: CertificateChainStatusCode.success,
-        resultMessage: "Certificate chain without expiration date validation",
-      };
-    }
+    const checkDate = params.checkDate || new Date();
     for (const chainCert of chain) {
-      if (chainCert.notBefore.getTime() > checkDate.getTime() || chainCert.notAfter.getTime() < checkDate.getTime()) {
+      if (
+        chainCert.notBefore.getTime() > checkDate.getTime() ||
+        chainCert.notAfter.getTime() < checkDate.getTime()
+      ) {
         return {
           resultMessage: "The certificate is either not yet valid or expired",
           chain,
           result: false,
-          resultCode: CertificateChainStatusCode.badDate,
+          resultCode: CertificateChainStatusCode.badDate
         };
       }
     }
 
     const revocations: (CRL | OCSP)[] = [];
     if (params.revocationMode !== "no") {
-      const revocationTypeOrder: storageHandler.RevocationType[] = ["ocsp", "crl"];
+      const revocationTypeOrder: storageHandler.RevocationType[] = [
+        "ocsp",
+        "crl"
+      ];
       if (params.preferCRL) {
         revocationTypeOrder.reverse();
       }
@@ -165,15 +178,23 @@ export class CertificateChain implements storageHandler.ICertificateStorage {
           // Don't get revocation item for the trusted certificate
           break;
         }
-        let revocationResult: storageHandler.IResult<CRL | OCSP | null> | undefined;
+        let revocationResult:
+          | storageHandler.IResult<CRL | OCSP | null>
+          | undefined;
         for (const revocationType of revocationTypeOrder) {
           if (revocationResult && revocationResult.result) {
             break;
           }
           if (params.revocationMode === "offline") {
-            revocationResult = await this.certificateHandler.findRevocation(revocationType, cert);
+            revocationResult = await this.certificateHandler.findRevocation(
+              revocationType,
+              cert
+            );
           } else if (params.revocationMode === "online") {
-            revocationResult = await this.certificateHandler.fetchRevocation(revocationType, cert);
+            revocationResult = await this.certificateHandler.fetchRevocation(
+              revocationType,
+              cert
+            );
           }
         }
         if (revocationResult && revocationResult.result) {
@@ -187,7 +208,7 @@ export class CertificateChain implements storageHandler.ICertificateStorage {
       certs: [] as pkijs.Certificate[],
       trustedCerts: [] as pkijs.Certificate[],
       crls: [] as pkijs.CertificateRevocationList[],
-      ocsps: [] as pkijs.BasicOCSPResponse[],
+      ocsps: [] as pkijs.BasicOCSPResponse[]
     };
 
     for (const revocation of revocations) {
@@ -202,22 +223,30 @@ export class CertificateChain implements storageHandler.ICertificateStorage {
       chainEngineParams.certs.push(PKIUtils.x509ToCert(certChain));
     }
     chainEngineParams.certs.reverse();
-    chainEngineParams.trustedCerts.push(PKIUtils.x509ToCert(chain[chain.length - 1]));
+    chainEngineParams.trustedCerts.push(
+      PKIUtils.x509ToCert(chain[chain.length - 1])
+    );
 
-    const chainEngine = new pkijs.CertificateChainValidationEngine(chainEngineParams);
+    const chainEngine = new pkijs.CertificateChainValidationEngine(
+      chainEngineParams
+    );
 
-    const chainEngineResult = await chainEngine.verify() as CertificateChainResult;
+    const chainEngineResult =
+      (await chainEngine.verify()) as CertificateChainResult;
     // console.log({
     //   cert: cert.subject,
     //   params: chainEngineParams,
-    //   chainEngineResult,  
+    //   chainEngineResult,
     // });
     chainEngineResult.chain = chain;
+    chainEngineResult.revocationMode = params.revocationMode;
+    if (revocations.length) {
+      chainEngineResult.revocations = revocations;
+    }
     chainEngineResult.trustListSource = trustedChain.source;
 
     return chainEngineResult;
   }
-
 }
 
 import { DefaultCertificateStorageHandler } from "./DefaultCertificateStorageHandler";

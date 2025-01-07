@@ -1,5 +1,5 @@
-import * as core from "@peculiarventures/pdf-core";
-import * as pdfFont from "@peculiarventures/pdf-font";
+import * as core from "@peculiar/pdf-core";
+import * as pdfFont from "@peculiar/pdf-font";
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
 import { type PDFDocument } from "./Document";
 import { TextEncoding, TextEncodingEnum } from "./TextEncoding";
@@ -21,7 +21,9 @@ export interface CMapsParams {
   glyphs: pdfFont.FontGlyph[];
 }
 
-function createFontInfoFromTrueType(dict: core.TrueTypeFontDictionary): pdfFont.IFontInfo {
+function createFontInfoFromTrueType(
+  dict: core.TrueTypeFontDictionary
+): pdfFont.IFontInfo {
   return {
     ascent: dict.FontDescriptor.ascent || 0,
     descent: dict.FontDescriptor.descent || 0,
@@ -30,34 +32,38 @@ function createFontInfoFromTrueType(dict: core.TrueTypeFontDictionary): pdfFont.
       if (!dict.Encoding) {
         throw new Error("TrueTypeFontDictionary should have Encoding field.");
       }
-      const encoding = TextEncodingEnum[dict.Encoding as keyof typeof TextEncodingEnum];
+      const encoding =
+        TextEncodingEnum[dict.Encoding as keyof typeof TextEncodingEnum];
       if (encoding === undefined) {
-        throw new Error(`Cannot get glyph index for specified unicode. Unsupported text encoding '${dict.Encoding}'`);
+        throw new Error(
+          `Cannot get glyph index for specified unicode. Unsupported text encoding '${dict.Encoding}'`
+        );
       }
 
       const index = TextEncoding.getIndex(code, encoding);
       if (index != -1) {
         const width = dict.Widths.find(index - dict.FirstChar);
-        const advanceWidth = (width instanceof core.PDFNumeric)
-          ? width.value : 0;
+        const advanceWidth = width instanceof core.PDFNumeric ? width.value : 0;
 
         return {
           index,
           advanceWidth,
-          unicode: [code],
+          unicode: [code]
         };
       }
 
       return {
         index: 0,
         advanceWidth: 0,
-        unicode: [code],
+        unicode: [code]
       };
     }
   };
 }
 
-function createFontInfoFromType1(dict: core.Type1FontDictionary): pdfFont.IFontInfo {
+function createFontInfoFromType1(
+  dict: core.Type1FontDictionary
+): pdfFont.IFontInfo {
   return {
     ascent: dict.FontDescriptor.ascent || 0,
     descent: dict.FontDescriptor.descent || 0,
@@ -66,15 +72,21 @@ function createFontInfoFromType1(dict: core.Type1FontDictionary): pdfFont.IFontI
       let encoding: TextEncodingEnum;
       if (dict.Encoding instanceof core.PDFDictionary) {
         const encodingDict = dict.Encoding.to(core.CharacterEncodingDictionary);
-        encoding = TextEncodingEnum[encodingDict.BaseEncoding as keyof typeof TextEncodingEnum];
+        encoding =
+          TextEncodingEnum[
+            encodingDict.BaseEncoding as keyof typeof TextEncodingEnum
+          ];
         // TODO: Handle differences between encoding and differences
       } else if (dict.Encoding instanceof core.PDFName) {
-        encoding = TextEncodingEnum[dict.Encoding.text as keyof typeof TextEncodingEnum];
+        encoding =
+          TextEncodingEnum[dict.Encoding.text as keyof typeof TextEncodingEnum];
       } else {
         encoding = TextEncodingEnum.StandardEncoding;
       }
       if (encoding === undefined) {
-        throw new Error(`Cannot get glyph index for specified unicode. Unsupported text encoding '${dict.Encoding}'`);
+        throw new Error(
+          `Cannot get glyph index for specified unicode. Unsupported text encoding '${dict.Encoding}'`
+        );
       }
 
       if (!dict.Widths) {
@@ -88,20 +100,19 @@ function createFontInfoFromType1(dict: core.Type1FontDictionary): pdfFont.IFontI
       const index = TextEncoding.getIndex(code, encoding);
       if (index != -1) {
         const width = dict.Widths.find(index - dict.FirstChar);
-        const advanceWidth = (width instanceof core.PDFNumeric)
-          ? width.value : 0;
+        const advanceWidth = width instanceof core.PDFNumeric ? width.value : 0;
 
         return {
           index,
           advanceWidth,
-          unicode: [code],
+          unicode: [code]
         };
       }
 
       return {
         index: 0,
         advanceWidth: 0,
-        unicode: [code],
+        unicode: [code]
       };
     }
   };
@@ -115,7 +126,9 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
   public name: string;
   public fontFile?: BufferSource;
 
-  public static toFontDictionary(dict: core.PDFDictionary): core.FontDictionary {
+  public static toFontDictionary(
+    dict: core.PDFDictionary
+  ): core.FontDictionary {
     if (dict instanceof core.FontDictionary) {
       return dict;
     }
@@ -143,22 +156,37 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
       this.fontInfo = params.fontInfo;
     } else {
       if (params.fontDictionary instanceof core.Type1FontDictionary) {
-        if (Object.values<string>(pdfFont.DefaultFonts).includes(params.fontDictionary.BaseFont)) {
-          this.fontInfo = pdfFont.FontFactory.createDefault(params.fontDictionary.BaseFont as pdfFont.DefaultFonts);
+        if (
+          Object.values<string>(pdfFont.DefaultFonts).includes(
+            params.fontDictionary.BaseFont
+          )
+        ) {
+          this.fontInfo = pdfFont.FontFactory.createDefault(
+            params.fontDictionary.BaseFont as pdfFont.DefaultFonts
+          );
         } else {
           this.fontInfo = createFontInfoFromType1(params.fontDictionary);
         }
       } else if (params.fontDictionary instanceof core.Type0FontDictionary) {
-        const cid = params.fontDictionary.DescendantFonts.get(0, core.CIDFontDictionary);
+        const cid = params.fontDictionary.DescendantFonts.get(
+          0,
+          core.CIDFontDictionary
+        );
 
-        const fontFile = cid.FontDescriptor.fontFile || cid.FontDescriptor.fontFile2 || cid.FontDescriptor.fontFile3;
+        const fontFile =
+          cid.FontDescriptor.fontFile ||
+          cid.FontDescriptor.fontFile2 ||
+          cid.FontDescriptor.fontFile3;
         if (!fontFile) {
           throw new Error(`Not found fontFile for '${params.name}'`);
         }
         this.fontInfo = pdfFont.FontFactory.create(fontFile.decodeSync());
       } else if (params.fontDictionary instanceof core.TrueTypeFontDictionary) {
         const fontDescriptor = params.fontDictionary.FontDescriptor;
-        const fontFile = fontDescriptor.fontFile || fontDescriptor.fontFile2 || fontDescriptor.fontFile3;
+        const fontFile =
+          fontDescriptor.fontFile ||
+          fontDescriptor.fontFile2 ||
+          fontDescriptor.fontFile3;
         if (!fontFile) {
           this.fontInfo = createFontInfoFromTrueType(params.fontDictionary);
         } else {
@@ -174,19 +202,24 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
   public addText(text: string): void {
     if (this.target instanceof core.Type1FontDictionary) {
       const maxUnicode = core.PDFLiteralString.getMaxUnicode(text);
-      if (maxUnicode > 255 && this.target.BaseFont !== pdfFont.DefaultFonts.Symbol && this.target.BaseFont !== pdfFont.DefaultFonts.ZapfDingbats) {
+      if (
+        maxUnicode > 255 &&
+        this.target.BaseFont !== pdfFont.DefaultFonts.Symbol &&
+        this.target.BaseFont !== pdfFont.DefaultFonts.ZapfDingbats
+      ) {
         throw new Error("Unsupported unicodes for this default font");
       }
     }
   }
 
-  public static addFont(doc: PDFDocument, font: pdfFont.DefaultFonts | BufferSource = FontComponent.DEFAULT_FONT): FontComponent {
-
+  public static addFont(
+    doc: PDFDocument,
+    font: pdfFont.DefaultFonts | BufferSource = FontComponent.DEFAULT_FONT
+  ): FontComponent {
     let fontObj: FontComponent;
 
     if (!BufferSourceConverter.isBufferSource(font)) {
       fontObj = this.addDefault(font, doc);
-
     } else {
       fontObj = this.addComposite(font, doc);
     }
@@ -194,11 +227,16 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
     return fontObj;
   }
 
-  private static findFont(font: string, document: PDFDocument): core.FontDictionary | null {
-    const obj = document.target.update.items.find(i => {
-
+  private static findFont(
+    font: string,
+    document: PDFDocument
+  ): core.FontDictionary | null {
+    const obj = document.target.update.items.find((i) => {
       // TODO need upgrade and optimize (add cash) equal?
-      if (i.type !== core.PDFDocumentObjectTypes.free && i.value instanceof core.PDFDictionary) {
+      if (
+        i.type !== core.PDFDocumentObjectTypes.free &&
+        i.value instanceof core.PDFDictionary
+      ) {
         if (i.value.has("Type")) {
           const type = i.value.get("Type");
           if (type && type instanceof core.PDFName && type.text === "Font") {
@@ -210,7 +248,9 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
             if (baseFont === font) {
               return i.value;
             } else if (fontDescriptor) {
-              const fontDescriptor = i.value.get("FontDescriptor") as core.PDFDictionary;
+              const fontDescriptor = i.value.get(
+                "FontDescriptor"
+              ) as core.PDFDictionary;
               const fontName = this.findFieldByName(fontDescriptor, "FontName");
               if (fontName === font) {
                 return i.value;
@@ -221,10 +261,13 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
       }
     });
 
-    return obj ? obj.value as core.FontDictionary : null;
+    return obj ? (obj.value as core.FontDictionary) : null;
   }
 
-  private static findFieldByName(value: core.PDFDictionary, fieldName: string): string | null {
+  private static findFieldByName(
+    value: core.PDFDictionary,
+    fieldName: string
+  ): string | null {
     if (value.has(fieldName)) {
       const baseFont = value.get(fieldName);
       if (baseFont && baseFont instanceof core.PDFName) {
@@ -235,7 +278,10 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
     return null;
   }
 
-  private static addDefault(font: pdfFont.DefaultFonts, document: PDFDocument): FontComponent {
+  private static addDefault(
+    font: pdfFont.DefaultFonts,
+    document: PDFDocument
+  ): FontComponent {
     let fontObj = this.findFont(font, document);
     let fontInfo: pdfFont.FontInfo;
 
@@ -258,7 +304,7 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
       fontDictionary: fontObj,
       document,
       fontInfo,
-      name: font,
+      name: font
     });
   }
 
@@ -272,7 +318,7 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
     }
     width *= scale;
 
-    return width * size / 1000;
+    return (width * size) / 1000;
   }
 
   /**
@@ -286,11 +332,13 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
     const ascent = this.fontInfo.ascent;
     const descent = includeDescent ? this.fontInfo.descent : 0;
 
-    return (ascent - descent) / 1000 * fontSize * scale;
+    return ((ascent - descent) / 1000) * fontSize * scale;
   }
 
-  private static addComposite(font: pdfFont.DefaultFonts | BufferSource, document: PDFDocument): FontComponent {
-
+  private static addComposite(
+    font: pdfFont.DefaultFonts | BufferSource,
+    document: PDFDocument
+  ): FontComponent {
     let fontInfo: pdfFont.FontInfo;
     let fontFile: core.PDFStream | null = null;
 
@@ -299,7 +347,6 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
 
       // add font stream
       fontFile = document.target.createStream(font);
-
     } else {
       fontInfo = pdfFont.FontFactory.createDefault(font);
     }
@@ -327,14 +374,18 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
         ordering: "UCS"
       },
       name: nameCmap,
-      glyphs: fontInfo.glyphs,
+      glyphs: fontInfo.glyphs
     });
     const toUnicodeStream = document.target.createStream(toUnicodeBuffer);
     toUnicodeStream.set("CMapName", document.target.createName(nameCmap));
     font0.ToUnicode = toUnicodeStream.makeIndirect();
 
     // add font Descriptor
-    const fontDescriptor = this.createFontDescriptor(fontInfo, document, fontFile);
+    const fontDescriptor = this.createFontDescriptor(
+      fontInfo,
+      document,
+      fontFile
+    );
     fontCID.FontDescriptor = fontDescriptor.makeIndirect();
 
     // add DescendantFonts
@@ -344,11 +395,14 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
       fontDictionary: font0,
       document,
       fontInfo,
-      name: font0.BaseFont,
+      name: font0.BaseFont
     });
   }
 
-  public static createFont0(fontInfo: pdfFont.FontInfo, document: PDFDocument): core.Type0FontDictionary {
+  public static createFont0(
+    fontInfo: pdfFont.FontInfo,
+    document: PDFDocument
+  ): core.Type0FontDictionary {
     const font = core.Type0FontDictionary.create(document.target.update);
 
     font.BaseFont = `PDFHLP+${fontInfo.name.postScriptName}`;
@@ -356,7 +410,11 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
     return font;
   }
 
-  public static createCIDFont(fontInfo: pdfFont.FontInfo, font0: core.Type0FontDictionary, document: PDFDocument): core.CIDFontDictionary {
+  public static createCIDFont(
+    fontInfo: pdfFont.FontInfo,
+    font0: core.Type0FontDictionary,
+    document: PDFDocument
+  ): core.CIDFontDictionary {
     const font = core.CIDFontDictionary.create(document.target.update);
 
     const widthsObject = this.getWidthArrayByString(fontInfo, document);
@@ -364,7 +422,9 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
 
     font.BaseFont = font0.BaseFont;
 
-    const cidSystemInfo = core.CIDSystemInfoDictionary.create(document.target.update);
+    const cidSystemInfo = core.CIDSystemInfoDictionary.create(
+      document.target.update
+    );
     cidSystemInfo.Registry = "Adobe";
     cidSystemInfo.Ordering = "Identity";
     cidSystemInfo.Supplement = 0;
@@ -375,30 +435,45 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
     return font;
   }
 
-  private static createFontDescriptor(fontInfo: pdfFont.FontInfo, document: PDFDocument, fontFile: core.PDFStream | null): core.FontDescriptorDictionary {
+  private static createFontDescriptor(
+    fontInfo: pdfFont.FontInfo,
+    document: PDFDocument,
+    fontFile: core.PDFStream | null
+  ): core.FontDescriptorDictionary {
     const scale = 1000 / fontInfo.unitsPerEm;
 
-    const fontDescriptor = core.FontDescriptorDictionary.create(document.target.update);
+    const fontDescriptor = core.FontDescriptorDictionary.create(
+      document.target.update
+    );
     if (fontFile) {
       fontDescriptor.fontFile2 = fontFile.makeIndirect();
     }
     fontDescriptor.fontName = fontInfo.name.fullName;
     fontDescriptor.fontFamily = fontInfo.name.fontFamily;
-    fontDescriptor.fontBBox = core.PDFRectangle.createWithData(document.target.update, fontInfo.head.xMin * scale, fontInfo.head.yMin * scale, fontInfo.head.xMax * scale, fontInfo.head.yMax * scale);
+    fontDescriptor.fontBBox = core.PDFRectangle.createWithData(
+      document.target.update,
+      fontInfo.head.xMin * scale,
+      fontInfo.head.yMin * scale,
+      fontInfo.head.xMax * scale,
+      fontInfo.head.yMax * scale
+    );
     fontDescriptor.italicAngle = fontInfo.post.italicAngle;
     fontDescriptor.ascent = fontInfo.head.yMax * scale;
     fontDescriptor.descent = fontInfo.head.yMin * scale;
     fontDescriptor.capHeight = fontInfo.os2.sCapHeight * scale;
     fontDescriptor.xHeight = fontInfo.os2.sxHeight * scale;
     fontDescriptor.fontWeight = fontInfo.os2.usWeightClass; // Optional
-    fontDescriptor.stemV = (50 + Math.pow(fontInfo.os2.usWeightClass / 65, 2)); // ??? Very unclear how to calculate this value
+    fontDescriptor.stemV = 50 + Math.pow(fontInfo.os2.usWeightClass / 65, 2); // ??? Very unclear how to calculate this value
     fontDescriptor.flags |= core.FontDescriptorFlags.nonsymbolic;
     fontDescriptor.flags |= core.FontDescriptorFlags.serif;
 
     return fontDescriptor;
   }
 
-  private static getWidthArrayByString(fontInfo: pdfFont.FontInfo, document: PDFDocument): core.PDFArray {
+  private static getWidthArrayByString(
+    fontInfo: pdfFont.FontInfo,
+    document: PDFDocument
+  ): core.PDFArray {
     const array: Array<core.PDFNumeric | core.PDFArray> = [];
     const scale = 1000 / fontInfo.unitsPerEm;
 
@@ -419,7 +494,9 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
     viewWriter.writeStringLine("1 dict begin");
     viewWriter.writeStringLine("begincmap");
 
-    viewWriter.writeStringLine(`/CIDSystemInfo <</Registry (${params.cidSystemInfo.registry}) /Ordering (${params.cidSystemInfo.ordering}) /Supplement 0>> def`);
+    viewWriter.writeStringLine(
+      `/CIDSystemInfo <</Registry (${params.cidSystemInfo.registry}) /Ordering (${params.cidSystemInfo.ordering}) /Supplement 0>> def`
+    );
 
     viewWriter.writeStringLine(`/CMapName /${params.name} def`);
     viewWriter.writeStringLine("/CMapType 2 def");
@@ -434,7 +511,10 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
     for (const glyph of params.glyphs) {
       if (glyph.unicode.length) {
         const keyHex = glyph.index.toString(16).toUpperCase().padStart(4, "0");
-        const valueHex = glyph.unicode[0].toString(16).toUpperCase().padStart(4, "0");
+        const valueHex = glyph.unicode[0]
+          .toString(16)
+          .toUpperCase()
+          .padStart(4, "0");
         viewWriter.writeStringLine(`<${keyHex}> <${valueHex}>`);
       }
     }
@@ -455,7 +535,7 @@ export enum TextAlignment {
   left = "left",
   center = "center",
   right = "right",
-  justify = "justify",
+  justify = "justify"
 }
 
 export interface TextStyle {
@@ -473,12 +553,12 @@ export interface TextBlock {
 }
 
 export class TextRectangle {
-
   public constructor(
     public left = 0,
     public top = 0,
     public width = 0,
-    public height = 0) { }
+    public height = 0
+  ) {}
 }
 
 export class TextRowItem extends TextRectangle {
@@ -489,7 +569,8 @@ export class TextRowItem extends TextRectangle {
   constructor(
     public original: TextBlock,
     fontMetrics: FontMetrics = { ascent: 0, descent: 0, height: 0 },
-    public text: string = "") {
+    public text: string = ""
+  ) {
     super();
 
     this.ascent = fontMetrics.ascent;
@@ -506,7 +587,6 @@ export class TextRowItem extends TextRectangle {
       this.space = 0;
     }
   }
-
 }
 export interface TextBlockParams {
   text: string;
@@ -572,7 +652,6 @@ export interface FontMetrics {
 }
 
 export class TextBlocks extends TextRectangle {
-
   public rows: TextRow[] = [];
   public leading = 1;
 
@@ -624,11 +703,9 @@ export class TextBlocks extends TextRectangle {
       }
     }
   }
-
 }
 
 export class TextSizeCounter {
-
   private static readonly NEW_LINE_CHAR = "\n";
   private static readonly SPACE_CHAR = " ";
   private static readonly MINUS_CHAR = "-";
@@ -639,18 +716,27 @@ export class TextSizeCounter {
       color: 0, // black
       strikeThrough: false,
       underline: false,
-      ...style,
+      ...style
     };
   }
 
-  public static getGlyphWidth(charCode: number, font: FontComponent, style: TextStyle): number {
+  public static getGlyphWidth(
+    charCode: number,
+    font: FontComponent,
+    style: TextStyle
+  ): number {
     const glyph = font.fontInfo.findGlyph(charCode);
-    const width = (glyph ? glyph.advanceWidth : 0) * style.size / font.fontInfo.unitsPerEm;
+    const width =
+      ((glyph ? glyph.advanceWidth : 0) * style.size) /
+      font.fontInfo.unitsPerEm;
 
     return width;
   }
 
-  public static getFontMetrics(font: FontComponent, style: TextStyle): FontMetrics {
+  public static getFontMetrics(
+    font: FontComponent,
+    style: TextStyle
+  ): FontMetrics {
     const scale = style.size / font.fontInfo.unitsPerEm;
     const ascent = font.fontInfo.ascent * scale;
     const descent = font.fontInfo.descent * scale;
@@ -658,7 +744,7 @@ export class TextSizeCounter {
     return {
       ascent,
       descent,
-      height: ascent - descent,
+      height: ascent - descent
     };
   }
 
@@ -680,7 +766,7 @@ export class TextSizeCounter {
       for (const char of block.text) {
         if (char === TextSizeCounter.NEW_LINE_CHAR) {
           // New line
-          word.text + char;
+          // word.text += char;
           rowItem.push(word.text, word.width);
           word = { text: "", width: 0 };
 
@@ -693,7 +779,11 @@ export class TextSizeCounter {
           continue;
         }
         // Measure glyph size
-        const glyphWidth = this.getGlyphWidth(char.charCodeAt(0), block.font, style);
+        const glyphWidth = this.getGlyphWidth(
+          char.charCodeAt(0),
+          block.font,
+          style
+        );
 
         const rowWidth = row.width + rowItem.width + word.width + glyphWidth;
         if (width < rowWidth && char !== TextSizeCounter.SPACE_CHAR) {
@@ -742,5 +832,4 @@ export class TextSizeCounter {
 
     return res;
   }
-
 }

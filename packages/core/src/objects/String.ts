@@ -2,7 +2,6 @@ import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 import { PDFObject } from "./Object";
 
 export abstract class PDFString extends PDFObject {
-
   public static DEFAULT_TEXT = "";
 
   public text = PDFString.DEFAULT_TEXT;
@@ -25,7 +24,6 @@ export abstract class PDFString extends PDFObject {
     } else if (BufferSourceConverter.isBufferSource(param)) {
       this.text = Convert.ToBinary(param);
     }
-
   }
 
   protected override onCopy(copy: PDFString): void {
@@ -35,8 +33,6 @@ export abstract class PDFString extends PDFObject {
   }
 
   protected onEqual(target: PDFObject): boolean {
-    return target instanceof PDFString &&
-      target.text === this.text;
+    return target instanceof PDFString && target.text === this.text;
   }
-
 }

@@ -1,7 +1,6 @@
 import { Filter } from "./Filter";
 
 export class LZWFilter extends Filter {
-
   public static readonly NAME = "LZWDecode";
   public name = LZWFilter.NAME;
 
@@ -24,5 +23,4 @@ export class LZWFilter extends Filter {
   public encodeSync(stream: Uint8Array): ArrayBuffer {
     return stream;
   }
-
 }

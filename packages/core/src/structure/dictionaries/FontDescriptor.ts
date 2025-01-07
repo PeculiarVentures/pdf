@@ -1,4 +1,11 @@
-import { PDFDictionaryField, PDFNumberField, PDFNameField, PDFStream, PDFTextString, PDFLiteralStringField } from "../../objects";
+import {
+  PDFDictionaryField,
+  PDFNumberField,
+  PDFNameField,
+  PDFStream,
+  PDFTextString,
+  PDFLiteralStringField
+} from "../../objects";
 import { PDFDictionary } from "../../objects/Dictionary";
 import { PDFRectangle } from "../common";
 
@@ -48,11 +55,10 @@ export enum FontDescriptorFlags {
   /**
    * See description after Note 1 in this subclause
    */
-  forceBold = 1 << 18,
+  forceBold = 1 << 18
 }
 
 export class FontDescriptorDictionary extends PDFDictionary {
-
   public static readonly TYPE = "Font";
 
   /**

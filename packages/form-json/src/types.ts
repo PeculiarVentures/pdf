@@ -1,11 +1,14 @@
-import * as pdfDoc from "@peculiarventures/pdf-doc";
-import { FormComponentType } from "@peculiarventures/pdf-doc";
+import * as pdfDoc from "@peculiar/pdf-doc";
+import { FormComponentType } from "@peculiar/pdf-doc";
 
 /**
  * Type representing a constructor for an IComponent instance.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type IComponentConstructor<T extends pdfDoc.IComponent> = new (target: any, doc: pdfDoc.PDFDocument) => T;
+export type IComponentConstructor<T extends pdfDoc.IComponent> = new (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  target: any,
+  doc: pdfDoc.PDFDocument
+) => T;
 
 /**
  * Interface representing the JSON object for a form component.
@@ -72,4 +75,9 @@ export interface JsonTextEditorUpdate extends JsonComponentUpdate {
 /**
  * Union type for all possible types of form component updates.
  */
-export type JsonUpdateMixed = JsonCheckBoxUpdate | JsonRadioButtonGroupUpdate | JsonRadioButtonUpdate | JsonComboBoxUpdate | JsonTextEditorUpdate;
+export type JsonUpdateMixed =
+  | JsonCheckBoxUpdate
+  | JsonRadioButtonGroupUpdate
+  | JsonRadioButtonUpdate
+  | JsonComboBoxUpdate
+  | JsonTextEditorUpdate;

@@ -1,7 +1,12 @@
-import { PDFDictionary, PDFNameField, PDFNumberField, PDFTextString, PDFTextStringField } from "../../objects";
+import {
+  PDFDictionary,
+  PDFNameField,
+  PDFNumberField,
+  PDFTextString,
+  PDFTextStringField
+} from "../../objects";
 
 export class DeveloperExtensionsDictionary extends PDFDictionary {
-
   public static readonly TYPE = "DeveloperExtensions";
 
   /**
@@ -12,17 +17,17 @@ export class DeveloperExtensionsDictionary extends PDFDictionary {
    */
   @PDFNameField("Type", true, DeveloperExtensionsDictionary.TYPE)
   public Type!: typeof DeveloperExtensionsDictionary.TYPE;
-  
+
   /**
    * The name of the PDF version to which this extension applies. The name
    * shall be consistent with the syntax used for the Version entry of the catalog
-   * dictionary (see 7.7.2, "Document catalog dictionary"). 
+   * dictionary (see 7.7.2, "Document catalog dictionary").
    * @remarks
    * - Required
    */
   @PDFNameField("BaseVersion")
   public BaseVersion!: string;
-  
+
   /**
    * An integer defined by the developer to denote the extension being
    * used. If the developer introduces more than one extension to a
@@ -33,7 +38,7 @@ export class DeveloperExtensionsDictionary extends PDFDictionary {
    */
   @PDFNumberField("ExtensionLevel")
   public ExtensionLevel!: number;
-  
+
   /**
    * A URL that refers to the documentation for this extension (see Annex E,
    * "PDF Name Registry").
@@ -42,12 +47,11 @@ export class DeveloperExtensionsDictionary extends PDFDictionary {
    */
   @PDFTextStringField("URL", true)
   URL!: PDFTextString | null;
-  
+
   protected override onCreate(): void {
     super.onCreate();
-    
+
     this.BaseVersion = "";
     this.ExtensionLevel = 0;
   }
-
 }

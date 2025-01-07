@@ -1,4 +1,11 @@
-import { PDFArray, PDFArrayField, PDFDictionaryField, PDFNameField, PDFNumberField, PDFStream } from "../../objects";
+import {
+  PDFArray,
+  PDFArrayField,
+  PDFDictionaryField,
+  PDFNameField,
+  PDFNumberField,
+  PDFStream
+} from "../../objects";
 import { FontDictionary } from "./FontDictionary";
 
 export class TrueTypeFontDictionary extends FontDictionary {
@@ -11,14 +18,14 @@ export class TrueTypeFontDictionary extends FontDictionary {
   public override subtype!: typeof TrueTypeFontDictionary.SUBTYPE;
 
   /**
-     * (Required) The PostScript language name of the font.For Type 1 fonts,
-     * this is always the value of the FontName entry in the font program; for
-     * more information, see Section 5.2 of the PostScript Language Reference,
-     * Third Edition.The PostScript language name of the font may be used to
-     * find the font program in the PDF processor or its environment.It is also
-     * the name that is used when printing to a PostScript language compatible
-     * output device.
-     */
+   * (Required) The PostScript language name of the font.For Type 1 fonts,
+   * this is always the value of the FontName entry in the font program; for
+   * more information, see Section 5.2 of the PostScript Language Reference,
+   * Third Edition.The PostScript language name of the font may be used to
+   * find the font program in the PDF processor or its environment.It is also
+   * the name that is used when printing to a PostScript language compatible
+   * output device.
+   */
   @PDFNameField("BaseFont")
   public BaseFont!: string;
 
@@ -70,10 +77,9 @@ export class TrueTypeFontDictionary extends FontDictionary {
   @PDFDictionaryField({
     name: "ToUnicode",
     type: PDFStream,
-    optional: true,
+    optional: true
   })
   public ToUnicode!: PDFStream | null;
-
 
   protected override onCreate(): void {
     super.onCreate();

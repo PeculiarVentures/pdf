@@ -1,12 +1,16 @@
-import * as pdfDoc from "@peculiarventures/pdf-doc";
-import { IComponentConstructor, JsonComponent, JsonForm, JsonUpdateMixed } from "./types";
+import * as pdfDoc from "@peculiar/pdf-doc";
+import {
+  IComponentConstructor,
+  JsonComponent,
+  JsonForm,
+  JsonUpdateMixed
+} from "./types";
 import { ComponentConverterFactory } from "./converters";
 
 /**
  * A utility class for exporting and updating PDF form components.
  */
 export class FormConverter {
-
   /**
    * The ComponentConverterFactory instance to use for converting PDF form components to JSON.
    */
@@ -27,7 +31,7 @@ export class FormConverter {
    */
   public export(doc: pdfDoc.PDFDocument): JsonForm {
     const res: JsonForm = {
-      form: {},
+      form: {}
     };
 
     const components = doc.getComponents();
@@ -47,8 +51,12 @@ export class FormConverter {
    * @returns The JSON representation of the specified form component,
    * or null if the component is not supported by the current converter registry.
    */
-  protected exportComponent(component: pdfDoc.IComponent): JsonComponent | null {
-    const converter = this.registry.find(component.constructor as IComponentConstructor<pdfDoc.IComponent>);
+  protected exportComponent(
+    component: pdfDoc.IComponent
+  ): JsonComponent | null {
+    const converter = this.registry.find(
+      component.constructor as IComponentConstructor<pdfDoc.IComponent>
+    );
     if (converter) {
       return converter.export(component);
     }
@@ -69,14 +77,14 @@ export class FormConverter {
         continue;
       }
 
-      const converter = this.registry.find(component.constructor as IComponentConstructor<pdfDoc.IComponent>);
+      const converter = this.registry.find(
+        component.constructor as IComponentConstructor<pdfDoc.IComponent>
+      );
       if (!converter || converter.typeJSON !== item.type) {
         continue;
       }
 
       converter.setValue(component, item);
     }
-
   }
-
 }

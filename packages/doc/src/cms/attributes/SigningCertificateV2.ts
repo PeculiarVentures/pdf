@@ -1,12 +1,23 @@
-import { AsnType, AsnTypeTypes, AsnProp, AsnPropTypes, AsnIntegerArrayBufferConverter, AsnSerializer, AsnConvert } from "@peculiar/asn1-schema";
-import { AlgorithmIdentifier, GeneralName, PolicyInformation } from "@peculiar/asn1-x509";
+import {
+  AsnType,
+  AsnTypeTypes,
+  AsnProp,
+  AsnPropTypes,
+  AsnIntegerArrayBufferConverter,
+  AsnSerializer,
+  AsnConvert
+} from "@peculiar/asn1-schema";
+import {
+  AlgorithmIdentifier,
+  GeneralName,
+  PolicyInformation
+} from "@peculiar/asn1-x509";
 import { X509Certificate } from "@peculiar/x509";
 import * as pkijs from "pkijs";
 
 import { AlgorithmFactory } from "../AlgorithmFactory";
 import { CmsAttribute } from "./Attribute";
 import { CmsAttributeFactory } from "./AttributeFactory";
-
 
 //#region ASN.1
 
@@ -23,7 +34,10 @@ export class IssuerSerial {
   @AsnProp({ type: GeneralName })
   public issuer = new GeneralName();
 
-  @AsnProp({ type: AsnPropTypes.Integer, converter: AsnIntegerArrayBufferConverter })
+  @AsnProp({
+    type: AsnPropTypes.Integer,
+    converter: AsnIntegerArrayBufferConverter
+  })
   public serialNumber = new ArrayBuffer(0);
 }
 
@@ -61,7 +75,7 @@ export class ESSCertIDv2 {
 export class SigningCertificateV2 {
   @AsnProp({
     type: ESSCertIDv2,
-    repeated: "sequence",
+    repeated: "sequence"
   })
   public certs: ESSCertIDv2[] = [];
 
@@ -77,10 +91,18 @@ export class SigningCertificateV2 {
 export class SigningCertificateV2Attribute extends CmsAttribute {
   public static readonly DEFAULT_IDENTIFIER = "1.2.840.113549.1.9.16.2.47 ";
 
-  public static async create(algorithm: globalThis.AlgorithmIdentifier, cert: X509Certificate): Promise<SigningCertificateV2Attribute> {
+  public static async create(
+    algorithm: globalThis.AlgorithmIdentifier,
+    cert: X509Certificate
+  ): Promise<SigningCertificateV2Attribute> {
     const essCert = new ESSCertIDv2();
-    essCert.certHash = await pkijs.getCrypto(true).digest(algorithm, cert.rawData);
-    essCert.hashAlgorithm = AsnConvert.parse(AlgorithmFactory.toBER(algorithm), AlgorithmIdentifier);
+    essCert.certHash = await pkijs
+      .getCrypto(true)
+      .digest(algorithm, cert.rawData);
+    essCert.hashAlgorithm = AsnConvert.parse(
+      AlgorithmFactory.toBER(algorithm),
+      AlgorithmIdentifier
+    );
 
     const signingCert = new SigningCertificateV2();
     signingCert.certs.push(essCert);
@@ -115,4 +137,7 @@ export class SigningCertificateV2Attribute extends CmsAttribute {
   }
 }
 
-CmsAttributeFactory.register(SigningCertificateV2Attribute.DEFAULT_IDENTIFIER, SigningCertificateV2Attribute);
+CmsAttributeFactory.register(
+  SigningCertificateV2Attribute.DEFAULT_IDENTIFIER,
+  SigningCertificateV2Attribute
+);

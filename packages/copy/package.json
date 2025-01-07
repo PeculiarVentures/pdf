@@ -1,8 +1,15 @@
 {
-  "name": "@peculiarventures/pdf-copy",
+  "name": "@peculiar/pdf-copy",
   "version": "1.16.0",
   "description": "This module allows to recreate the PDF document using specified filters.",
-  "keywords": [],
+  "keywords": [
+    "pdf",
+    "pdf-copy",
+    "pdf-merge",
+    "document",
+    "copy",
+    "merge"
+  ],
   "author": "microshine <microshine@mail.ru>",
   "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/copy#readme",
   "license": "AGPL",
@@ -11,11 +18,9 @@
   "types": "build/index.d.ts",
   "files": [
     "build",
+    "LICENSE",
     "README.md"
   ],
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/PeculiarVentures/pdf.git"
@@ -31,7 +36,7 @@
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
   "dependencies": {
-    "@peculiarventures/pdf-core": "^1.16.0",
-    "tslib": "^2.6.3"
+    "@peculiar/pdf-core": "^1.16.0",
+    "tslib": "^2.8.1"
   }
 }

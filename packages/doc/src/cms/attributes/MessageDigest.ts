@@ -6,7 +6,6 @@ import { CmsAttribute } from "./Attribute";
 import { CmsAttributeFactory } from "./AttributeFactory";
 
 export class MessageDigestAttribute extends CmsAttribute {
-
   public static readonly DEFAULT_IDENTIFIER = "1.2.840.113549.1.9.4";
 
   public get digest(): ArrayBuffer {
@@ -24,9 +23,15 @@ export class MessageDigestAttribute extends CmsAttribute {
     super();
 
     this.asn.type = MessageDigestAttribute.DEFAULT_IDENTIFIER;
-    this.asn.values.push(new asn1js.OctetString({ valueHex: BufferSourceConverter.toArrayBuffer(digest) }));
+    this.asn.values.push(
+      new asn1js.OctetString({
+        valueHex: BufferSourceConverter.toArrayBuffer(digest)
+      })
+    );
   }
-
 }
 
-CmsAttributeFactory.register(MessageDigestAttribute.DEFAULT_IDENTIFIER, MessageDigestAttribute);
+CmsAttributeFactory.register(
+  MessageDigestAttribute.DEFAULT_IDENTIFIER,
+  MessageDigestAttribute
+);

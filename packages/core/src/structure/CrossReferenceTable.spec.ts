@@ -1,23 +1,17 @@
-import * as assert from "assert";
 import { PDFDictionary, PDFNumeric } from "../objects";
 import { PDFDocument } from "./Document";
-import { XrefStructure } from "./XrefStructure";
 
-context("CrossReferenceTable", () => {
-
+describe("CrossReferenceTable", () => {
   it("create document", async () => {
-    const doc = new PDFDocument();
-    doc.options = {
-      xref: XrefStructure.Table,
-    };
+    const doc = PDFDocument.create();
 
     const dict1 = new PDFDictionary([
       ["First", new PDFNumeric(1)],
-      ["Second", new PDFNumeric(2)],
+      ["Second", new PDFNumeric(2)]
     ]);
     const dict2 = new PDFDictionary([
       ["Third", new PDFNumeric(3)],
-      ["Fourth", new PDFNumeric(4)],
+      ["Fourth", new PDFNumeric(4)]
     ]);
 
     const objDict1 = doc.append(dict1);
@@ -25,12 +19,15 @@ context("CrossReferenceTable", () => {
 
     const buf = await doc.toPDF();
 
-    console.log(Buffer.from(buf).toString("binary"));
+    const doc2 = await PDFDocument.fromPDF(buf);
 
-    const doc2 = new PDFDocument();
-    await doc2.fromPDF(buf);
-
-    const dict1_2 = doc2.getObject(objDict1.id);
+    const obj = doc2.getObject(objDict1.id);
+    expect(obj.id).toBe(objDict1.id);
+    expect(obj.generation).toBe(objDict1.generation);
+    expect(obj.type).toBe(objDict1.type);
+    const objValue = obj.value;
+    expect(objValue).toBeInstanceOf(PDFDictionary);
+    const dict = objValue as PDFDictionary;
+    expect(dict.equal(dict1)).toBe(true);
   });
-
 });

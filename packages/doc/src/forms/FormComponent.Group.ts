@@ -1,4 +1,4 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { WrapObject } from "../WrapObject";
 import { IComponent } from "./IComponent";
 import { FormComponent } from "./FormComponent";
@@ -10,8 +10,13 @@ export interface IFormGroupedComponent extends IComponent {
   findGroup(): FormComponentGroup | null;
 }
 
-export class FormComponentGroup<TTarget extends core.PDFField = core.PDFField, TItem extends IFormGroupedComponent = any> extends WrapObject<TTarget> implements IComponent, Iterable<TItem> {
-
+export class FormComponentGroup<
+    TTarget extends core.PDFField = core.PDFField,
+    TItem extends IFormGroupedComponent = IFormGroupedComponent
+  >
+  extends WrapObject<TTarget>
+  implements IComponent, Iterable<TItem>
+{
   private get acroFormFields(): core.PDFArray {
     const fields = this.target.documentUpdate?.catalog?.AcroForm.get().Fields;
     if (!fields) {
@@ -21,7 +26,7 @@ export class FormComponentGroup<TTarget extends core.PDFField = core.PDFField, T
     return fields;
   }
 
-  [Symbol.iterator](): Iterator<TItem, any, undefined> {
+  [Symbol.iterator](): Iterator<TItem, unknown, undefined> {
     let pointer = 0;
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const _this = this;
@@ -72,9 +77,12 @@ export class FormComponentGroup<TTarget extends core.PDFField = core.PDFField, T
     if (this.target.Kids.has()) {
       const kids = this.target.Kids.get();
 
-      const component = FormComponentFactory.create(kids.get(index, core.WidgetDictionary, true), this.document);
+      const component = FormComponentFactory.create(
+        kids.get(index, core.WidgetDictionary, true),
+        this.document
+      );
       if (component instanceof FormComponent) {
-        return component as any as TItem;
+        return component as unknown as TItem;
       }
 
       throw new Error("Cannot load form component from PDF Widget.");
@@ -83,7 +91,7 @@ export class FormComponentGroup<TTarget extends core.PDFField = core.PDFField, T
       const widget = this.target.to(core.WidgetDictionary);
       const component = FormComponentFactory.create(widget, this.document);
       if (component instanceof FormComponent) {
-        return component as any as TItem;
+        return component as unknown as TItem;
       }
 
       throw new Error("Cannot load form component from PDF Widget.");
@@ -154,7 +162,7 @@ export class FormComponentGroup<TTarget extends core.PDFField = core.PDFField, T
     return false;
   }
 
-  protected onDetach(item: TItem): void {
+  protected onDetach(_item: TItem): void {
     // nothing
   }
 
@@ -169,5 +177,4 @@ export class FormComponentGroup<TTarget extends core.PDFField = core.PDFField, T
   public get name(): string {
     return this.target.getFullName();
   }
-
 }

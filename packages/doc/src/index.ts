@@ -17,3 +17,10 @@ export * from "./CertificateStorageHandler";
 export * from "./embedded_file";
 export * from "./forms";
 
+import { Registry } from "./Registry";
+import { CRL } from "./cms/CRL";
+import { OCSP } from "./cms/OCSP";
+
+const registry = Registry.getInstance();
+registry.register("OCSP", OCSP);
+registry.register("CRL", CRL);

@@ -1,4 +1,4 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { BufferSourceConverter } from "pvtsutils";
 import { WrapObject } from "../WrapObject";
 import { EmbeddedFile } from "./EmbeddedFile";
@@ -37,8 +37,10 @@ export interface EmbeddedFileMapAttachParams {
 /**
  * Represents an embedded file mapping of strings to {@link EmbeddedFile} objects.
  */
-export class EmbeddedFileMap extends WrapObject<core.CatalogDictionary> implements Iterable<[string, EmbeddedFile]> {
-
+export class EmbeddedFileMap
+  extends WrapObject<core.CatalogDictionary>
+  implements Iterable<[string, EmbeddedFile]>
+{
   #nameTree?: NameTree<core.FileSpecificationDictionary>;
 
   [Symbol.iterator](): Iterator<[string, EmbeddedFile], unknown, undefined> {
@@ -54,7 +56,7 @@ export class EmbeddedFileMap extends WrapObject<core.CatalogDictionary> implemen
           } else {
             return {
               done: false,
-              value: [res.value[0], new EmbeddedFile(res.value[1], doc)],
+              value: [res.value[0], new EmbeddedFile(res.value[1], doc)]
             };
           }
         }
@@ -71,6 +73,9 @@ export class EmbeddedFileMap extends WrapObject<core.CatalogDictionary> implemen
     }
   }
 
+  /**
+   * The number of embedded files in the map.
+   */
   get size(): number {
     return [...this].length;
   }
@@ -101,7 +106,11 @@ export class EmbeddedFileMap extends WrapObject<core.CatalogDictionary> implemen
       if (names.EmbeddedFiles) {
         const nameTree = names.EmbeddedFiles;
         if (nameTree) {
-          this.#nameTree = new NameTree(nameTree, this.document, core.FileSpecificationDictionary);
+          this.#nameTree = new NameTree(
+            nameTree,
+            this.document,
+            core.FileSpecificationDictionary
+          );
         }
       }
     }
@@ -110,21 +119,20 @@ export class EmbeddedFileMap extends WrapObject<core.CatalogDictionary> implemen
   }
 
   /**
-  * Setter for the nameTree.
-  * @param v NameTree to be set
-  */
-  private set nameTree(v: NameTree<core.FileSpecificationDictionary> | null) {
+   * Setter for the nameTree.
+   * @param v NameTree to be set
+   */
+  private set nameTree(v: NameTree<core.FileSpecificationDictionary>) {
     if (v) {
       this.#nameTree = v;
-    } else {
-      this.#nameTree = undefined;
     }
   }
 
-
+  /**
+   * Retrieves the {@link EmbeddedFile} for a given key.
+   */
   public get(key: string): EmbeddedFile {
     const res = this.find(key);
-
     if (!res) {
       throw new Error(`Cannot retrieve the value for the given key '${key}'.`);
     }
@@ -136,7 +144,7 @@ export class EmbeddedFileMap extends WrapObject<core.CatalogDictionary> implemen
    * Sets a new {@link EmbeddedFile} in the map.
    * @param key Used as the identifier for the embedded file
    * @param file Instance of EmbeddedFile class
-   * @returns This EmbeddedFileMap instance.
+   * @returns This {@link EmbeddedFileMap} instance
    */
   public set(key: string, file: EmbeddedFile): this {
     if (!this.nameTree) {
@@ -146,7 +154,11 @@ export class EmbeddedFileMap extends WrapObject<core.CatalogDictionary> implemen
       embeddedFiles.Names = this.document.target.createArray();
       this.target.Names.get().EmbeddedFiles = embeddedFiles;
 
-      this.nameTree = new NameTree(embeddedFiles, this.document, core.FileSpecificationDictionary);
+      this.nameTree = new NameTree(
+        embeddedFiles,
+        this.document,
+        core.FileSpecificationDictionary
+      );
     }
 
     this.nameTree.set(key, file.target);
@@ -185,5 +197,4 @@ export class EmbeddedFileMap extends WrapObject<core.CatalogDictionary> implemen
     // Add the embedded file to the map using the provided or generated ID
     return this.set(params.id, new EmbeddedFile(embeddedFile, this.document));
   }
-
 }

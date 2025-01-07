@@ -1,6 +1,6 @@
-import * as core from "@peculiarventures/pdf-core";
-import * as font from "@peculiarventures/pdf-font";
-import * as copy from "@peculiarventures/pdf-copy";
+import * as core from "@peculiar/pdf-core";
+import * as font from "@peculiar/pdf-font";
+import * as copy from "@peculiar/pdf-copy";
 import { X509Certificate } from "@peculiar/x509";
 import { BufferSource, Convert } from "pvtsutils";
 import * as pkijs from "pkijs";
@@ -11,7 +11,10 @@ import { Watermark, WatermarkParams } from "./Watermark";
 import { FormObject } from "./FormObject";
 import { WrapObject } from "./WrapObject";
 import { Dss } from "./Dss";
-import { IPdfCertificateStorageHandler, PDFCertificateStorageHandler } from "./CertificateStorageHandler";
+import {
+  IPdfCertificateStorageHandler,
+  PDFCertificateStorageHandler
+} from "./CertificateStorageHandler";
 import { EmbeddedFileMap } from "./embedded_file";
 import * as forms from "./forms";
 import { PDFVersion } from "./Version";
@@ -41,7 +44,8 @@ export interface PDFDocumentCreateCommonParameters {
   disableCompressedObjects?: boolean;
 }
 
-export interface StandardEncryptionParameters extends core.StandardEncryptionHandlerCreateCommonParams {
+export interface StandardEncryptionParameters
+  extends core.StandardEncryptionHandlerCreateCommonParams {
   algorithm: keyof typeof core.CryptoFilterMethods;
 }
 
@@ -52,11 +56,13 @@ export interface PublicKeyEncryptionParameters {
   recipients: X509Certificate[];
 }
 
-export type PDFDocumentCreateParameters = PDFDocumentCreateCommonParameters |
-  (PDFDocumentCreateCommonParameters & StandardEncryptionParameters) |
-  (PDFDocumentCreateCommonParameters & PublicKeyEncryptionParameters);
+export type PDFDocumentCreateParameters =
+  | PDFDocumentCreateCommonParameters
+  | (PDFDocumentCreateCommonParameters & StandardEncryptionParameters)
+  | (PDFDocumentCreateCommonParameters & PublicKeyEncryptionParameters);
 
-export interface PDFDocumentSignParameters extends forms.SignatureBoxSignParameters {
+export interface PDFDocumentSignParameters
+  extends forms.SignatureBoxSignParameters {
   groupName?: string;
 }
 
@@ -87,10 +93,10 @@ export interface PDFDocumentLoadParameters {
   onCertificate?: core.CertificateHandle;
 }
 
-export type PDFDocumentCloneParams = copy.PDFCopierCreateParams & copy.PDFCopierAppendParams;
+export type PDFDocumentCloneParams = copy.PDFCopierCreateParams &
+  copy.PDFCopierAppendParams;
 
 export class PDFDocument {
-
   #dss?: Dss;
 
   public readonly version: PDFVersion;
@@ -104,7 +110,6 @@ export class PDFDocument {
   public signatureBoxHandler: forms.SignatureBoxHandler;
   public inputImageHandler: forms.InputImageBoxHandler;
   public certificateHandler: IPdfCertificateStorageHandler;
-  public crypto: Crypto;
 
   /**
    * Creates PDF document
@@ -123,7 +128,9 @@ export class PDFDocument {
 
     // Set options
     target.version = version;
-    target.options.xref = useXrefTable ? core.XrefStructure.Table : core.XrefStructure.Stream;
+    target.options.xref = useXrefTable
+      ? core.XrefStructure.Table
+      : core.XrefStructure.Stream;
     target.options.disableAscii85Encoding = disableAscii85Encoding;
     target.options.disableCompressedStreams = disableCompressedStreams;
     target.options.disableCompressedObjects = disableCompressedObjects;
@@ -138,7 +145,9 @@ export class PDFDocument {
           document: target,
           crypto: pkijs.getCrypto(true),
           ...others,
-          algorithm: core.CryptoFilterMethods[others.algorithm] as core.CryptoFilterMethods.AES128,
+          algorithm: core.CryptoFilterMethods[
+            others.algorithm
+          ] as core.CryptoFilterMethods.AES128
         });
       } else {
         // Standard Encryption
@@ -146,7 +155,9 @@ export class PDFDocument {
           document: target,
           crypto: pkijs.getCrypto(true),
           ...others,
-          algorithm: core.CryptoFilterMethods[others.algorithm] as core.CryptoFilterMethods.AES128,
+          algorithm: core.CryptoFilterMethods[
+            others.algorithm
+          ] as core.CryptoFilterMethods.AES128
         });
       }
     }
@@ -156,7 +167,10 @@ export class PDFDocument {
     return new PDFDocument(target);
   }
 
-  public static async load(raw: string | BufferSource, params: PDFDocumentLoadParameters = {}): Promise<PDFDocument> {
+  public static async load(
+    raw: string | BufferSource,
+    params: PDFDocumentLoadParameters = {}
+  ): Promise<PDFDocument> {
     if (typeof raw === "string") {
       raw = Convert.FromBinary(raw);
     }
@@ -164,10 +178,16 @@ export class PDFDocument {
     const target = await core.PDFDocument.fromPDF(raw);
 
     if (target.encryptHandler) {
-      if (target.encryptHandler instanceof core.StandardEncryptionHandler && params.onUserPassword) {
+      if (
+        target.encryptHandler instanceof core.StandardEncryptionHandler &&
+        params.onUserPassword
+      ) {
         target.encryptHandler.onUserPassword = params.onUserPassword;
       }
-      if (target.encryptHandler instanceof core.PublicKeyEncryptionHandler && params.onCertificate) {
+      if (
+        target.encryptHandler instanceof core.PublicKeyEncryptionHandler &&
+        params.onCertificate
+      ) {
         target.encryptHandler.onCertificate = params.onCertificate;
       }
 
@@ -197,7 +217,6 @@ export class PDFDocument {
     this.signatureBoxHandler = new forms.SignatureBoxHandler(this);
     this.inputImageHandler = new forms.InputImageBoxHandler(this);
     this.certificateHandler = new PDFCertificateStorageHandler(this);
-    this.crypto = pkijs.getCrypto(true).crypto;
   }
 
   public get dss(): Dss {
@@ -270,7 +289,9 @@ export class PDFDocument {
     return components;
   }
 
-  private searchNestedComponents(parent: core.PDFDictionary): forms.IComponent[] {
+  private searchNestedComponents(
+    parent: core.PDFDictionary
+  ): forms.IComponent[] {
     if (!parent.has("Kids")) {
       return [];
     }
@@ -300,7 +321,9 @@ export class PDFDocument {
     return components;
   }
 
-  public filterComponents<T extends forms.IComponent>(...types: forms.IComponentConstructor<T>[]): T[] {
+  public filterComponents<T extends forms.IComponent>(
+    ...types: forms.IComponentConstructor<T>[]
+  ): T[] {
     const components = this.getComponents();
     const filteredComponents: T[] = [];
     for (const component of components) {
@@ -315,8 +338,14 @@ export class PDFDocument {
   }
 
   public getComponentByName(name: string): forms.IComponent | null;
-  public getComponentByName<T>(name: string, type: new (target: any, document: PDFDocument) => T): T;
-  public getComponentByName(name: string, type?: typeof WrapObject): forms.IComponent | WrapObject<any> | null {
+  public getComponentByName<T>(
+    name: string,
+    type: new (target: never, document: PDFDocument) => T
+  ): T;
+  public getComponentByName(
+    name: string,
+    type?: typeof WrapObject
+  ): forms.IComponent | null {
     const acroForm = this.target.update.catalog?.AcroForm;
     let component: forms.IComponent | null = null;
 
@@ -351,7 +380,9 @@ export class PDFDocument {
     }
 
     if (type && !(component instanceof type)) {
-      throw new TypeError("Cannot get PDF Component from the Document. Component doesn't require to the requested type.");
+      throw new TypeError(
+        "Cannot get PDF Component from the Document. Component doesn't require to the requested type."
+      );
     }
 
     return component;
@@ -380,12 +411,20 @@ export class PDFDocument {
           try {
             const component = forms.FormComponentFactory.create(pdfField, this);
 
-            return type ? (component instanceof type ? component : null) : component;
+            return type
+              ? component instanceof type
+                ? component
+                : null
+              : component;
           } catch {
             // component not found or error occurred, continue searching
           }
         } else if (pdfField.has("Kids")) {
-          const childComponent = this.searchNestedComponent(pdfField, name, type);
+          const childComponent = this.searchNestedComponent(
+            pdfField,
+            name,
+            type
+          );
           if (childComponent) {
             return childComponent;
           }
@@ -396,9 +435,20 @@ export class PDFDocument {
     return null;
   }
 
-  public getComponentById(id: number, generation?: number): forms.IComponent | null;
-  public getComponentById<T>(id: number, generation: number, type: new (target: any, document: PDFDocument) => T): T;
-  public getComponentById(id: number, generation?: number, type?: typeof WrapObject): forms.IComponent | WrapObject<any> | null {
+  public getComponentById(
+    id: number,
+    generation?: number
+  ): forms.IComponent | null;
+  public getComponentById<T>(
+    id: number,
+    generation: number,
+    type: new (target: never, document: PDFDocument) => T
+  ): T;
+  public getComponentById(
+    id: number,
+    generation?: number,
+    type?: typeof WrapObject
+  ): forms.IComponent | null {
     let component: forms.IComponent | null = null;
 
     try {
@@ -414,19 +464,24 @@ export class PDFDocument {
 
     if (type) {
       if (!(component instanceof type)) {
-        throw new TypeError("Cannot get PDF Component from the Document. Component doesn't require to the requested type.");
+        throw new TypeError(
+          "Cannot get PDF Component from the Document. Component doesn't require to the requested type."
+        );
       }
     }
 
     return component;
   }
 
-  public createForm(width: core.TypographySize, height: core.TypographySize): FormObject {
+  public createForm(
+    width: core.TypographySize,
+    height: core.TypographySize
+  ): FormObject {
     return FormObject.create(this, width, height);
   }
 
   public get isSigned(): boolean {
-    const sig = this.getSignatures().find(o => {
+    const sig = this.getSignatures().find((o) => {
       if (o instanceof forms.SignatureBoxGroup) {
         return o.isSigned;
       }
@@ -438,19 +493,24 @@ export class PDFDocument {
   }
 
   public getSignatures(): Array<forms.SignatureBoxGroup | forms.SignatureBox> {
-    const signatures = this.filterComponents<forms.SignatureBoxGroup | forms.SignatureBox>(forms.SignatureBoxGroup, forms.SignatureBox);
+    const signatures = this.filterComponents<
+      forms.SignatureBoxGroup | forms.SignatureBox
+    >(forms.SignatureBoxGroup, forms.SignatureBox);
 
     return signatures;
   }
 
-  public async sign(params: PDFDocumentSignParameters): Promise<forms.SignatureBoxGroup> {
+  public async sign(
+    params: PDFDocumentSignParameters
+  ): Promise<forms.SignatureBoxGroup> {
     let group: forms.SignatureBoxGroup | null = null;
     if (params.groupName) {
       // get signature filed
       const component = this.getComponentByName(params.groupName);
       if (component instanceof forms.SignatureBoxGroup) {
         group = component;
-      } if (component instanceof forms.SignatureBox) {
+      }
+      if (component instanceof forms.SignatureBox) {
         group = component.findGroup();
       }
     }
@@ -458,7 +518,7 @@ export class PDFDocument {
       // create hidden signature box and add it to the first page
       const page = this.pages.get(0);
       const box = page.addSignatureBox({
-        groupName: params.groupName,
+        groupName: params.groupName
       });
 
       group = box.findGroup();
@@ -470,7 +530,9 @@ export class PDFDocument {
     return group.sign(params);
   }
 
-  public async verify(params?: forms.SignatureBoxGroupVerifyParams): Promise<DocumentHandlerVerifyResult> {
+  public async verify(
+    params?: forms.SignatureBoxGroupVerifyParams
+  ): Promise<DocumentHandlerVerifyResult> {
     const result: DocumentHandlerVerifyResult = {
       err: null,
       items: []
@@ -489,7 +551,9 @@ export class PDFDocument {
    * @param params Parameters for the new document
    * @returns
    */
-  public async clone(params: PDFDocumentCloneParams = {}): Promise<PDFDocument> {
+  public async clone(
+    params: PDFDocumentCloneParams = {}
+  ): Promise<PDFDocument> {
     const copier = await copy.PDFCopier.create(params);
 
     copier.append(this.target, params);
@@ -531,5 +595,4 @@ export class PDFDocument {
 
     return false;
   }
-
 }

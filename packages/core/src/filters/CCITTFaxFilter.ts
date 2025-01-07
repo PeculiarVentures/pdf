@@ -1,7 +1,6 @@
 import { Filter } from "./Filter";
 
 export class CCITTFaxFilter extends Filter {
-
   public static readonly NAME = "CCITTFaxDecode";
   public name = CCITTFaxFilter.NAME;
 
@@ -24,5 +23,4 @@ export class CCITTFaxFilter extends Filter {
   public encodeSync(stream: Uint8Array): ArrayBuffer {
     return stream;
   }
-
 }

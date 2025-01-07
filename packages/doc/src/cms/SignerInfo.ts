@@ -52,7 +52,7 @@ export enum CMSSignerInfoVerifyResultCodes {
   /**
    * Error during verification
    */
-  unknown = 15,
+  unknown = 15
 }
 
 export interface CMSSignerInfoVerifyResult {
@@ -68,48 +68,54 @@ export enum CMSContentType {
   data = "1.2.840.113549.1.7.1",
   signedData = "1.2.840.113549.1.7.2",
   envelopedData = "1.2.840.113549.1.7.3",
-  signedAndEnvelopedData = "1.2.840.113549.1.7.4",
+  signedAndEnvelopedData = "1.2.840.113549.1.7.4"
 }
 
 export enum CMSAttributeTypes {
   contentType = "1.2.840.113549.1.9.3",
   signingTime = "1.2.840.113549.1.9.4",
-  messageDigest = "1.2.840.113549.1.9.5",
+  messageDigest = "1.2.840.113549.1.9.5"
 }
-export class CMSSignerInfo extends AsnEncoded {
-
+export class CMSSignerInfo extends AsnEncoded<pkijs.SignerInfo> {
   public parent: CMSSignedData | null = null;
 
-  public signedAttributes: ReadonlyArray<attributes.CmsAttribute> = [];
-  public unsignedAttributes: attributes.CmsAttribute[] = [];
+  public signedAttributes: ReadonlyArray<CmsAttribute> = [];
+  public unsignedAttributes: CmsAttribute[] = [];
 
   constructor() {
     super();
 
     this.asn = new pkijs.SignerInfo({
-      version: 1,
+      version: 1
     });
   }
 
-  protected onFromSchema(schema: any): any {
-    const result = schema instanceof pkijs.SignerInfo ? schema : new pkijs.SignerInfo({ schema });
+  protected onFromSchema(schema: pkijs.SchemaType): pkijs.SignerInfo {
+    const result =
+      schema instanceof pkijs.SignerInfo
+        ? schema
+        : new pkijs.SignerInfo({ schema });
 
     // Load attributes
     if (result.signedAttrs) {
-      this.signedAttributes = this.readAttributes(result.signedAttrs.attributes);
+      this.signedAttributes = this.readAttributes(
+        result.signedAttrs.attributes
+      );
     }
     if (result.unsignedAttrs) {
-      this.unsignedAttributes = this.readAttributes(result.unsignedAttrs.attributes);
+      this.unsignedAttributes = this.readAttributes(
+        result.unsignedAttrs.attributes
+      );
     }
 
     return result;
   }
 
-  protected readAttributes(attrs?: any[]): attributes.CmsAttribute[] {
-    const res: attributes.CmsAttribute[] = [];
+  protected readAttributes(attrs?: pkijs.Attribute[]): CmsAttribute[] {
+    const res: CmsAttribute[] = [];
     if (attrs) {
       for (const attr of attrs) {
-        const attrConst = attributes.CmsAttributeFactory.get(attr.type);
+        const attrConst = CmsAttributeFactory.get(attr.type);
         const cmsAttr = new attrConst();
         cmsAttr.fromBER(attr.toSchema().toBER());
 
@@ -136,7 +142,10 @@ export class CMSSignerInfo extends AsnEncoded {
     return this.asn.signature.valueBlock.valueHex;
   }
 
-  public async verify(data?: BufferSource, checkDate = new Date()): Promise<CMSSignerInfoVerifyResult> {
+  public async verify(
+    data?: BufferSource,
+    checkDate = new Date()
+  ): Promise<CMSSignerInfoVerifyResult> {
     const signedData = this.getParent();
 
     const result = await signedData.verify(data, checkDate, this);
@@ -159,12 +168,14 @@ export class CMSSignerInfo extends AsnEncoded {
     if (this.asn.sid instanceof pkijs.IssuerAndSerialNumber) {
       // IssuerAndSerialNumber
       cert = await parent.certificateHandler.findCertificate(
-        this.asn.sid.serialNumber.valueBlock.valueHex,
-        this.asn.sid.issuer.toSchema().toBER(),
+        this.asn.sid.serialNumber.valueBeforeDecode,
+        this.asn.sid.issuer.toSchema().toBER()
       );
     } else {
       // OctetString
-      cert = await parent.certificateHandler.findCertificate(this.asn.sid.valueBlock.valueHex);
+      cert = await parent.certificateHandler.findCertificate(
+        this.asn.sid.valueBlock.valueHex
+      );
     }
 
     if (!cert) {
@@ -174,7 +185,7 @@ export class CMSSignerInfo extends AsnEncoded {
     return cert;
   }
 
-  public override toSchema(): any {
+  public override toSchema(): pkijs.SchemaType {
     if (this.unsignedAttributes.length) {
       const attrs: pkijs.Attribute[] = [];
       for (const attr of this.unsignedAttributes) {
@@ -183,16 +194,16 @@ export class CMSSignerInfo extends AsnEncoded {
 
       this.asn.unsignedAttrs = new pkijs.SignedAndUnsignedAttributes({
         type: 1,
-        attributes: attrs,
+        attributes: attrs
       });
     }
 
     return super.toSchema();
   }
-
 }
 
-import * as attributes from "./attributes";
+import { CmsAttribute } from "./attributes/Attribute";
+import { CmsAttributeFactory } from "./attributes/AttributeFactory";
 import { AlgorithmFactory } from "./AlgorithmFactory";
 
 import type { CMSSignedData } from "./SignedData";

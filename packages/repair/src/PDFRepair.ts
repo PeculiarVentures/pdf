@@ -1,5 +1,9 @@
-import { PDFDocument } from "@peculiarventures/pdf-doc";
-import { PDFRepairRegistry, IRepairRule, globalRepairRegistry } from "./PDFRepairRegistry";
+import { PDFDocument } from "@peculiar/pdf-doc";
+import {
+  PDFRepairRegistry,
+  IRepairRule,
+  globalRepairRegistry
+} from "./PDFRepairRegistry";
 
 /**
  * An object that records repair notes for a PDF file. The keys are rule IDs and the values are arrays of strings
@@ -15,7 +19,10 @@ interface RepairNotes {
 export class PDFRepair {
   private rules: IRepairRule[] = [];
 
-  constructor(registry: PDFRepairRegistry = globalRepairRegistry, ruleIds?: string[]) {
+  constructor(
+    registry: PDFRepairRegistry = globalRepairRegistry,
+    ruleIds?: string[]
+  ) {
     this.rules = registry.getRules(ruleIds);
   }
 

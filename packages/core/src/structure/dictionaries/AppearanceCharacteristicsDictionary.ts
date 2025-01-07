@@ -1,4 +1,13 @@
-import { PDFArray, PDFArrayField, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFStream, PDFTextString, PDFTextStringField } from "../../objects";
+import {
+  PDFArray,
+  PDFArrayField,
+  PDFDictionary,
+  PDFDictionaryField,
+  PDFNumberField,
+  PDFStream,
+  PDFTextString,
+  PDFTextStringField
+} from "../../objects";
 import { IconFitDictionary } from "./IconFitDictionary";
 
 export enum CaptionPosition {
@@ -29,11 +38,10 @@ export enum CaptionPosition {
   /**
    * Caption overlaid directly on the icon
    */
-  captionOverlaid = 6,
+  captionOverlaid = 6
 }
 
 export class AppearanceCharacteristicsDictionary extends PDFDictionary {
-
   /**
    * The number of degrees by which the widget annotation shall be
    * rotated counterclockwise relative to the page. The value shall be a multiple of
@@ -49,7 +57,7 @@ export class AppearanceCharacteristicsDictionary extends PDFDictionary {
    * - 0 No colour; transparent
    * - 1 DeviceGray
    * - 3 DeviceRGB
-   * - 4 DeviceCMYK 
+   * - 4 DeviceCMYK
    */
   @PDFArrayField("BC", true)
   public BC!: PDFArray | null;
@@ -57,7 +65,7 @@ export class AppearanceCharacteristicsDictionary extends PDFDictionary {
   /**
    * An array of numbers that shall be in the range 0.0 to 1.0 specifying
    * the colour of the widget annotation’s background. The number of array
-   * elements shall determine the colour space, as described for BC. 
+   * elements shall determine the colour space, as described for BC.
    */
   @PDFArrayField("BG", true)
   public BG!: PDFArray | null;
@@ -65,28 +73,28 @@ export class AppearanceCharacteristicsDictionary extends PDFDictionary {
   /**
    * The widget annotation’s normal caption, which
    * shall be displayed when it is not interacting with the user.
-   * 
+   *
    * Unlike the remaining entries listed in this Table, which apply only to widget
-   * annotations associated with push-button fields (see 12.7.5.2.2, "Pushbuttons"), 
+   * annotations associated with push-button fields (see 12.7.5.2.2, "Pushbuttons"),
    * he CA entry may be used with any type of button field, including
    * check boxes (see 12.7.5.2.3, "Check boxes") and radio buttons (12.7.5.2.4,
-   * "Radio buttons"). 
+   * "Radio buttons").
    * @remarks Button fields only
    */
   @PDFTextStringField("CA", true)
   public ca!: PDFTextString | null;
 
   /**
-   * The widget annotation’s rollover caption, which shall be displayed 
+   * The widget annotation’s rollover caption, which shall be displayed
    * when the user rolls the cursor into its active area
-   * without pressing the mouse button. 
+   * without pressing the mouse button.
    * @remarks Push-button fields only
    */
   @PDFTextStringField("RC", true)
   public rc!: PDFTextString | null;
 
   /**
-   * The widget annotation’s alternate (down) caption, which shall be displayed 
+   * The widget annotation’s alternate (down) caption, which shall be displayed
    * when the mouse button is pressed within its active area.
    * @remarks Push-button fields only
    */
@@ -96,7 +104,7 @@ export class AppearanceCharacteristicsDictionary extends PDFDictionary {
   /**
    * A form XObject defining the widget annotation’s normal icon, which shall be
    * displayed when it is not interacting with the user.
-   * @remarks 
+   * @remarks
    * - push-button fields only
    * - shall be an indirect reference
    */
@@ -104,21 +112,21 @@ export class AppearanceCharacteristicsDictionary extends PDFDictionary {
     name: "I",
     type: PDFStream,
     optional: true,
-    indirect: true,
+    indirect: true
   })
   public I!: PDFStream | null;
 
   /**
    * A form XObject defining the widget annotation’s rollover icon, which shall be
    * displayed when the user rolls the cursor into its active area without pressing
-   * the mouse button. 
+   * the mouse button.
    * @remarks Push-button fields only
    */
   @PDFDictionaryField({
     name: "RI",
     type: PDFStream,
     optional: true,
-    indirect: true,
+    indirect: true
   })
   public ri!: PDFStream | null;
 
@@ -131,7 +139,7 @@ export class AppearanceCharacteristicsDictionary extends PDFDictionary {
     name: "IX",
     type: PDFStream,
     optional: true,
-    indirect: true,
+    indirect: true
   })
   public ix!: PDFStream | null;
 
@@ -139,13 +147,13 @@ export class AppearanceCharacteristicsDictionary extends PDFDictionary {
    * An icon fit dictionary specifying how the widget annotation’s icon
    * shall be displayed within its annotation rectangle. If present, the icon fit
    * dictionary shall apply to all of the annotation’s icons (normal, rollover, and
-   * alternate). 
+   * alternate).
    * @remarks Push-button fields only
    */
   @PDFDictionaryField({
     name: "IF",
     type: IconFitDictionary,
-    optional: true,
+    optional: true
   })
   public if!: IconFitDictionary | null;
 
@@ -159,11 +167,10 @@ export class AppearanceCharacteristicsDictionary extends PDFDictionary {
    * - 4 Caption to the right of the icon
    * - 5 Caption to the left of the icon
    * - 6 Caption overlaid directly on the icon
-   * 
+   *
    * Default value: 0.
    * @remarks Push-button fields only
    */
   @PDFNumberField("TP", true, 0)
   public tp!: CaptionPosition;
-
 }

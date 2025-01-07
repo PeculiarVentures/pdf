@@ -1,20 +1,13 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { IFormComponentCreateParameters } from "./FormComponent.Handler";
 import { PDFDocument } from "../Document";
 import { FontComponent } from "../Font";
 import { FormObject } from "../FormObject";
 import { ComboBox } from "./ComboBox";
-export interface ComboBoxCreateParameters extends IFormComponentCreateParameters {
+export interface ComboBoxCreateParameters
+  extends IFormComponentCreateParameters {
   options?: Record<string, string> | string[];
   selected?: string | string[];
-
-}
-
-interface BorderParameters {
-  color?: core.Colors;
-  width: core.TypographySize;
-  length: number;
-  height: number;
 }
 
 export interface ComboBoxCreateParameters {
@@ -61,12 +54,11 @@ export interface IComboBoxHandler {
 }
 
 export class ComboBoxHandler implements IComboBoxHandler {
-
   public static readonly PADDING = 1;
   public static readonly COLOR = 0;
   public static readonly MAX_LEN = 0;
 
-  public constructor(public document: PDFDocument) { }
+  public constructor(public document: PDFDocument) {}
 
   public create(params: ComboBoxCreateParameters): core.WidgetDictionary {
     const doc = this.document.target;
@@ -76,7 +68,7 @@ export class ComboBoxHandler implements IComboBoxHandler {
 
     dict.ft = "Ch";
 
-    const widget = dict.to(core.WidgetDictionary);
+    const _widget = dict.to(core.WidgetDictionary);
 
     const field = dict.to(core.ChoiceDictionary);
     field.t = doc.createString(params.name || core.UUID.generate());
@@ -92,16 +84,42 @@ export class ComboBoxHandler implements IComboBoxHandler {
     const ascent = fontInfo.ascent * scale;
     const descent = fontInfo.descent * scale;
 
-    const padding = ComboBoxHandler.PADDING;
-    const x = padding;
-    const y = (form.height - ascent + descent) / 2 + padding;
+    const borderWidth = component.borderWidth;
+
+    // Calculate inner area dimensions
+    const innerWidth = form.width - borderWidth * 2;
+    const innerHeight = form.height - borderWidth * 2;
+
+    // Calculate text position relative to inner area
+    const x = borderWidth + ComboBoxHandler.PADDING;
+    const y =
+      borderWidth +
+      (innerHeight - ascent + descent) / 2 +
+      ComboBoxHandler.PADDING;
+
+    // draw border
+    const formContent =
+      borderWidth > 0
+        ? form
+            .graphics()
+            .strokeColor(component.borderColor)
+            .lineWidth(borderWidth * 2)
+            .rect(0, 0, form.width, form.height)
+            .stroke()
+        : form.graphics();
+
+    // draw background
+    formContent
+      .fillColor(component.backgroundColor)
+      .rect(borderWidth, borderWidth, innerWidth, innerHeight)
+      .fill();
 
     // draw content
-    const textContent = form
+    const textContent = formContent
       .text(true)
       .graphics()
-      // Clip rec
-      .rect(padding, padding, form.width - padding * 2, form.height - padding * 2)
+      // Clip rect for inner area
+      .rect(borderWidth, borderWidth, innerWidth, innerHeight)
       .clip()
       .pathEnd()
       .text()
@@ -116,14 +134,19 @@ export class ComboBoxHandler implements IComboBoxHandler {
       if (v instanceof core.PDFArray) {
         text = component.options[v.get(0, core.PDFTextString).text];
       } else if (v instanceof core.PDFTextString) {
-        text = component.options[component.target.get("V", core.PDFTextString).text];
+        text =
+          component.options[component.target.get("V", core.PDFTextString).text];
       } else {
-        throw new Error("Cannot get text value from the CheckBox. Unsupported type of V.");
+        throw new Error(
+          "Cannot get text value from the CheckBox. Unsupported type of V."
+        );
       }
     }
 
     if (text === undefined) {
-      throw new Error("Cannot get text value from the ComboBox. 'text' property is undefined or null.");
+      throw new Error(
+        "Cannot get text value from the ComboBox. 'text' property is undefined or null."
+      );
     }
 
     const textShow = this.getSingleLineText(text);
@@ -134,4 +157,3 @@ export class ComboBoxHandler implements IComboBoxHandler {
     return text.replace(/\n/g, " ");
   }
 }
-

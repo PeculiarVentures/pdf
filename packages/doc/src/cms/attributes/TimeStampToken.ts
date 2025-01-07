@@ -2,7 +2,6 @@ import { CmsAttribute } from "./Attribute";
 import { CmsAttributeFactory } from "./AttributeFactory";
 
 export class TimeStampTokenAttribute extends CmsAttribute {
-
   public static readonly DEFAULT_IDENTIFIER = "1.2.840.113549.1.9.16.2.14";
 
   #token?: TimeStampToken;
@@ -33,9 +32,11 @@ export class TimeStampTokenAttribute extends CmsAttribute {
       this.token = token;
     }
   }
-
 }
 
-CmsAttributeFactory.register(TimeStampTokenAttribute.DEFAULT_IDENTIFIER, TimeStampTokenAttribute);
+CmsAttributeFactory.register(
+  TimeStampTokenAttribute.DEFAULT_IDENTIFIER,
+  TimeStampTokenAttribute
+);
 
 import { TimeStampToken } from "../TimeStampToken";

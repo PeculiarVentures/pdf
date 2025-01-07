@@ -1,9 +1,6 @@
-import * as bs from "bytestreamjs";
 import { Filter } from "./Filter";
 
-
 export class RunLengthFilter extends Filter {
-
   public static readonly NAME = "RunLengthDecode";
   public name = RunLengthFilter.NAME;
 
@@ -20,34 +17,58 @@ export class RunLengthFilter extends Filter {
   }
 
   public decodeSync(stream: Uint8Array): ArrayBuffer {
-    let blockLength = 0;
-    let count = 0;
+    // Pre-allocate with input size as a reasonable starting point
+    let result = new Uint8Array(stream.length);
+    let resultPos = 0;
 
-    const result = new bs.SeqStream({
-      appendBlock: stream.buffer.byteLength
-    });
+    let index = 0;
+    while (index < stream.length) {
+      const length = stream[index++];
 
-    while ((blockLength = stream[count++]) !== 0x80) {
-      if (blockLength < 128) {
-        result.append(new bs.ByteStream(stream.subarray(count, blockLength + 1)));
-        count += (blockLength + 1);
+      if (length === 0x80) {
+        if (index < stream.length) {
+          throw new Error(
+            "RunLengthDecode: Unexpected end of data marker (EOD) found before end of stream"
+          );
+        }
+        break;
+      }
+
+      if (length < 128) {
+        // Copy length + 1 bytes literally
+        const copyLength = length + 1;
+        // Grow result buffer if needed
+        if (resultPos + copyLength > result.length) {
+          const newResult = new Uint8Array(result.length * 2);
+          newResult.set(result);
+          result = newResult;
+        }
+        result.set(stream.subarray(index, index + copyLength), resultPos);
+        resultPos += copyLength;
+        index += copyLength;
       } else {
-        const buffer = new ArrayBuffer(257 - blockLength);
-        const view = new Uint8Array(buffer);
-
-        for (let i = 0; i < (257 - blockLength); i++)
-          view[i] = stream[count];
-
-        result.append(new bs.ByteStream({ buffer }));
-        count++;
+        // Repeat single byte 257 - length times
+        const repeatLength = 257 - length;
+        const repeatByte = stream[index++];
+        // Grow result buffer if needed
+        if (resultPos + repeatLength > result.length) {
+          const newResult = new Uint8Array(result.length * 2);
+          newResult.set(result);
+          result = newResult;
+        }
+        result.fill(repeatByte, resultPos, resultPos + repeatLength);
+        resultPos += repeatLength;
       }
     }
 
-    return result.stream.buffer.slice(0, result.start);
+    if (index >= stream.length && stream[index - 1] !== 0x80) {
+      // Note: Missing EOD marker in RunLengthDecode stream
+    }
+
+    return result.buffer.slice(0, resultPos);
   }
 
-  public encodeSync(stream: Uint8Array): ArrayBuffer {
+  public encodeSync(_stream: Uint8Array): ArrayBuffer {
     throw new Error("Method not implemented");
   }
-
 }

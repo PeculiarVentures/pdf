@@ -18,4 +18,8 @@
     // "packages/*/src/**/*.spec.ts": true,
   },
   "typescript.tsdk": "node_modules/typescript/lib",
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "jest.runMode": "on-demand",
 }

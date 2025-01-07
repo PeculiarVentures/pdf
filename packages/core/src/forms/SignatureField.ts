@@ -5,7 +5,6 @@ import { SignatureDictionary } from "./Signature";
 import { SignatureLockDictionary } from "./SignatureLock";
 
 export class SignatureField extends PDFField {
-
   public static readonly FIELD_TYPE = "Sig";
 
   /**
@@ -43,7 +42,7 @@ export class SignatureField extends PDFField {
   @objects.PDFDictionaryField({
     name: "SV",
     type: objects.PDFDictionary,
-    optional: true,
+    optional: true
   })
   public SV!: objects.PDFDictionary | null;
 
@@ -52,5 +51,4 @@ export class SignatureField extends PDFField {
 
     this.ft = SignatureField.FIELD_TYPE;
   }
-
 }

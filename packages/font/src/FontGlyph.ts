@@ -3,7 +3,6 @@ import { IFontGlyph } from "./IFontGlyph";
 
 @asn.AsnType({ type: asn.AsnTypeTypes.Sequence })
 export class FontGlyph implements IFontGlyph {
-
   @asn.AsnProp({ type: asn.AsnPropTypes.Integer })
   public index = 0;
 

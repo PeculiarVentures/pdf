@@ -1,11 +1,13 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { type PDFDocument } from "../Document";
 import { WrapObject } from "../WrapObject";
 import { annotFlag, fieldFlag } from "./decorators";
 import { IComponent } from "./IComponent";
 
-export class FormComponent extends WrapObject<core.WidgetDictionary> implements IComponent {
-
+export class FormComponent
+  extends WrapObject<core.WidgetDictionary>
+  implements IComponent
+{
   public static readonly COLOR_OPERATORS = ["g", "rg", "k"];
 
   constructor(target: core.WidgetDictionary, document: PDFDocument) {
@@ -48,13 +50,14 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
     let vPt = core.TypographyConverter.toPoint(v);
     const height = this.height;
 
-    vPt = (this.target.p)
-      ? this.target.p.to(core.PageObjectDictionary).MediaBox.urY - vPt
-      : vPt;
+    if (this.target.p) {
+      const page = this.target.p.to(core.PageObjectDictionary);
+      vPt = page.MediaBox.urY - vPt;
+    }
 
     this.target.rect.modify();
-    this.target.rect.llY = vPt - height;
     this.target.rect.urY = vPt;
+    this.target.rect.llY = vPt - height;
   }
 
   /**
@@ -95,7 +98,12 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
   }
 
   /**
-   * Sets component height
+   * Sets the height of the form component.
+   *
+   * @note When the height is changed, the bottom edge of the rectangle remains fixed
+   * while the top edge moves to accommodate the new height.
+   *
+   * @param value - The new height value in typography units
    */
   public set height(value: core.TypographySize) {
     const height = core.TypographyConverter.toPoint(value);
@@ -139,7 +147,7 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
   }
 
   protected onBorderWidthChanged(): void {
-    // nothing
+    this.paint();
   }
 
   /**
@@ -170,7 +178,7 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
   }
 
   protected onBorderColorChanged(): void {
-    // nothing
+    this.paint();
   }
 
   /**
@@ -197,11 +205,11 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
     const mk = this.target.MK.get();
     mk.BG = color;
 
-    this.onBorderColorChanged();
+    this.onBackgroundColorChanged();
   }
 
   protected onBackgroundColorChanged(): void {
-    // nothing
+    this.paint();
   }
 
   /**
@@ -218,9 +226,15 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
 
       if (text) {
         const content = core.PDFContent.fromString(text.text);
-        const color = content.operators.find(o => o instanceof core.PDFOperator && FormComponent.COLOR_OPERATORS.includes(o.name));
+        const color = content.operators.find(
+          (o) =>
+            o instanceof core.PDFOperator &&
+            FormComponent.COLOR_OPERATORS.includes(o.name)
+        );
         if (color instanceof core.PDFOperator) {
-          return core.ColorConverter.fromPDFNumberArray(color.parameters as core.PDFNumeric[]);
+          return core.ColorConverter.fromPDFNumberArray(
+            color.parameters as core.PDFNumeric[]
+          );
         }
       }
     } catch {
@@ -237,15 +251,17 @@ export class FormComponent extends WrapObject<core.WidgetDictionary> implements 
   public set foreColor(value: core.Colors) {
     // PDF doesn't have field for the fore color annotation. For variable text use DA.
     // If set DA for graphics Acrobat doesn't show images
-    const content = new core.PDFContent()
-      .setColor(value);
-    this.target.MK.get().set("PV_FC", this.document.target.createString(content.toString()));
+    const content = new core.PDFContent().setColor(value);
+    this.target.MK.get().set(
+      "PV_FC",
+      this.document.target.createString(content.toString())
+    );
 
     this.onForeColorChanged();
   }
 
   protected onForeColorChanged(): void {
-    // nothing
+    this.paint();
   }
 
   /**

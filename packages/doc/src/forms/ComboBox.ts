@@ -1,10 +1,9 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { FormObject } from "../FormObject";
 import { ResourceManager } from "../ResourceManager";
 import { FontComponent } from "../Font";
 import { FormComponent } from "./FormComponent";
 import { fieldFlag } from "./decorators";
-import { FormComponentRegistry, FormComponentType } from "./FormComponent.Registry";
 
 /**
  * Represents a ComboBox form component which allows users to select
@@ -45,7 +44,7 @@ export class ComboBox extends FormComponent {
   /**
    * Indicates whether the ComboBox should commit the selected value when the user
    * selects a different value from the drop-down list.
-  */
+   */
   @fieldFlag(core.ChoiceFlags.commitOnSelChange)
   public commitOnSelChange!: boolean;
 
@@ -85,7 +84,7 @@ export class ComboBox extends FormComponent {
       for (const key in value) {
         const map = doc.createArray(
           doc.createString(key),
-          doc.createString(value[key]),
+          doc.createString(value[key])
         );
         opt.push(map);
       }
@@ -142,7 +141,10 @@ export class ComboBox extends FormComponent {
 
       const ap = this.target.AP.get().N;
       if (ap instanceof core.PDFDictionary) {
-        const formAP = new FormObject(ap.to(core.FormDictionary), this.document);
+        const formAP = new FormObject(
+          ap.to(core.FormDictionary),
+          this.document
+        );
         // Try to get Font from Appearance.Resources
         let font = formAP.resources.find(fontName);
 
@@ -159,11 +161,17 @@ export class ComboBox extends FormComponent {
         }
 
         if (!(font && font.target instanceof core.PDFDictionary)) {
-          throw new TypeError("Cannot get Font from Resources. Incorrect type.");
+          throw new TypeError(
+            "Cannot get Font from Resources. Incorrect type."
+          );
         }
         const fontDictionary = FontComponent.toFontDictionary(font.target);
 
-        return new FontComponent({ document: this.document, fontDictionary, name: fontName });
+        return new FontComponent({
+          document: this.document,
+          fontDictionary,
+          name: fontName
+        });
       }
     }
 
@@ -175,19 +183,29 @@ export class ComboBox extends FormComponent {
       resName = formAP.resources.set(defaultFont.target).name;
     }
 
-    return new FontComponent({ document: this.document, fontDictionary: defaultFont.target, name: resName });
+    return new FontComponent({
+      document: this.document,
+      fontDictionary: defaultFont.target,
+      name: resName
+    });
   }
 
   public set font(v: FontComponent) {
     if (!(this.target.has("DA") && this.font.name === v.name)) {
-
       let resName = "";
       const ap = this.target.AP.get().N;
       if (ap instanceof core.PDFDictionary) {
-        const formAP = new FormObject(ap.to(core.FormDictionary), this.document);
+        const formAP = new FormObject(
+          ap.to(core.FormDictionary),
+          this.document
+        );
         resName = formAP.resources.set(v.target).name;
       }
-      const resFontComponent = new FontComponent({ document: this.document, fontDictionary: v.target, name: resName });
+      const resFontComponent = new FontComponent({
+        document: this.document,
+        fontDictionary: v.target,
+        name: resName
+      });
 
       this.setDA(resFontComponent, this.fontSize, this.textColor);
     }
@@ -215,7 +233,9 @@ export class ComboBox extends FormComponent {
     const operator = this.findDaOperator(...FormComponent.COLOR_OPERATORS);
 
     if (operator) {
-      const color = core.ColorConverter.fromPDFNumberArray(operator.parameters as core.PDFNumeric[]);
+      const color = core.ColorConverter.fromPDFNumberArray(
+        operator.parameters as core.PDFNumeric[]
+      );
 
       return color;
     }
@@ -235,8 +255,7 @@ export class ComboBox extends FormComponent {
       const content = core.PDFContent.fromString(text);
 
       for (const item of content.operators) {
-        if (item instanceof core.PDFOperator &&
-          operators.includes(item.name)) {
+        if (item instanceof core.PDFOperator && operators.includes(item.name)) {
           return item;
         }
       }
@@ -245,12 +264,38 @@ export class ComboBox extends FormComponent {
     return null;
   }
 
-  protected setDA(font: FontComponent, size: core.TypographySize, color: core.Colors) {
+  protected setDA(
+    font: FontComponent,
+    size: core.TypographySize,
+    color: core.Colors
+  ) {
     const newContent = new core.PDFContent();
     newContent.setColor(color);
-    newContent.setFontAndSize({ font: font.name, size: core.TypographyConverter.toPoint(size) });
+    newContent.setFontAndSize({
+      font: font.name,
+      size: core.TypographyConverter.toPoint(size)
+    });
 
-    this.target.set("DA", this.document.target.createString(newContent.toString(true)));
+    this.target.set(
+      "DA",
+      this.document.target.createString(newContent.toString(true))
+    );
+    this.paint();
+  }
+
+  protected override onBorderColorChanged(): void {
+    this.paint();
+  }
+
+  protected override onBorderWidthChanged(): void {
+    this.paint();
+  }
+
+  protected override onBackgroundColorChanged(): void {
+    this.paint();
+  }
+
+  protected override onForeColorChanged(): void {
     this.paint();
   }
 

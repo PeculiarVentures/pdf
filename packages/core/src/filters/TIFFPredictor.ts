@@ -1,19 +1,15 @@
-import * as bs from "bytestreamjs";
 import { Predictor } from "./Predicator";
 
-
 export class TIFFPredictor extends Predictor {
+  public static get className(): string {
+    return "TIFFPredictor";
+  }
 
-	public static get className(): string {
-		return "TIFFPredictor";
-	}
+  public decode(view: Uint8Array): Uint8Array {
+    return view;
+  }
 
-	public decode(stream: bs.ByteStream): bs.ByteStream {
-		return stream;
-	}
-
-	public encode(stream: bs.ByteStream): bs.ByteStream {
-		return stream;
-	}
-
+  public encode(view: Uint8Array): Uint8Array {
+    return view;
+  }
 }

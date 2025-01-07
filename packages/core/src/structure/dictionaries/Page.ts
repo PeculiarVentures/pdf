@@ -11,9 +11,14 @@ interface PageInheritable {
   Rotate: number;
 }
 
-export abstract class PageDictionary extends objects.PDFDictionary implements PageInheritable {
-
-  public createMediaBox(width: TypographySize, heigh: TypographySize): PDFRectangle {
+export abstract class PageDictionary
+  extends objects.PDFDictionary
+  implements PageInheritable
+{
+  public createMediaBox(
+    width: TypographySize,
+    heigh: TypographySize
+  ): PDFRectangle {
     const w = TypographyConverter.toPoint(width);
     const h = TypographyConverter.toPoint(heigh);
 
@@ -22,9 +27,18 @@ export abstract class PageDictionary extends objects.PDFDictionary implements Pa
 
   public abstract Parent: PageDictionary | null;
 
-  protected getInherited<T extends keyof PageInheritable, R extends objects.PDFObject>(name: T, type: new () => R, optional?: false): R;
-  protected getInherited<T extends keyof PageInheritable, R extends objects.PDFObject>(name: T, type: new () => R, optional: true): R | null;
-  protected getInherited<T extends keyof PageInheritable, R extends objects.PDFObject>(name: T, type: new () => R, optional = false): R | null {
+  protected getInherited<
+    T extends keyof PageInheritable,
+    R extends objects.PDFObject
+  >(name: T, type: new () => R, optional?: false): R;
+  protected getInherited<
+    T extends keyof PageInheritable,
+    R extends objects.PDFObject
+  >(name: T, type: new () => R, optional: true): R | null;
+  protected getInherited<
+    T extends keyof PageInheritable,
+    R extends objects.PDFObject
+  >(name: T, type: new () => R, optional = false): R | null {
     if (!this.has(name)) {
       if (!this.Parent) {
         if (optional) {
@@ -42,7 +56,7 @@ export abstract class PageDictionary extends objects.PDFDictionary implements Pa
 
   /**
    * A dictionary containing any resources required by the page contents.
-   * If the page requires no resources, the value of this entry shall be 
+   * If the page requires no resources, the value of this entry shall be
    * an empty dictionary
    */
   public get Resources(): ResourceDictionary {
@@ -54,9 +68,9 @@ export abstract class PageDictionary extends objects.PDFDictionary implements Pa
   }
 
   /**
-   * A rectangle, expressed in default user space units, that shall define the boundaries 
+   * A rectangle, expressed in default user space units, that shall define the boundaries
    * of the physical medium on which the page shall be displayed or printed
-  */
+   */
   public get MediaBox(): PDFRectangle {
     return this.getInherited("MediaBox", PDFRectangle);
   }
@@ -65,8 +79,8 @@ export abstract class PageDictionary extends objects.PDFDictionary implements Pa
   }
 
   /**
-   * A rectangle, expressed in default user space units, that shall define 
-   * the visible region of default user space. When the page is displayed 
+   * A rectangle, expressed in default user space units, that shall define
+   * the visible region of default user space. When the page is displayed
    * or printed, its contents shall be clipped (cropped) to this rectangle
    */
   public get CropBox(): PDFRectangle | null {
@@ -79,7 +93,7 @@ export abstract class PageDictionary extends objects.PDFDictionary implements Pa
   }
 
   /**
-   * The number of degrees by which the page shall be rotated clockwise 
+   * The number of degrees by which the page shall be rotated clockwise
    * when displayed or printed. The value shall be a multiple of 90
    */
   public get Rotate(): number {
@@ -98,7 +112,10 @@ export abstract class PageDictionary extends objects.PDFDictionary implements Pa
     }
   }
 
-  public addResource(resource: objects.PDFObject, preferredName: string): string {
+  public addResource(
+    resource: objects.PDFObject,
+    preferredName: string
+  ): string {
     if (resource instanceof objects.PDFDictionary) {
       if (resource.has("Type")) {
         const type = resource.get("Type", objects.PDFName).text;
@@ -106,12 +123,16 @@ export abstract class PageDictionary extends objects.PDFDictionary implements Pa
           if (!this.Resources.XObject) {
             this.Resources.XObject = this.getDocument().createDictionary();
           }
-          this.Resources.XObject.set(preferredName ?? UUID.generate(), resource.makeIndirect());
+          this.Resources.XObject.set(
+            preferredName ?? UUID.generate(),
+            resource.makeIndirect()
+          );
         }
       }
     }
 
-    throw new TypeError("Cannot add the resource to the page. Unsupported type of the resource.");
+    throw new TypeError(
+      "Cannot add the resource to the page. Unsupported type of the resource."
+    );
   }
-
 }

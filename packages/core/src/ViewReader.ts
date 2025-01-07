@@ -1,9 +1,13 @@
 import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 
-export type ViewReaderFindCallback = (value: number, index: number, array: Uint8Array, reader: ViewReader) => boolean;
+export type ViewReaderFindCallback = (
+  value: number,
+  index: number,
+  array: Uint8Array,
+  reader: ViewReader
+) => boolean;
 
 export class ViewReader {
-
   public view: Uint8Array;
   public position = 0;
   public backward = false;
@@ -15,7 +19,6 @@ export class ViewReader {
   constructor(view: BufferSource) {
     this.view = BufferSourceConverter.toUint8Array(view);
   }
-
 
   /**
    * Finds index of the first element that satisfies the callback function. If not found, returns -1.
@@ -36,7 +39,9 @@ export class ViewReader {
    */
   public findIndex(text: string): number;
   public findIndex(param: ViewReaderFindCallback | Uint8Array | string): number;
-  public findIndex(param: ViewReaderFindCallback | Uint8Array | string): number {
+  public findIndex(
+    param: ViewReaderFindCallback | Uint8Array | string
+  ): number {
     if (typeof param === "function") {
       return this.findIndexByCallback(param);
     } else if (typeof param === "string") {
@@ -54,6 +59,7 @@ export class ViewReader {
   protected findIndexByCallback(cb: ViewReaderFindCallback): number {
     const step = this.backward ? -1 : 1;
 
+    // eslint-disable-next-line no-constant-condition
     for (this.position; true; this.position += step) {
       const value = this.view[this.position];
       if (value === undefined) {
@@ -143,14 +149,18 @@ export class ViewReader {
   public read(view: Uint8Array): Uint8Array;
   public read(length: number): Uint8Array;
   public read(cb: ViewReaderFindCallback): Uint8Array;
-  public read(param?: ViewReaderFindCallback | number | string | Uint8Array): Uint8Array;
-  public read(param?: ViewReaderFindCallback | number | string | Uint8Array): Uint8Array {
+  public read(
+    param?: ViewReaderFindCallback | number | string | Uint8Array
+  ): Uint8Array;
+  public read(
+    param?: ViewReaderFindCallback | number | string | Uint8Array
+  ): Uint8Array {
     const startPosition = this.position;
 
     if (typeof param === "number") {
       this.position += this.backward ? -param : param;
     } else if (!param) {
-      this.position = (this.backward) ? -1 : this.view.length;
+      this.position = this.backward ? -1 : this.view.length;
     } else if (param) {
       this.position = this.findIndex(param);
       if (this.position === -1 && !this.backward) {
@@ -158,7 +168,7 @@ export class ViewReader {
       }
     }
 
-    return (this.backward)
+    return this.backward
       ? this.view.subarray(this.position, startPosition)
       : this.view.subarray(startPosition, this.position);
   }
@@ -184,5 +194,4 @@ export class ViewReader {
   public start(): void {
     this.position = 0;
   }
-
 }

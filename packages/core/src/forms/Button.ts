@@ -24,14 +24,12 @@ export enum ButtonFlags {
    * mutually exclusive (the same behavior as HTML radio buttons).
    * @remarks PDF 1.5
    */
-  radiosInUnison = 1 << 25,
+  radiosInUnison = 1 << 25
 }
 
 export class ButtonDictionary extends PDFField {
-
   declare public ff: FieldFlags | ButtonFlags;
 
   @PDFArrayField("Opt", true)
   public opt!: PDFArray | null;
-
 }

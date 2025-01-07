@@ -1,12 +1,15 @@
 import { ParsingError } from "./ParsingError";
 
 export class BadCharError extends ParsingError {
-
   public static override readonly NAME: string = "BadCharError";
 
   constructor(position?: number, cause?: Error);
   constructor(message: string, position?: number, cause?: Error);
-  constructor(messageOrPosition?: string | number, positionOrCause?: number | Error, cause?: Error) {
+  constructor(
+    messageOrPosition?: string | number,
+    positionOrCause?: number | Error,
+    cause?: Error
+  ) {
     let message: string;
     let position: number | undefined;
     if (typeof messageOrPosition === "string") {
@@ -19,5 +22,4 @@ export class BadCharError extends ParsingError {
     }
     super(message, position, cause);
   }
-
 }

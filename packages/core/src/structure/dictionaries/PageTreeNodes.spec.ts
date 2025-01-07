@@ -3,22 +3,36 @@ import { PDFDocument } from "../Document";
 import { PageObjectDictionary } from "./PageObject";
 import { PageTreeNodesDictionary } from "./PageTreeNodes";
 
-context("PageTreeNodes", () => {
-
+describe("PageTreeNodes", () => {
   it("create/Count", () => {
-
-    const doc = new PDFDocument();
-    const tree = PageTreeNodesDictionary.createWithData(doc,
+    const doc = PDFDocument.create();
+    const tree = PageTreeNodesDictionary.createWithData(
+      doc,
       PageObjectDictionary.create(doc),
-      PageTreeNodesDictionary.createWithData(doc, PageObjectDictionary.create(doc), PageObjectDictionary.create(doc)),
-      PageTreeNodesDictionary.createWithData(doc,
-        PageTreeNodesDictionary.createWithData(doc, PageObjectDictionary.create(doc)),
-      ));
+      PageTreeNodesDictionary.createWithData(
+        doc,
+        PageObjectDictionary.create(doc),
+        PageObjectDictionary.create(doc)
+      ),
+      PageTreeNodesDictionary.createWithData(
+        doc,
+        PageTreeNodesDictionary.createWithData(
+          doc,
+          PageObjectDictionary.create(doc)
+        )
+      )
+    );
 
     assert.strictEqual(tree.Count, 4);
     assert.strictEqual(tree.Kids.get(1, PageTreeNodesDictionary).Count, 2);
     assert.strictEqual(tree.Kids.get(2, PageTreeNodesDictionary).Count, 1);
-    assert.strictEqual(tree.Kids.get(2, PageTreeNodesDictionary).Kids.get(0, PageTreeNodesDictionary).Count, 1);
+    assert.strictEqual(
+      tree.Kids.get(2, PageTreeNodesDictionary).Kids.get(
+        0,
+        PageTreeNodesDictionary
+      ).Count,
+      1
+    );
 
     // append
     const page = PageObjectDictionary.create(doc);
@@ -26,19 +40,30 @@ context("PageTreeNodes", () => {
     assert.strictEqual(tree.Count, 5);
     assert.strictEqual(tree.Kids.get(1, PageTreeNodesDictionary).Count, 2);
     assert.strictEqual(tree.Kids.get(2, PageTreeNodesDictionary).Count, 2);
-    assert.strictEqual(tree.Kids.get(2, PageTreeNodesDictionary).Kids.get(0, PageTreeNodesDictionary).Count, 1);
+    assert.strictEqual(
+      tree.Kids.get(2, PageTreeNodesDictionary).Kids.get(
+        0,
+        PageTreeNodesDictionary
+      ).Count,
+      1
+    );
 
     // remove
     tree.Kids.get(2, PageTreeNodesDictionary).remove(page);
     assert.strictEqual(tree.Count, 4);
     assert.strictEqual(tree.Kids.get(1, PageTreeNodesDictionary).Count, 2);
     assert.strictEqual(tree.Kids.get(2, PageTreeNodesDictionary).Count, 1);
-    assert.strictEqual(tree.Kids.get(2, PageTreeNodesDictionary).Kids.get(0, PageTreeNodesDictionary).Count, 1);
+    assert.strictEqual(
+      tree.Kids.get(2, PageTreeNodesDictionary).Kids.get(
+        0,
+        PageTreeNodesDictionary
+      ).Count,
+      1
+    );
   });
 
-  context("getPages", () => {
-
-    const doc = new PDFDocument();
+  describe("getPages", () => {
+    const doc = PDFDocument.create();
 
     function addPages(tree: PageTreeNodesDictionary, amount: number) {
       while (amount--) {
@@ -69,27 +94,27 @@ context("PageTreeNodes", () => {
       tree: PageTreeNodesDictionary;
       pages: number;
     }[] = [
-        {
-          name: "root",
-          tree: pages1,
-          pages: 13,
-        },
-        {
-          name: "tree with internal trees",
-          tree: pages1_1,
-          pages: 9,
-        },
-        {
-          name: "tree with pages only",
-          tree: pages1_2,
-          pages: 3,
-        },
-        {
-          name: "tree without pages",
-          tree: pages1_3,
-          pages: 0,
-        },
-      ];
+      {
+        name: "root",
+        tree: pages1,
+        pages: 13
+      },
+      {
+        name: "tree with internal trees",
+        tree: pages1_1,
+        pages: 9
+      },
+      {
+        name: "tree with pages only",
+        tree: pages1_2,
+        pages: 3
+      },
+      {
+        name: "tree without pages",
+        tree: pages1_3,
+        pages: 0
+      }
+    ];
 
     for (const t of tests) {
       it(t.name, () => {
@@ -97,7 +122,5 @@ context("PageTreeNodes", () => {
         assert.strictEqual(pages.length, t.pages);
       });
     }
-
   });
-
 });

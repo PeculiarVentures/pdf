@@ -8,7 +8,6 @@ const falseChars = new Uint8Array([0x66, 0x61, 0x6c, 0x73, 0x65]);
 const trueChars = new Uint8Array([0x74, 0x72, 0x75, 0x65]);
 
 export class PDFBoolean extends PDFObject {
-
   public static readonly NAME = ObjectTypeEnum.Boolean;
 
   constructor();
@@ -29,22 +28,20 @@ export class PDFBoolean extends PDFObject {
     const firstChar = reader.view[reader.position];
 
     switch (firstChar) {
-      case 0x74: // t
-        {
-          if (!trueChars.every(c => c === reader.readByte())) {
-            throw new BadCharError(reader.position - 1);
-          }
-          this.value = true;
-          break;
+      case 0x74: { // t
+        if (!trueChars.every((c) => c === reader.readByte())) {
+          throw new BadCharError(reader.position - 1);
         }
-      case 0x66: // f
-        {
-          if (!falseChars.every(c => c === reader.readByte())) {
-            throw new BadCharError(reader.position - 1);
-          }
-          this.value = false;
-          break;
+        this.value = true;
+        break;
+      }
+      case 0x66: { // f
+        if (!falseChars.every((c) => c === reader.readByte())) {
+          throw new BadCharError(reader.position - 1);
         }
+        this.value = false;
+        break;
+      }
       default:
         throw new BadCharError(reader.position);
     }
@@ -61,8 +58,6 @@ export class PDFBoolean extends PDFObject {
   }
 
   protected onEqual(target: PDFObject): boolean {
-    return target instanceof PDFBoolean &&
-      target.value === this.value;
+    return target instanceof PDFBoolean && target.value === this.value;
   }
-
 }

@@ -1,4 +1,9 @@
-import { PDFArray, PDFDictionaryField, PDFNameField, PDFStream } from "../../objects";
+import {
+  PDFArray,
+  PDFDictionaryField,
+  PDFNameField,
+  PDFStream
+} from "../../objects";
 import { FontDictionary } from "./FontDictionary";
 
 export class Type0FontDictionary extends FontDictionary {
@@ -31,12 +36,12 @@ export class Type0FontDictionary extends FontDictionary {
   public Encoding!: string;
 
   /**
-    * (Required) A one-element array specifying the CIDFont dictionary that is
-    * the descendant of this Type 0 font.
-    */
+   * (Required) A one-element array specifying the CIDFont dictionary that is
+   * the descendant of this Type 0 font.
+   */
   @PDFDictionaryField({
     name: "DescendantFonts",
-    type: PDFArray,
+    type: PDFArray
   })
   public DescendantFonts!: PDFArray;
 
@@ -47,7 +52,7 @@ export class Type0FontDictionary extends FontDictionary {
   @PDFDictionaryField({
     name: "ToUnicode",
     type: PDFStream,
-    optional: true,
+    optional: true
   })
   public ToUnicode!: PDFStream | null;
 

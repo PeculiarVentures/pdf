@@ -1,0 +1,28 @@
+{
+  "name": "@peculiar/pdf-tests",
+  "version": "1.16.0",
+  "description": "Test suite for PDF - Utilities and helper tools for testing purposes",
+  "keywords": [],
+  "author": "microshine <microshine@mail.ru>",
+  "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/pdf-tests#readme",
+  "license": "AGPL",
+  "private": true,
+  "files": [
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PeculiarVentures/pdf.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "warn": "echo \"This package is for testing purposes only\"",
+    "clear": "npm run warn",
+    "build": "npm run warn",
+    "rebuild": "npm run build",
+    "prepack": "npm run rebuild"
+  },
+  "bugs": {
+    "url": "https://github.com/PeculiarVentures/pdf/issues"
+  }
+}

@@ -1,4 +1,4 @@
-import * as pdfDoc from "@peculiarventures/pdf-doc";
+import * as pdfDoc from "@peculiar/pdf-doc";
 import { ComponentConverter } from "../index";
 import { IComponentConstructor } from "../types";
 
@@ -10,11 +10,13 @@ import { IComponentConstructor } from "../types";
  * To create a new ComponentConverter instance, call the register method with a new instance of the converter.
  */
 export class ComponentConverterFactory {
-
   /**
    * A map of ComponentConverter instances, keyed by their associated IComponent type.
    */
-  protected items = new Map<IComponentConstructor<pdfDoc.IComponent>, ComponentConverter<pdfDoc.IComponent>>();
+  protected items = new Map<
+    IComponentConstructor<pdfDoc.IComponent>,
+    ComponentConverter<pdfDoc.IComponent>
+  >();
 
   constructor(...converters: ComponentConverter<pdfDoc.IComponent>[]) {
     for (const converter of converters) {
@@ -38,7 +40,9 @@ export class ComponentConverterFactory {
    * @param type - The constructor function for the IComponent type to find a converter for.
    * @returns The ComponentConverter instance for the given IComponent type, or null if not found.
    */
-  public find<T extends pdfDoc.IComponent>(type: IComponentConstructor<T>): ComponentConverter<T> | null {
+  public find<T extends pdfDoc.IComponent>(
+    type: IComponentConstructor<T>
+  ): ComponentConverter<T> | null {
     const converter = this.items.get(type) as ComponentConverter<T>;
 
     return converter || null;
@@ -52,7 +56,9 @@ export class ComponentConverterFactory {
    * @returns The ComponentConverter instance for the given IComponent type.
    * @throws If no converter is found for the given IComponent type.
    */
-  public get<T extends pdfDoc.IComponent>(type: IComponentConstructor<T>): ComponentConverter<T> {
+  public get<T extends pdfDoc.IComponent>(
+    type: IComponentConstructor<T>
+  ): ComponentConverter<T> {
     const converter = this.find(type);
     if (!converter) {
       throw new Error(`Converter not found for type ${type.name}`);

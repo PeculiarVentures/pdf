@@ -1,9 +1,8 @@
-import * as bs from "bytestreamjs";
 import { PDFNumeric } from "../objects/Numeric";
 import { PDFDictionary } from "../objects/Dictionary";
 
 export interface PredictorParameters {
-  prevData?: bs.ByteStream;
+  prevData?: Uint8Array;
   colors?: number;
   bitsPerComponent?: number;
   columns?: number;
@@ -11,14 +10,13 @@ export interface PredictorParameters {
 }
 
 export abstract class Predictor {
-
-  public prevData: bs.ByteStream;
+  public prevData: Uint8Array;
   public colors: number;
   public bitsPerComponent: number;
   public columns: number;
 
   constructor(parameters: PredictorParameters = {}) {
-    this.prevData = parameters.prevData ?? new bs.ByteStream(); // Previous data, before action on "Stream"
+    this.prevData = parameters.prevData ?? new Uint8Array(); // Previous data, before action on "Stream"
 
     this.colors = parameters.colors ?? 1;
     this.bitsPerComponent = parameters.bitsPerComponent ?? 8;
@@ -28,21 +26,18 @@ export abstract class Predictor {
       const params = parameters.parameters;
 
       const valueColors = params.get("Colors", PDFNumeric);
-      if (valueColors)
-        this.colors = valueColors.value;
+      if (valueColors) this.colors = valueColors.value;
 
       const valueBitsPerComponent = params.get("BitsPerComponent", PDFNumeric);
       if (valueBitsPerComponent)
         this.bitsPerComponent = valueBitsPerComponent.value;
 
       const valueColumns = params.get("Columns", PDFNumeric);
-      if (valueColumns)
-        this.columns = valueColumns.value;
+      if (valueColumns) this.columns = valueColumns.value;
     }
   }
 
-  public abstract decode(stream: bs.ByteStream): bs.ByteStream;
+  public abstract decode(view: Uint8Array): Uint8Array;
 
-  public abstract encode(stream: bs.ByteStream): bs.ByteStream;
-
+  public abstract encode(view: Uint8Array): Uint8Array;
 }

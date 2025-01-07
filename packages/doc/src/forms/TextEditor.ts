@@ -1,4 +1,4 @@
-import * as core from "@peculiarventures/pdf-core";
+import * as core from "@peculiar/pdf-core";
 import { TextEditorDrawParameters } from "./TextEditor.Handler";
 import { FormObject } from "../FormObject";
 import { Resource, ResourceManager } from "../ResourceManager";
@@ -9,12 +9,10 @@ import { FormComponent } from "./FormComponent";
 export enum TextEditorAlignment {
   left = 0,
   center = 1,
-  right = 2,
+  right = 2
 }
 
-
 export class TextEditor extends FormComponent {
-
   public get alignment(): TextEditorAlignment {
     if (this.target.has("Q")) {
       return this.target.get("Q", core.PDFNumeric).value as TextEditorAlignment;
@@ -112,7 +110,11 @@ export class TextEditor extends FormComponent {
       resName = formAP.resources.set(defaultFont.target).name;
     }
 
-    return new FontComponent({ document: this.document, fontDictionary: defaultFont.target, name: resName });
+    return new FontComponent({
+      document: this.document,
+      fontDictionary: defaultFont.target,
+      name: resName
+    });
   }
 
   public set font(v: FontComponent) {
@@ -124,7 +126,11 @@ export class TextEditor extends FormComponent {
       const formAP = new FormObject(ap.to(core.FormDictionary), this.document);
       resName = formAP.resources.set(v.target).name;
     }
-    const resFontComponent = new FontComponent({ document: this.document, fontDictionary: v.target, name: resName });
+    const resFontComponent = new FontComponent({
+      document: this.document,
+      fontDictionary: v.target,
+      name: resName
+    });
 
     this.setDA(resFontComponent, this.fontSize, this.textColor);
   }
@@ -160,8 +166,13 @@ export class TextEditor extends FormComponent {
       const content = core.PDFContent.fromString(text);
 
       for (const operator of content.operators) {
-        if (operator instanceof core.PDFOperator && FormComponent.COLOR_OPERATORS.includes(operator.name)) {
-          const color = core.ColorConverter.fromPDFNumberArray(operator.parameters as core.PDFNumeric[]);
+        if (
+          operator instanceof core.PDFOperator &&
+          FormComponent.COLOR_OPERATORS.includes(operator.name)
+        ) {
+          const color = core.ColorConverter.fromPDFNumberArray(
+            operator.parameters as core.PDFNumeric[]
+          );
 
           return color;
         }
@@ -177,12 +188,23 @@ export class TextEditor extends FormComponent {
     }
   }
 
-  private setDA(font: FontComponent, size: core.TypographySize, color: core.Colors, noPaint?: boolean) {
+  private setDA(
+    font: FontComponent,
+    size: core.TypographySize,
+    color: core.Colors,
+    noPaint?: boolean
+  ) {
     const newContent = new core.PDFContent();
     newContent.setColor(color);
-    newContent.setFontAndSize({ font: font.name, size: core.TypographyConverter.toPoint(size) });
+    newContent.setFontAndSize({
+      font: font.name,
+      size: core.TypographyConverter.toPoint(size)
+    });
 
-    this.target.set("DA", this.document.target.createString(newContent.toString(true)));
+    this.target.set(
+      "DA",
+      this.document.target.createString(newContent.toString(true))
+    );
 
     if (!noPaint) {
       this.paint();
@@ -214,7 +236,8 @@ export class TextEditor extends FormComponent {
     // Compute the font size based on the height of the form.
     const fontInfo = this.font.fontInfo;
     const heightEm = this.height * fontInfo.unitsPerEm;
-    const fontSize = ((heightEm - 2) / (fontInfo.ascent - fontInfo.descent)) * 0.7;
+    const fontSize =
+      ((heightEm - 2) / (fontInfo.ascent - fontInfo.descent)) * 0.7;
 
     return fontSize;
   }
@@ -255,6 +278,10 @@ export class TextEditor extends FormComponent {
 
         width: this.width,
         height: this.height,
+
+        backgroundColor: this.backgroundColor,
+        borderColor: this.borderColor,
+        borderWidth: this.borderWidth
       };
 
       const handler = this.document.textEditorHandler;
@@ -266,17 +293,20 @@ export class TextEditor extends FormComponent {
   /**
    * Looks for a font in the document resources.
    * @param fontName Font name to find
-   * @param value Text value to check if font is suitable
+   * @param _value Text value to check if font is suitable
    * @returns FontComponent if font is found, null otherwise
    */
-  protected findFont(fontName: string, value?: string): FontComponent | null {
+  protected findFont(fontName: string, _value?: string): FontComponent | null {
     let resource: Resource | null = null;
 
     // Find in Appearance.Resources
     if (this.target.AP.has()) {
       const ap = this.target.AP.get();
       if (ap.N instanceof core.PDFStream) {
-        const formAP = new FormObject(ap.N.to(core.FormDictionary), this.document);
+        const formAP = new FormObject(
+          ap.N.to(core.FormDictionary),
+          this.document
+        );
         resource = formAP.resources.find(fontName);
       }
     }
@@ -304,7 +334,7 @@ export class TextEditor extends FormComponent {
 
     // Find in Document.fonts
     if (!resource) {
-      const font = this.document.fonts.find(o => o.name === fontName);
+      const font = this.document.fonts.find((o) => o.name === fontName);
 
       return font || null;
     }
@@ -312,7 +342,11 @@ export class TextEditor extends FormComponent {
     if (resource && resource.target instanceof core.PDFDictionary) {
       const fontDictionary = FontComponent.toFontDictionary(resource.target);
 
-      return new FontComponent({ document: this.document, fontDictionary, name: fontName });
+      return new FontComponent({
+        document: this.document,
+        fontDictionary,
+        name: fontName
+      });
     }
 
     return null;
