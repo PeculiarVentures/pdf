@@ -148,6 +148,18 @@ export class CertificateChain implements storageHandler.ICertificateStorage {
       };
     }
 
+    // Handle the case where the leaf certificate itself is trusted
+    if (chain.length === 1 && trustedChain.result) {
+      return {
+        chain,
+        result: true,
+        resultMessage: "Certificate is trusted",
+        resultCode: CertificateChainStatusCode.success,
+        trustListSource: trustedChain.source,
+        revocationMode: params.revocationMode
+      };
+    }
+
     const checkDate = params.checkDate || new Date();
     for (const chainCert of chain) {
       if (
