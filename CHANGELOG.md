@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.17.1](https://github.com/PeculiarVentures/pdf/compare/v1.17.0...v1.17.1) (2025-05-05)
+
+
+### Bug Fixes
+
+* handle case where leaf certificate is trusted in CertificateChain ([5b0d94c](https://github.com/PeculiarVentures/pdf/commit/5b0d94c3f6e7a0dea8b5d8e3d12c71a17b382463))
+* improve LTV state handling in signature verification process for trusted leaf certificate ([c92ab13](https://github.com/PeculiarVentures/pdf/commit/c92ab138132e965ec30e5fa5a324d7fc3b33196e))
+
+
+
+
+
 # [1.17.0](https://github.com/PeculiarVentures/pdf/compare/v1.16.0...v1.17.0) (2025-01-07)
 
 
