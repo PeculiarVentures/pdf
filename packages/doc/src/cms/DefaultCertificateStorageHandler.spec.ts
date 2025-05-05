@@ -695,82 +695,66 @@ describe("DefaultCertificateStorageHandler", () => {
   });
 
   describe("fetchRevocation", () => {
-    let _rootCert: x509.X509Certificate;
+    let rootCert: x509.X509Certificate;
     let caCert: x509.X509Certificate;
-    let cert: x509.X509Certificate;
 
     beforeAll(async () => {
       const rootEnc = [
-        "MIICCTCCAY6gAwIBAgINAgPlwGjvYxqccpBQUjAKBggqhkjOPQQDAzBHMQswCQYD",
-        "VQQGEwJVUzEiMCAGA1UEChMZR29vZ2xlIFRydXN0IFNlcnZpY2VzIExMQzEUMBIG",
-        "A1UEAxMLR1RTIFJvb3QgUjQwHhcNMTYwNjIyMDAwMDAwWhcNMzYwNjIyMDAwMDAw",
-        "WjBHMQswCQYDVQQGEwJVUzEiMCAGA1UEChMZR29vZ2xlIFRydXN0IFNlcnZpY2Vz",
-        "IExMQzEUMBIGA1UEAxMLR1RTIFJvb3QgUjQwdjAQBgcqhkjOPQIBBgUrgQQAIgNi",
-        "AATzdHOnaItgrkO4NcWBMHtLSZ37wWHO5t5GvWvVYRg1rkDdc/eJkTBa6zzuhXyi",
-        "QHY7qca4R9gq55KRanPpsXI5nymfopjTX15YhmUPoYRlBtHci8nHc8iMai/lxKvR",
-        "HYqjQjBAMA4GA1UdDwEB/wQEAwIBhjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQW",
-        "BBSATNbrdP9JNqPV2Py1PsVq8JQdjDAKBggqhkjOPQQDAwNpADBmAjEA6ED/g94D",
-        "9J+uHXqnLrmvT/aDHQ4thQEd0dlq7A/Cr8deVl5c1RxYIigL9zC2L7F8AjEA8GE8",
-        "p/SgguMh1YQdc4acLa/KNJvxn7kjNuK8YAOdgLOaVsjh4rsUecrNIdSUtUlD"
+        "MIICjzCCAhWgAwIBAgIQXIuZxVqUxdJxVt7NiYDMJjAKBggqhkjOPQQDAzCBiDEL",
+        "MAkGA1UEBhMCVVMxEzARBgNVBAgTCk5ldyBKZXJzZXkxFDASBgNVBAcTC0plcnNl",
+        "eSBDaXR5MR4wHAYDVQQKExVUaGUgVVNFUlRSVVNUIE5ldHdvcmsxLjAsBgNVBAMT",
+        "JVVTRVJUcnVzdCBFQ0MgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMTAwMjAx",
+        "MDAwMDAwWhcNMzgwMTE4MjM1OTU5WjCBiDELMAkGA1UEBhMCVVMxEzARBgNVBAgT",
+        "Ck5ldyBKZXJzZXkxFDASBgNVBAcTC0plcnNleSBDaXR5MR4wHAYDVQQKExVUaGUg",
+        "VVNFUlRSVVNUIE5ldHdvcmsxLjAsBgNVBAMTJVVTRVJUcnVzdCBFQ0MgQ2VydGlm",
+        "aWNhdGlvbiBBdXRob3JpdHkwdjAQBgcqhkjOPQIBBgUrgQQAIgNiAAQarFRaqflo",
+        "I+d61SRvU8Za2EurxtW20eZzca7dnNYMYf3boIkDuAUU7FfO7l0/4iGzzvfUinng",
+        "o4N+LZfQYcTxmdwlkWOrfzCjtHDix6EznPO/LlxTsV+zfTJ/ijTjeXmjQjBAMB0G",
+        "A1UdDgQWBBQ64QmG1M8ZwpZ2dEl23OA1xmNjmjAOBgNVHQ8BAf8EBAMCAQYwDwYD",
+        "VR0TAQH/BAUwAwEB/zAKBggqhkjOPQQDAwNoADBlAjA2Z6EWCNzklwBBHU6+4WMB",
+        "zzuqQhFkoJ2UOQIReVx7Hfpkue4WQrO/isIJxOzksU0CMQDpKmFHjFJKS04YcPbW",
+        "RNZu9YO6bVi9JNlWSOrvxKJGgYhqOkbRqZtNyWHa0V1Xahg="
       ].join("");
       const caEnc = [
-        "MIICnzCCAiWgAwIBAgIQf/MZd5csIkp2FV0TttaF4zAKBggqhkjOPQQDAzBHMQsw",
-        "CQYDVQQGEwJVUzEiMCAGA1UEChMZR29vZ2xlIFRydXN0IFNlcnZpY2VzIExMQzEU",
-        "MBIGA1UEAxMLR1RTIFJvb3QgUjQwHhcNMjMxMjEzMDkwMDAwWhcNMjkwMjIwMTQw",
-        "MDAwWjA7MQswCQYDVQQGEwJVUzEeMBwGA1UEChMVR29vZ2xlIFRydXN0IFNlcnZp",
-        "Y2VzMQwwCgYDVQQDEwNXRTEwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARvzTr+",
-        "Z1dHTCEDhUDCR127WEcPQMFcF4XGGTfn1XzthkubgdnXGhOlCgP4mMTG6J7/EFmP",
-        "LCaY9eYmJbsPAvpWo4H+MIH7MA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggr",
-        "BgEFBQcDAQYIKwYBBQUHAwIwEgYDVR0TAQH/BAgwBgEB/wIBADAdBgNVHQ4EFgQU",
-        "kHeSNWfE/6jMqeZ72YB5e8yT+TgwHwYDVR0jBBgwFoAUgEzW63T/STaj1dj8tT7F",
-        "avCUHYwwNAYIKwYBBQUHAQEEKDAmMCQGCCsGAQUFBzAChhhodHRwOi8vaS5wa2ku",
-        "Z29vZy9yNC5jcnQwKwYDVR0fBCQwIjAgoB6gHIYaaHR0cDovL2MucGtpLmdvb2cv",
-        "ci9yNC5jcmwwEwYDVR0gBAwwCjAIBgZngQwBAgEwCgYIKoZIzj0EAwMDaAAwZQIx",
-        "AOcCq1HW90OVznX+0RGU1cxAQXomvtgM8zItPZCuFQ8jSBJSjz5keROv9aYsAm5V",
-        "sQIwJonMaAFi54mrfhfoFNZEfuNMSQ6/bIBiNLiyoX46FohQvKeIoJ99cx7sUkFN",
-        "7uJW"
+        "MIIDqDCCAy6gAwIBAgIRAPNkTmtuAFAjfglGvXvh9R0wCgYIKoZIzj0EAwMwgYgx",
+        "CzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpOZXcgSmVyc2V5MRQwEgYDVQQHEwtKZXJz",
+        "ZXkgQ2l0eTEeMBwGA1UEChMVVGhlIFVTRVJUUlVTVCBOZXR3b3JrMS4wLAYDVQQD",
+        "EyVVU0VSVHJ1c3QgRUNDIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MB4XDTE4MTEw",
+        "MjAwMDAwMFoXDTMwMTIzMTIzNTk1OVowgY8xCzAJBgNVBAYTAkdCMRswGQYDVQQI",
+        "ExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGDAWBgNVBAoT",
+        "D1NlY3RpZ28gTGltaXRlZDE3MDUGA1UEAxMuU2VjdGlnbyBFQ0MgRG9tYWluIFZh",
+        "bGlkYXRpb24gU2VjdXJlIFNlcnZlciBDQTBZMBMGByqGSM49AgEGCCqGSM49AwEH",
+        "A0IABHkYk8qfbZ5sVwAjBTcLXw9YWsTef1Wj6R7W2SUKiKAgSh16TwUwimNJE4xk",
+        "IQeV/To14UrOkPAY9z2vaKb71EijggFuMIIBajAfBgNVHSMEGDAWgBQ64QmG1M8Z",
+        "wpZ2dEl23OA1xmNjmjAdBgNVHQ4EFgQU9oUKOxGG4QR9DqoLLNLuzGR7e64wDgYD",
+        "VR0PAQH/BAQDAgGGMBIGA1UdEwEB/wQIMAYBAf8CAQAwHQYDVR0lBBYwFAYIKwYB",
+        "BQUHAwEGCCsGAQUFBwMCMBsGA1UdIAQUMBIwBgYEVR0gADAIBgZngQwBAgEwUAYD",
+        "VR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2VydHJ1c3QuY29tL1VTRVJUcnVz",
+        "dEVDQ0NlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUFBwEBBGowaDA/",
+        "BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdEVD",
+        "Q0FkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1",
+        "c3QuY29tMAoGCCqGSM49BAMDA2gAMGUCMEvnx3FcsVwJbZpCYF9z6fDWJtS1UVRs",
+        "cS0chWBNKPFNpvDKdrdKRe+oAkr2jU+ubgIxAODheSr2XhcA7oz9HmedGdMhlrd9",
+        "4ToKFbZl+/OnFFzqnvOhcjHvClECEQcKmc8fmA=="
       ].join("");
-      const certEnc = [
-        "MIIDojCCA0mgAwIBAgIQKODlo0VpcV4TEHcBw9Y8DDAKBggqhkjOPQQDAjA7MQsw",
-        "CQYDVQQGEwJVUzEeMBwGA1UEChMVR29vZ2xlIFRydXN0IFNlcnZpY2VzMQwwCgYD",
-        "VQQDEwNXRTEwHhcNMjQxMjA1MjMyOTM1WhcNMjUwMzA2MDAyOTMxWjAWMRQwEgYD",
-        "VQQDEwtjaGF0Z3B0LmNvbTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJ09S0KS",
-        "ao0+MAzggcE/oTok6Cx4hv/f886KlILa3d1eRnEZwc9FOsj60BR6LduaQXLI8xhA",
-        "mBvwl4rioYBmqpejggJSMIICTjAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYI",
-        "KwYBBQUHAwEwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQUmUCuOmJZrxi2DFzM1rV2",
-        "/C0O9K0wHwYDVR0jBBgwFoAUkHeSNWfE/6jMqeZ72YB5e8yT+TgwXgYIKwYBBQUH",
-        "AQEEUjBQMCcGCCsGAQUFBzABhhtodHRwOi8vby5wa2kuZ29vZy9zL3dlMS9LT0Ew",
-        "JQYIKwYBBQUHMAKGGWh0dHA6Ly9pLnBraS5nb29nL3dlMS5jcnQwJQYDVR0RBB4w",
-        "HIILY2hhdGdwdC5jb22CDSouY2hhdGdwdC5jb20wEwYDVR0gBAwwCjAIBgZngQwB",
-        "AgEwNgYDVR0fBC8wLTAroCmgJ4YlaHR0cDovL2MucGtpLmdvb2cvd2UxLzBiMDds",
-        "S3lTZ1UwLmNybDCCAQMGCisGAQQB1nkCBAIEgfQEgfEA7wB2AE51oydcmhDDOFts",
-        "1N8/Uusd8OCOG41pwLH6ZLFimjnfAAABk5lfO6AAAAQDAEcwRQIgAdnerY/vdUuk",
-        "jf6AGf9Rp9stsGRvYsaRl8QEmGz6cbQCIQDigKWmX0jbDDq7f2WO6kZdhVen6Rh8",
-        "ZqokA8lOJbTPrAB1ABNK3xq1mEIJeAxv70x6kaQWtyNJzlhXat+u2qfCq+AiAAAB",
-        "k5lfPHYAAAQDAEYwRAIgOjef9vwMCILmtMWa8L5ViqiXiSWjAaM2wWx0TtSVnc8C",
-        "IEdGqhkCFYtMD2DqkiYHKNPLLRcTv7geE3RcrxvbPyCxMAoGCCqGSM49BAMCA0cA",
-        "MEQCIBfc+qfgOONqsCrA/xt9AKiuTopv37w1I96fRkIwaXxrAiBUZdt4PA/c7sWv",
-        "ph3htOEbnfZNb0ndAztmLUbQ717MjQ=="
-      ].join("");
-      _rootCert = new x509.X509Certificate(Buffer.from(rootEnc, "base64"));
+      rootCert = new x509.X509Certificate(Buffer.from(rootEnc, "base64"));
       caCert = new x509.X509Certificate(Buffer.from(caEnc, "base64"));
-      cert = new x509.X509Certificate(Buffer.from(certEnc, "base64"));
     });
 
     it("should fetch CRL by certificate", async () => {
       const storage = new DefaultCertificateStorageHandler();
-      storage.certificates.push(caCert);
+      storage.certificates.push(rootCert);
 
-      const result = await storage.fetchRevocation("crl", cert);
+      const result = await storage.fetchRevocation("crl", caCert);
       expect(result.result).toBeTruthy();
       expect(result.result).toBeInstanceOf(CRL);
     });
 
     it("should fetch OCSP by certificate", async () => {
       const storage = new DefaultCertificateStorageHandler();
-      storage.certificates.push(caCert);
+      storage.certificates.push(rootCert);
 
-      const result = await storage.fetchRevocation("ocsp", cert);
+      const result = await storage.fetchRevocation("ocsp", caCert);
       expect(result.result).toBeTruthy();
       expect(result.result).toBeInstanceOf(OCSP);
     });

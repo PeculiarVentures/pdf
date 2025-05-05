@@ -148,6 +148,21 @@ export class CertificateChain implements storageHandler.ICertificateStorage {
       };
     }
 
+    // Handle the case where the leaf certificate itself is trusted
+    if (chain.length === 1 && trustedChain.result) {
+      // IMPORTANT: This check must come before the date check because Adobe Acrobat
+      // explicitly trusts certificates in the trusted list, even if they are expired.
+      // This behavior ensures compatibility with Adobe Acrobat's handling of trusted certificates.
+      return {
+        chain,
+        result: true,
+        resultMessage: "Certificate is trusted",
+        resultCode: CertificateChainStatusCode.success,
+        trustListSource: trustedChain.source,
+        revocationMode: params.revocationMode
+      };
+    }
+
     const checkDate = params.checkDate || new Date();
     for (const chainCert of chain) {
       if (

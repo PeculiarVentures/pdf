@@ -247,6 +247,21 @@ describe("CertificateChain", () => {
   });
 
   describe("trusted", () => {
+    it("should build certificate chain with leaf certificate trusted", async () => {
+      const chain = new CertificateChain();
+      chain.certificateHandler.certificates.push(rootCert);
+      chain.certificateHandler.certificates.push(intermediateCert1);
+      chain.certificateHandler.certificates.push(intermediateCert2);
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(
+        leafCert
+      );
+
+      const result = await chain.build(leafCert);
+      expect(result.result).toBe(true);
+      expect(result.resultCode).toBe(CertificateChainStatusCode.success);
+      expect(result.chain.length).toBe(1);
+    });
+
     it("should build certificate chain with trusted intermediate certificate", async () => {
       const chain = new CertificateChain();
       chain.certificateHandler.certificates.push(rootCert);

@@ -335,12 +335,6 @@ export class SignatureBoxGroup extends FormComponentGroup<
             }
           } else {
             // verify chain with online revocations
-            result.states.push(
-              this.makeLtvState(
-                false,
-                "PDF document doesn't have revocation items"
-              )
-            );
             chainResult = await chain.build(
               verificationResult.signerCertificate,
               {
@@ -349,6 +343,16 @@ export class SignatureBoxGroup extends FormComponentGroup<
                 preferCRL: params.preferCRL
               }
             );
+            if (chainResult.result === true && chainResult.chain.length === 1) {
+              result.states.push(this.makeLtvState(true));
+            } else {
+              result.states.push(
+                this.makeLtvState(
+                  false,
+                  "PDF document doesn't have revocation items"
+                )
+              );
+            }
           }
 
           switch (chainResult.result) {
