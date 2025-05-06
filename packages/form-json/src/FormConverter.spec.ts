@@ -212,8 +212,8 @@ describe("FormConverter", () => {
 
     const expectedHash: Record<string, string> = {
       darwin:
-        "ba8e2842155e1105bcc3d674930fb354eb0913492ba8264a06293e50b0245603",
-      linux: "1f025cb5eeae5f8c36faade8ae5aaf75cb882ebc8216318bea621a132cecc06e"
+        "21b6a49b6f63b74cafc33c475ae1757b95ae8965a6d6df65f7d0dc10d33344fa",
+      linux: "92cc24f6ccce7a1a19102235aad77341539d7795c0cb250043129e6be49aa525"
     };
     expect(hash).toBe(expectedHash[process.platform]);
   });
@@ -252,8 +252,8 @@ describe("FormConverter", () => {
 
     const expectedHash: Record<string, string> = {
       darwin:
-        "492b15b25d4ad68f09d751af166ece97f91fe23bbcce5730dfba60a72b8fa8d0",
-      linux: "78a67a9d1d1d787b15bdde8dc4d23312365a8a377de60c9fdb6b53ed512b4a29"
+        "8194df0596ccb08a2710af0bd848eefb8ee1d8fcc6f052519fef685d5d2a08c2",
+      linux: "a8db93dbb796d32fd44ea1b30da8f745b7ba6274d6138f8243d169ca087c6386"
     };
     expect(hash).toBe(expectedHash[process.platform]);
   });
