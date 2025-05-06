@@ -1,6 +1,6 @@
 {
   "name": "@peculiar/pdf-doc",
-  "version": "1.17.1",
+  "version": "1.17.2",
   "description": "High-level PDF manipulation and generation module for Node.js and browser",
   "keywords": [],
   "author": "microshine <microshine@mail.ru>",

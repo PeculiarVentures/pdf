@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.17.2](https://github.com/PeculiarVentures/pdf/compare/v1.17.1...v1.17.2) (2025-05-06)
+
+
+### Bug Fixes
+
+* enhance border and background color handling in ComboBoxHandler ([4f4c030](https://github.com/PeculiarVentures/pdf/commit/4f4c030e42a82c258c5ea9efd6e5cc1d064aa6c0))
+* fix background color and border properties in TextEditor ([8988b29](https://github.com/PeculiarVentures/pdf/commit/8988b291832f8b548a77d9edb30c83c33e24d5e9))
+* update border width conversion in TextEditorHandler ([e4e3ee6](https://github.com/PeculiarVentures/pdf/commit/e4e3ee65a2b2e450a946495ab8c38c49a335e8c9))
+
+
+
+
+
 ## [1.17.1](https://github.com/PeculiarVentures/pdf/compare/v1.17.0...v1.17.1) (2025-05-05)
 
 

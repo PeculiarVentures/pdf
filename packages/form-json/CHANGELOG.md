@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.17.2](https://github.com/PeculiarVentures/pdf/compare/v1.17.1...v1.17.2) (2025-05-06)
+
+
+### Bug Fixes
+
+* enhance border and background color handling in ComboBoxHandler ([4f4c030](https://github.com/PeculiarVentures/pdf/commit/4f4c030e42a82c258c5ea9efd6e5cc1d064aa6c0))
+
+
+
+
+
 ## [1.17.1](https://github.com/PeculiarVentures/pdf/compare/v1.17.0...v1.17.1) (2025-05-05)
 
 **Note:** Version bump only for package @peculiar/pdf-form-json
