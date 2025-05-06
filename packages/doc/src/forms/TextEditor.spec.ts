@@ -28,6 +28,34 @@ describe("TextEditor", () => {
     docRaw = await doc.save();
   });
 
+  it("draw default", async () => {
+    const doc = await PDFDocument.create(xrefTableOptions);
+    const page = doc.pages.create();
+
+    const helvetica = doc.addFont(DefaultFonts.Helvetica);
+
+    page.addTextEditor({
+      left: 10,
+      top: 10,
+      width: 200,
+      height: 30,
+      name: "textEditor1",
+      text: "Test example",
+      fontSize: 12,
+      font: helvetica
+    });
+
+    const pdf = await doc.save();
+
+    const pageHash = await PdfRenderingHelper.getPageHash(pdf, 1);
+    const expectedHash: Record<string, string> = {
+      darwin:
+        "6d60b897a3a1d4d0a2c9f3e8cfd80d8ac35575e768339213e463888ef04a8e5e",
+      linux: "06664973078ee8281ced8234534b7024d2e9e2ba3eeaea18406be91df34bb9b6"
+    };
+    expect(pageHash).toBe(expectedHash[process.platform]);
+  });
+
   it("draw", async () => {
     const pageHash = await PdfRenderingHelper.getPageHash(docRaw, 1);
 

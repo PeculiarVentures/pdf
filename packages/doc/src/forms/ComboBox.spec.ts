@@ -28,6 +28,34 @@ describe("ComboBox", () => {
     docRaw = await doc.save();
   });
 
+  it("draw without border", async () => {
+    const doc = await PDFDocument.create(xrefTableOptions);
+    const page = doc.pages.create();
+
+    page.addComboBox({
+      left: 10,
+      top: 10,
+      width: 140,
+      height: 20,
+      name: "comboBox1",
+      options: {
+        item1: "Item 1",
+        item2: "Item 2",
+        item3: "Item 3"
+      },
+      selected: "item2"
+    });
+
+    const pdf = await doc.save();
+    const pageHash = await PdfRenderingHelper.getPageHash(pdf, 1);
+    const expectedHash: Record<string, string> = {
+      darwin:
+        "fba4ec049cc1b4de55812907a832f612826c028486e014e3717d75e9e75452de",
+      linux: "a9124757eac250d1f5d1eb0d728212f07a63ac583b38ebe5f087477440697dad"
+    };
+    expect(pageHash).toBe(expectedHash[process.platform]);
+  });
+
   it("draw", async () => {
     const pageHash = await PdfRenderingHelper.getPageHash(docRaw, 1);
     const expectedHash: Record<string, string> = {

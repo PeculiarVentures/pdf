@@ -33,6 +33,7 @@ export interface TextEditorCreateParameters {
   height: core.TypographySize;
   borderColor?: core.Colors;
   borderWidth?: core.TypographySize;
+  backgroundColor?: core.Colors;
   /**
    * Max count symbols
    */
@@ -273,6 +274,22 @@ export class TextEditorHandler implements ITextEditorHandler {
     });
     da.setColor(params.color);
     widget.set("DA", doc.createString(da.toString(true)));
+
+    if (params.borderWidth) {
+      const bs = widget.BS.get();
+      bs.W = core.TypographyConverter.toPoint(params.borderWidth);
+      const mk = widget.MK.get();
+      mk.BC = core.ColorConverter.toPDFArray(
+        params.borderColor ?? TextEditorHandler.BORDER_COLOR
+      );
+    }
+
+    if (params.backgroundColor) {
+      const mk = widget.MK.get();
+      mk.BG = core.ColorConverter.toPDFArray(
+        params.backgroundColor ?? TextEditorHandler.BACKGROUND_COLOR
+      );
+    }
 
     // Draw
     this.drawText(

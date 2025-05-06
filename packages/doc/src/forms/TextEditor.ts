@@ -277,12 +277,26 @@ export class TextEditor extends FormComponent {
         maxLen: this.maxLen,
 
         width: this.width,
-        height: this.height,
-
-        backgroundColor: this.backgroundColor,
-        borderColor: this.borderColor,
-        borderWidth: this.borderWidth
+        height: this.height
       };
+
+      if (this.target.BS.has()) {
+        const bs = this.target.BS.get();
+        params.borderWidth = bs.W;
+        if (this.target.MK.has()) {
+          const mk = this.target.MK.get();
+          if (mk.BC) {
+            params.borderColor = core.ColorConverter.fromPDFArray(mk.BC);
+          }
+        }
+      }
+
+      if (this.target.MK.has()) {
+        const mk = this.target.MK.get();
+        if (mk.BG) {
+          params.backgroundColor = core.ColorConverter.fromPDFArray(mk.BG);
+        }
+      }
 
       const handler = this.document.textEditorHandler;
       form.clear();

@@ -66,6 +66,21 @@ export class ComboBoxHandler implements IComboBoxHandler {
 
     const dict = core.SingleWidgetDictionary.create(update);
 
+    if (params.borderWidth) {
+      const bs = dict.BS.get();
+      bs.W = core.TypographyConverter.toPoint(params.borderWidth);
+
+      if (params.borderColor) {
+        const mk = dict.MK.get();
+        mk.BC = core.ColorConverter.toPDFArray(params.borderColor);
+      }
+    }
+
+    if (params.backgroundColor) {
+      const mk = dict.MK.get();
+      mk.BG = core.ColorConverter.toPDFArray(params.backgroundColor);
+    }
+
     dict.ft = "Ch";
 
     const _widget = dict.to(core.WidgetDictionary);
@@ -99,7 +114,7 @@ export class ComboBoxHandler implements IComboBoxHandler {
 
     // draw border
     const formContent =
-      borderWidth > 0
+      component.target.BS.has() && component.target.BS.get().W > 0
         ? form
             .graphics()
             .strokeColor(component.borderColor)
