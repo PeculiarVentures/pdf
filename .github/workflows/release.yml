@@ -57,7 +57,7 @@ jobs:
         if: env.PREV_VERSION != env.CURRENT_VERSION
         with:
           script: |
-            github.issues.createComment({
+            github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
