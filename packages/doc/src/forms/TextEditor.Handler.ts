@@ -276,7 +276,8 @@ export class TextEditorHandler implements ITextEditorHandler {
     widget.set("DA", doc.createString(da.toString(true)));
 
     if (params.borderWidth) {
-      widget.BS.get();
+      const bs = widget.BS.get();
+      bs.W = core.TypographyConverter.toPoint(params.borderWidth);
       const mk = widget.MK.get();
       mk.BC = core.ColorConverter.toPDFArray(
         params.borderColor ?? TextEditorHandler.BORDER_COLOR
