@@ -1,9 +1,4 @@
-import {
-  PDFArray,
-  PDFArrayField,
-  PDFDictionary,
-  PDFNameField
-} from "../../objects";
+import { PDFArray, PDFArrayField, PDFDictionary, PDFNameField } from "../../objects";
 
 export class PointDataDictionary extends PDFDictionary {
   public static readonly TYPE = "PtData";

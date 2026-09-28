@@ -11,11 +11,7 @@ export class PDFIndirectObject extends PDFIndirect {
 
   public constructor();
   public constructor(id?: number, generation?: number, value?: PDFObject);
-  public constructor(
-    id?: number,
-    generation = 0,
-    value: PDFObject = new PDFNull()
-  ) {
+  public constructor(id?: number, generation = 0, value: PDFObject = new PDFNull()) {
     if (id === undefined) {
       super();
     } else {

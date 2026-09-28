@@ -5,11 +5,7 @@ export class BadCharError extends ParsingError {
 
   constructor(position?: number, cause?: Error);
   constructor(message: string, position?: number, cause?: Error);
-  constructor(
-    messageOrPosition?: string | number,
-    positionOrCause?: number | Error,
-    cause?: Error
-  ) {
+  constructor(messageOrPosition?: string | number, positionOrCause?: number | Error, cause?: Error) {
     let message: string;
     let position: number | undefined;
     if (typeof messageOrPosition === "string") {

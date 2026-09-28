@@ -31,18 +31,8 @@ describe("PDFArray", () => {
 
   describe("toPDF", () => {
     const vector: [PDFObjectTypes[], string][] = [
-      [
-        [new PDFNumeric(549), new PDFBoolean(false), new PDFName("SomeName")],
-        "[ 549 false /SomeName ]"
-      ],
-      [
-        [
-          new PDFArray(new PDFNumeric(549)),
-          new PDFBoolean(false),
-          new PDFName("SomeName")
-        ],
-        "[ [ 549 ] false /SomeName ]"
-      ]
+      [[new PDFNumeric(549), new PDFBoolean(false), new PDFName("SomeName")], "[ 549 false /SomeName ]"],
+      [[new PDFArray(new PDFNumeric(549)), new PDFBoolean(false), new PDFName("SomeName")], "[ [ 549 ] false /SomeName ]"],
     ];
     vector.forEach(([i, o]) => {
       it(i.toString(), () => {
@@ -212,18 +202,13 @@ describe("PDFArray", () => {
         doc.createString("SomeString"),
         doc.createHexString(new Uint8Array([0x01, 0x02, 0x03])),
         doc.createNull(),
-        doc.createDictionary(
-          ["SomeKey", doc.createNumber(1)],
-          ["AnotherKey", doc.createBoolean(true)]
-        ),
-        doc.createStream(new Uint8Array([0x01, 0x02, 0x03])) // ref
+        doc.createDictionary(["SomeKey", doc.createNumber(1)], ["AnotherKey", doc.createBoolean(true)]),
+        doc.createStream(new Uint8Array([0x01, 0x02, 0x03])), // ref
       );
       const writer = new ViewWriter();
       array.writePDF(writer);
       const refId = array.get(7).getIndirect().id;
-      expect(writer.toString()).toBe(
-        `[ 1 true /SomeName (SomeString) <010203> null <<\n/SomeKey 1\n/AnotherKey true\n>> ${refId} 0 R ]`
-      );
+      expect(writer.toString()).toBe(`[ 1 true /SomeName (SomeString) <010203> null <<\n/SomeKey 1\n/AnotherKey true\n>> ${refId} 0 R ]`);
     });
   });
 

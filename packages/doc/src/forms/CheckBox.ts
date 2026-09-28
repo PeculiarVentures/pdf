@@ -77,7 +77,7 @@ export class CheckBox extends FormComponent {
             foreColor: this.foreColor,
             backgroundColor: this.backgroundColor,
             borderColor: this.borderColor,
-            borderWidth: this.borderWidth
+            borderWidth: this.borderWidth,
           };
           const handler = this.getHandler();
           form.clear();

@@ -68,7 +68,7 @@ describe("SignatureBox", () => {
           ["Type", targetDoc.createName("Annot")],
           ["Subtype", targetDoc.createName("Widget")],
           ["Rect", targetDoc.createRectangle(0, 0, 0, 0)],
-          ["F", targetDoc.createNumber(4)]
+          ["F", targetDoc.createNumber(4)],
         )
         .makeIndirect();
       page.target.addAnnot(singleWidget.to(core.AnnotationDictionary));
@@ -77,9 +77,7 @@ describe("SignatureBox", () => {
       const group = box.split();
       expect(group).toBeInstanceOf(SignatureBoxGroup);
       expect(singleWidget.has("Parent")).toBe(true);
-      expect(singleWidget.get("Parent", core.PDFDictionary).toString()).toBe(
-        group.target.toString()
-      );
+      expect(singleWidget.get("Parent", core.PDFDictionary).toString()).toBe(group.target.toString());
       const groupDict = group.target.to(core.PDFField);
       expect(groupDict.Kids.get(true).length).toBe(1);
       expect(groupDict.t.text).toBe("test");

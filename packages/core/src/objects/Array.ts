@@ -12,7 +12,6 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
 
   [Symbol.iterator](): Iterator<PDFObject, unknown, undefined> {
     let pointer = 0;
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const _this = this;
 
     return {
@@ -20,15 +19,15 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
         if (pointer < _this.items.length) {
           return {
             done: false,
-            value: _this.get(pointer++)
+            value: _this.get(pointer++),
           };
         } else {
           return {
             done: true,
-            value: null
+            value: null,
           };
         }
-      }
+      },
     };
   }
 
@@ -72,26 +71,14 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
    * if it is not of the expected type.
    * @returns The item at the specified index, or `null` if the index is out of bounds.
    */
-  public find<T extends PDFObject>(
-    index: number,
-    type: abstract new () => T,
-    replace?: boolean
-  ): T | null;
-  public find(
-    index: number,
-    type?: abstract new () => PDFObject,
-    replace = false
-  ): PDFObject | null {
+  public find<T extends PDFObject>(index: number, type: abstract new () => T, replace?: boolean): T | null;
+  public find(index: number, type?: abstract new () => PDFObject, replace = false): PDFObject | null {
     const item = this.items[index];
 
     if (item) {
-      const res = typeOf(item, ObjectTypeEnum.IndirectReference)
-        ? item.getValue()
-        : item;
+      const res = typeOf(item, ObjectTypeEnum.IndirectReference) ? item.getValue() : item;
 
-      const resType = type
-        ? PDFTypeConverter.convert(res, type, replace)
-        : PDFTypeConverter.convert(res);
+      const resType = type ? PDFTypeConverter.convert(res, type, replace) : PDFTypeConverter.convert(res);
       if (replace && !resType.isIndirect) {
         this.items[index] = resType as PDFObjectTypes;
       }
@@ -118,16 +105,8 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
    * @returns The item at the specified index.
    * @throws RangeError - If the index is out of bounds.
    */
-  public get<T extends PDFObject>(
-    index: number,
-    type: abstract new () => T,
-    replace?: boolean
-  ): T;
-  public get(
-    index: number,
-    type?: abstract new () => PDFObject,
-    replace = false
-  ): PDFObject {
+  public get<T extends PDFObject>(index: number, type: abstract new () => T, replace?: boolean): T;
+  public get(index: number, type?: abstract new () => PDFObject, replace = false): PDFObject {
     const item = type ? this.find(index, type, replace) : this.find(index);
 
     if (!item) {
@@ -178,11 +157,7 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
   public indexOf(item: PDFObjectTypes): number {
     for (let index = 0; index < this.items.length; index++) {
       const element = this.items[index];
-      if (
-        item.equal(element) ||
-        (typeOf(element, ObjectTypeEnum.IndirectReference) &&
-          item.ownerElement?.equal(element))
-      ) {
+      if (item.equal(element) || (typeOf(element, ObjectTypeEnum.IndirectReference) && item.ownerElement?.equal(element))) {
         return index;
       }
     }
@@ -224,13 +199,8 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
     for (const item of this.items) {
       if (item.isIndirect()) {
         const indirect = item.getIndirect();
-        const PDFIndirectReferenceConstructor = PDFObjectReader.get(
-          ObjectTypeEnum.IndirectReference
-        );
-        const indirectRef = new PDFIndirectReferenceConstructor(
-          indirect.id,
-          indirect.generation
-        );
+        const PDFIndirectReferenceConstructor = PDFObjectReader.get(ObjectTypeEnum.IndirectReference);
+        const indirectRef = new PDFIndirectReferenceConstructor(indirect.id, indirect.generation);
         indirectRef.writePDF(writer);
       } else {
         item.writePDF(writer);
@@ -288,10 +258,7 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
   }
 
   protected onEqual(target: PDFObject): boolean {
-    if (
-      target instanceof PDFArray &&
-      target.items.length === this.items.length
-    ) {
+    if (target instanceof PDFArray && target.items.length === this.items.length) {
       for (let i = 0; i < target.length; i++) {
         const item = target.items[i];
 

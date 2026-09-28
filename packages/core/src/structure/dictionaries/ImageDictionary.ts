@@ -1,10 +1,7 @@
 import * as objects from "../../objects";
 import { XObjectDictionary, XOBJECT_TYPE } from "./XObjectDictionary";
 
-export class ImageDictionary
-  extends objects.PDFStream
-  implements XObjectDictionary
-{
+export class ImageDictionary extends objects.PDFStream implements XObjectDictionary {
   public static readonly SUBTYPE = "Image";
   public static readonly WIDTH = 0;
   public static readonly HEIGHT = 0;
@@ -47,7 +44,7 @@ export class ImageDictionary
    */
   @objects.PDFDictionaryField({
     name: "ColorSpace",
-    optional: true
+    optional: true,
   })
   public ColorSpace!: objects.PDFArray | objects.PDFName | null;
 
@@ -106,7 +103,7 @@ export class ImageDictionary
    */
   @objects.PDFDictionaryField({
     name: "Mask",
-    optional: true
+    optional: true,
   })
   public Mask!: objects.PDFStream | objects.PDFArray | null;
 
@@ -221,7 +218,7 @@ export class ImageDictionary
   @objects.PDFDictionaryField({
     name: "ID",
     optional: true,
-    indirect: true
+    indirect: true,
   })
   public ID!: objects.PDFHexString | null;
 
@@ -237,7 +234,7 @@ export class ImageDictionary
   @objects.PDFDictionaryField({
     name: "OPI",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public OPI!: objects.PDFDictionary | null;
 
@@ -261,7 +258,7 @@ export class ImageDictionary
   @objects.PDFDictionaryField({
     name: "OC",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public OC!: objects.PDFDictionary | null;
 
@@ -284,7 +281,7 @@ export class ImageDictionary
   @objects.PDFDictionaryField({
     name: "Measure",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public Measure!: objects.PDFDictionary | null;
 
@@ -297,7 +294,7 @@ export class ImageDictionary
   @objects.PDFDictionaryField({
     name: "PtData",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public PtData!: objects.PDFDictionary | null;
 

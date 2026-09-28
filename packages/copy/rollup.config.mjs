@@ -27,9 +27,9 @@ export default [
         tsconfigOverride: {
           compilerOptions: {
             module: "es2015",
-            removeComments: true
-          }
-        }
+            removeComments: true,
+          },
+        },
       }),
     ],
     external: Object.keys(pkg.dependencies),
@@ -44,7 +44,7 @@ export default [
         file: pkg.module,
         format: "es",
       },
-    ]
+    ],
   },
   {
     input,
@@ -55,14 +55,14 @@ export default [
         compilerOptions: {
           target: ScriptTarget.ES2022,
           removeComments: false,
-        }
-      })
+        },
+      }),
     ],
     output: [
       {
         banner,
         file: pkg.types,
-      }
-    ]
+      },
+    ],
   },
 ];

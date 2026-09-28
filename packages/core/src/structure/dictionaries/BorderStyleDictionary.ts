@@ -1,10 +1,4 @@
-import {
-  PDFArray,
-  PDFArrayField,
-  PDFDictionary,
-  PDFNumberField,
-  PDFNameField
-} from "../../objects";
+import { PDFArray, PDFArrayField, PDFDictionary, PDFNumberField, PDFNameField } from "../../objects";
 
 export enum BorderStyle {
   /**
@@ -29,7 +23,7 @@ export enum BorderStyle {
   /**
    * A single line along the bottom of the annotation rectangle
    */
-  underline = "U"
+  underline = "U",
 }
 
 export class BorderStyleDictionary extends PDFDictionary {

@@ -40,11 +40,7 @@ interface EncryptionAlgorithmsCipherParams extends EncryptionAlgorithmsParams {
 const keyUsages: KeyUsage[] = ["encrypt", "decrypt"];
 
 export abstract class EncryptionAlgorithms {
-  private static async getCutHashV2(
-    combinedKey: BufferSource,
-    stmKeyByteLength: number,
-    crypto: ICryptoEngine
-  ): Promise<ArrayBuffer> {
+  private static async getCutHashV2(combinedKey: BufferSource, stmKeyByteLength: number, crypto: ICryptoEngine): Promise<ArrayBuffer> {
     const md = await crypto.digest("MD5", combinedKey);
     const initialKeyLength = stmKeyByteLength + 5;
 
@@ -56,9 +52,7 @@ export abstract class EncryptionAlgorithms {
    * @param params Parameters
    * @returns
    */
-  private static async cipher(
-    params: EncryptionAlgorithmsCipherParams
-  ): Promise<ArrayBuffer> {
+  private static async cipher(params: EncryptionAlgorithmsCipherParams): Promise<ArrayBuffer> {
     const { crypto, encrypt, key, target, data } = params;
     const view = BufferSourceConverter.toUint8Array(data);
 
@@ -83,62 +77,32 @@ export abstract class EncryptionAlgorithms {
     const parent = target.getIndirect(true);
     const id = new Int32Array([parent.id]);
     const generation = new Int32Array([parent.generation]);
-    const combinedKey = BufferSourceConverter.concat([
-      key.raw,
-      id.buffer.slice(0, 3),
-      generation.buffer.slice(0, 2)
-    ]);
+    const combinedKey = BufferSourceConverter.concat([key.raw, id.buffer.slice(0, 3), generation.buffer.slice(0, 2)]);
 
     const alg = { name: "AES-CBC", iv };
     switch (key.type) {
       case CryptoFilterMethods.AES128: {
-        const cutHash = await this.getCutHashV2(
-          BufferSourceConverter.concat(combinedKey, staticData),
-          key.raw.length,
-          crypto
-        );
-        const cryptoKey = await crypto.importKey(
-          "raw",
-          cutHash,
-          alg.name,
-          false,
-          keyUsages
-        );
+        const cutHash = await this.getCutHashV2(BufferSourceConverter.concat(combinedKey, staticData), key.raw.length, crypto);
+        const cryptoKey = await crypto.importKey("raw", cutHash, alg.name, false, keyUsages);
 
         if (encrypt) {
-          return BufferSourceConverter.concat([
-            iv,
-            await crypto.encrypt(alg, cryptoKey, cipherData)
-          ]);
+          return BufferSourceConverter.concat([iv, await crypto.encrypt(alg, cryptoKey, cipherData)]);
         }
 
         return await crypto.decrypt(alg, cryptoKey, cipherData);
       }
       case CryptoFilterMethods.AES256: {
-        const cryptoKey = await crypto.importKey(
-          "raw",
-          key.raw,
-          alg.name,
-          false,
-          keyUsages
-        );
+        const cryptoKey = await crypto.importKey("raw", key.raw, alg.name, false, keyUsages);
 
         if (encrypt) {
-          return BufferSourceConverter.concat([
-            iv,
-            await crypto.encrypt(alg, cryptoKey, cipherData)
-          ]);
+          return BufferSourceConverter.concat([iv, await crypto.encrypt(alg, cryptoKey, cipherData)]);
         }
 
         return await crypto.decrypt(alg, cryptoKey, cipherData);
       }
       case CryptoFilterMethods.RC4:
       default: {
-        const cutHash = await this.getCutHashV2(
-          combinedKey,
-          key.raw.length,
-          crypto
-        );
+        const cutHash = await this.getCutHashV2(combinedKey, key.raw.length, crypto);
         const cryptoKey = cutHash as unknown as CryptoKey;
 
         if (encrypt) {
@@ -150,21 +114,17 @@ export abstract class EncryptionAlgorithms {
     }
   }
 
-  public static async encrypt(
-    params: EncryptionAlgorithmsParams
-  ): Promise<ArrayBuffer> {
+  public static async encrypt(params: EncryptionAlgorithmsParams): Promise<ArrayBuffer> {
     return this.cipher({
       encrypt: true,
-      ...params
+      ...params,
     });
   }
 
-  public static async decrypt(
-    params: EncryptionAlgorithmsParams
-  ): Promise<ArrayBuffer> {
+  public static async decrypt(params: EncryptionAlgorithmsParams): Promise<ArrayBuffer> {
     return this.cipher({
       encrypt: false,
-      ...params
+      ...params,
     });
   }
 }

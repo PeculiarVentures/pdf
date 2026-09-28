@@ -7,13 +7,13 @@ export enum CertificateSeedValueFlags {
   subjectDN = 0x08,
   reserved = 0x10,
   keyUsage = 0x20,
-  url = 0x40
+  url = 0x40,
 }
 
 export enum KeyUsageState {
   notShallBe,
   shallBe,
-  notMatter
+  notMatter,
 }
 
 export interface CertificateSeedValueKeyUsages {
@@ -39,16 +39,11 @@ function getKeyUsageState(char?: string) {
   }
 }
 
-function getKeyUsageHandler(
-  this: CertificateSeedValueDictionary,
-  o: objects.PDFArray
-) {
+function getKeyUsageHandler(this: CertificateSeedValueDictionary, o: objects.PDFArray) {
   const res: CertificateSeedValueKeyUsages[] = [];
   for (const item of o.items) {
     if (!(item instanceof objects.PDFLiteralString)) {
-      throw new TypeError(
-        "Wrong type of KeyUsage item. Must be PDF literal string"
-      );
+      throw new TypeError("Wrong type of KeyUsage item. Must be PDF literal string");
     }
 
     res.push({
@@ -60,7 +55,7 @@ function getKeyUsageHandler(
       keyCertSign: getKeyUsageState(item.text[5]),
       cRLSign: getKeyUsageState(item.text[6]),
       encipherOnly: getKeyUsageState(item.text[7]),
-      decipherOnly: getKeyUsageState(item.text[8])
+      decipherOnly: getKeyUsageState(item.text[8]),
     });
   }
 
@@ -76,7 +71,7 @@ export class CertificateSeedValueDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Type",
     type: objects.PDFName,
-    optional: true
+    optional: true,
   })
   public type!: objects.PDFName | null;
 
@@ -93,7 +88,7 @@ export class CertificateSeedValueDictionary extends objects.PDFDictionary {
     type: objects.PDFNumeric,
     optional: true,
     defaultValue: 0,
-    get: (o) => o.value
+    get: (o) => o.value,
   })
   public ff!: CertificateSeedValueFlags;
 
@@ -104,7 +99,7 @@ export class CertificateSeedValueDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Subject",
     type: objects.PDFArray,
-    optional: true
+    optional: true,
   })
   public subject!: objects.PDFArray | null;
 
@@ -115,7 +110,7 @@ export class CertificateSeedValueDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "SubjectDN",
     type: objects.PDFArray,
-    optional: true
+    optional: true,
   })
   public subjectDN!: objects.PDFArray | null;
 
@@ -128,7 +123,7 @@ export class CertificateSeedValueDictionary extends objects.PDFDictionary {
     type: objects.PDFArray,
     optional: true,
     cache: true,
-    get: getKeyUsageHandler
+    get: getKeyUsageHandler,
   })
   public keyUsage!: CertificateSeedValueKeyUsages[] | null;
 
@@ -139,7 +134,7 @@ export class CertificateSeedValueDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Issuer",
     type: objects.PDFArray,
-    optional: true
+    optional: true,
   })
   public issuer!: objects.PDFArray | null;
 
@@ -150,13 +145,11 @@ export class CertificateSeedValueDictionary extends objects.PDFDictionary {
     get: (o) =>
       o.items.map((item) => {
         if (!(item instanceof objects.PDFLiteralString)) {
-          throw new TypeError(
-            "Wrong type of OID item. Must be PDF literal string"
-          );
+          throw new TypeError("Wrong type of OID item. Must be PDF literal string");
         }
 
         return item;
-      })
+      }),
   })
   public oid!: objects.PDFLiteralString[] | null;
 
@@ -166,7 +159,7 @@ export class CertificateSeedValueDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "URL",
     type: objects.PDFLiteralString,
-    optional: true
+    optional: true,
   })
   public url!: objects.PDFLiteralString | null;
 
@@ -177,7 +170,7 @@ export class CertificateSeedValueDictionary extends objects.PDFDictionary {
     name: "URLType",
     type: objects.PDFName,
     optional: true,
-    get: (o) => o.text
+    get: (o) => o.text,
   })
   public urlType!: string | null;
 }

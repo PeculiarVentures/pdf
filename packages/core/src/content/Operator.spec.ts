@@ -1,10 +1,4 @@
-import {
-  PDFArray,
-  PDFHexString,
-  PDFLiteralString,
-  PDFName,
-  PDFNumeric
-} from "../objects";
+import { PDFArray, PDFHexString, PDFLiteralString, PDFName, PDFNumeric } from "../objects";
 import { PDFOperator } from "./Operator";
 
 describe("PDFOperator", () => {
@@ -23,13 +17,8 @@ describe("PDFOperator", () => {
     const operator = PDFOperator.fromString(text);
     expect(operator.name).toBe("Tf");
     expect(operator.parameters.length).toBe(2);
-    expect(
-      operator.parameters[0] instanceof PDFName && operator.parameters[0].text
-    ).toBe("F13");
-    expect(
-      operator.parameters[1] instanceof PDFNumeric &&
-        operator.parameters[1].value
-    ).toBe(12);
+    expect(operator.parameters[0] instanceof PDFName && operator.parameters[0].text).toBe("F13");
+    expect(operator.parameters[1] instanceof PDFNumeric && operator.parameters[1].value).toBe(12);
 
     const strOperator = operator.toString();
     expect(strOperator).toBe(text);
@@ -40,10 +29,7 @@ describe("PDFOperator", () => {
     const operator = PDFOperator.fromString(text);
     expect(operator.name).toBe("Tj");
     expect(operator.parameters.length).toBe(1);
-    expect(
-      operator.parameters[0] instanceof PDFLiteralString &&
-        operator.parameters[0].text
-    ).toBe("Hello world");
+    expect(operator.parameters[0] instanceof PDFLiteralString && operator.parameters[0].text).toBe("Hello world");
 
     const strOperator = operator.toString();
     expect(strOperator).toBe(text);
@@ -54,10 +40,7 @@ describe("PDFOperator", () => {
     const operator = PDFOperator.fromString(text);
     expect(operator.name).toBe("Tj");
     expect(operator.parameters.length).toBe(1);
-    expect(
-      operator.parameters[0] instanceof PDFHexString &&
-        operator.parameters[0].text
-    ).toBe("\x00z");
+    expect(operator.parameters[0] instanceof PDFHexString && operator.parameters[0].text).toBe("\x00z");
 
     const strOperator = operator.toString();
     expect(strOperator).toBe("<007a> Tj");

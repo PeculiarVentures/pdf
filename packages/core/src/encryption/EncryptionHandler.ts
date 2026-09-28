@@ -36,18 +36,12 @@ export abstract class EncryptionHandler {
    * @param target Target object which includes that data
    * @returns Returns encrypted message
    */
-  public abstract encrypt(
-    data: BufferSource,
-    target: PDFStream | PDFTextString
-  ): Promise<ArrayBuffer>;
+  public abstract encrypt(data: BufferSource, target: PDFStream | PDFTextString): Promise<ArrayBuffer>;
   /**
    * Decrypts incoming data
    * @param data Data that should be decrypted
    * @param target Target object which includes that data
    * @returns Returns decrypted message
    */
-  public abstract decrypt(
-    data: BufferSource,
-    target: PDFStream | PDFTextString
-  ): Promise<ArrayBuffer>;
+  public abstract decrypt(data: BufferSource, target: PDFStream | PDFTextString): Promise<ArrayBuffer>;
 }

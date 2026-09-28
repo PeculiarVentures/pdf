@@ -11,8 +11,8 @@ pkijs.setEngine(
   "pdf",
   new core.PDFCryptoEngine({
     name: "pdf",
-    crypto: new Crypto()
-  })
+    crypto: new Crypto(),
+  }),
 );
 program.addCommand(commands.info);
 

@@ -22,7 +22,7 @@ describe("EmbeddedFileMap", () => {
       const file = {
         name: "test.txt",
         id: "test-id",
-        data: Buffer.from("test content")
+        data: Buffer.from("test content"),
       };
 
       doc.embeddedFiles.attach(file);
@@ -41,7 +41,7 @@ describe("EmbeddedFileMap", () => {
         data: Buffer.from("test content"),
         description: "Test file",
         created,
-        modified
+        modified,
       };
 
       doc.embeddedFiles.attach(file);
@@ -58,7 +58,7 @@ describe("EmbeddedFileMap", () => {
     it("should generate id if not provided", () => {
       const file = {
         name: "test.txt",
-        data: Buffer.from("test content")
+        data: Buffer.from("test content"),
       };
 
       doc.embeddedFiles.attach(file);
@@ -78,7 +78,7 @@ describe("EmbeddedFileMap", () => {
       const file = {
         name: "test.txt",
         id: "test-id",
-        data: Buffer.from("test content")
+        data: Buffer.from("test content"),
       };
 
       doc.embeddedFiles.attach(file);
@@ -91,16 +91,14 @@ describe("EmbeddedFileMap", () => {
 
   describe("get", () => {
     it("should throw error for non-existent key", () => {
-      expect(() => doc.embeddedFiles.get("non-existent")).toThrow(
-        "Cannot retrieve the value for the given key 'non-existent'"
-      );
+      expect(() => doc.embeddedFiles.get("non-existent")).toThrow("Cannot retrieve the value for the given key 'non-existent'");
     });
 
     it("should get existing file", () => {
       const file = {
         name: "test.txt",
         id: "test-id",
-        data: Buffer.from("test content")
+        data: Buffer.from("test content"),
       };
 
       doc.embeddedFiles.attach(file);
@@ -114,7 +112,7 @@ describe("EmbeddedFileMap", () => {
     it("should persist embedded files after save/load", async () => {
       const files = [
         { name: "file1.txt", id: "id1", data: Buffer.from("content1") },
-        { name: "file2.txt", id: "id2", data: Buffer.from("content2") }
+        { name: "file2.txt", id: "id2", data: Buffer.from("content2") },
       ];
 
       files.forEach((file) => doc.embeddedFiles.attach(file));
@@ -134,7 +132,7 @@ describe("EmbeddedFileMap", () => {
     it("should iterate over all files", () => {
       const files = [
         { name: "file1.txt", id: "id1", data: Buffer.from("content1") },
-        { name: "file2.txt", id: "id2", data: Buffer.from("content2") }
+        { name: "file2.txt", id: "id2", data: Buffer.from("content2") },
       ];
 
       files.forEach((file) => doc.embeddedFiles.attach(file));

@@ -1,13 +1,4 @@
-import {
-  PDFArray,
-  PDFArrayField,
-  PDFDictionary,
-  PDFDictionaryField,
-  PDFNumberField,
-  PDFStream,
-  PDFTextString,
-  PDFTextStringField
-} from "../../objects";
+import { PDFArray, PDFArrayField, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFStream, PDFTextString, PDFTextStringField } from "../../objects";
 import { IconFitDictionary } from "./IconFitDictionary";
 
 export enum CaptionPosition {
@@ -38,7 +29,7 @@ export enum CaptionPosition {
   /**
    * Caption overlaid directly on the icon
    */
-  captionOverlaid = 6
+  captionOverlaid = 6,
 }
 
 export class AppearanceCharacteristicsDictionary extends PDFDictionary {
@@ -112,7 +103,7 @@ export class AppearanceCharacteristicsDictionary extends PDFDictionary {
     name: "I",
     type: PDFStream,
     optional: true,
-    indirect: true
+    indirect: true,
   })
   public I!: PDFStream | null;
 
@@ -126,7 +117,7 @@ export class AppearanceCharacteristicsDictionary extends PDFDictionary {
     name: "RI",
     type: PDFStream,
     optional: true,
-    indirect: true
+    indirect: true,
   })
   public ri!: PDFStream | null;
 
@@ -139,7 +130,7 @@ export class AppearanceCharacteristicsDictionary extends PDFDictionary {
     name: "IX",
     type: PDFStream,
     optional: true,
-    indirect: true
+    indirect: true,
   })
   public ix!: PDFStream | null;
 
@@ -153,7 +144,7 @@ export class AppearanceCharacteristicsDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "IF",
     type: IconFitDictionary,
-    optional: true
+    optional: true,
   })
   public if!: IconFitDictionary | null;
 

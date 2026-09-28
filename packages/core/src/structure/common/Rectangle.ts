@@ -3,13 +3,7 @@ import { PDFNumeric } from "../../objects/Numeric";
 import { PDFArray } from "../../objects/Array";
 
 export class PDFRectangle extends PDFArray {
-  public static createWithData(
-    update: PDFDocumentUpdate,
-    llX: number,
-    llY: number,
-    urX: number,
-    urY: number
-  ): PDFRectangle {
+  public static createWithData(update: PDFDocumentUpdate, llX: number, llY: number, urX: number, urY: number): PDFRectangle {
     const rect = this.create(update);
 
     rect.get(0, PDFNumeric).value = llX;
@@ -61,12 +55,7 @@ export class PDFRectangle extends PDFArray {
   }
 
   protected override onCreate(): void {
-    this.items = [
-      new PDFNumeric(0),
-      new PDFNumeric(0),
-      new PDFNumeric(0),
-      new PDFNumeric(0)
-    ];
+    this.items = [new PDFNumeric(0), new PDFNumeric(0), new PDFNumeric(0), new PDFNumeric(0)];
   }
 
   /**

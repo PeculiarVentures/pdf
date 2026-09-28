@@ -2,17 +2,10 @@ import * as core from "@peculiar/pdf-core";
 import { FormObject } from "../FormObject";
 import { FormComponent } from "./FormComponent";
 import { IFormGroupedComponent } from "./FormComponent.Group";
-import {
-  SignatureBoxSignParameters,
-  SignatureBoxGroupVerifyParams,
-  SignatureVerifyResult
-} from "./SignatureBox.Types";
+import { SignatureBoxSignParameters, SignatureBoxGroupVerifyParams, SignatureVerifyResult } from "./SignatureBox.Types";
 import { SignatureBoxGroup } from "./SignatureBox.Group";
 
-export class SignatureBox
-  extends FormComponent
-  implements IFormGroupedComponent
-{
+export class SignatureBox extends FormComponent implements IFormGroupedComponent {
   public get groupName(): string | null {
     return this.getField().getFullName();
   }
@@ -30,10 +23,7 @@ export class SignatureBox
     try {
       const field = this.getField();
 
-      return new SignatureBoxGroup(
-        field.to(core.SignatureField),
-        this.document
-      );
+      return new SignatureBoxGroup(field.to(core.SignatureField), this.document);
     } catch {
       return null;
     }
@@ -42,9 +32,7 @@ export class SignatureBox
   public getGroup(): SignatureBoxGroup {
     const group = this.findGroup();
     if (!group) {
-      throw Error(
-        "Cannot sign document. SignatureBox is not assigned to the Signature field."
-      );
+      throw Error("Cannot sign document. SignatureBox is not assigned to the Signature field.");
     }
 
     return group;
@@ -69,17 +57,13 @@ export class SignatureBox
     return this;
   }
 
-  public async sign(
-    params: SignatureBoxSignParameters
-  ): Promise<SignatureBoxGroup> {
+  public async sign(params: SignatureBoxSignParameters): Promise<SignatureBoxGroup> {
     const group = this.getGroup();
 
     return group.sign(params);
   }
 
-  public async verify(
-    params?: SignatureBoxGroupVerifyParams
-  ): Promise<SignatureVerifyResult> {
+  public async verify(params?: SignatureBoxGroupVerifyParams): Promise<SignatureVerifyResult> {
     const group = this.getGroup();
 
     return group.verify(params);
@@ -93,20 +77,11 @@ export class SignatureBox
       const formDict = core.FormDictionary.create(update);
 
       // Update BBox to match widget size
-      formDict.bBox = core.PDFRectangle.createWithData(
-        update,
-        0,
-        0,
-        this.width,
-        this.height
-      );
+      formDict.bBox = core.PDFRectangle.createWithData(update, 0, 0, this.width, this.height);
 
       ap.N = formDict.makeIndirect();
     }
-    const formDict =
-      ap.N instanceof core.PDFStream
-        ? ap.N.to(core.FormDictionary, true)
-        : core.FormDictionary.create(update).makeIndirect();
+    const formDict = ap.N instanceof core.PDFStream ? ap.N.to(core.FormDictionary, true) : core.FormDictionary.create(update).makeIndirect();
 
     return new FormObject(formDict, this.document);
   }
@@ -170,7 +145,7 @@ export class SignatureBox
       "AA", // Field
       "V",
       "Lock",
-      "SV" // SigField
+      "SV", // SigField
     ];
     for (const [key, value] of singleWidget.items) {
       if (fieldNames.includes(key)) {

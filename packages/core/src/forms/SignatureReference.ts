@@ -16,7 +16,7 @@ export enum TransformMethod {
    * Used to detect modifications to a list of form fields
    * specified in TransformParams
    */
-  fieldMDP = "FieldMDP"
+  fieldMDP = "FieldMDP",
 }
 
 export class SignatureReferenceDictionary extends objects.PDFDictionary {
@@ -26,7 +26,7 @@ export class SignatureReferenceDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     type: objects.PDFName,
     name: "Type",
-    get: (o) => o.text
+    get: (o) => o.text,
   })
   public type!: string;
 
@@ -38,7 +38,7 @@ export class SignatureReferenceDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     type: objects.PDFName,
     name: "TransformMethod",
-    get: (o) => o.text
+    get: (o) => o.text,
   })
   transformMethod!: TransformMethod;
 
@@ -49,7 +49,7 @@ export class SignatureReferenceDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     type: objects.PDFDictionary,
     name: "TransformParams",
-    optional: true
+    optional: true,
   })
   transformParams!: objects.PDFDictionary | null;
 
@@ -60,7 +60,7 @@ export class SignatureReferenceDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     name: "Data",
-    optional: true
+    optional: true,
   })
   data!: objects.PDFObjectTypes | null;
 
@@ -73,7 +73,7 @@ export class SignatureReferenceDictionary extends objects.PDFDictionary {
     type: objects.PDFName,
     optional: true,
     get: (o) => o.text,
-    defaultValue: "MD5"
+    defaultValue: "MD5",
   })
   digest!: string | null;
 }

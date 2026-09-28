@@ -63,10 +63,7 @@ export interface TextEditorDrawParameters {
 
 export interface ITextEditorHandler {
   document: PDFDocument;
-  create(
-    params: TextEditorCreateParameters,
-    page: PDFPage
-  ): core.WidgetDictionary;
+  create(params: TextEditorCreateParameters, page: PDFPage): core.WidgetDictionary;
 }
 
 export class TextEditorHandler implements ITextEditorHandler {
@@ -89,11 +86,7 @@ export class TextEditorHandler implements ITextEditorHandler {
    * @param params Parameters for drawing text
    * @param target Widget dictionary
    */
-  public drawText(
-    form: FormObject,
-    params: TextEditorDrawParameters,
-    target: core.WidgetDictionary
-  ): void {
+  public drawText(form: FormObject, params: TextEditorDrawParameters, target: core.WidgetDictionary): void {
     if (params.text.length === 0) {
       return;
     }
@@ -101,10 +94,7 @@ export class TextEditorHandler implements ITextEditorHandler {
     const field = FormComponentFactory.getField(target);
     const comb = field.ff & core.TextFieldFlags.comb;
     const fontSize = params.fontSize ?? FontComponent.DEFAULT_SIZE;
-    const alignment = target.has("Q")
-      ? (target.get("Q", core.PDFNumeric)
-          .value as unknown as TextEditorAlignment)
-      : TextEditorAlignment.left;
+    const alignment = target.has("Q") ? (target.get("Q", core.PDFNumeric).value as unknown as TextEditorAlignment) : TextEditorAlignment.left;
 
     const fontInfo = params.font.fontInfo;
     const scale = fontSize / fontInfo.unitsPerEm;
@@ -120,9 +110,7 @@ export class TextEditorHandler implements ITextEditorHandler {
       .fill();
 
     // border
-    const borderWidth = params.borderWidth
-      ? core.TypographyConverter.toPoint(params.borderWidth)
-      : 0;
+    const borderWidth = params.borderWidth ? core.TypographyConverter.toPoint(params.borderWidth) : 0;
     if (borderWidth > 0) {
       formContent = formContent
         .rect(0, 0, form.width, form.height)
@@ -134,21 +122,14 @@ export class TextEditorHandler implements ITextEditorHandler {
     // Calculate the x and y coordinates.
     const padding = TextEditorHandler.PADDING + borderWidth;
     let x = padding;
-    const y = params.multiline
-      ? padding
-      : (form.height - (ascent + descent)) / 2;
+    const y = params.multiline ? padding : (form.height - (ascent + descent)) / 2;
 
     // draw content
     let textContent = formContent
       .text(true)
       .graphics()
       // Clip rec
-      .rect(
-        padding,
-        padding,
-        form.width - padding * 2,
-        form.height - padding * 2
-      )
+      .rect(padding, padding, form.width - padding * 2, form.height - padding * 2)
       .clip()
       .text();
 
@@ -163,13 +144,13 @@ export class TextEditorHandler implements ITextEditorHandler {
               font: params.font,
               style: {
                 color: params.color,
-                size: fontSize
-              }
-            }
-          ]
+                size: fontSize,
+              },
+            },
+          ],
         },
         x,
-        y
+        y,
       );
     } else if (comb) {
       const text = this.getSingleLineText(params.text);
@@ -185,9 +166,7 @@ export class TextEditorHandler implements ITextEditorHandler {
       for (let i = 0; i < len; i++) {
         const char = text[i];
         const charWidth = params.font.measureTextWidth(char, fontSize);
-        textContent
-          .move(width + prevCharWidth / 2 - charWidth / 2, 0, true)
-          .show(char);
+        textContent.move(width + prevCharWidth / 2 - charWidth / 2, 0, true).show(char);
 
         prevCharWidth = charWidth;
       }
@@ -231,8 +210,7 @@ export class TextEditorHandler implements ITextEditorHandler {
 
     // count position
     const positionX = core.TypographyConverter.toPoint(params.left ?? 0);
-    const positionY =
-      core.TypographyConverter.toPoint(params.top ?? height) - height;
+    const positionY = core.TypographyConverter.toPoint(params.top ?? height) - height;
 
     // create widget
     if (!params.font) {
@@ -252,13 +230,8 @@ export class TextEditorHandler implements ITextEditorHandler {
       widget.ff = core.TextFieldFlags.multiline;
     }
 
-    widget.set(
-      "MaxLen",
-      new core.PDFNumeric(params.maxLen || TextEditorHandler.MAX_LEN)
-    );
-    widget.t = params.name
-      ? doc.createString(params.name)
-      : doc.createString(core.UUID.generate());
+    widget.set("MaxLen", new core.PDFNumeric(params.maxLen || TextEditorHandler.MAX_LEN));
+    widget.t = params.name ? doc.createString(params.name) : doc.createString(core.UUID.generate());
     widget.V = doc.createString(text);
     widget.rect.llX = positionX;
     widget.rect.llY = positionY;
@@ -270,7 +243,7 @@ export class TextEditorHandler implements ITextEditorHandler {
     const fontRes = yes.resources.set(params.font.target);
     const da = new core.PDFContent().setFontAndSize({
       font: fontRes.name,
-      size: fontSize
+      size: fontSize,
     });
     da.setColor(params.color);
     widget.set("DA", doc.createString(da.toString(true)));
@@ -279,16 +252,12 @@ export class TextEditorHandler implements ITextEditorHandler {
       const bs = widget.BS.get();
       bs.W = core.TypographyConverter.toPoint(params.borderWidth);
       const mk = widget.MK.get();
-      mk.BC = core.ColorConverter.toPDFArray(
-        params.borderColor ?? TextEditorHandler.BORDER_COLOR
-      );
+      mk.BC = core.ColorConverter.toPDFArray(params.borderColor ?? TextEditorHandler.BORDER_COLOR);
     }
 
     if (params.backgroundColor) {
       const mk = widget.MK.get();
-      mk.BG = core.ColorConverter.toPDFArray(
-        params.backgroundColor ?? TextEditorHandler.BACKGROUND_COLOR
-      );
+      mk.BG = core.ColorConverter.toPDFArray(params.backgroundColor ?? TextEditorHandler.BACKGROUND_COLOR);
     }
 
     // Draw
@@ -303,9 +272,9 @@ export class TextEditorHandler implements ITextEditorHandler {
         width: params.width,
         color: params.color,
         multiline: params.multiline,
-        maxLen: params.maxLen
+        maxLen: params.maxLen,
       },
-      widget
+      widget,
     );
 
     widget.AP.get().N = yes.target.makeIndirect();

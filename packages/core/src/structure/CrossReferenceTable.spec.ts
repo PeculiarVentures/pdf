@@ -7,11 +7,11 @@ describe("CrossReferenceTable", () => {
 
     const dict1 = new PDFDictionary([
       ["First", new PDFNumeric(1)],
-      ["Second", new PDFNumeric(2)]
+      ["Second", new PDFNumeric(2)],
     ]);
     const dict2 = new PDFDictionary([
       ["Third", new PDFNumeric(3)],
-      ["Fourth", new PDFNumeric(4)]
+      ["Fourth", new PDFNumeric(4)],
     ]);
 
     const objDict1 = doc.append(dict1);

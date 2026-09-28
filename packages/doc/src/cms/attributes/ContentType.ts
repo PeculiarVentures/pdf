@@ -14,7 +14,4 @@ export class ContentTypeAttribute extends CmsAttribute {
   }
 }
 
-CmsAttributeFactory.register(
-  ContentTypeAttribute.DEFAULT_IDENTIFIER,
-  ContentTypeAttribute
-);
+CmsAttributeFactory.register(ContentTypeAttribute.DEFAULT_IDENTIFIER, ContentTypeAttribute);

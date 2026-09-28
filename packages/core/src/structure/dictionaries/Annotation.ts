@@ -1,15 +1,4 @@
-import {
-  Maybe,
-  PDFArray,
-  PDFArrayField,
-  PDFDateField,
-  PDFDictionary,
-  PDFDictionaryField,
-  PDFNumberField,
-  PDFMaybeField,
-  PDFNameField,
-  PDFTextString
-} from "../../objects";
+import { Maybe, PDFArray, PDFArrayField, PDFDateField, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFMaybeField, PDFNameField, PDFTextString } from "../../objects";
 import { PDFRectangle } from "../common/Rectangle";
 import { AppearanceDictionary } from "./AppearanceDictionary";
 import { PageObjectDictionary } from "./PageObject";
@@ -97,7 +86,7 @@ export enum AnnotationFlags {
    * properties, such as position and size.
    * @remarks PDF 1.7
    */
-  lockedContents = 1 << 9
+  lockedContents = 1 << 9,
 }
 
 export enum SubTypeAnnotation {
@@ -212,7 +201,7 @@ export enum SubTypeAnnotation {
   /**
    * 3D Annotations
    */
-  threeD = "3D"
+  threeD = "3D",
 }
 
 export class AnnotationDictionary extends PDFDictionary {
@@ -237,7 +226,7 @@ export class AnnotationDictionary extends PDFDictionary {
    */
   @PDFDictionaryField({
     name: "Rect",
-    type: PDFRectangle
+    type: PDFRectangle,
   })
   public rect!: PDFRectangle;
 
@@ -250,7 +239,7 @@ export class AnnotationDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "Contents",
     type: PDFTextString,
-    optional: true
+    optional: true,
   })
   public contents!: string | null;
 
@@ -262,7 +251,7 @@ export class AnnotationDictionary extends PDFDictionary {
     name: "P",
     type: PageObjectDictionary,
     optional: true,
-    indirect: true
+    indirect: true,
   })
   public p!: PageObjectDictionary | null;
 
@@ -273,7 +262,7 @@ export class AnnotationDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "NM",
     type: PDFTextString,
-    optional: true
+    optional: true,
   })
   public nm!: string | null;
 
@@ -335,7 +324,7 @@ export class AnnotationDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "OC",
     type: PDFDictionary,
-    optional: true
+    optional: true,
   })
   public oc!: PDFDictionary | null;
 
@@ -345,7 +334,7 @@ export class AnnotationDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "AF",
     type: PDFDictionary,
-    optional: true
+    optional: true,
   })
   public af!: PDFDictionary | null;
 
@@ -369,7 +358,7 @@ export class AnnotationDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "Lang",
     type: PDFTextString,
-    optional: true
+    optional: true,
   })
   public lang!: string | null;
 

@@ -27,10 +27,7 @@ export class PKIUtils {
     return new X509Certificate(raw);
   }
 
-  public static findExtension(
-    cert: pkijs.Certificate,
-    extnID: string
-  ): pkijs.Extension | null {
+  public static findExtension(cert: pkijs.Certificate, extnID: string): pkijs.Extension | null {
     if (cert.extensions) {
       for (const extension of cert.extensions) {
         if (extension.extnID === extnID) {

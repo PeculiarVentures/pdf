@@ -165,7 +165,7 @@ export class FileSpecificationDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "RF",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public RF!: objects.PDFDictionary | null;
 
@@ -190,7 +190,7 @@ export class FileSpecificationDictionary extends objects.PDFDictionary {
     name: "CI",
     type: objects.PDFDictionary,
     optional: true,
-    indirect: true
+    indirect: true,
   })
   public CI!: objects.PDFDictionary | null;
 

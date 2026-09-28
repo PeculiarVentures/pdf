@@ -7,21 +7,10 @@ export class CmsCertificateStorageHandler extends DefaultCertificateStorageHandl
     super();
   }
 
-  public override findCertificate(
-    serialNumber: BufferSource,
-    issuer: BufferSource
-  ): Promise<X509Certificate | null>;
-  public override findCertificate(
-    spki: BufferSource
-  ): Promise<X509Certificate | null>;
-  public override async findCertificate(
-    serialNumber: BufferSource,
-    issuer?: BufferSource
-  ): Promise<X509Certificate | null> {
-    const certs: X509Certificate[] = [
-      ...this.certificates,
-      ...this.cms.certificates
-    ];
+  public override findCertificate(serialNumber: BufferSource, issuer: BufferSource): Promise<X509Certificate | null>;
+  public override findCertificate(spki: BufferSource): Promise<X509Certificate | null>;
+  public override async findCertificate(serialNumber: BufferSource, issuer?: BufferSource): Promise<X509Certificate | null> {
+    const certs: X509Certificate[] = [...this.certificates, ...this.cms.certificates];
     for (const cert of certs) {
       const ok = await this.matchCertificate(cert, serialNumber, issuer);
       if (ok) {

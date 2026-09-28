@@ -31,7 +31,7 @@ export class EmbeddedFileParams extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Mac",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public Mac!: objects.PDFDictionary | null;
 

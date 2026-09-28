@@ -11,33 +11,33 @@ const testVectors: TestVector[] = [
   {
     name: "ECDSA with SHA-1",
     webAlg: { name: "ECDSA", hash: { name: "SHA-1" } },
-    asnAlg: "300b06072a8648ce3d04010500"
+    asnAlg: "300b06072a8648ce3d04010500",
   },
   {
     name: "ECDSA with SHA-256",
     webAlg: { name: "ECDSA", hash: { name: "SHA-256" } },
-    asnAlg: "300c06082a8648ce3d0403020500"
+    asnAlg: "300c06082a8648ce3d0403020500",
   },
   {
     name: "ECDSA with SHA-384",
     webAlg: { name: "ECDSA", hash: { name: "SHA-384" } },
-    asnAlg: "300c06082a8648ce3d0403030500"
+    asnAlg: "300c06082a8648ce3d0403030500",
   },
   {
     name: "ECDSA with SHA-512",
     webAlg: { name: "ECDSA", hash: { name: "SHA-512" } },
-    asnAlg: "300c06082a8648ce3d0403040500"
+    asnAlg: "300c06082a8648ce3d0403040500",
   },
   {
     name: "Ed25519",
     webAlg: { name: "EdDSA", namedCurve: "Ed25519" },
-    asnAlg: "300506032b6570"
+    asnAlg: "300506032b6570",
   },
   {
     name: "Ed448",
     webAlg: { name: "EdDSA", namedCurve: "Ed448" },
-    asnAlg: "300506032b6571"
-  }
+    asnAlg: "300506032b6571",
+  },
 ];
 
 describe("ecAlgorithmConverter", () => {
@@ -64,7 +64,7 @@ describe("ecAlgorithmConverter", () => {
     it("should return null for ECDSA with unsupported hash", () => {
       const result = ecAlgorithmConverter.toBER({
         name: "ECDSA",
-        hash: { name: "MD5" }
+        hash: { name: "MD5" },
       });
       expect(result).toBeNull();
     });

@@ -9,7 +9,7 @@ import { FormComponent } from "./FormComponent";
 export enum TextEditorAlignment {
   left = 0,
   center = 1,
-  right = 2
+  right = 2,
 }
 
 export class TextEditor extends FormComponent {
@@ -113,7 +113,7 @@ export class TextEditor extends FormComponent {
     return new FontComponent({
       document: this.document,
       fontDictionary: defaultFont.target,
-      name: resName
+      name: resName,
     });
   }
 
@@ -129,7 +129,7 @@ export class TextEditor extends FormComponent {
     const resFontComponent = new FontComponent({
       document: this.document,
       fontDictionary: v.target,
-      name: resName
+      name: resName,
     });
 
     this.setDA(resFontComponent, this.fontSize, this.textColor);
@@ -166,13 +166,8 @@ export class TextEditor extends FormComponent {
       const content = core.PDFContent.fromString(text);
 
       for (const operator of content.operators) {
-        if (
-          operator instanceof core.PDFOperator &&
-          FormComponent.COLOR_OPERATORS.includes(operator.name)
-        ) {
-          const color = core.ColorConverter.fromPDFNumberArray(
-            operator.parameters as core.PDFNumeric[]
-          );
+        if (operator instanceof core.PDFOperator && FormComponent.COLOR_OPERATORS.includes(operator.name)) {
+          const color = core.ColorConverter.fromPDFNumberArray(operator.parameters as core.PDFNumeric[]);
 
           return color;
         }
@@ -188,23 +183,15 @@ export class TextEditor extends FormComponent {
     }
   }
 
-  private setDA(
-    font: FontComponent,
-    size: core.TypographySize,
-    color: core.Colors,
-    noPaint?: boolean
-  ) {
+  private setDA(font: FontComponent, size: core.TypographySize, color: core.Colors, noPaint?: boolean) {
     const newContent = new core.PDFContent();
     newContent.setColor(color);
     newContent.setFontAndSize({
       font: font.name,
-      size: core.TypographyConverter.toPoint(size)
+      size: core.TypographyConverter.toPoint(size),
     });
 
-    this.target.set(
-      "DA",
-      this.document.target.createString(newContent.toString(true))
-    );
+    this.target.set("DA", this.document.target.createString(newContent.toString(true)));
 
     if (!noPaint) {
       this.paint();
@@ -236,8 +223,7 @@ export class TextEditor extends FormComponent {
     // Compute the font size based on the height of the form.
     const fontInfo = this.font.fontInfo;
     const heightEm = this.height * fontInfo.unitsPerEm;
-    const fontSize =
-      ((heightEm - 2) / (fontInfo.ascent - fontInfo.descent)) * 0.7;
+    const fontSize = ((heightEm - 2) / (fontInfo.ascent - fontInfo.descent)) * 0.7;
 
     return fontSize;
   }
@@ -277,7 +263,7 @@ export class TextEditor extends FormComponent {
         maxLen: this.maxLen,
 
         width: this.width,
-        height: this.height
+        height: this.height,
       };
 
       if (this.target.BS.has()) {
@@ -317,10 +303,7 @@ export class TextEditor extends FormComponent {
     if (this.target.AP.has()) {
       const ap = this.target.AP.get();
       if (ap.N instanceof core.PDFStream) {
-        const formAP = new FormObject(
-          ap.N.to(core.FormDictionary),
-          this.document
-        );
+        const formAP = new FormObject(ap.N.to(core.FormDictionary), this.document);
         resource = formAP.resources.find(fontName);
       }
     }
@@ -359,7 +342,7 @@ export class TextEditor extends FormComponent {
       return new FontComponent({
         document: this.document,
         fontDictionary,
-        name: fontName
+        name: fontName,
       });
     }
 

@@ -13,14 +13,8 @@ describe("Dictionary", () => {
       ["<< null >>", 0],
       ["<< /Type /Example /Version 0.01 >>", 2],
       ["<< /Type /Example \n /Dictionary << /Version 1.0 >> >>", 2],
-      [
-        "<</Info 13 0 R/ID [<71d39b4fb9a237145f7abbdb515bbd11><ed92098a42c1aa6e4e086646f97d7f55>]/Root 12 0 R/Size 14>>",
-        4
-      ],
-      [
-        "<</Subtype/Type0/Type/Font/BaseFont/WVMPXN+Roboto-Regular/Encoding/Identity-H/DescendantFonts[8 0 R]/ToUnicode 9 0 R>>",
-        6
-      ]
+      ["<</Info 13 0 R/ID [<71d39b4fb9a237145f7abbdb515bbd11><ed92098a42c1aa6e4e086646f97d7f55>]/Root 12 0 R/Size 14>>", 4],
+      ["<</Subtype/Type0/Type/Font/BaseFont/WVMPXN+Roboto-Regular/Encoding/Identity-H/DescendantFonts[8 0 R]/ToUnicode 9 0 R>>", 6],
     ];
 
     test.each(vectors)("should parse %s correctly", (input, expectedSize) => {
@@ -46,13 +40,11 @@ describe("Dictionary", () => {
     it("should correctly serialize and deserialize dictionary", () => {
       const item = new PDFDictionary([
         ["Item1", new PDFLiteralString("Value1")],
-        [new PDFName("Item2"), new PDFLiteralString("Value2")]
+        [new PDFName("Item2"), new PDFLiteralString("Value2")],
       ]);
 
       const pdf = item.toPDF();
-      expect(Buffer.from(pdf).toString()).toBe(
-        "<<\n/Item1 (Value1)\n/Item2 (Value2)\n>>"
-      );
+      expect(Buffer.from(pdf).toString()).toBe("<<\n/Item1 (Value1)\n/Item2 (Value2)\n>>");
 
       const parsedItem = PDFDictionary.fromPDF(pdf);
       expect(parsedItem.size).toBe(2);
@@ -66,7 +58,7 @@ describe("Dictionary", () => {
       dictionary = new PDFDictionary([
         ["Item1", new PDFLiteralString("Value1")],
         [new PDFName("Item2"), new PDFLiteralString("Value2")],
-        ["Item3", new PDFLiteralString("Value3")]
+        ["Item3", new PDFLiteralString("Value3")],
       ]);
     });
 
@@ -132,9 +124,7 @@ describe("Dictionary", () => {
       });
 
       it("should return false for different dictionaries", () => {
-        const other = new PDFDictionary([
-          ["Different", new PDFLiteralString("Value")]
-        ]);
+        const other = new PDFDictionary([["Different", new PDFLiteralString("Value")]]);
         expect(dictionary.equal(other)).toBe(false);
       });
     });
@@ -155,7 +145,7 @@ describe("Dictionary", () => {
           @PDFDictionaryField({
             name: "Point",
             type: PointDictionary,
-            maybe: true
+            maybe: true,
           })
           public Point!: Maybe<PointDictionary>;
         }
@@ -166,9 +156,7 @@ describe("Dictionary", () => {
         test.Point.get().Top = 2;
 
         const view = test.toPDF();
-        expect(Convert.ToBinary(view)).toBe(
-          "<<\n/Point <<\n/Left 1\n/Top 2\n>>\n>>"
-        );
+        expect(Convert.ToBinary(view)).toBe("<<\n/Point <<\n/Left 1\n/Top 2\n>>\n>>");
       });
     });
   });
@@ -177,7 +165,7 @@ describe("Dictionary", () => {
     it("should convert dictionary to string", () => {
       const item = new PDFDictionary([
         ["Item1", new PDFLiteralString("Value1")],
-        [new PDFName("Item2"), new PDFLiteralString("Value2")]
+        [new PDFName("Item2"), new PDFLiteralString("Value2")],
       ]);
 
       const result = item.toString();

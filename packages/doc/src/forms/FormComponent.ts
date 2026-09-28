@@ -4,10 +4,7 @@ import { WrapObject } from "../WrapObject";
 import { annotFlag, fieldFlag } from "./decorators";
 import { IComponent } from "./IComponent";
 
-export class FormComponent
-  extends WrapObject<core.WidgetDictionary>
-  implements IComponent
-{
+export class FormComponent extends WrapObject<core.WidgetDictionary> implements IComponent {
   public static readonly COLOR_OPERATORS = ["g", "rg", "k"];
 
   constructor(target: core.WidgetDictionary, document: PDFDocument) {
@@ -226,15 +223,9 @@ export class FormComponent
 
       if (text) {
         const content = core.PDFContent.fromString(text.text);
-        const color = content.operators.find(
-          (o) =>
-            o instanceof core.PDFOperator &&
-            FormComponent.COLOR_OPERATORS.includes(o.name)
-        );
+        const color = content.operators.find((o) => o instanceof core.PDFOperator && FormComponent.COLOR_OPERATORS.includes(o.name));
         if (color instanceof core.PDFOperator) {
-          return core.ColorConverter.fromPDFNumberArray(
-            color.parameters as core.PDFNumeric[]
-          );
+          return core.ColorConverter.fromPDFNumberArray(color.parameters as core.PDFNumeric[]);
         }
       }
     } catch {
@@ -252,10 +243,7 @@ export class FormComponent
     // PDF doesn't have field for the fore color annotation. For variable text use DA.
     // If set DA for graphics Acrobat doesn't show images
     const content = new core.PDFContent().setColor(value);
-    this.target.MK.get().set(
-      "PV_FC",
-      this.document.target.createString(content.toString())
-    );
+    this.target.MK.get().set("PV_FC", this.document.target.createString(content.toString()));
 
     this.onForeColorChanged();
   }

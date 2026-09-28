@@ -14,7 +14,4 @@ export class SigningTimeAttribute extends CmsAttribute {
   }
 }
 
-CmsAttributeFactory.register(
-  SigningTimeAttribute.DEFAULT_IDENTIFIER,
-  SigningTimeAttribute
-);
+CmsAttributeFactory.register(SigningTimeAttribute.DEFAULT_IDENTIFIER, SigningTimeAttribute);

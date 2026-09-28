@@ -40,28 +40,16 @@ export class FlateFilter extends Filter {
 
     if (this.decodeParams) {
       if (this.decodeParams.has(FlateFilter.FIELD_PREDICTOR)) {
-        predictor = this.decodeParams.get(
-          FlateFilter.FIELD_PREDICTOR,
-          PDFNumeric
-        ).value;
+        predictor = this.decodeParams.get(FlateFilter.FIELD_PREDICTOR, PDFNumeric).value;
       }
       if (this.decodeParams.has(FlateFilter.FIELD_COLUMNS)) {
-        columns = this.decodeParams.get(
-          FlateFilter.FIELD_COLUMNS,
-          PDFNumeric
-        ).value;
+        columns = this.decodeParams.get(FlateFilter.FIELD_COLUMNS, PDFNumeric).value;
       }
       if (this.decodeParams.has(FlateFilter.FIELD_COLORS)) {
-        colors = this.decodeParams.get(
-          FlateFilter.FIELD_COLORS,
-          PDFNumeric
-        ).value;
+        colors = this.decodeParams.get(FlateFilter.FIELD_COLORS, PDFNumeric).value;
       }
       if (this.decodeParams.has(FlateFilter.FIELD_BITS_PER_COMPONENT)) {
-        bitsPerComponent = this.decodeParams.get(
-          FlateFilter.FIELD_BITS_PER_COMPONENT,
-          PDFNumeric
-        ).value;
+        bitsPerComponent = this.decodeParams.get(FlateFilter.FIELD_BITS_PER_COMPONENT, PDFNumeric).value;
       }
     }
 
@@ -73,9 +61,7 @@ export class FlateFilter extends Filter {
         throw e;
       }
 
-      throw new Error(
-        `Cannot decode the stream using the FlateDecode filter. ${e}`
-      );
+      throw new Error(`Cannot decode the stream using the FlateDecode filter. ${e}`);
     }
 
     if (!result) {
@@ -85,13 +71,13 @@ export class FlateFilter extends Filter {
     if (predictor > 1) {
       if (predictor === 2) {
         result = new TIFFPredictor({
-          columns
+          columns,
         }).decode(result);
       } else {
         result = new PNGPredictor({
           columns,
           colors,
-          bitsPerComponent
+          bitsPerComponent,
         }).decode(result);
       }
     }

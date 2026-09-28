@@ -5,16 +5,13 @@ export class PNGPredictor extends Predictor {
 
   public decode(view: Uint8Array): Uint8Array {
     const bytesPerPixel = (this.colors * this.bitsPerComponent + 7) >> 3;
-    const bytesPerRow =
-      (this.colors * this.bitsPerComponent * this.columns + 7) >> 3;
+    const bytesPerRow = (this.colors * this.bitsPerComponent * this.columns + 7) >> 3;
 
     // Store initial data
     this.prevData = new Uint8Array(view);
 
     // Create result array
-    const result = new Uint8Array(
-      Math.ceil(view.length / (bytesPerRow + 1)) * bytesPerRow
-    );
+    const result = new Uint8Array(Math.ceil(view.length / (bytesPerRow + 1)) * bytesPerRow);
     let resultPos = 0;
     let pos = 0;
 
@@ -33,48 +30,31 @@ export class PNGPredictor extends Predictor {
             result[resultPos + i] = row[i];
           }
           for (let i = bytesPerPixel; i < bytesPerRow; i++) {
-            result[resultPos + i] =
-              (row[i] + result[resultPos + i - bytesPerPixel]) & 0xff;
+            result[resultPos + i] = (row[i] + result[resultPos + i - bytesPerPixel]) & 0xff;
           }
           break;
 
         case 2: // Up
           for (let i = 0; i < bytesPerRow; i++) {
-            const up =
-              resultPos >= bytesPerRow
-                ? result[resultPos - bytesPerRow + i]
-                : 0;
+            const up = resultPos >= bytesPerRow ? result[resultPos - bytesPerRow + i] : 0;
             result[resultPos + i] = (row[i] + up) & 0xff;
           }
           break;
 
         case 3: // Average
           for (let i = 0; i < bytesPerRow; i++) {
-            const left =
-              i < bytesPerPixel ? 0 : result[resultPos + i - bytesPerPixel];
-            const up =
-              resultPos >= bytesPerRow
-                ? result[resultPos - bytesPerRow + i]
-                : 0;
-            result[resultPos + i] =
-              (row[i] + Math.floor((left + up) / 2)) & 0xff;
+            const left = i < bytesPerPixel ? 0 : result[resultPos + i - bytesPerPixel];
+            const up = resultPos >= bytesPerRow ? result[resultPos - bytesPerRow + i] : 0;
+            result[resultPos + i] = (row[i] + Math.floor((left + up) / 2)) & 0xff;
           }
           break;
 
         case 4: // Paeth
           for (let i = 0; i < bytesPerRow; i++) {
-            const left =
-              i < bytesPerPixel ? 0 : result[resultPos + i - bytesPerPixel];
-            const up =
-              resultPos >= bytesPerRow
-                ? result[resultPos - bytesPerRow + i]
-                : 0;
-            const upLeft =
-              i < bytesPerPixel || resultPos < bytesPerRow
-                ? 0
-                : result[resultPos - bytesPerRow + i - bytesPerPixel];
-            result[resultPos + i] =
-              (row[i] + paethPredictor(left, up, upLeft)) & 0xff;
+            const left = i < bytesPerPixel ? 0 : result[resultPos + i - bytesPerPixel];
+            const up = resultPos >= bytesPerRow ? result[resultPos - bytesPerRow + i] : 0;
+            const upLeft = i < bytesPerPixel || resultPos < bytesPerRow ? 0 : result[resultPos - bytesPerRow + i - bytesPerPixel];
+            result[resultPos + i] = (row[i] + paethPredictor(left, up, upLeft)) & 0xff;
           }
           break;
 

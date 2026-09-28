@@ -4,8 +4,7 @@ import { PDFDocument } from "../Document";
 import { FontComponent } from "../Font";
 import { FormObject } from "../FormObject";
 import { ComboBox } from "./ComboBox";
-export interface ComboBoxCreateParameters
-  extends IFormComponentCreateParameters {
+export interface ComboBoxCreateParameters extends IFormComponentCreateParameters {
   options?: Record<string, string> | string[];
   selected?: string | string[];
 }
@@ -107,10 +106,7 @@ export class ComboBoxHandler implements IComboBoxHandler {
 
     // Calculate text position relative to inner area
     const x = borderWidth + ComboBoxHandler.PADDING;
-    const y =
-      borderWidth +
-      (innerHeight - ascent + descent) / 2 +
-      ComboBoxHandler.PADDING;
+    const y = borderWidth + (innerHeight - ascent + descent) / 2 + ComboBoxHandler.PADDING;
 
     // draw border
     const formContent =
@@ -124,10 +120,7 @@ export class ComboBoxHandler implements IComboBoxHandler {
         : form.graphics();
 
     // draw background
-    formContent
-      .fillColor(component.backgroundColor)
-      .rect(borderWidth, borderWidth, innerWidth, innerHeight)
-      .fill();
+    formContent.fillColor(component.backgroundColor).rect(borderWidth, borderWidth, innerWidth, innerHeight).fill();
 
     // draw content
     const textContent = formContent
@@ -149,19 +142,14 @@ export class ComboBoxHandler implements IComboBoxHandler {
       if (v instanceof core.PDFArray) {
         text = component.options[v.get(0, core.PDFTextString).text];
       } else if (v instanceof core.PDFTextString) {
-        text =
-          component.options[component.target.get("V", core.PDFTextString).text];
+        text = component.options[component.target.get("V", core.PDFTextString).text];
       } else {
-        throw new Error(
-          "Cannot get text value from the CheckBox. Unsupported type of V."
-        );
+        throw new Error("Cannot get text value from the CheckBox. Unsupported type of V.");
       }
     }
 
     if (text === undefined) {
-      throw new Error(
-        "Cannot get text value from the ComboBox. 'text' property is undefined or null."
-      );
+      throw new Error("Cannot get text value from the ComboBox. 'text' property is undefined or null.");
     }
 
     const textShow = this.getSingleLineText(text);

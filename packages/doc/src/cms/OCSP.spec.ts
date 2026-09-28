@@ -7,10 +7,7 @@ import { DefaultCertificateStorageHandler } from "./DefaultCertificateStorageHan
 
 describe("OCSP", () => {
   beforeAll(() => {
-    pkijs.setEngine(
-      "newEngine",
-      new pkijs.CryptoEngine({ name: "nodejs", crypto })
-    );
+    pkijs.setEngine("newEngine", new pkijs.CryptoEngine({ name: "nodejs", crypto }));
   });
 
   describe("create", () => {
@@ -18,35 +15,29 @@ describe("OCSP", () => {
       const algorithm = {
         name: "ECDSA",
         namedCurve: "P-256",
-        hash: "SHA-256"
+        hash: "SHA-256",
       } as EcKeyGenParams | EcdsaParams;
 
       // create CA
-      const caKeys = (await crypto.subtle.generateKey(algorithm, false, [
-        "sign",
-        "verify"
-      ])) as CryptoKeyPair;
+      const caKeys = (await crypto.subtle.generateKey(algorithm, false, ["sign", "verify"])) as CryptoKeyPair;
       const caCert = await x509.X509CertificateGenerator.createSelfSigned(
         {
           name: "CN=CA Test",
           keys: caKeys,
           signingAlgorithm: algorithm,
-          notAfter: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365) // 1 year
+          notAfter: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
         },
-        crypto
+        crypto,
       );
 
       // create leaf
-      const leafKeys = (await crypto.subtle.generateKey(algorithm, false, [
-        "sign",
-        "verify"
-      ])) as CryptoKeyPair;
+      const leafKeys = (await crypto.subtle.generateKey(algorithm, false, ["sign", "verify"])) as CryptoKeyPair;
       const leafCert = await x509.X509CertificateGenerator.create({
         issuer: caCert.issuer,
         subject: "CN=Leaf Test",
         publicKey: leafKeys.publicKey,
         signingKey: caKeys.privateKey,
-        signingAlgorithm: algorithm
+        signingAlgorithm: algorithm,
       });
 
       // create OCSP response
@@ -58,13 +49,13 @@ describe("OCSP", () => {
           {
             certId: await CertificateID.create("SHA-256", leafCert, caCert),
             status: {
-              type: "good"
+              type: "good",
             },
             thisUpdate: new Date(),
-            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24) // 1 day
-          }
+            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24), // 1 day
+          },
         ],
-        producedAt: new Date()
+        producedAt: new Date(),
       });
 
       const ok = await ocsp.verify(caCert);
@@ -80,17 +71,15 @@ describe("OCSP", () => {
         "AwIaBQAEFB4RwMms/aRT70svanMhFWBNVK25BBSZzSnDoVgmr3p6TIRaj3OIYLDf3gISA2Z/04DWtQg1",
         "FEVjZfQKjaHYgAAYDzIwMjQxMjE1MDgyNjAwWqARGA8yMDI0MTIyMjA4MjU1OFowCgYIKoZIzj0EAwMD",
         "aQAwZgIxAO/YNlTbYzpsrRGfRmux0SRofPeF3qayn5r+V3e9chKw9Z0k/DPrn5uDXt5rMubPvgIxAKvD",
-        "47tcxPW+oBouWNNESF3tz9fP9qJDKMchvsXGAUcQ7zNZdWFobZML3LVuQbNxhw=="
+        "47tcxPW+oBouWNNESF3tz9fP9qJDKMchvsXGAUcQ7zNZdWFobZML3LVuQbNxhw==",
       ].join("");
 
-      const ocspResponse = OCSP.fromOCSPResponse(
-        Buffer.from(ocspResponseEnc, "base64")
-      );
+      const ocspResponse = OCSP.fromOCSPResponse(Buffer.from(ocspResponseEnc, "base64"));
       expect(ocspResponse.signatureAlgorithm).toEqual({
         name: "ECDSA",
         hash: {
-          name: "SHA-384"
-        }
+          name: "SHA-384",
+        },
       });
       expect(ocspResponse.signatureValue).toBeDefined();
 
@@ -127,7 +116,7 @@ describe("OCSP", () => {
         "K1BcaJ6fJZsmbjRgD5p3mvEf5vdQM7MCEvU0tHbsx2I5mHHJoABHb8KVBgWp/lcX",
         "GWiWaeOyB7RP+OfDtvi2OsapxXiV7vNVs7fMlrRjY1joKaqmmycnBvAq14AEbtyL",
         "sVfOS66B8apkeFX2NY4XPEYV4ZSCe8VHPrdrERk2wILG3T/EGmSIkCYVUMSnjmJd",
-        "VQD9F6Na/+zmXCc="
+        "VQD9F6Na/+zmXCc=",
       ].join("");
       const certEnc = [
         "MIIDezCCAwCgAwIBAgISA2Z/04DWtQg1FEVjZfQKjaHYMAoGCCqGSM49BAMDMDIx",
@@ -148,7 +137,7 @@ describe("OCSP", () => {
         "IKF34tE83nIgBDKfr3JN2FiVqrm9AiEA1mI+1WIAugqoZY17e9Og9QEZgZVBxQYx",
         "AeRIry8do8AwCgYIKoZIzj0EAwMDaQAwZgIxANKdmQMcUc6mk9RVutMNmvQYccS9",
         "+yu8zNpuU9w4/SgsuaDue4I6bbkc6f8KC+3y3QIxAKjyv2BdsJpeOQPd8Idn+MaZ",
-        "8czfzqWZ3jvEvPPr8gDpx+8JfaHrRBFmdKij28GevA=="
+        "8czfzqWZ3jvEvPPr8gDpx+8JfaHrRBFmdKij28GevA==",
       ].join("");
       const caCert = new x509.X509Certificate(Buffer.from(caEnc, "base64"));
       const cert = new x509.X509Certificate(Buffer.from(certEnc, "base64"));

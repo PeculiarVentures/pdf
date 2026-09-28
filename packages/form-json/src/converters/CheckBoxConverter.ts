@@ -12,18 +12,12 @@ export class CheckBoxConverter extends WidgetConverter<pdfDoc.CheckBox> {
     super(pdfDoc.CheckBox);
   }
 
-  protected onExport(
-    component: pdfDoc.CheckBox,
-    json: Record<string, unknown>
-  ): void {
+  protected onExport(component: pdfDoc.CheckBox, json: Record<string, unknown>): void {
     json.checked = component.checked;
     json.value = component.value;
   }
 
-  public override setValue(
-    component: pdfDoc.CheckBox,
-    data: JsonCheckBoxUpdate
-  ): void {
+  public override setValue(component: pdfDoc.CheckBox, data: JsonCheckBoxUpdate): void {
     component.checked = data.checked;
   }
 }

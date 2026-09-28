@@ -1,11 +1,7 @@
 import * as core from "@peculiar/pdf-core";
 import { type FormComponent } from "./FormComponent";
 
-function flag(
-  f: core.AnnotationFlags,
-  fieldFlag = false,
-  repaint = false
-): PropertyDecorator {
+function flag(f: core.AnnotationFlags, fieldFlag = false, repaint = false): PropertyDecorator {
   return (target: object, propertyKey: string | symbol) => {
     Object.defineProperty(target, propertyKey, {
       get: function (this: FormComponent): boolean {
@@ -20,9 +16,7 @@ function flag(
         return !!((flags & f) === f);
       },
       set: function (this: FormComponent, v: boolean): void {
-        const value = (this as unknown as Record<string | symbol, unknown>)[
-          propertyKey
-        ];
+        const value = (this as unknown as Record<string | symbol, unknown>)[propertyKey];
         if (value === v) {
           return;
         }
@@ -42,7 +36,7 @@ function flag(
         if (repaint) {
           this.paint();
         }
-      }
+      },
     });
   };
 }

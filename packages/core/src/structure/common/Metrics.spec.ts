@@ -41,7 +41,7 @@ describe("Metrics", () => {
       expect(result).toEqual([
         [1, 2, 0],
         [3, 4, 0],
-        [5, 6, 1]
+        [5, 6, 1],
       ]);
     });
   });
@@ -97,7 +97,7 @@ describe("Metrics", () => {
       metrics.transform([
         { type: "scale", width: 2, height: 2 },
         { type: "rotate", angle: 90 },
-        { type: "translate", x: "10pt", y: "10pt" }
+        { type: "translate", x: "10pt", y: "10pt" },
       ]);
 
       const result = metrics.toArray();

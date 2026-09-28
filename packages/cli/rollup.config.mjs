@@ -3,9 +3,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import typescript from "rollup-plugin-typescript2";
 import pkg from "./package.json" assert { type: "json" };
 
-const banner = [
-  "#!/usr/bin/env node"
-].join("\n");
+const banner = ["#!/usr/bin/env node"].join("\n");
 const input = "src/index.ts";
 
 export default [
@@ -23,9 +21,9 @@ export default [
         tsconfigOverride: {
           compilerOptions: {
             module: "es2015",
-            removeComments: true
-          }
-        }
+            removeComments: true,
+          },
+        },
       }),
     ],
     external: Object.keys(pkg.dependencies),
@@ -34,7 +32,7 @@ export default [
         banner,
         file: pkg.main,
         format: "cjs",
-      }
-    ]
+      },
+    ],
   },
 ];

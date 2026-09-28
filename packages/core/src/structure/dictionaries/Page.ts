@@ -11,14 +11,8 @@ interface PageInheritable {
   Rotate: number;
 }
 
-export abstract class PageDictionary
-  extends objects.PDFDictionary
-  implements PageInheritable
-{
-  public createMediaBox(
-    width: TypographySize,
-    heigh: TypographySize
-  ): PDFRectangle {
+export abstract class PageDictionary extends objects.PDFDictionary implements PageInheritable {
+  public createMediaBox(width: TypographySize, heigh: TypographySize): PDFRectangle {
     const w = TypographyConverter.toPoint(width);
     const h = TypographyConverter.toPoint(heigh);
 
@@ -27,18 +21,9 @@ export abstract class PageDictionary
 
   public abstract Parent: PageDictionary | null;
 
-  protected getInherited<
-    T extends keyof PageInheritable,
-    R extends objects.PDFObject
-  >(name: T, type: new () => R, optional?: false): R;
-  protected getInherited<
-    T extends keyof PageInheritable,
-    R extends objects.PDFObject
-  >(name: T, type: new () => R, optional: true): R | null;
-  protected getInherited<
-    T extends keyof PageInheritable,
-    R extends objects.PDFObject
-  >(name: T, type: new () => R, optional = false): R | null {
+  protected getInherited<T extends keyof PageInheritable, R extends objects.PDFObject>(name: T, type: new () => R, optional?: false): R;
+  protected getInherited<T extends keyof PageInheritable, R extends objects.PDFObject>(name: T, type: new () => R, optional: true): R | null;
+  protected getInherited<T extends keyof PageInheritable, R extends objects.PDFObject>(name: T, type: new () => R, optional = false): R | null {
     if (!this.has(name)) {
       if (!this.Parent) {
         if (optional) {
@@ -112,10 +97,7 @@ export abstract class PageDictionary
     }
   }
 
-  public addResource(
-    resource: objects.PDFObject,
-    preferredName: string
-  ): string {
+  public addResource(resource: objects.PDFObject, preferredName: string): string {
     if (resource instanceof objects.PDFDictionary) {
       if (resource.has("Type")) {
         const type = resource.get("Type", objects.PDFName).text;
@@ -123,16 +105,11 @@ export abstract class PageDictionary
           if (!this.Resources.XObject) {
             this.Resources.XObject = this.getDocument().createDictionary();
           }
-          this.Resources.XObject.set(
-            preferredName ?? UUID.generate(),
-            resource.makeIndirect()
-          );
+          this.Resources.XObject.set(preferredName ?? UUID.generate(), resource.makeIndirect());
         }
       }
     }
 
-    throw new TypeError(
-      "Cannot add the resource to the page. Unsupported type of the resource."
-    );
+    throw new TypeError("Cannot add the resource to the page. Unsupported type of the resource.");
   }
 }

@@ -3,21 +3,10 @@ import { PDFArray } from "../../objects/Array";
 import { TypographyConverter, TypographySize } from "../../TypographyConverter";
 
 /** Array of 6 numbers representing a transformation matrix [a,b,c,d,e,f] */
-export type MetricsNumberArray = [
-  number,
-  number,
-  number,
-  number,
-  number,
-  number
-];
+export type MetricsNumberArray = [number, number, number, number, number, number];
 
 /** 3x3 transformation matrix representation */
-export type TransformationMatrix = [
-  [number, number, 0],
-  [number, number, 0],
-  [number, number, 1]
-];
+export type TransformationMatrix = [[number, number, 0], [number, number, 0], [number, number, 1]];
 
 /** Rotation transformation parameters */
 export interface RotateTransformation {
@@ -53,11 +42,7 @@ export interface SkewTransformation {
   b: number;
 }
 
-export type Transformation =
-  | ScaleTransformation
-  | RotateTransformation
-  | SkewTransformation
-  | TranslateTransformation;
+export type Transformation = ScaleTransformation | RotateTransformation | SkewTransformation | TranslateTransformation;
 export type Transformations = Transformation[];
 
 /**
@@ -89,7 +74,7 @@ export class Metrics extends PDFArray {
     return [
       [metrics[0], metrics[1], 0],
       [metrics[2], metrics[3], 0],
-      [metrics[4], metrics[5], 1]
+      [metrics[4], metrics[5], 1],
     ];
   }
 
@@ -179,14 +164,7 @@ export class Metrics extends PDFArray {
    * Initializes the metrics with identity matrix values
    */
   protected override onCreate(): void {
-    this.items = [
-      new PDFNumeric(1),
-      new PDFNumeric(0),
-      new PDFNumeric(0),
-      new PDFNumeric(1),
-      new PDFNumeric(0),
-      new PDFNumeric(0)
-    ];
+    this.items = [new PDFNumeric(1), new PDFNumeric(0), new PDFNumeric(0), new PDFNumeric(1), new PDFNumeric(0), new PDFNumeric(0)];
   }
 
   /**
@@ -194,14 +172,7 @@ export class Metrics extends PDFArray {
    * @returns Array of 6 numbers [a,b,c,d,e,f]
    */
   public toArray(): MetricsNumberArray {
-    return [
-      this.get(0, PDFNumeric).value,
-      this.get(1, PDFNumeric).value,
-      this.get(2, PDFNumeric).value,
-      this.get(3, PDFNumeric).value,
-      this.get(4, PDFNumeric).value,
-      this.get(5, PDFNumeric).value
-    ];
+    return [this.get(0, PDFNumeric).value, this.get(1, PDFNumeric).value, this.get(2, PDFNumeric).value, this.get(3, PDFNumeric).value, this.get(4, PDFNumeric).value, this.get(5, PDFNumeric).value];
   }
 
   /**
@@ -211,10 +182,7 @@ export class Metrics extends PDFArray {
   protected transformMetrics(metrics: MetricsNumberArray): void {
     const current = this.toArray();
 
-    const result = this.multiply(
-      Metrics.toMatrix(current),
-      Metrics.toMatrix(metrics)
-    );
+    const result = this.multiply(Metrics.toMatrix(current), Metrics.toMatrix(metrics));
 
     this.a = result[0][0];
     this.b = result[0][1];
@@ -230,14 +198,7 @@ export class Metrics extends PDFArray {
    * @param y - Vertical translation distance
    */
   public translate(x: TypographySize, y: TypographySize): void {
-    this.transformMetrics([
-      1,
-      0,
-      0,
-      1,
-      TypographyConverter.toPoint(x),
-      TypographyConverter.toPoint(y)
-    ]);
+    this.transformMetrics([1, 0, 0, 1, TypographyConverter.toPoint(x), TypographyConverter.toPoint(y)]);
   }
 
   /**
@@ -312,15 +273,9 @@ export class Metrics extends PDFArray {
       y = b[0].length;
     if (b.length !== z) {
       // XxZ & ZxY => XxY
-      throw new Error(
-        "Number of columns in the first matrix should be the same as the number of rows in the second"
-      );
+      throw new Error("Number of columns in the first matrix should be the same as the number of rows in the second");
     }
-    // eslint-disable-next-line prefer-spread
-    const productRow = Array.apply(null, new Array(y)).map(
-      Number.prototype.valueOf,
-      0
-    );
+    const productRow = Array.apply(null, new Array(y)).map(Number.prototype.valueOf, 0);
     const product = new Array(x);
     for (let p = 0; p < x; p++) {
       product[p] = productRow.slice();

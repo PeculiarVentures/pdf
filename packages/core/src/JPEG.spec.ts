@@ -7,7 +7,7 @@ function createMockJPEGData(
     height?: number;
     channels?: number;
     bitsPerComponent?: number;
-  } = {}
+  } = {},
 ): Uint8Array {
   const data = new Uint8Array([
     0xff,
@@ -21,7 +21,7 @@ function createMockJPEGData(
     (options.height ?? 0x01) & 0xff, // Height low byte
     (options.width ?? 0x01) >> 8, // Width high byte
     (options.width ?? 0x01) & 0xff, // Width low byte
-    options.channels ?? 0x03 // Number of channels
+    options.channels ?? 0x03, // Number of channels
   ]);
   return data;
 }
@@ -45,7 +45,7 @@ describe("JPEG", () => {
         width: 100,
         height: 200,
         channels: 3,
-        bitsPerComponent: 8
+        bitsPerComponent: 8,
       });
 
       const jpeg = JPEG.fromView(mockData);
@@ -59,9 +59,7 @@ describe("JPEG", () => {
 
     it("should throw error for invalid JPEG data", () => {
       const invalidData = new Uint8Array([0x00, 0x00]);
-      expect(() => JPEG.fromView(invalidData)).toThrow(
-        /Cannot get SOI marker from JPEG/
-      );
+      expect(() => JPEG.fromView(invalidData)).toThrow(/Cannot get SOI marker from JPEG/);
     });
 
     it("should throw error when Frame marker is not found", () => {
@@ -69,7 +67,7 @@ describe("JPEG", () => {
         0xff,
         0xd8, // SOI marker
         0xff,
-        0xd9 // EOI marker
+        0xd9, // EOI marker
       ]);
       expect(() => JPEG.fromView(invalidData)).toThrow(RangeError);
     });

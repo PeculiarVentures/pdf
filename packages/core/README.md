@@ -50,10 +50,7 @@ const stringObj = doc.createString("Hello, PDF!");
 const arrayObj = doc.createArray(doc.createNumber(1), doc.createString("item"));
 
 // Create a dictionary
-const dictObj = doc.createDictionary(
-  ["Key1", doc.createNumber(1)],
-  ["Key2", doc.createString("value")]
-);
+const dictObj = doc.createDictionary(["Key1", doc.createNumber(1)], ["Key2", doc.createString("value")]);
 
 // Create stream
 const streamObj = doc.createStream(new Uint8Array([1, 2, 3, 4]));

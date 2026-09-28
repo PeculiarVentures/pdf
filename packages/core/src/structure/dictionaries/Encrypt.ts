@@ -1,10 +1,4 @@
-import {
-  PDFDictionary,
-  PDFNumberField,
-  PDFNameField,
-  PDFMaybeField,
-  Maybe
-} from "../../objects";
+import { PDFDictionary, PDFNumberField, PDFNameField, PDFMaybeField, Maybe } from "../../objects";
 import { CryptoFiltersDictionary } from "./CryptoFilters";
 
 export class EncryptDictionary extends PDFDictionary {

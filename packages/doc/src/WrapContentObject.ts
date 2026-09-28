@@ -9,12 +9,10 @@ import { WrapObject } from "./WrapObject";
 export enum OpacityModes {
   all,
   stroke,
-  fill
+  fill,
 }
 
-export abstract class WrapContentObject<
-  T extends core.PDFDictionary
-> extends WrapObject<T> {
+export abstract class WrapContentObject<T extends core.PDFDictionary> extends WrapObject<T> {
   protected abstract readonly content: core.PDFContent;
 
   public abstract readonly resources: ResourceManager;
@@ -41,23 +39,17 @@ export abstract class WrapContentObject<
 export class WrapContentChild {
   constructor(
     public content: core.PDFContent,
-    protected parent: WrapContentObject<core.PDFDictionary>
+    protected parent: WrapContentObject<core.PDFDictionary>,
   ) {}
 
   protected getY(y: core.TypographySize, original = false): number {
-    const res = original
-      ? core.TypographyConverter.toPoint(y)
-      : this.parent.height +
-        this.parent.bottom -
-        core.TypographyConverter.toPoint(y);
+    const res = original ? core.TypographyConverter.toPoint(y) : this.parent.height + this.parent.bottom - core.TypographyConverter.toPoint(y);
 
     return res;
   }
 
   protected getX(x: core.TypographySize, original = false): number {
-    return original
-      ? core.TypographyConverter.toPoint(x)
-      : this.parent.left + core.TypographyConverter.toPoint(x);
+    return original ? core.TypographyConverter.toPoint(x) : this.parent.left + core.TypographyConverter.toPoint(x);
   }
 }
 
@@ -93,9 +85,7 @@ export class Graphics extends WrapContentChild {
   public opacity(value: number, mode = OpacityModes.all): this {
     this.modify();
 
-    const extGState = core.ExtGStateDictionary.create(
-      this.parent.document.target.update
-    );
+    const extGState = core.ExtGStateDictionary.create(this.parent.document.target.update);
     if (mode === OpacityModes.all || mode === OpacityModes.fill) {
       extGState.ca = value;
     }
@@ -165,11 +155,7 @@ export class Graphics extends WrapContentChild {
     return this;
   }
 
-  public translate(
-    left: core.TypographySize,
-    top: core.TypographySize,
-    original = false
-  ): this {
+  public translate(left: core.TypographySize, top: core.TypographySize, original = false): this {
     left = this.getX(left, original);
     top = this.getY(top, original);
     this.modify();
@@ -205,23 +191,13 @@ export class Graphics extends WrapContentChild {
     return this;
   }
 
-  public drawImage(
-    image: Image,
-    width?: core.TypographySize,
-    height?: core.TypographySize
-  ): this {
+  public drawImage(image: Image, width?: core.TypographySize, height?: core.TypographySize): this {
     width = core.TypographyConverter.toPoint(width || image.width);
     height = core.TypographyConverter.toPoint(height || image.height);
     const form = FormObject.create(this.parent.document, width, height);
 
     if (image.target.ColorSpace instanceof core.PDFArray) {
-      this.parent.resources.target.set(
-        "ColorSpace",
-        this.parent.document.target.createDictionary([
-          this.parent.resources.createNamePrefix(NAME_PREFIX_COLOR_SPEC),
-          image.target.ColorSpace
-        ])
-      );
+      this.parent.resources.target.set("ColorSpace", this.parent.document.target.createDictionary([this.parent.resources.createNamePrefix(NAME_PREFIX_COLOR_SPEC), image.target.ColorSpace]));
     }
 
     this.modify();
@@ -230,19 +206,8 @@ export class Graphics extends WrapContentChild {
     return this.drawObject(form);
   }
 
-  public rect(
-    width: core.TypographySize,
-    height: core.TypographySize,
-    original?: boolean
-  ): this;
-  public rect(
-    left: core.TypographySize,
-    top: core.TypographySize,
-    width: core.TypographySize,
-    height: core.TypographySize,
-    original?: boolean
-  ): this;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public rect(width: core.TypographySize, height: core.TypographySize, original?: boolean): this;
+  public rect(left: core.TypographySize, top: core.TypographySize, width: core.TypographySize, height: core.TypographySize, original?: boolean): this;
   public rect(...args: any[]): this {
     let x, y, width, height: number;
     if (args.length === 2 || args.length === 3) {
@@ -266,12 +231,7 @@ export class Graphics extends WrapContentChild {
     return this;
   }
 
-  public circle(
-    x: core.TypographySize,
-    y: core.TypographySize,
-    r: core.TypographySize,
-    original = false
-  ): this {
+  public circle(x: core.TypographySize, y: core.TypographySize, r: core.TypographySize, original = false): this {
     x = this.getX(x, original);
     y = this.getY(y, original);
 
@@ -281,11 +241,7 @@ export class Graphics extends WrapContentChild {
     return this;
   }
 
-  public pathTo(
-    left: core.TypographySize,
-    top: core.TypographySize,
-    original = false
-  ): this {
+  public pathTo(left: core.TypographySize, top: core.TypographySize, original = false): this {
     left = this.getX(left, original);
     top = this.getY(top, original);
 
@@ -295,11 +251,7 @@ export class Graphics extends WrapContentChild {
     return this;
   }
 
-  public pathLine(
-    left: core.TypographySize,
-    top: core.TypographySize,
-    original = false
-  ): this {
+  public pathLine(left: core.TypographySize, top: core.TypographySize, original = false): this {
     left = this.getX(left, original);
     top = this.getY(top, original);
 
@@ -315,27 +267,13 @@ export class Graphics extends WrapContentChild {
     return this;
   }
 
-  public line(
-    x1: core.TypographySize,
-    y1: core.TypographySize,
-    x2: core.TypographySize,
-    y2: core.TypographySize,
-    original = false
-  ): this {
+  public line(x1: core.TypographySize, y1: core.TypographySize, x2: core.TypographySize, y2: core.TypographySize, original = false): this {
     return this.pathTo(x1, y1, original).pathLine(x2, y2, original);
   }
 
-  public drawText(
-    textBlock: font.TextCalculateParams | font.TextBlocks,
-    left: core.TypographySize = 0,
-    top: core.TypographySize = 0
-  ): this {
+  public drawText(textBlock: font.TextCalculateParams | font.TextBlocks, left: core.TypographySize = 0, top: core.TypographySize = 0): this {
     if (!(textBlock instanceof font.TextBlocks)) {
-      return this.drawText(
-        font.TextSizeCounter.calculate(textBlock),
-        left,
-        top
-      );
+      return this.drawText(font.TextSizeCounter.calculate(textBlock), left, top);
     }
 
     left = this.getX(left);
@@ -352,11 +290,7 @@ export class Graphics extends WrapContentChild {
 
       // Set text position for the first line
       const firstRow = textBlock.rows[0];
-      const textScope = this.text().move(
-        left + firstRow.left,
-        top - firstRow.ascent,
-        true
-      );
+      const textScope = this.text().move(left + firstRow.left, top - firstRow.ascent, true);
       let lastRow: font.TextRow | null = null;
       let lastItem: font.TextRowItem | null = null;
       let lastLeading = 0;
@@ -374,9 +308,7 @@ export class Graphics extends WrapContentChild {
 
         for (const item of row.items) {
           if (!(lastItem && lastItem.original === item.original)) {
-            textScope
-              .color(item.original.style.color)
-              .font(item.original.font, item.original.style.size);
+            textScope.color(item.original.style.color).font(item.original.font, item.original.style.size);
           }
           textScope.show(item.text);
 
@@ -413,9 +345,7 @@ export class Text extends WrapContentChild {
 
   private get lastFont(): font.FontComponent {
     if (!this.#font) {
-      const defaultFont = (this.#font = font.FontComponent.addFont(
-        this.parent.document
-      ));
+      const defaultFont = (this.#font = font.FontComponent.addFont(this.parent.document));
       this.font(defaultFont, this.lastFontSize);
     }
 
@@ -455,19 +385,14 @@ export class Text extends WrapContentChild {
     return this;
   }
 
-  public move(
-    x: core.TypographySize,
-    y: core.TypographySize,
-    original = false
-  ): this {
+  public move(x: core.TypographySize, y: core.TypographySize, original = false): this {
     x = this.getX(x, original);
     y = this.getY(y, original);
 
     if (!original) {
       const fontSize = this.lastFontSize;
       const font = this.lastFont;
-      const ascent =
-        (font.fontInfo.ascent / font.fontInfo.unitsPerEm) * fontSize;
+      const ascent = (font.fontInfo.ascent / font.fontInfo.unitsPerEm) * fontSize;
 
       y -= ascent;
     }

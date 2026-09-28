@@ -5,10 +5,7 @@ import type { EncryptionObject } from "./EncryptionObject";
 import { PDFString } from "./String";
 import { TextEncoder } from "./TextEncoder";
 
-export abstract class PDFTextString
-  extends PDFString
-  implements EncryptionObject
-{
+export abstract class PDFTextString extends PDFString implements EncryptionObject {
   public encrypted?: boolean;
 
   public async encryptAsync(): Promise<ArrayBuffer> {

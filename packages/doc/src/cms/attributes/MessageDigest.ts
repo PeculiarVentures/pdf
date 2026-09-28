@@ -25,13 +25,10 @@ export class MessageDigestAttribute extends CmsAttribute {
     this.asn.type = MessageDigestAttribute.DEFAULT_IDENTIFIER;
     this.asn.values.push(
       new asn1js.OctetString({
-        valueHex: BufferSourceConverter.toArrayBuffer(digest)
-      })
+        valueHex: BufferSourceConverter.toArrayBuffer(digest),
+      }),
     );
   }
 }
 
-CmsAttributeFactory.register(
-  MessageDigestAttribute.DEFAULT_IDENTIFIER,
-  MessageDigestAttribute
-);
+CmsAttributeFactory.register(MessageDigestAttribute.DEFAULT_IDENTIFIER, MessageDigestAttribute);

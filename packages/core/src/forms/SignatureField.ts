@@ -20,7 +20,7 @@ export class SignatureField extends PDFField {
   @objects.PDFDictionaryField({
     name: "V",
     type: SignatureDictionary,
-    optional: true
+    optional: true,
   })
   public override V!: SignatureDictionary | null;
 
@@ -42,7 +42,7 @@ export class SignatureField extends PDFField {
   @objects.PDFDictionaryField({
     name: "SV",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public SV!: objects.PDFDictionary | null;
 

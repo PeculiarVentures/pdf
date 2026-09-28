@@ -1,13 +1,4 @@
-import {
-  PDFArray,
-  PDFArrayField,
-  PDFDictionary,
-  PDFDictionaryField,
-  PDFNumberField,
-  PDFNameField,
-  PDFTextString,
-  PDFTextStringField
-} from "../../objects";
+import { PDFArray, PDFArrayField, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFNameField, PDFTextString, PDFTextStringField } from "../../objects";
 
 export class MeasureDictionary extends PDFDictionary {
   public static readonly TYPE = "PtData";
@@ -168,7 +159,7 @@ export class GeospatialMeasureDictionary extends MeasureDictionary {
    * @remarks PDF 2.0
    */
   @PDFDictionaryField({
-    name: "GCS"
+    name: "GCS",
   })
   public gcs!: PDFDictionary;
 
@@ -181,7 +172,7 @@ export class GeospatialMeasureDictionary extends MeasureDictionary {
    */
   @PDFDictionaryField({
     name: "DCS",
-    optional: true
+    optional: true,
   })
   public dcs!: PDFDictionary | null;
 
@@ -271,13 +262,10 @@ export class GeospatialMeasureDictionary extends MeasureDictionary {
 export class MeasureFactory {
   public static items = new Map<string, typeof MeasureDictionary>([
     [RectilinearMeasureDictionary.SUBTYPE, RectilinearMeasureDictionary],
-    [GeospatialMeasureDictionary.SUBTYPE, GeospatialMeasureDictionary]
+    [GeospatialMeasureDictionary.SUBTYPE, GeospatialMeasureDictionary],
   ]);
 
-  public static register(
-    subtype: string,
-    value: typeof MeasureDictionary
-  ): void {
+  public static register(subtype: string, value: typeof MeasureDictionary): void {
     this.items.set(subtype, value);
   }
 

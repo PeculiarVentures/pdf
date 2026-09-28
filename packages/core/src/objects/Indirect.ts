@@ -8,7 +8,7 @@ export abstract class PDFIndirect extends PDFObject implements IPDFIndirect {
   public constructor(id: number, generation?: number);
   public constructor(
     public id = 0,
-    public generation = 0
+    public generation = 0,
   ) {
     super();
   }
@@ -56,11 +56,7 @@ export abstract class PDFIndirect extends PDFObject implements IPDFIndirect {
   }
 
   protected onEqual(target: PDFObject): boolean {
-    return (
-      target instanceof PDFIndirect &&
-      target.id === this.id &&
-      target.generation === this.generation
-    );
+    return target instanceof PDFIndirect && target.id === this.id && target.generation === this.generation;
   }
 }
 

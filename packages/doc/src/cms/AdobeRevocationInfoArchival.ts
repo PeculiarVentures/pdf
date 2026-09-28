@@ -1,12 +1,6 @@
 import { CertificateList } from "@peculiar/asn1-x509";
 import { OCSPResponse } from "@peculiar/asn1-ocsp";
-import {
-  AsnConvert,
-  AsnProp,
-  AsnPropTypes,
-  AsnType,
-  AsnTypeTypes
-} from "@peculiar/asn1-schema";
+import { AsnConvert, AsnProp, AsnPropTypes, AsnType, AsnTypeTypes } from "@peculiar/asn1-schema";
 import * as asn1js from "asn1js";
 import { CmsAttribute } from "./attributes/Attribute";
 import { CmsAttributeFactory } from "./attributes/AttributeFactory";
@@ -59,7 +53,7 @@ export class RevocationInfoArchival {
     implicit: false,
     repeated: "sequence",
     context: 0,
-    optional: true
+    optional: true,
   })
   public crl?: CertificateList[];
 
@@ -68,7 +62,7 @@ export class RevocationInfoArchival {
     implicit: false,
     repeated: "sequence",
     context: 1,
-    optional: true
+    optional: true,
   })
   public ocsp?: OCSPResponse[];
 
@@ -77,7 +71,7 @@ export class RevocationInfoArchival {
     implicit: false,
     repeated: "sequence",
     context: 2,
-    optional: true
+    optional: true,
   })
   public otherRevInfo?: OtherRevInfo[];
 
@@ -177,7 +171,7 @@ export class AdobeRevocationInfoArchival extends CmsAttribute {
     const revInfo = new RevocationInfoArchival({
       crl,
       ocsp,
-      otherRevInfo: otherRevInfos
+      otherRevInfo: otherRevInfos,
     });
     const revInfoRaw = AsnConvert.serialize(revInfo);
     const asnValue = asn1js.fromBER(revInfoRaw);
@@ -185,7 +179,4 @@ export class AdobeRevocationInfoArchival extends CmsAttribute {
   }
 }
 
-CmsAttributeFactory.register(
-  AdobeRevocationInfoArchival.DEFAULT_IDENTIFIER,
-  AdobeRevocationInfoArchival
-);
+CmsAttributeFactory.register(AdobeRevocationInfoArchival.DEFAULT_IDENTIFIER, AdobeRevocationInfoArchival);

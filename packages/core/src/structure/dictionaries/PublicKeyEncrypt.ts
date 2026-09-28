@@ -44,7 +44,7 @@ export enum PublicKeyPermissionFlags {
    * is set), printing shall be limited to a low-level representation of the
    * appearance, possibly of degraded quality.
    */
-  printRepresentation = 1 << 11
+  printRepresentation = 1 << 11,
 }
 
 export class PublicKeyEncryptDictionary extends EncryptDictionary {

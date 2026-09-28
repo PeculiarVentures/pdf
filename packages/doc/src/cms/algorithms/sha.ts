@@ -1,11 +1,7 @@
 import * as asn1js from "asn1js";
 import * as pkijs from "pkijs";
 import { Convert } from "pvtsutils";
-import {
-  AlgorithmFactory,
-  AlgorithmConverter,
-  HashedAlgorithm
-} from "../AlgorithmFactory";
+import { AlgorithmFactory, AlgorithmConverter, HashedAlgorithm } from "../AlgorithmFactory";
 
 const id_sha1 = "1.3.14.3.2.26";
 const id_sha256 = "2.16.840.1.101.3.4.2.1";
@@ -37,7 +33,7 @@ export const shaAlgorithmConverter: AlgorithmConverter = {
   fromBER(raw: ArrayBuffer): Algorithm | null {
     const asn = asn1js.fromBER(raw);
     const algorithmIdentifier = new pkijs.AlgorithmIdentifier({
-      schema: asn.result
+      schema: asn.result,
     });
 
     switch (algorithmIdentifier.algorithmId) {
@@ -52,7 +48,7 @@ export const shaAlgorithmConverter: AlgorithmConverter = {
     }
 
     return null;
-  }
+  },
 };
 
 AlgorithmFactory.register(shaAlgorithmConverter);

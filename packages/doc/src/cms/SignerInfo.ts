@@ -52,7 +52,7 @@ export enum CMSSignerInfoVerifyResultCodes {
   /**
    * Error during verification
    */
-  unknown = 15
+  unknown = 15,
 }
 
 export interface CMSSignerInfoVerifyResult {
@@ -68,13 +68,13 @@ export enum CMSContentType {
   data = "1.2.840.113549.1.7.1",
   signedData = "1.2.840.113549.1.7.2",
   envelopedData = "1.2.840.113549.1.7.3",
-  signedAndEnvelopedData = "1.2.840.113549.1.7.4"
+  signedAndEnvelopedData = "1.2.840.113549.1.7.4",
 }
 
 export enum CMSAttributeTypes {
   contentType = "1.2.840.113549.1.9.3",
   signingTime = "1.2.840.113549.1.9.4",
-  messageDigest = "1.2.840.113549.1.9.5"
+  messageDigest = "1.2.840.113549.1.9.5",
 }
 export class CMSSignerInfo extends AsnEncoded<pkijs.SignerInfo> {
   public parent: CMSSignedData | null = null;
@@ -86,26 +86,19 @@ export class CMSSignerInfo extends AsnEncoded<pkijs.SignerInfo> {
     super();
 
     this.asn = new pkijs.SignerInfo({
-      version: 1
+      version: 1,
     });
   }
 
   protected onFromSchema(schema: pkijs.SchemaType): pkijs.SignerInfo {
-    const result =
-      schema instanceof pkijs.SignerInfo
-        ? schema
-        : new pkijs.SignerInfo({ schema });
+    const result = schema instanceof pkijs.SignerInfo ? schema : new pkijs.SignerInfo({ schema });
 
     // Load attributes
     if (result.signedAttrs) {
-      this.signedAttributes = this.readAttributes(
-        result.signedAttrs.attributes
-      );
+      this.signedAttributes = this.readAttributes(result.signedAttrs.attributes);
     }
     if (result.unsignedAttrs) {
-      this.unsignedAttributes = this.readAttributes(
-        result.unsignedAttrs.attributes
-      );
+      this.unsignedAttributes = this.readAttributes(result.unsignedAttrs.attributes);
     }
 
     return result;
@@ -142,10 +135,7 @@ export class CMSSignerInfo extends AsnEncoded<pkijs.SignerInfo> {
     return this.asn.signature.valueBlock.valueHex;
   }
 
-  public async verify(
-    data?: BufferSource,
-    checkDate = new Date()
-  ): Promise<CMSSignerInfoVerifyResult> {
+  public async verify(data?: BufferSource, checkDate = new Date()): Promise<CMSSignerInfoVerifyResult> {
     const signedData = this.getParent();
 
     const result = await signedData.verify(data, checkDate, this);
@@ -167,15 +157,10 @@ export class CMSSignerInfo extends AsnEncoded<pkijs.SignerInfo> {
 
     if (this.asn.sid instanceof pkijs.IssuerAndSerialNumber) {
       // IssuerAndSerialNumber
-      cert = await parent.certificateHandler.findCertificate(
-        this.asn.sid.serialNumber.valueBeforeDecode,
-        this.asn.sid.issuer.toSchema().toBER()
-      );
+      cert = await parent.certificateHandler.findCertificate(this.asn.sid.serialNumber.valueBeforeDecode, this.asn.sid.issuer.toSchema().toBER());
     } else {
       // OctetString
-      cert = await parent.certificateHandler.findCertificate(
-        this.asn.sid.valueBlock.valueHex
-      );
+      cert = await parent.certificateHandler.findCertificate(this.asn.sid.valueBlock.valueHex);
     }
 
     if (!cert) {
@@ -194,7 +179,7 @@ export class CMSSignerInfo extends AsnEncoded<pkijs.SignerInfo> {
 
       this.asn.unsignedAttrs = new pkijs.SignedAndUnsignedAttributes({
         type: 1,
-        attributes: attrs
+        attributes: attrs,
       });
     }
 

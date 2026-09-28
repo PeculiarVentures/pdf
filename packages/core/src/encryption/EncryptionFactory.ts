@@ -5,10 +5,7 @@ import { PublicKeyEncryptionHandler } from "./PublicKeyEncryptionHandler";
 import { StandardEncryptionHandler } from "./StandardEncryptionHandler";
 
 export interface EncryptionHandlerConstructor {
-  new (
-    dictionary: EncryptDictionary,
-    crypot: pkijs.ICryptoEngine
-  ): EncryptionHandler;
+  new (dictionary: EncryptDictionary, crypot: pkijs.ICryptoEngine): EncryptionHandler;
   NAME: string;
 }
 
@@ -16,9 +13,7 @@ export interface EncryptionHandlerConstructor {
  * Represents the global registry for encryption handlers. PDF document uses it for encryption handler getting
  */
 export class EncryptionFactory {
-  public static handlers = new Map<string, EncryptionHandlerConstructor>([
-    [StandardEncryptionHandler.NAME, StandardEncryptionHandler]
-  ]);
+  public static handlers = new Map<string, EncryptionHandlerConstructor>([[StandardEncryptionHandler.NAME, StandardEncryptionHandler]]);
 
   /**
    * Registers encryption handler in the registry

@@ -1,26 +1,9 @@
 import { Convert } from "pvtsutils";
-import {
-  PDFArray,
-  PDFDictionary,
-  PDFDictionaryField,
-  PDFNumberField,
-  PDFName,
-  PDFNameField,
-  PDFNumeric,
-  PDFStream,
-  Maybe,
-  PDFMaybeField
-} from "../objects";
+import { PDFArray, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFName, PDFNameField, PDFNumeric, PDFStream, Maybe, PDFMaybeField } from "../objects";
 import { CatalogDictionary } from "./dictionaries/Catalog";
 import { CrossReference } from "./CrossReference";
 import { PDFDocumentObject, PDFDocumentObjectTypes } from "./DocumentObject";
-import {
-  EncryptDictionary,
-  InformationDictionary,
-  PublicKeyEncryptDictionary,
-  StandardEncryptDictionary,
-  TrailerDictionary
-} from "./dictionaries";
+import { EncryptDictionary, InformationDictionary, PublicKeyEncryptDictionary, StandardEncryptDictionary, TrailerDictionary } from "./dictionaries";
 import { PDFTextString } from "../objects/TextString";
 import { ViewWriter } from "../ViewWriter";
 import { PDFDocumentObjectGrouper } from "./DocumentObjectGrouper";
@@ -54,10 +37,7 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
    * @param position
    * @returns
    */
-  public static getIdentifier(
-    indexes: CrossReferenceIndex[],
-    position: number
-  ): number {
+  public static getIdentifier(indexes: CrossReferenceIndex[], position: number): number {
     let current = 0;
     for (const index of indexes) {
       if (current + index.size > position) {
@@ -65,9 +45,7 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
       }
       current += index.size;
     }
-    throw new RangeError(
-      "Argument 'position' is greater than amount of items in the Cross-Reference Stream"
-    );
+    throw new RangeError("Argument 'position' is greater than amount of items in the Cross-Reference Stream");
   }
 
   /**
@@ -101,7 +79,7 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
   @PDFDictionaryField({
     name: "Root",
     type: CatalogDictionary,
-    indirect: true
+    indirect: true,
   })
   public Root!: CatalogDictionary;
 
@@ -127,7 +105,7 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
         }
       }
       throw new Error("Wrong type for 'Filter'");
-    }
+    },
   })
   public Encrypt!: null | EncryptDictionary;
 
@@ -150,7 +128,7 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
     name: "ID",
     type: PDFArray,
     optional: true,
-    get: (o) => o.items
+    get: (o) => o.items,
   })
   public ID!: null | PDFTextString[];
 
@@ -167,9 +145,7 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
         if (n instanceof PDFNumeric) {
           return n.value;
         }
-        throw new Error(
-          "Unsupported type in Index filed item of the Cross-Reference stream"
-        );
+        throw new Error("Unsupported type in Index filed item of the Cross-Reference stream");
       });
 
       // split to pairs
@@ -177,7 +153,7 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
       for (let i = 0; i < items.length; i++) {
         pairs.push({
           start: items[i++],
-          size: items[i]
+          size: items[i],
         });
       }
 
@@ -191,7 +167,7 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
       }
 
       return new PDFArray(...result);
-    }
+    },
   })
   public Index!: null | CrossReferenceIndex[];
 
@@ -208,12 +184,9 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
         if (o instanceof PDFNumeric) {
           return o.value;
         }
-        throw new Error(
-          "Unsupported type in W item of the Cross-Reference stream"
-        );
+        throw new Error("Unsupported type in W item of the Cross-Reference stream");
       }),
-    set: (value: number[]) =>
-      new PDFArray(...value.map((o) => new PDFNumeric(o)))
+    set: (value: number[]) => new PDFArray(...value.map((o) => new PDFNumeric(o))),
   })
   public W!: number[];
 
@@ -256,10 +229,7 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
   private numberToUint8Array(number: number, size: number): Uint8Array {
     const res = new Uint8Array(size);
     const numberArray = Convert.FromHex(number.toString(16));
-    res.set(
-      new Uint8Array(numberArray),
-      res.byteLength - numberArray.byteLength
-    );
+    res.set(new Uint8Array(numberArray), res.byteLength - numberArray.byteLength);
 
     return res;
   }
@@ -317,7 +287,6 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
     }
 
     // TODO Implement via static function and Trailer Dictionary interface
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (TrailerDictionary.prototype as any).onCreate.call(this);
   }
 
@@ -327,19 +296,13 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
     for (const object of this.objects) {
       switch (object.type) {
         case PDFDocumentObjectTypes.compressed:
-          res.push(
-            `  compressed id:${object.id} stream:${object.offset} index:${object.generation}`
-          );
+          res.push(`  compressed id:${object.id} stream:${object.offset} index:${object.generation}`);
           break;
         case PDFDocumentObjectTypes.free:
-          res.push(
-            `  free       id:${object.id} next:${object.offset} gen:${object.generation}`
-          );
+          res.push(`  free       id:${object.id} next:${object.offset} gen:${object.generation}`);
           break;
         case PDFDocumentObjectTypes.inUse:
-          res.push(
-            `  in-use     id:${object.id} offset:${object.offset} gen:${object.generation}`
-          );
+          res.push(`  in-use     id:${object.id} offset:${object.offset} gen:${object.generation}`);
           break;
       }
     }
@@ -400,15 +363,11 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
           break;
         }
         default:
-          throw new ParsingError(
-            "Unsupported type in PDF Cross-Reference stream"
-          );
+          throw new ParsingError("Unsupported type in PDF Cross-Reference stream");
       }
 
       if (!this.documentUpdate) {
-        throw new ParsingError(
-          "Cross-Reference stream does not have document update. Please set it before parsing."
-        );
+        throw new ParsingError("Cross-Reference stream does not have document update. Please set it before parsing.");
       }
 
       const docObject = new PDFDocumentObject({
@@ -416,7 +375,7 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
         documentUpdate: this.documentUpdate,
         id: index,
         offset: field2,
-        generation: field3
+        generation: field3,
       });
       this.addObject(docObject);
 

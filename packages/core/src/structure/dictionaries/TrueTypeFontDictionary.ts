@@ -1,11 +1,4 @@
-import {
-  PDFArray,
-  PDFArrayField,
-  PDFDictionaryField,
-  PDFNameField,
-  PDFNumberField,
-  PDFStream
-} from "../../objects";
+import { PDFArray, PDFArrayField, PDFDictionaryField, PDFNameField, PDFNumberField, PDFStream } from "../../objects";
 import { FontDictionary } from "./FontDictionary";
 
 export class TrueTypeFontDictionary extends FontDictionary {
@@ -77,7 +70,7 @@ export class TrueTypeFontDictionary extends FontDictionary {
   @PDFDictionaryField({
     name: "ToUnicode",
     type: PDFStream,
-    optional: true
+    optional: true,
   })
   public ToUnicode!: PDFStream | null;
 

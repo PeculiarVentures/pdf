@@ -18,17 +18,13 @@ describe("RunLengthFilter", () => {
       // 0x02 means next 3 bytes are literal
       const literal = new Uint8Array([0x02, 0x41, 0x42, 0x43, 0x80]);
       const literalResult = await filter.decode(literal);
-      expect(new Uint8Array(literalResult)).toEqual(
-        new Uint8Array([0x41, 0x42, 0x43])
-      );
+      expect(new Uint8Array(literalResult)).toEqual(new Uint8Array([0x41, 0x42, 0x43]));
 
       // Test case 2: Repeated run
       // 0xFF means repeat next byte 2 times (257 - 255)
       const repeated = new Uint8Array([0xff, 0x41, 0x80]);
       const repeatedResult = await filter.decode(repeated);
-      expect(new Uint8Array(repeatedResult)).toEqual(
-        new Uint8Array([0x41, 0x41])
-      );
+      expect(new Uint8Array(repeatedResult)).toEqual(new Uint8Array([0x41, 0x41]));
     });
 
     it("should handle multiple runs in the same stream", async () => {
@@ -42,21 +38,17 @@ describe("RunLengthFilter", () => {
         0x01,
         0x59,
         0x5a, // literal run of 2 bytes
-        0x80 // EOD
+        0x80, // EOD
       ]);
       const result = await filter.decode(mixed);
-      expect(new Uint8Array(result)).toEqual(
-        new Uint8Array([0x41, 0x42, 0x43, 0x58, 0x58, 0x58, 0x59, 0x5a])
-      );
+      expect(new Uint8Array(result)).toEqual(new Uint8Array([0x41, 0x42, 0x43, 0x58, 0x58, 0x58, 0x59, 0x5a]));
     });
   });
 
   describe("encode", () => {
     it("should throw error for unimplemented encode method", async () => {
       const data = new Uint8Array([0x41, 0x42, 0x43]);
-      await expect(filter.encode(data)).rejects.toThrow(
-        "Method not implemented"
-      );
+      await expect(filter.encode(data)).rejects.toThrow("Method not implemented");
     });
 
     it("should throw error for unimplemented encodeSync method", () => {
@@ -69,9 +61,7 @@ describe("RunLengthFilter", () => {
     it("should decode data synchronously", () => {
       const input = new Uint8Array([0x02, 0x41, 0x42, 0x43, 0x80]);
       const result = filter.decodeSync(input);
-      expect(new Uint8Array(result)).toEqual(
-        new Uint8Array([0x41, 0x42, 0x43])
-      );
+      expect(new Uint8Array(result)).toEqual(new Uint8Array([0x41, 0x42, 0x43]));
     });
 
     it("should handle empty content", () => {

@@ -13,16 +13,11 @@ import { PDFNumeric } from "./Numeric";
 import type { PDFArray } from "./Array";
 
 const streamChars = new Uint8Array([0x73, 0x74, 0x72, 0x65, 0x61, 0x6d]);
-const endStreamChars = new Uint8Array([
-  0x65, 0x6e, 0x64, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d
-]);
+const endStreamChars = new Uint8Array([0x65, 0x6e, 0x64, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d]);
 
 //#region Filed handlers
 
-function getDecodeParamsHandler(
-  this: PDFStream,
-  obj: PDFObjectTypes
-): Array<PDFDictionary | null> {
+function getDecodeParamsHandler(this: PDFStream, obj: PDFObjectTypes): Array<PDFDictionary | null> {
   if (typeOf(obj, ObjectTypeEnum.Dictionary)) {
     return [obj];
   } else if (typeOf(obj, ObjectTypeEnum.Array)) {
@@ -34,9 +29,7 @@ function getDecodeParamsHandler(
       } else if (typeOf(item, ObjectTypeEnum.Null)) {
         res.push(null);
       } else {
-        throw new TypeError(
-          "Unsupported type of DecodeParms subitem in the PDF Stream"
-        );
+        throw new TypeError("Unsupported type of DecodeParms subitem in the PDF Stream");
       }
     }
 
@@ -64,14 +57,14 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
 
   @PDFDictionaryField({
     name: "Length",
-    type: PDFNumeric
+    type: PDFNumeric,
   })
   public length!: PDFNumeric;
 
   @PDFDictionaryField({
     name: "Filter",
     optional: true,
-    cache: true
+    cache: true,
   })
   public filter!: PDFArray | PDFName | null;
 
@@ -79,17 +72,13 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
     name: "DecodeParms",
     get: getDecodeParamsHandler,
     optional: true,
-    cache: true
+    cache: true,
   })
   public decodeParams!: Array<PDFDictionary | null> | null;
 
   public static readonly DEFAULT_STREAM = new Uint8Array();
 
-  public static async createAsync(
-    data: BufferSource,
-    filters: Filter[] = [],
-    parameters?: { [key: string]: PDFObjectTypes }
-  ): Promise<PDFStream> {
+  public static async createAsync(data: BufferSource, filters: Filter[] = [], parameters?: { [key: string]: PDFObjectTypes }): Promise<PDFStream> {
     // Apply filters
     let filteredStream = BufferSourceConverter.toUint8Array(data);
     for (const filter of filters) {
@@ -105,9 +94,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
         stream.filter = new PDFName(filters[0].name);
       } else {
         const ArrayConstructor = PDFObjectReader.get(ObjectTypeEnum.Array);
-        stream.filter = new ArrayConstructor(
-          ...filters.map((o) => new PDFName(o.name))
-        );
+        stream.filter = new ArrayConstructor(...filters.map((o) => new PDFName(o.name)));
       }
     }
 
@@ -120,7 +107,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
   }
 
   private _stream = {
-    view: PDFStream.DEFAULT_STREAM
+    view: PDFStream.DEFAULT_STREAM,
   };
 
   public get stream(): Uint8Array {
@@ -185,15 +172,9 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
     if (endStreamPosition === -1) {
       throw new ParsingError("Cannot find 'endstream' keyword");
     }
-    if (
-      reader.view[endStreamPosition - 2] === 0x0d &&
-      reader.view[endStreamPosition - 1] === 0x0a
-    ) {
+    if (reader.view[endStreamPosition - 2] === 0x0d && reader.view[endStreamPosition - 1] === 0x0a) {
       endStreamPosition -= 2;
-    } else if (
-      reader.view[endStreamPosition - 1] === 0x0a ||
-      reader.view[endStreamPosition - 1] === 0x0d
-    ) {
+    } else if (reader.view[endStreamPosition - 1] === 0x0a || reader.view[endStreamPosition - 1] === 0x0d) {
       endStreamPosition -= 1;
     } else {
       throw new ParsingError("Wrong end of line (must be \\r\\n or \\n)");
@@ -201,11 +182,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
     this.stream = reader.view.subarray(startPosition, endStreamPosition);
     reader.position = endStreamPosition;
 
-    if (
-      this.has("Filter") ||
-      (!(this.has("Type") && this.get("Type", PDFName).text === "XRef") &&
-        this.documentUpdate?.document.encryptHandler)
-    ) {
+    if (this.has("Filter") || (!(this.has("Type") && this.get("Type", PDFName).text === "XRef") && this.documentUpdate?.document.encryptHandler)) {
       this.encrypted = true;
     }
 
@@ -314,10 +291,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
     }
 
     if (!this.encrypted) {
-      if (
-        this.documentUpdate?.document.encryptHandler &&
-        !(this.has("Type") && this.get("Type", PDFName).text === "XRef")
-      ) {
+      if (this.documentUpdate?.document.encryptHandler && !(this.has("Type") && this.get("Type", PDFName).text === "XRef")) {
         // The cross-reference stream shall not be encrypted and strings appearing in the cross-reference
         // stream dictionary shall not be encrypted. It shall not have a Filter entry that specifies a Crypt filter
         const encryptedText = await this.encryptAsync();
@@ -351,9 +325,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
                   const indirect = this.getIndirect();
                   ref = ` (R ${indirect.id} ${indirect.generation})`;
                 }
-                throw new Error(
-                  `Cannot decrypt PDF stream${ref}. ${e.message}`
-                );
+                throw new Error(`Cannot decrypt PDF stream${ref}. ${e.message}`);
               }
             }
           }
@@ -379,10 +351,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
       return streamView;
     }
 
-    return this.documentUpdate.document.encryptHandler.encrypt(
-      streamView,
-      this
-    );
+    return this.documentUpdate.document.encryptHandler.encrypt(streamView, this);
   }
 
   public async decryptAsync(): Promise<ArrayBuffer> {
@@ -393,10 +362,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
       return streamView;
     }
 
-    return this.documentUpdate.document.encryptHandler.decrypt(
-      streamView,
-      this
-    );
+    return this.documentUpdate.document.encryptHandler.decrypt(streamView, this);
   }
 
   protected override onCopy(copy: PDFStream): void {
@@ -419,10 +385,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
       if (options.disableAscii85Encoding) {
         this.filter = update.document.createName("FlateDecode");
       } else {
-        this.filter = update.document.createArray(
-          update.document.createName("ASCII85Decode"),
-          update.document.createName("FlateDecode")
-        );
+        this.filter = update.document.createArray(update.document.createName("ASCII85Decode"), update.document.createName("FlateDecode"));
       }
     }
   }
@@ -464,10 +427,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
     }
   }
 
-  public override to<T extends PDFDictionary>(
-    type: new () => T,
-    replace = false
-  ): T {
+  public override to<T extends PDFDictionary>(type: new () => T, replace = false): T {
     const res = super.to(type);
 
     if (replace && this.ownerElement instanceof PDFIndirectObject) {

@@ -14,9 +14,7 @@ export class CmsAttribute extends AsnEncoded<pkijs.Attribute> {
   }
 
   public get values(): ReadonlyArray<ArrayBuffer> {
-    return this.asn.values.map((o) =>
-      o.toBER ? o.toBER() : o.toSchema().toBER()
-    );
+    return this.asn.values.map((o) => (o.toBER ? o.toBER() : o.toSchema().toBER()));
   }
 
   public constructor();

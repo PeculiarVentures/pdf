@@ -52,19 +52,16 @@ describe("TimeStampToken", () => {
       "2vZiCRhF9k3giOrbIXYQsiw/pcUyQHg8W9cB8RTf39ZqRDwWJk8RAlK7TOiR4wr8",
       "AzC4Zm+c0VxycfGrGVt8Lb1ZSsAEyxKgDsOwxNl1eUUtIEpDAFTuU2XPa2+mRqF1",
       "C/WLgr3NNizFNilc2AORRuWlmCb2KA1e4mkSkvoRemCsCBB6zu9vsvKWwvaFu3qM",
-      "FMQXJFkR6s2slF3KeaKSr9B5ndvaMD8AYGgoThf5"
+      "FMQXJFkR6s2slF3KeaKSr9B5ndvaMD8AYGgoThf5",
     ];
     timeStampRaw = Buffer.from(timeStampEnc.join(""), "base64");
     data = Buffer.from(
       "P9QieShJlXNZqeYARlYbx9uc499Jt3JqC+1YX4qqlJtnzzAPEmevY5j3Vpi1JhNbtvqupKNL1X7UymK+I8t/N3o7ZDuGKJ+Dylyvns6jmH3UXXQ3Hr/6wxUcOsaBr/YvfGANE6CWOAyK6MvWKuukWfFFlZsZT1x5RADdRmCiKqYDjsAjWBiAj2RbWBhbwYkrdnNR1HXY8gdcNYuI3Xz/VPPud094Jb796hTNHitjMwwbPiUd58Laxvr7dzLbdK/fYzQbu1xYRRqZc+m7Td67ebFPaIEQriBUWjvhjGzTkvk/Vl7J0aZEs4koiq3gohIwk6eAfL34sQ2RgC92EPilqw==",
-      "base64"
+      "base64",
     );
 
     // Set the engine for pkijs and x509
-    pkijs.setEngine(
-      "newEngine",
-      new pkijs.CryptoEngine({ name: "nodejs", crypto })
-    );
+    pkijs.setEngine("newEngine", new pkijs.CryptoEngine({ name: "nodejs", crypto }));
     x509.cryptoProvider.set(crypto);
   });
 

@@ -6,8 +6,6 @@ export class OCSPCertificateStorageHandler extends DefaultCertificateStorageHand
   public constructor(private ocsp: OCSP) {
     super();
 
-    this.certificates = new X509Certificates(
-      (ocsp.certificates || []) as X509Certificate[]
-    );
+    this.certificates = new X509Certificates((ocsp.certificates || []) as X509Certificate[]);
   }
 }

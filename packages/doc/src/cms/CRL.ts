@@ -4,9 +4,7 @@ import * as pkijs from "pkijs";
 import { AsnEncoded } from "./AsnEncoded";
 
 export class CRL extends AsnEncoded {
-  protected onFromSchema(
-    schema: pkijs.SchemaType
-  ): pkijs.CertificateRevocationList {
+  protected onFromSchema(schema: pkijs.SchemaType): pkijs.CertificateRevocationList {
     if (schema instanceof pkijs.CertificateRevocationList) {
       this.asn = schema;
 
@@ -25,7 +23,7 @@ export class CRL extends AsnEncoded {
   public async verify(issuer: X509Certificate): Promise<boolean> {
     try {
       return this.asn.verify({
-        issuerCertificate: PKIUtils.x509ToCert(issuer)
+        issuerCertificate: PKIUtils.x509ToCert(issuer),
       });
     } catch {
       return false;

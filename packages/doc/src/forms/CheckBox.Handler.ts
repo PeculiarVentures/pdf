@@ -1,14 +1,8 @@
 import * as core from "@peculiar/pdf-core";
-import {
-  FormComponentHandler,
-  IFormComponentCreateParameters,
-  IFormComponentHandler,
-  IFormComponentParameters
-} from "./FormComponent.Handler";
+import { FormComponentHandler, IFormComponentCreateParameters, IFormComponentHandler, IFormComponentParameters } from "./FormComponent.Handler";
 import { FormObject } from "../FormObject";
 
-export interface ICheckBoxCreateParameters
-  extends IFormComponentCreateParameters {
+export interface ICheckBoxCreateParameters extends IFormComponentCreateParameters {
   enabled?: boolean;
   value?: string;
 }
@@ -24,10 +18,7 @@ export interface ICheckBoxHandler extends IFormComponentHandler {
   drawOff(content: FormObject, params: IFormComponentParameters): void;
 }
 
-export class CheckBoxHandler
-  extends FormComponentHandler
-  implements ICheckBoxHandler
-{
+export class CheckBoxHandler extends FormComponentHandler implements ICheckBoxHandler {
   public ON_STATE_NAME = "Yes";
   public OFF_STATE_NAME = "Off";
 
@@ -41,36 +32,24 @@ export class CheckBoxHandler
     const graphics = object.graphics();
 
     // Draw background
-    graphics
-      .fillColor(params.backgroundColor)
-      .rect(xPt, yPt, widthPt, heightPt)
-      .fill();
+    graphics.fillColor(params.backgroundColor).rect(xPt, yPt, widthPt, heightPt).fill();
 
     if (params.borderWidth) {
       // Draw border
-      graphics
-        .strokeColor(params.borderColor)
-        .lineWidth(params.borderWidth)
-        .rect(xPt, yPt, widthPt, heightPt)
-        .stroke();
+      graphics.strokeColor(params.borderColor).lineWidth(params.borderWidth).rect(xPt, yPt, widthPt, heightPt).stroke();
     }
   }
 
-  public override getParameters(
-    params: ICheckBoxCreateParameters
-  ): ICheckBoxParameters {
+  public override getParameters(params: ICheckBoxCreateParameters): ICheckBoxParameters {
     return {
       ...super.getParameters(params),
       enabled: params.enabled || false,
-      value: params.value || this.ON_STATE_NAME
+      value: params.value || this.ON_STATE_NAME,
     };
   }
 
   public drawCheck(object: FormObject, params: IFormComponentParameters): void {
-    const size =
-      params.width - params.height > 0
-        ? params.height - params.borderWidth * 2
-        : params.width - params.borderWidth * 2;
+    const size = params.width - params.height > 0 ? params.height - params.borderWidth * 2 : params.width - params.borderWidth * 2;
     const x = (params.width - size) / 2;
     const y = (params.height - size) / 2;
     const lineWidth = params.borderWidth || 1;
@@ -97,20 +76,14 @@ export class CheckBoxHandler
     return widget;
   }
 
-  protected fillField(
-    field: core.IFieldDictionary,
-    params: ICheckBoxParameters
-  ): void {
+  protected fillField(field: core.IFieldDictionary, params: ICheckBoxParameters): void {
     field.ft = "Btn";
     field.t = this.document.target.createString(params.name);
     const stateName = params.enabled ? params.value : this.OFF_STATE_NAME;
     field.V = this.document.target.createName(stateName);
   }
 
-  protected fillWidget(
-    widget: core.WidgetDictionary,
-    params: ICheckBoxParameters
-  ): void {
+  protected fillWidget(widget: core.WidgetDictionary, params: ICheckBoxParameters): void {
     const x = params.left;
     const y = params.top - params.height;
 
@@ -129,10 +102,7 @@ export class CheckBoxHandler
     const on = this.createOnState(params);
     const off = this.createOffState(params);
 
-    widget.AP.get().N = this.document.target.createDictionary(
-      [params.value, on.target.makeIndirect()],
-      [this.OFF_STATE_NAME, off.target.makeIndirect()]
-    );
+    widget.AP.get().N = this.document.target.createDictionary([params.value, on.target.makeIndirect()], [this.OFF_STATE_NAME, off.target.makeIndirect()]);
   }
 
   public create(params: ICheckBoxCreateParameters): core.WidgetDictionary {
@@ -169,10 +139,7 @@ export class CheckBoxHandler
     this.drawCheck(object, params);
   }
 
-  protected override setFontStyle(
-    widget: core.WidgetDictionary,
-    params: IFormComponentParameters
-  ): void {
+  protected override setFontStyle(widget: core.WidgetDictionary, params: IFormComponentParameters): void {
     const mk = widget.MK.get();
     // PDF doesn't have field for the fore color annotation. For variable text use DA.
     // If set DA for graphics Acrobat doesn't show images

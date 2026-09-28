@@ -3,9 +3,7 @@ import { ViewReader } from "./ViewReader";
 import { ViewWriter } from "./ViewWriter";
 
 export class PNG {
-  public static readonly HEADER = new Uint8Array([
-    137, 80, 78, 71, 13, 10, 26, 10
-  ]);
+  public static readonly HEADER = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
 
   public static isPNG(view: BufferSource): boolean {
     const reader = new ViewReader(view);
@@ -40,10 +38,7 @@ export class PNG {
 
     // Initialize internal values
     const ihdr = sections.get("IHDR");
-    if (!ihdr)
-      throw new TypeError(
-        "Invalid structure of PNG data. IHDR section not found."
-      );
+    if (!ihdr) throw new TypeError("Invalid structure of PNG data. IHDR section not found.");
 
     const headerData = new ViewReader(ihdr.toUint8Array());
 

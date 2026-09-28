@@ -2,19 +2,12 @@ import * as objects from "../../objects";
 
 export type NameTreeIterator = [string, objects.PDFObject, NameTree];
 
-export type NameTreeType =
-  | typeof NameTree.EMPTY
-  | typeof NameTree.ROOT
-  | typeof NameTree.INTERMEDIATE
-  | typeof NameTree.LEAF;
+export type NameTreeType = typeof NameTree.EMPTY | typeof NameTree.ROOT | typeof NameTree.INTERMEDIATE | typeof NameTree.LEAF;
 
 /**
  * Represents a NameTree object in a PDF document.
  */
-export class NameTree
-  extends objects.PDFDictionary
-  implements Iterable<NameTreeIterator>
-{
+export class NameTree extends objects.PDFDictionary implements Iterable<NameTreeIterator> {
   public static EMPTY = "empty";
   public static ROOT = "root";
   public static INTERMEDIATE = "intermediate";
@@ -134,15 +127,15 @@ export class NameTree
         if (pointer < array.length) {
           return {
             done: false,
-            value: array[pointer++]
+            value: array[pointer++],
           };
         } else {
           return {
             done: true,
-            value: null
+            value: null,
           };
         }
-      }
+      },
     };
   }
 
@@ -202,10 +195,7 @@ export class NameTree
    * @throws `Error` if the value associated with the given key cannot be retrieved
    * @throws `TypeError` if the value associated with the given key cannot be cast to the given type
    */
-  public getValue<T extends objects.PDFObject>(
-    key: string,
-    type?: new () => T
-  ): T;
+  public getValue<T extends objects.PDFObject>(key: string, type?: new () => T): T;
   /**
    * Returns the value associated with the given key.
    * @param key The key whose associated value should be retrieved
@@ -213,19 +203,14 @@ export class NameTree
    * @throws `Error` if the value associated with the given key cannot be retrieved
    */
   public getValue(key: string): objects.PDFObject;
-  public getValue(
-    key: string,
-    type?: new () => objects.PDFObject
-  ): objects.PDFObject {
+  public getValue(key: string, type?: new () => objects.PDFObject): objects.PDFObject {
     const res = this.findValue(key);
     if (!res) {
       throw new Error(`Cannot retrieve the value for the given key '${key}'.`);
     }
 
     if (type && !(res instanceof type)) {
-      throw new TypeError(
-        "Unable to cast value to type because the types do not match."
-      );
+      throw new TypeError("Unable to cast value to type because the types do not match.");
     }
 
     return res;
@@ -380,11 +365,7 @@ export class NameTree
       }
 
       // Dictionary, Array and Strings shall be indirect objects
-      if (
-        v instanceof objects.PDFDictionary ||
-        v instanceof objects.PDFArray ||
-        v instanceof objects.PDFTextString
-      ) {
+      if (v instanceof objects.PDFDictionary || v instanceof objects.PDFArray || v instanceof objects.PDFTextString) {
         v.makeIndirect();
       }
 

@@ -79,9 +79,7 @@ describe("FlateFilter", () => {
     it("should encode data", () => {
       const input = new Uint8Array([1, 2, 3, 4]);
       const encoded = filter.encodeSync(input);
-      const decoded = new Uint8Array(
-        filter.decodeSync(new Uint8Array(encoded))
-      );
+      const decoded = new Uint8Array(filter.decodeSync(new Uint8Array(encoded)));
       expect(decoded).toEqual(input);
     });
   });

@@ -8,10 +8,7 @@ export class PDFOperator {
   public name = PDFOperator.DEFAULT_NAME;
   public parameters: PDFObjectTypes[] = [];
 
-  public static create(
-    name: string,
-    ...parameters: PDFObjectTypes[]
-  ): PDFOperator {
+  public static create(name: string, ...parameters: PDFObjectTypes[]): PDFOperator {
     const operator = new PDFOperator();
 
     operator.name = name;
@@ -53,10 +50,7 @@ export class PDFOperator {
   }
 
   public toString(): string {
-    const res = [
-      ...this.parameters.map((o) => Convert.ToBinary(o.toPDF())),
-      this.name
-    ];
+    const res = [...this.parameters.map((o) => Convert.ToBinary(o.toPDF())), this.name];
 
     return res.join(PDFOperator.SPACE_CHAR);
   }

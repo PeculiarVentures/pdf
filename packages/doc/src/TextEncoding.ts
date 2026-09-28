@@ -1,18 +1,12 @@
-/* eslint-disable no-sparse-arrays */
 type TextEncodingUnicode = number | undefined;
 interface TextEncodingTable {
-  [key: number]: [
-    TextEncodingUnicode,
-    TextEncodingUnicode,
-    TextEncodingUnicode,
-    string
-  ];
+  [key: number]: [TextEncodingUnicode, TextEncodingUnicode, TextEncodingUnicode, string];
 }
 
 export enum TextEncodingEnum {
   StandardEncoding,
   MacRomanEncoding,
-  WinAnsiEncoding
+  WinAnsiEncoding,
 }
 
 export class TextEncoding {
@@ -260,7 +254,7 @@ export class TextEncoding {
     9674: [, 215, , "lozenge"],
     63743: [, 240, , "apple"],
     64257: [142, 222, , "fi"],
-    64258: [143, 223, , "fl"]
+    64258: [143, 223, , "fl"],
   };
 
   public static getIndex(unicode: number, encoding: TextEncodingEnum): number {

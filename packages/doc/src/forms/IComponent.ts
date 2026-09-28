@@ -7,8 +7,4 @@ export interface IComponent {
   delete(): void;
 }
 
-export type IComponentConstructor<T extends IComponent> = new (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  target: any,
-  document: PDFDocument
-) => T;
+export type IComponentConstructor<T extends IComponent> = new (target: any, document: PDFDocument) => T;

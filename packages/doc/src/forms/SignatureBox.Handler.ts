@@ -1,16 +1,10 @@
 import * as core from "@peculiar/pdf-core";
 import { SignatureBoxGroup } from "./SignatureBox.Group";
 import { PDFDocument } from "../Document";
-import {
-  FormComponentHandler,
-  IFormComponentCreateParameters,
-  IFormComponentHandler,
-  IFormComponentParameters
-} from "./FormComponent.Handler";
+import { FormComponentHandler, IFormComponentCreateParameters, IFormComponentHandler, IFormComponentParameters } from "./FormComponent.Handler";
 import { SignatureBox } from "./SignatureBox";
 
-export interface ISignatureBoxCreateParameters
-  extends IFormComponentCreateParameters {
+export interface ISignatureBoxCreateParameters extends IFormComponentCreateParameters {
   groupName?: string;
 }
 
@@ -27,10 +21,7 @@ export interface ISignatureBoxHandler extends IFormComponentHandler {
   create(params: ISignatureBoxCreateParameters): core.WidgetDictionary;
 }
 
-export class SignatureBoxHandler
-  extends FormComponentHandler
-  implements ISignatureBoxHandler
-{
+export class SignatureBoxHandler extends FormComponentHandler implements ISignatureBoxHandler {
   public override DEFAULT_WIDTH = 0;
   public override DEFAULT_HEIGHT = 0;
 
@@ -39,9 +30,7 @@ export class SignatureBoxHandler
 
     if (field.has("FT")) {
       if (field.t.text !== "Sig") {
-        throw new TypeError(
-          `Field '${name}' already exists and it's not a signature field.`
-        );
+        throw new TypeError(`Field '${name}' already exists and it's not a signature field.`);
       }
     } else {
       // Create signature field
@@ -61,17 +50,13 @@ export class SignatureBoxHandler
     }
 
     if (!(group instanceof SignatureBoxGroup)) {
-      throw new TypeError(
-        `Component group already exists '${name}'. It doesn't match to SignatureBoxGroup type.`
-      );
+      throw new TypeError(`Component group already exists '${name}'. It doesn't match to SignatureBoxGroup type.`);
     }
 
     return group;
   }
 
-  public override create(
-    params: ISignatureBoxCreateParameters
-  ): core.WidgetDictionary {
+  public override create(params: ISignatureBoxCreateParameters): core.WidgetDictionary {
     const update = this.document.target.update;
 
     const p = this.getParameters(params);
@@ -93,12 +78,7 @@ export class SignatureBoxHandler
     group.target.Kids.get().push(widget.makeIndirect());
     widget.Parent = group.target.makeIndirect();
 
-    if (
-      widget.rect.llX === 0 &&
-      widget.rect.llY === 0 &&
-      widget.rect.urX === 0 &&
-      widget.rect.urY === 0
-    ) {
+    if (widget.rect.llX === 0 && widget.rect.llY === 0 && widget.rect.urX === 0 && widget.rect.urY === 0) {
       // invisible signature
       return widget;
     }

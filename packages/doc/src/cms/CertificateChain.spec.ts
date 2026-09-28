@@ -1,16 +1,9 @@
 import * as x509 from "@peculiar/x509";
 import * as pkijs from "pkijs";
 import "./algorithms";
-import {
-  CertificateChain,
-  CertificateChainStatusCode
-} from "./CertificateChain";
+import { CertificateChain, CertificateChainStatusCode } from "./CertificateChain";
 import { DefaultCertificateStorageHandler } from "./DefaultCertificateStorageHandler";
-import {
-  IResult,
-  IsTrustedResult,
-  RevocationType
-} from "./ICertificateStorageHandler";
+import { IResult, IsTrustedResult, RevocationType } from "./ICertificateStorageHandler";
 import { CRL } from "./CRL";
 import { OCSP } from "./OCSP";
 import { CertificateID } from "./CertID";
@@ -21,52 +14,38 @@ import { CertificateID } from "./CertID";
 class RootCertificateStorageHandler extends DefaultCertificateStorageHandler {
   constructor(
     private trustedCertificate: x509.X509Certificate,
-    private revocations: Record<string, CRL | OCSP> = {}
+    private revocations: Record<string, CRL | OCSP> = {},
   ) {
     super();
   }
-  public override async isTrusted(
-    cert: x509.X509Certificate
-  ): Promise<IsTrustedResult> {
+  public override async isTrusted(cert: x509.X509Certificate): Promise<IsTrustedResult> {
     if (this.trustedCertificate.equal(cert)) {
       return {
         result: true,
         target: this,
-        source: "RootCertificateStorageHandler"
+        source: "RootCertificateStorageHandler",
       };
     }
 
     return {
       result: false,
       target: this,
-      source: "RootCertificateStorageHandler"
+      source: "RootCertificateStorageHandler",
     };
   }
 
-  public override async fetchRevocation(
-    type: "crl",
-    cert: x509.X509Certificate
-  ): Promise<IResult<CRL | null>>;
-  public override async fetchRevocation(
-    type: "ocsp",
-    cert: x509.X509Certificate
-  ): Promise<IResult<OCSP | null>>;
-  public override async fetchRevocation(
-    type: RevocationType,
-    cert: x509.X509Certificate
-  ): Promise<IResult<CRL | OCSP | null>> {
+  public override async fetchRevocation(type: "crl", cert: x509.X509Certificate): Promise<IResult<CRL | null>>;
+  public override async fetchRevocation(type: "ocsp", cert: x509.X509Certificate): Promise<IResult<OCSP | null>>;
+  public override async fetchRevocation(type: RevocationType, cert: x509.X509Certificate): Promise<IResult<CRL | OCSP | null>> {
     if (type === "crl") {
-      const crlDistriPoints = cert.getExtension(
-        x509.CRLDistributionPointsExtension
-      );
+      const crlDistriPoints = cert.getExtension(x509.CRLDistributionPointsExtension);
       if (crlDistriPoints) {
         for (const point of crlDistriPoints.distributionPoints) {
-          const url =
-            point.distributionPoint?.fullName?.[0].uniformResourceIdentifier;
+          const url = point.distributionPoint?.fullName?.[0].uniformResourceIdentifier;
           if (url && this.revocations[url]) {
             return {
               result: this.revocations[url] as CRL,
-              target: this
+              target: this,
             };
           }
         }
@@ -79,7 +58,7 @@ class RootCertificateStorageHandler extends DefaultCertificateStorageHandler {
           if (url && this.revocations[url]) {
             return {
               result: this.revocations[url] as OCSP,
-              target: this
+              target: this,
             };
           }
         }
@@ -87,7 +66,7 @@ class RootCertificateStorageHandler extends DefaultCertificateStorageHandler {
     }
     return {
       result: null,
-      target: this
+      target: this,
     };
   }
 }
@@ -103,26 +82,20 @@ describe("CertificateChain", () => {
 
   beforeAll(async () => {
     // Set engine
-    pkijs.setEngine(
-      "newEngine",
-      new pkijs.CryptoEngine({ name: "nodejs", crypto })
-    );
+    pkijs.setEngine("newEngine", new pkijs.CryptoEngine({ name: "nodejs", crypto }));
     x509.cryptoProvider.set(crypto);
 
     algorithm = {
       name: "ECDSA",
-      namedCurve: "P-256"
+      namedCurve: "P-256",
     };
     signingAlgorithm = {
       name: "ECDSA",
-      hash: "SHA-256"
+      hash: "SHA-256",
     };
 
     // Create root certificate
-    const rootKeys = await crypto.subtle.generateKey(algorithm, false, [
-      "sign",
-      "verify"
-    ]);
+    const rootKeys = await crypto.subtle.generateKey(algorithm, false, ["sign", "verify"]);
     rootCert = await x509.X509CertificateGenerator.createSelfSigned({
       name: "CN=Root Test",
       keys: rootKeys,
@@ -131,22 +104,15 @@ describe("CertificateChain", () => {
       notAfter: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 365), // 1 year
       extensions: [
         new x509.BasicConstraintsExtension(true, undefined, true),
-        new x509.KeyUsagesExtension(
-          x509.KeyUsageFlags.keyCertSign | x509.KeyUsageFlags.cRLSign,
-          true
-        ),
+        new x509.KeyUsagesExtension(x509.KeyUsageFlags.keyCertSign | x509.KeyUsageFlags.cRLSign, true),
         await x509.SubjectKeyIdentifierExtension.create(rootKeys.publicKey),
-        await x509.AuthorityKeyIdentifierExtension.create(rootKeys.publicKey)
-      ]
+        await x509.AuthorityKeyIdentifierExtension.create(rootKeys.publicKey),
+      ],
     });
     rootCert.privateKey = rootKeys.privateKey;
 
     // Create intermediate certificate 1
-    const intermediateKeys1 = await crypto.subtle.generateKey(
-      algorithm,
-      false,
-      ["sign", "verify"]
-    );
+    const intermediateKeys1 = await crypto.subtle.generateKey(algorithm, false, ["sign", "verify"]);
     intermediateCert1 = await x509.X509CertificateGenerator.create({
       notBefore: now,
       notAfter: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 30 * 10), // 10 months
@@ -157,25 +123,16 @@ describe("CertificateChain", () => {
       signingAlgorithm,
       extensions: [
         new x509.BasicConstraintsExtension(true, undefined, true),
-        new x509.KeyUsagesExtension(
-          x509.KeyUsageFlags.keyCertSign | x509.KeyUsageFlags.cRLSign,
-          true
-        ),
-        await x509.SubjectKeyIdentifierExtension.create(
-          intermediateKeys1.publicKey
-        ),
+        new x509.KeyUsagesExtension(x509.KeyUsageFlags.keyCertSign | x509.KeyUsageFlags.cRLSign, true),
+        await x509.SubjectKeyIdentifierExtension.create(intermediateKeys1.publicKey),
         await x509.AuthorityKeyIdentifierExtension.create(rootKeys.publicKey),
-        new x509.CRLDistributionPointsExtension(["http://intermediate1.crl"])
-      ]
+        new x509.CRLDistributionPointsExtension(["http://intermediate1.crl"]),
+      ],
     });
     intermediateCert1.privateKey = intermediateKeys1.privateKey;
 
     // Create intermediate certificate 2
-    const intermediateKeys2 = await crypto.subtle.generateKey(
-      algorithm,
-      false,
-      ["sign", "verify"]
-    );
+    const intermediateKeys2 = await crypto.subtle.generateKey(algorithm, false, ["sign", "verify"]);
     intermediateCert2 = await x509.X509CertificateGenerator.create({
       notBefore: now,
       notAfter: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 30 * 5), // 5 months
@@ -186,28 +143,18 @@ describe("CertificateChain", () => {
       signingAlgorithm,
       extensions: [
         new x509.BasicConstraintsExtension(true, undefined, true),
-        new x509.KeyUsagesExtension(
-          x509.KeyUsageFlags.keyCertSign | x509.KeyUsageFlags.cRLSign,
-          true
-        ),
-        await x509.SubjectKeyIdentifierExtension.create(
-          intermediateKeys2.publicKey
-        ),
-        await x509.AuthorityKeyIdentifierExtension.create(
-          intermediateKeys1.publicKey
-        ),
+        new x509.KeyUsagesExtension(x509.KeyUsageFlags.keyCertSign | x509.KeyUsageFlags.cRLSign, true),
+        await x509.SubjectKeyIdentifierExtension.create(intermediateKeys2.publicKey),
+        await x509.AuthorityKeyIdentifierExtension.create(intermediateKeys1.publicKey),
         new x509.AuthorityInfoAccessExtension({
-          ocsp: ["http://intermediate2.ocsp"]
-        })
-      ]
+          ocsp: ["http://intermediate2.ocsp"],
+        }),
+      ],
     });
     intermediateCert2.privateKey = intermediateKeys2.privateKey;
 
     // Create leaf certificate
-    const leafKeys = await crypto.subtle.generateKey(algorithm, false, [
-      "sign",
-      "verify"
-    ]);
+    const leafKeys = await crypto.subtle.generateKey(algorithm, false, ["sign", "verify"]);
     leafCert = await x509.X509CertificateGenerator.create({
       notBefore: now,
       notAfter: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 30), // 1 month
@@ -220,14 +167,12 @@ describe("CertificateChain", () => {
         new x509.BasicConstraintsExtension(false, undefined, true),
         new x509.KeyUsagesExtension(x509.KeyUsageFlags.digitalSignature, true),
         await x509.SubjectKeyIdentifierExtension.create(leafKeys.publicKey),
-        await x509.AuthorityKeyIdentifierExtension.create(
-          intermediateKeys2.publicKey
-        ),
+        await x509.AuthorityKeyIdentifierExtension.create(intermediateKeys2.publicKey),
         new x509.CRLDistributionPointsExtension(["http://leaf.crl"]),
         new x509.AuthorityInfoAccessExtension({
-          ocsp: ["http://leaf.ocsp"]
-        })
-      ]
+          ocsp: ["http://leaf.ocsp"],
+        }),
+      ],
     });
   });
 
@@ -236,9 +181,7 @@ describe("CertificateChain", () => {
     chain.certificateHandler.certificates.push(rootCert);
     chain.certificateHandler.certificates.push(intermediateCert1);
     chain.certificateHandler.certificates.push(intermediateCert2);
-    chain.certificateHandler.parent = new RootCertificateStorageHandler(
-      rootCert
-    );
+    chain.certificateHandler.parent = new RootCertificateStorageHandler(rootCert);
 
     const result = await chain.build(leafCert);
     expect(result.result).toBe(true);
@@ -252,9 +195,7 @@ describe("CertificateChain", () => {
       chain.certificateHandler.certificates.push(rootCert);
       chain.certificateHandler.certificates.push(intermediateCert1);
       chain.certificateHandler.certificates.push(intermediateCert2);
-      chain.certificateHandler.parent = new RootCertificateStorageHandler(
-        leafCert
-      );
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(leafCert);
 
       const result = await chain.build(leafCert);
       expect(result.result).toBe(true);
@@ -267,9 +208,7 @@ describe("CertificateChain", () => {
       chain.certificateHandler.certificates.push(rootCert);
       chain.certificateHandler.certificates.push(intermediateCert1);
       chain.certificateHandler.certificates.push(intermediateCert2);
-      chain.certificateHandler.parent = new RootCertificateStorageHandler(
-        intermediateCert1
-      );
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(intermediateCert1);
 
       const result = await chain.build(leafCert);
       expect(result.result).toBe(true);
@@ -295,12 +234,10 @@ describe("CertificateChain", () => {
       chain.certificateHandler.certificates.push(rootCert);
       chain.certificateHandler.certificates.push(intermediateCert1);
       chain.certificateHandler.certificates.push(intermediateCert2);
-      chain.certificateHandler.parent = new RootCertificateStorageHandler(
-        rootCert
-      );
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(rootCert);
 
       const result = await chain.build(leafCert, {
-        checkDate: new Date(now.getTime() - 1000)
+        checkDate: new Date(now.getTime() - 1000),
       });
       expect(result.result).toBe(false);
       expect(result.resultCode).toBe(CertificateChainStatusCode.badDate);
@@ -311,12 +248,10 @@ describe("CertificateChain", () => {
       chain.certificateHandler.certificates.push(rootCert);
       chain.certificateHandler.certificates.push(intermediateCert1);
       chain.certificateHandler.certificates.push(intermediateCert2);
-      chain.certificateHandler.parent = new RootCertificateStorageHandler(
-        rootCert
-      );
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(rootCert);
 
       const result = await chain.build(leafCert, {
-        checkDate: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 31)
+        checkDate: new Date(now.getTime() + 1000 * 60 * 60 * 24 * 31),
       });
       expect(result.result).toBe(false);
       expect(result.resultCode).toBe(CertificateChainStatusCode.badDate);
@@ -336,7 +271,7 @@ describe("CertificateChain", () => {
         thisUpdate: new Date(),
         nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
         signingKey: intermediateCert2.privateKey!,
-        signingAlgorithm
+        signingAlgorithm,
       });
       crlLeaf = CRL.fromBER(x509Crl.rawData);
 
@@ -345,21 +280,17 @@ describe("CertificateChain", () => {
         issuer: intermediateCert2,
         responses: [
           {
-            certId: await CertificateID.create(
-              "SHA-256",
-              leafCert,
-              intermediateCert2
-            ),
+            certId: await CertificateID.create("SHA-256", leafCert, intermediateCert2),
             status: {
-              type: "good"
+              type: "good",
             },
             thisUpdate: new Date(),
-            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24) // 1 day
-          }
+            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24), // 1 day
+          },
         ],
         producedAt: new Date(),
         signingAlgorithm,
-        signingKey: intermediateCert2.privateKey!
+        signingKey: intermediateCert2.privateKey!,
       });
 
       // Create Intermediate 2 OCSP
@@ -367,21 +298,17 @@ describe("CertificateChain", () => {
         issuer: intermediateCert1,
         responses: [
           {
-            certId: await CertificateID.create(
-              "SHA-256",
-              intermediateCert2,
-              intermediateCert1
-            ),
+            certId: await CertificateID.create("SHA-256", intermediateCert2, intermediateCert1),
             status: {
-              type: "good"
+              type: "good",
             },
             thisUpdate: new Date(),
-            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24) // 1 day
-          }
+            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24), // 1 day
+          },
         ],
         producedAt: new Date(),
         signingAlgorithm,
-        signingKey: intermediateCert1.privateKey!
+        signingKey: intermediateCert1.privateKey!,
       });
 
       // Create Intermediate 1 CRL
@@ -390,7 +317,7 @@ describe("CertificateChain", () => {
         thisUpdate: new Date(),
         nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
         signingKey: rootCert.privateKey!,
-        signingAlgorithm
+        signingAlgorithm,
       });
       crlIntermediate1 = CRL.fromBER(x509CrlIntermediate1.rawData);
     });
@@ -400,18 +327,15 @@ describe("CertificateChain", () => {
       chain.certificateHandler.certificates.push(rootCert);
       chain.certificateHandler.certificates.push(intermediateCert1);
       chain.certificateHandler.certificates.push(intermediateCert2);
-      chain.certificateHandler.parent = new RootCertificateStorageHandler(
-        rootCert,
-        {
-          "http://leaf.crl": crlLeaf,
-          "http://leaf.ocsp": ocspLeaf,
-          "http://intermediate2.ocsp": ocspIntermediate2,
-          "http://intermediate1.crl": crlIntermediate1
-        }
-      );
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(rootCert, {
+        "http://leaf.crl": crlLeaf,
+        "http://leaf.ocsp": ocspLeaf,
+        "http://intermediate2.ocsp": ocspIntermediate2,
+        "http://intermediate1.crl": crlIntermediate1,
+      });
 
       const result = await chain.build(leafCert, {
-        revocationMode: "online"
+        revocationMode: "online",
       });
       expect(result.result).toBe(true);
       expect(result.resultCode).toBe(CertificateChainStatusCode.success);
@@ -429,12 +353,10 @@ describe("CertificateChain", () => {
       chain.certificateHandler.crls.push(crlIntermediate1);
       chain.certificateHandler.ocsps.push(ocspLeaf);
       chain.certificateHandler.ocsps.push(ocspIntermediate2);
-      chain.certificateHandler.parent = new RootCertificateStorageHandler(
-        rootCert
-      );
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(rootCert);
 
       const result = await chain.build(leafCert, {
-        revocationMode: "offline"
+        revocationMode: "offline",
       });
       expect(result.result).toBe(true);
       expect(result.resultCode).toBe(CertificateChainStatusCode.success);
@@ -449,19 +371,16 @@ describe("CertificateChain", () => {
       chain.certificateHandler.certificates.push(rootCert);
       chain.certificateHandler.certificates.push(intermediateCert1);
       chain.certificateHandler.certificates.push(intermediateCert2);
-      chain.certificateHandler.parent = new RootCertificateStorageHandler(
-        rootCert,
-        {
-          "http://leaf.crl": crlLeaf,
-          "http://leaf.ocsp": ocspLeaf,
-          "http://intermediate2.ocsp": ocspIntermediate2,
-          "http://intermediate1.crl": crlIntermediate1
-        }
-      );
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(rootCert, {
+        "http://leaf.crl": crlLeaf,
+        "http://leaf.ocsp": ocspLeaf,
+        "http://intermediate2.ocsp": ocspIntermediate2,
+        "http://intermediate1.crl": crlIntermediate1,
+      });
 
       const result = await chain.build(leafCert, {
         revocationMode: "online",
-        preferCRL: true
+        preferCRL: true,
       });
       expect(result.result).toBe(true);
       expect(result.resultCode).toBe(CertificateChainStatusCode.success);
@@ -474,7 +393,7 @@ describe("CertificateChain", () => {
 
       const result2 = await chain.build(leafCert, {
         revocationMode: "online",
-        preferCRL: false
+        preferCRL: false,
       });
       expect(result2.result).toBe(true);
       expect(result2.resultCode).toBe(CertificateChainStatusCode.success);
@@ -497,9 +416,9 @@ describe("CertificateChain", () => {
           {
             serialNumber: leafCert.serialNumber,
             revocationDate: new Date(),
-            reason: x509.X509CrlReason.privilegeWithdrawn
-          }
-        ]
+            reason: x509.X509CrlReason.privilegeWithdrawn,
+          },
+        ],
       });
       const crlRevoked = CRL.fromBER(x509RevokedCrl.rawData);
 
@@ -507,17 +426,14 @@ describe("CertificateChain", () => {
       chain.certificateHandler.certificates.push(rootCert);
       chain.certificateHandler.certificates.push(intermediateCert1);
       chain.certificateHandler.certificates.push(intermediateCert2);
-      chain.certificateHandler.parent = new RootCertificateStorageHandler(
-        rootCert,
-        {
-          "http://leaf.crl": crlRevoked,
-          "http://intermediate2.ocsp": ocspIntermediate2,
-          "http://intermediate1.crl": crlIntermediate1
-        }
-      );
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(rootCert, {
+        "http://leaf.crl": crlRevoked,
+        "http://intermediate2.ocsp": ocspIntermediate2,
+        "http://intermediate1.crl": crlIntermediate1,
+      });
 
       const result = await chain.build(leafCert, {
-        revocationMode: "online"
+        revocationMode: "online",
       });
       expect(result.result).toBe(false);
       expect(result.resultCode).toBe(CertificateChainStatusCode.revokedOCSP);
@@ -528,40 +444,33 @@ describe("CertificateChain", () => {
         issuer: intermediateCert2,
         responses: [
           {
-            certId: await CertificateID.create(
-              "SHA-256",
-              leafCert,
-              intermediateCert2
-            ),
+            certId: await CertificateID.create("SHA-256", leafCert, intermediateCert2),
             status: {
               type: "revoked",
               revocationTime: new Date(),
-              reason: "privilegeWithdrawn"
+              reason: "privilegeWithdrawn",
             },
             thisUpdate: new Date(),
-            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24) // 1 day
-          }
+            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24), // 1 day
+          },
         ],
         producedAt: new Date(),
         signingAlgorithm,
-        signingKey: intermediateCert2.privateKey!
+        signingKey: intermediateCert2.privateKey!,
       });
 
       const chain = new CertificateChain();
       chain.certificateHandler.certificates.push(rootCert);
       chain.certificateHandler.certificates.push(intermediateCert1);
       chain.certificateHandler.certificates.push(intermediateCert2);
-      chain.certificateHandler.parent = new RootCertificateStorageHandler(
-        rootCert,
-        {
-          "http://leaf.ocsp": ocspRevoked,
-          "http://intermediate2.ocsp": ocspIntermediate2,
-          "http://intermediate1.crl": crlIntermediate1
-        }
-      );
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(rootCert, {
+        "http://leaf.ocsp": ocspRevoked,
+        "http://intermediate2.ocsp": ocspIntermediate2,
+        "http://intermediate1.crl": crlIntermediate1,
+      });
 
       const result = await chain.build(leafCert, {
-        revocationMode: "online"
+        revocationMode: "online",
       });
       expect(result.result).toBe(false);
       expect(result.resultCode).toBe(CertificateChainStatusCode.revokedOCSP);
@@ -578,9 +487,9 @@ describe("CertificateChain", () => {
           {
             serialNumber: intermediateCert1.serialNumber,
             revocationDate: new Date(),
-            reason: x509.X509CrlReason.privilegeWithdrawn
-          }
-        ]
+            reason: x509.X509CrlReason.privilegeWithdrawn,
+          },
+        ],
       });
       const crlRevoked = CRL.fromBER(x509RevokedCrl.rawData);
 
@@ -588,18 +497,15 @@ describe("CertificateChain", () => {
       chain.certificateHandler.certificates.push(rootCert);
       chain.certificateHandler.certificates.push(intermediateCert1);
       chain.certificateHandler.certificates.push(intermediateCert2);
-      chain.certificateHandler.parent = new RootCertificateStorageHandler(
-        rootCert,
-        {
-          "http://leaf.crl": crlLeaf,
-          "http://leaf.ocsp": ocspLeaf,
-          "http://intermediate2.ocsp": ocspIntermediate2,
-          "http://intermediate1.crl": crlRevoked
-        }
-      );
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(rootCert, {
+        "http://leaf.crl": crlLeaf,
+        "http://leaf.ocsp": ocspLeaf,
+        "http://intermediate2.ocsp": ocspIntermediate2,
+        "http://intermediate1.crl": crlRevoked,
+      });
 
       const result = await chain.build(leafCert, {
-        revocationMode: "online"
+        revocationMode: "online",
       });
       expect(result.result).toBe(false);
       expect(result.resultCode).toBe(CertificateChainStatusCode.revokedOCSP);
@@ -610,41 +516,34 @@ describe("CertificateChain", () => {
         issuer: intermediateCert1,
         responses: [
           {
-            certId: await CertificateID.create(
-              "SHA-256",
-              intermediateCert2,
-              intermediateCert1
-            ),
+            certId: await CertificateID.create("SHA-256", intermediateCert2, intermediateCert1),
             status: {
               type: "revoked",
               revocationTime: new Date(),
-              reason: "privilegeWithdrawn"
+              reason: "privilegeWithdrawn",
             },
             thisUpdate: new Date(),
-            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24) // 1 day
-          }
+            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24), // 1 day
+          },
         ],
         producedAt: new Date(),
         signingAlgorithm,
-        signingKey: intermediateCert1.privateKey!
+        signingKey: intermediateCert1.privateKey!,
       });
 
       const chain = new CertificateChain();
       chain.certificateHandler.certificates.push(rootCert);
       chain.certificateHandler.certificates.push(intermediateCert1);
       chain.certificateHandler.certificates.push(intermediateCert2);
-      chain.certificateHandler.parent = new RootCertificateStorageHandler(
-        rootCert,
-        {
-          "http://leaf.crl": crlLeaf,
-          "http://leaf.ocsp": ocspLeaf,
-          "http://intermediate2.ocsp": ocspRevoked,
-          "http://intermediate1.crl": crlIntermediate1
-        }
-      );
+      chain.certificateHandler.parent = new RootCertificateStorageHandler(rootCert, {
+        "http://leaf.crl": crlLeaf,
+        "http://leaf.ocsp": ocspLeaf,
+        "http://intermediate2.ocsp": ocspRevoked,
+        "http://intermediate1.crl": crlIntermediate1,
+      });
 
       const result = await chain.build(leafCert, {
-        revocationMode: "online"
+        revocationMode: "online",
       });
       expect(result.result).toBe(false);
       expect(result.resultCode).toBe(CertificateChainStatusCode.revokedOCSP);

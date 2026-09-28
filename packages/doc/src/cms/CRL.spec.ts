@@ -15,31 +15,25 @@ describe("CRL", () => {
     // key algorithm
     const algorithm = {
       name: "ECDSA",
-      namedCurve: "P-256"
+      namedCurve: "P-256",
     };
 
     // create CA certificate
-    const caKeys = await crypto.subtle.generateKey(algorithm, false, [
-      "sign",
-      "verify"
-    ]);
+    const caKeys = await crypto.subtle.generateKey(algorithm, false, ["sign", "verify"]);
     caCert = await x509.X509CertificateGenerator.createSelfSigned({
       name: "CN=CA Test",
       keys: caKeys,
       signingAlgorithm: algorithm,
-      notAfter: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365) // 1 year
+      notAfter: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
     });
 
     // create wrong CA certificate
-    const wrongCaKeys = await crypto.subtle.generateKey(algorithm, false, [
-      "sign",
-      "verify"
-    ]);
+    const wrongCaKeys = await crypto.subtle.generateKey(algorithm, false, ["sign", "verify"]);
     wrongCaCert = await x509.X509CertificateGenerator.createSelfSigned({
       name: "CN=Wrong CA Test",
       keys: wrongCaKeys,
       signingAlgorithm: algorithm,
-      notAfter: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365) // 1 year
+      notAfter: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
     });
 
     // create CRL
@@ -48,7 +42,7 @@ describe("CRL", () => {
       thisUpdate: new Date(),
       nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
       signingKey: caKeys.privateKey,
-      signingAlgorithm: { ...algorithm, hash: "SHA-256" }
+      signingAlgorithm: { ...algorithm, hash: "SHA-256" },
     });
     crlRaw = crl.rawData;
   });

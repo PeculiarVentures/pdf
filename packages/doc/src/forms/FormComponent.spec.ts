@@ -105,9 +105,7 @@ describe("FormComponent", () => {
     it("should get/set fore color", () => {
       component.foreColor = [0, 0, 1]; // blue
       expect(component.foreColor).toEqual([0, 0, 1]);
-      expect(component.target.MK.get().get("PV_FC")?.toString()).toBe(
-        "(0 0 1 rg)"
-      );
+      expect(component.target.MK.get().get("PV_FC")?.toString()).toBe("(0 0 1 rg)");
     });
   });
 
@@ -115,17 +113,13 @@ describe("FormComponent", () => {
     it("should get/set hidden flag", () => {
       component.hidden = true;
       expect(component.hidden).toBe(true);
-      expect(component.target.f & core.AnnotationFlags.hidden).toBe(
-        core.AnnotationFlags.hidden
-      );
+      expect(component.target.f & core.AnnotationFlags.hidden).toBe(core.AnnotationFlags.hidden);
     });
 
     it("should get/set print flag", () => {
       component.print = true;
       expect(component.print).toBe(true);
-      expect(component.target.f & core.AnnotationFlags.print).toBe(
-        core.AnnotationFlags.print
-      );
+      expect(component.target.f & core.AnnotationFlags.print).toBe(core.AnnotationFlags.print);
     });
   });
 
@@ -133,17 +127,13 @@ describe("FormComponent", () => {
     it("should get/set required flag", () => {
       component.required = true;
       expect(component.required).toBe(true);
-      expect(
-        (component.target.Parent?.ff || 0) & core.FieldFlags.required
-      ).toBe(core.FieldFlags.required);
+      expect((component.target.Parent?.ff || 0) & core.FieldFlags.required).toBe(core.FieldFlags.required);
     });
 
     it("should get/set readOnly flag", () => {
       component.readOnly = true;
       expect(component.readOnly).toBe(true);
-      expect(component.target.Parent?.ff || 0 & core.FieldFlags.readOnly).toBe(
-        core.FieldFlags.readOnly
-      );
+      expect((component.target.Parent?.ff || 0) & core.FieldFlags.readOnly).toBe(core.FieldFlags.readOnly);
     });
   });
 

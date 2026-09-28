@@ -27,9 +27,7 @@ export class RunLengthFilter extends Filter {
 
       if (length === 0x80) {
         if (index < stream.length) {
-          throw new Error(
-            "RunLengthDecode: Unexpected end of data marker (EOD) found before end of stream"
-          );
+          throw new Error("RunLengthDecode: Unexpected end of data marker (EOD) found before end of stream");
         }
         break;
       }

@@ -10,7 +10,7 @@ export class NameDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Dests",
     type: common.NameTree,
-    optional: true
+    optional: true,
   })
   public Dests!: common.NameTree | null;
 
@@ -22,7 +22,7 @@ export class NameDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "AP",
     type: common.NameTree,
-    optional: true
+    optional: true,
   })
   public AP!: common.NameTree | null;
 
@@ -34,7 +34,7 @@ export class NameDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "JavaScript",
     type: common.NameTree,
-    optional: true
+    optional: true,
   })
   public JavaScript!: common.NameTree | null;
 
@@ -46,7 +46,7 @@ export class NameDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Pages",
     type: common.NameTree,
-    optional: true
+    optional: true,
   })
   public Pages!: common.NameTree | null;
 
@@ -58,7 +58,7 @@ export class NameDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Templates",
     type: common.NameTree,
-    optional: true
+    optional: true,
   })
   public Templates!: common.NameTree | null;
 
@@ -70,7 +70,7 @@ export class NameDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "IDS",
     type: common.NameTree,
-    optional: true
+    optional: true,
   })
   public IDS!: common.NameTree | null;
 
@@ -82,7 +82,7 @@ export class NameDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "URLS",
     type: common.NameTree,
-    optional: true
+    optional: true,
   })
   public URLS!: common.NameTree | null;
 
@@ -105,7 +105,7 @@ export class NameDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "EmbeddedFiles",
     type: common.NameTree,
-    optional: true
+    optional: true,
   })
   public EmbeddedFiles!: common.NameTree | null;
 
@@ -118,7 +118,7 @@ export class NameDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "AlternatePresentations",
     type: common.NameTree,
-    optional: true
+    optional: true,
   })
   public AlternatePresentations!: common.NameTree | null;
 
@@ -130,7 +130,7 @@ export class NameDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Renditions",
     type: common.NameTree,
-    optional: true
+    optional: true,
   })
   public Renditions!: common.NameTree | null;
 }

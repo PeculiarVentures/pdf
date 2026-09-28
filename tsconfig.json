@@ -6,39 +6,15 @@
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
-      "@peculiar/pdf-core": [
-        "./packages/core/src"
-      ],
-      "@peculiar/pdf-cli": [
-        "./packages/cli/src"
-      ],
-      "@peculiar/pdf-doc": [
-        "./packages/doc/src"
-      ],
-      "@peculiar/pdf-font": [
-        "./packages/font/src"
-      ],
-      "@peculiar/pdf-copy": [
-        "./packages/copy/src"
-      ],
-      "@peculiar/pdf-form-json": [
-        "./packages/form-json/src"
-      ],
-      "@peculiar/pdf-repair": [
-        "./packages/repair/src"
-      ],
-      "@peculiar/pdf-tests": [
-        "./packages/tests/src"
-      ],
+      "@peculiar/pdf-core": ["./packages/core/src"],
+      "@peculiar/pdf-cli": ["./packages/cli/src"],
+      "@peculiar/pdf-doc": ["./packages/doc/src"],
+      "@peculiar/pdf-font": ["./packages/font/src"],
+      "@peculiar/pdf-copy": ["./packages/copy/src"],
+      "@peculiar/pdf-form-json": ["./packages/form-json/src"],
+      "@peculiar/pdf-repair": ["./packages/repair/src"],
+      "@peculiar/pdf-tests": ["./packages/tests/src"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "coverage",
-    "packages/*/build",
-    "packages/**/*/*.js",
-    "packages/**/*/*.mjs",
-    "eslint.config.mjs",
-    "jest.config.js",
-  ]
+  "exclude": ["node_modules", "coverage", "packages/*/build", "packages/**/*/*.js", "packages/**/*/*.mjs", "jest.config.js"]
 }

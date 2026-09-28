@@ -2,17 +2,10 @@ import * as core from "@peculiar/pdf-core";
 import { PDFDocument } from "../Document";
 import { WrapObject } from "../WrapObject";
 
-export class NameTree<T extends core.PDFObject = core.PDFObject>
-  extends WrapObject<core.NameTree>
-  implements Iterable<[string, T]>
-{
+export class NameTree<T extends core.PDFObject = core.PDFObject> extends WrapObject<core.NameTree> implements Iterable<[string, T]> {
   protected type: abstract new () => T;
 
-  constructor(
-    target: core.NameTree,
-    document: PDFDocument,
-    type?: new () => T
-  ) {
+  constructor(target: core.NameTree, document: PDFDocument, type?: new () => T) {
     super(target, document);
 
     this.type = type || (core.PDFObject as unknown as new () => T);
@@ -21,7 +14,6 @@ export class NameTree<T extends core.PDFObject = core.PDFObject>
   [Symbol.iterator](): Iterator<[string, T], unknown, undefined> {
     let pointer = 0;
     const array = this.target.keys();
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const _this = this;
 
     return {
@@ -31,15 +23,15 @@ export class NameTree<T extends core.PDFObject = core.PDFObject>
 
           return {
             done: false,
-            value: [key, _this.get(key)]
+            value: [key, _this.get(key)],
           };
         } else {
           return {
             done: true,
-            value: null
+            value: null,
           };
         }
-      }
+      },
     };
   }
 
@@ -50,9 +42,7 @@ export class NameTree<T extends core.PDFObject = core.PDFObject>
       if (res instanceof core.PDFDictionary) {
         return core.PDFTypeConverter.convert(res, this.type, true);
       }
-      throw new Error(
-        "Unable to cast value to type because the types do not match."
-      );
+      throw new Error("Unable to cast value to type because the types do not match.");
     }
 
     return res;
@@ -67,9 +57,7 @@ export class NameTree<T extends core.PDFObject = core.PDFObject>
     }
 
     if (!(res instanceof type)) {
-      throw new Error(
-        "Unable to cast value to type because the types do not match."
-      );
+      throw new Error("Unable to cast value to type because the types do not match.");
     }
 
     return res;

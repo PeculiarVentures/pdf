@@ -1,8 +1,4 @@
-import {
-  PDFBooleanField,
-  PDFNumberField,
-  PDFTextStringField
-} from "../../objects";
+import { PDFBooleanField, PDFNumberField, PDFTextStringField } from "../../objects";
 import { PDFTextString } from "../../objects/TextString";
 import { EncryptDictionary } from "./Encrypt";
 
@@ -59,7 +55,7 @@ export enum UserAccessPermissionFlags {
    * appearance, possibly of degraded quality.
    * @remarks Security handlers of revision 3 or greater
    */
-  printRepresentation = 1 << 11
+  printRepresentation = 1 << 11,
 }
 
 export class StandardEncryptDictionary extends EncryptDictionary {

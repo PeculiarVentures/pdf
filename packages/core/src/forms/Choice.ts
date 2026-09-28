@@ -49,7 +49,7 @@ export enum ChoiceFlags {
    *
    * @since PDF 1.5
    */
-  commitOnSelChange = 1 << 26
+  commitOnSelChange = 1 << 26,
 }
 
 export class ChoiceDictionary extends PDFField {

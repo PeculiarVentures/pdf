@@ -38,8 +38,8 @@ copier.append(sourceDoc, {
     1, // Single page
     [2, 4], // Page range
     [5, undefined], // From page 5 to end
-    [undefined, 3] // From start to page 3
-  ]
+    [undefined, 3], // From start to page 3
+  ],
 });
 ```
 
@@ -53,7 +53,7 @@ const copier = await PDFCopier.create({
   useXRefTable: true,
   algorithm: "AESV3", // Encryption algorithm
   userPassword: "user123",
-  ownerPassword: "owner123"
+  ownerPassword: "owner123",
 });
 ```
 
@@ -63,7 +63,7 @@ const copier = await PDFCopier.create({
 copier.append(sourceDoc, {
   progressCallback: (info) => {
     console.log("Changed object indexes:", info.changedIndexes);
-  }
+  },
 });
 ```
 

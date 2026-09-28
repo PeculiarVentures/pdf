@@ -23,13 +23,9 @@ import {
   SigningTimeAttribute,
   SigningTimeState,
   TimeStampToken,
-  TimeStampTokenAttribute
+  TimeStampTokenAttribute,
 } from "@peculiar/pdf-doc";
-import {
-  createPdfWithPage,
-  getTimeStampToken,
-  RootCertificateStorageHandler
-} from "@peculiar/pdf-tests";
+import { createPdfWithPage, getTimeStampToken, RootCertificateStorageHandler } from "@peculiar/pdf-tests";
 import { BufferSourceConverter, Convert } from "pvtsutils";
 import * as pkijs from "pkijs";
 
@@ -39,7 +35,7 @@ async function createSelfSignedCertificate() {
     name: "RSASSA-PKCS1-v1_5",
     hash: "SHA-256",
     publicExponent: new Uint8Array([1, 0, 1]),
-    modulusLength: 2048
+    modulusLength: 2048,
   };
   const keys = await crypto.subtle.generateKey(alg, false, ["sign", "verify"]);
   const cert = await x509.X509CertificateGenerator.createSelfSigned(
@@ -51,49 +47,29 @@ async function createSelfSignedCertificate() {
       keys,
       signingAlgorithm: alg,
       extensions: [
-        new x509.KeyUsagesExtension(
-          x509.KeyUsageFlags.digitalSignature |
-            x509.KeyUsageFlags.nonRepudiation |
-            x509.KeyUsageFlags.keyCertSign
-        ),
+        new x509.KeyUsagesExtension(x509.KeyUsageFlags.digitalSignature | x509.KeyUsageFlags.nonRepudiation | x509.KeyUsageFlags.keyCertSign),
         new x509.BasicConstraintsExtension(false),
-        await x509.AuthorityKeyIdentifierExtension.create(
-          keys.publicKey!,
-          false,
-          crypto
-        ),
-        await x509.SubjectKeyIdentifierExtension.create(
-          keys.publicKey!,
-          false,
-          crypto
-        ),
+        await x509.AuthorityKeyIdentifierExtension.create(keys.publicKey!, false, crypto),
+        await x509.SubjectKeyIdentifierExtension.create(keys.publicKey!, false, crypto),
         new x509.ExtendedKeyUsageExtension([
           "1.3.6.1.4.1.311.10.3.12", // documentSigning
-          "1.2.840.113583.1.1.5" // pdfAuthenticDocumentsTrust
-        ])
-      ]
+          "1.2.840.113583.1.1.5", // pdfAuthenticDocumentsTrust
+        ]),
+      ],
     },
-    crypto
+    crypto,
   );
 
   return { keys, cert };
 }
 
-function signHandler(
-  hash: string,
-  keys: CryptoKeyPair,
-  cert: x509.X509Certificate
-) {
+function signHandler(hash: string, keys: CryptoKeyPair, cert: x509.X509Certificate) {
   return async (data: Uint8Array) => {
     const messageDigest = await crypto.subtle.digest(hash, data);
     const signedData = new CMSSignedData();
     const signer = signedData.createSigner(cert, {
       digestAlgorithm: hash,
-      signedAttributes: [
-        new ContentTypeAttribute(CMSContentType.data),
-        new SigningTimeAttribute(new Date()),
-        new MessageDigestAttribute(messageDigest)
-      ]
+      signedAttributes: [new ContentTypeAttribute(CMSContentType.data), new SigningTimeAttribute(new Date()), new MessageDigestAttribute(messageDigest)],
     });
 
     signedData.certificates.push(cert);
@@ -120,16 +96,13 @@ async function createAndSignDocument(eol: string = "\n") {
       dict.Reason.get().text = "Test Reason";
       dict.Location.get().text = "Test Location";
     },
-    containerCreate: signHandler("SHA-256", keys, cert)
+    containerCreate: signHandler("SHA-256", keys, cert),
   });
 
   return { doc, keys, cert };
 }
 
-function getSignatureState(
-  states: SignatureVerifyResult,
-  code: string
-): SignatureStates {
+function getSignatureState(states: SignatureVerifyResult, code: string): SignatureStates {
   const state = states.states.find((o) => o.code === code);
   expect(state).toBeDefined();
   return state!;
@@ -151,17 +124,14 @@ describe("SignatureBoxGroup", () => {
       ["LF", "\n"],
       ["CRLF", "\r\n"],
       ["LFLF", "\n\n"],
-      ["LFLFLF", "\n\n\n"]
+      ["LFLFLF", "\n\n\n"],
     ];
 
-    test.each(validEOLs)(
-      "should create valid PDF with %s EOL",
-      async (_, eol) => {
-        const { doc } = await createAndSignDocument(eol);
-        const verify = await doc.verify();
-        expect(verify.items[0].states[0].type).toBe("valid");
-      }
-    );
+    test.each(validEOLs)("should create valid PDF with %s EOL", async (_, eol) => {
+      const { doc } = await createAndSignDocument(eol);
+      const verify = await doc.verify();
+      expect(verify.items[0].states[0].type).toBe("valid");
+    });
 
     it("should detect too many bytes after %%EOF marker", async () => {
       const { doc } = await createAndSignDocument("\n\n\n\n");
@@ -169,9 +139,7 @@ describe("SignatureBoxGroup", () => {
       const formattingState = verify.items[0].states[0] as FormattingState;
 
       expect(formattingState.type).toBe("invalid");
-      expect(formattingState.data.error?.message).toBe(
-        "The range of bytes points to an incorrect data. Too many bytes after %%EOF marker."
-      );
+      expect(formattingState.data.error?.message).toBe("The range of bytes points to an incorrect data. Too many bytes after %%EOF marker.");
     });
 
     it("should detect invalid EOL characters", async () => {
@@ -180,9 +148,7 @@ describe("SignatureBoxGroup", () => {
       const formattingState = verify.items[0].states[0] as FormattingState;
 
       expect(formattingState.type).toBe("invalid");
-      expect(formattingState.data.error?.message).toBe(
-        "The range of bytes points to an incorrect data. EOL contains invalid characters."
-      );
+      expect(formattingState.data.error?.message).toBe("The range of bytes points to an incorrect data. EOL contains invalid characters.");
     });
 
     it("should detect extra bytes after signed data", async () => {
@@ -195,62 +161,55 @@ describe("SignatureBoxGroup", () => {
       const formattingState = verify.items[0].states[0] as FormattingState;
 
       expect(formattingState.type).toBe("invalid");
-      expect(formattingState.data.error?.message).toBe(
-        "The range of bytes points to an incorrect data. Document contains extra bytes after signed data."
-      );
+      expect(formattingState.data.error?.message).toBe("The range of bytes points to an incorrect data. Document contains extra bytes after signed data.");
     });
   });
 
   describe("ByteRange validation", () => {
-    test.each([0, 1, 2])(
-      "should detect incorrect ByteRange[%i]",
-      async (index) => {
-        const doc = await createPdfWithPage();
-        const page = doc.pages.get(0);
-        page.addSignatureBox({ groupName: "box1" });
-        await doc.save();
+    test.each([0, 1, 2])("should detect incorrect ByteRange[%i]", async (index) => {
+      const doc = await createPdfWithPage();
+      const page = doc.pages.get(0);
+      page.addSignatureBox({ groupName: "box1" });
+      await doc.save();
 
-        const { keys, cert } = await createSelfSignedCertificate();
-        const box1 = doc.getComponentByName("box1", SignatureBoxGroup);
+      const { keys, cert } = await createSelfSignedCertificate();
+      const box1 = doc.getComponentByName("box1", SignatureBoxGroup);
 
-        await box1.sign({
-          dictionaryUpdate: async (dict) => {
-            dict.subFilter = "adbe.pkcs7.detached";
-            dict.Reason.get().text = "Test Reason";
-            dict.Location.get().text = "Test Location";
-          },
-          containerCreate: (data) => {
-            const byteRange = box1.getSignatureValue().ByteRange.get();
-            const num = byteRange.get(index, core.PDFNumeric);
-            const numValue = index > 1 ? num.value - 1 : num.value + 1;
-            const str = numValue.toString();
-            for (let i = 0; i < num.view.length; i++) {
-              num.view[i] = str.charCodeAt(i) || 0;
-            }
-            return signHandler("SHA-256", keys, cert)(data);
+      await box1.sign({
+        dictionaryUpdate: async (dict) => {
+          dict.subFilter = "adbe.pkcs7.detached";
+          dict.Reason.get().text = "Test Reason";
+          dict.Location.get().text = "Test Location";
+        },
+        containerCreate: (data) => {
+          const byteRange = box1.getSignatureValue().ByteRange.get();
+          const num = byteRange.get(index, core.PDFNumeric);
+          const numValue = index > 1 ? num.value - 1 : num.value + 1;
+          const str = numValue.toString();
+          for (let i = 0; i < num.view.length; i++) {
+            num.view[i] = str.charCodeAt(i) || 0;
           }
-        });
+          return signHandler("SHA-256", keys, cert)(data);
+        },
+      });
 
-        const doc2 = await PDFDocument.load(await doc.save());
-        const verify = await doc2.verify();
-        const formattingState = verify.items[0].states[0] as FormattingState;
+      const doc2 = await PDFDocument.load(await doc.save());
+      const verify = await doc2.verify();
+      const formattingState = verify.items[0].states[0] as FormattingState;
 
-        expect(formattingState.type).toBe("invalid");
-        expect(formattingState.data.error?.message).toBe(
-          `The range of bytes points to an incorrect data. ByteRange[${index}] points to an incorrect data.`
-        );
-      }
-    );
+      expect(formattingState.type).toBe("invalid");
+      expect(formattingState.data.error?.message).toBe(`The range of bytes points to an incorrect data. ByteRange[${index}] points to an incorrect data.`);
+    });
   });
 
   describe("verify", () => {
     const keyAlg = {
       name: "ECDSA",
-      namedCurve: "P-256"
+      namedCurve: "P-256",
     };
     const signingAlg = {
       name: "ECDSA",
-      hash: "SHA-256"
+      hash: "SHA-256",
     };
     let digicertCaCert: x509.X509Certificate;
     let rootCert: x509.X509Certificate;
@@ -317,8 +276,8 @@ describe("SignatureBoxGroup", () => {
           "dWKuh+vy1dneVrOfzM4UKLkNl2BcEkxY5NM9g0lFWJc1aRqoR+pWxnmrEthngYTffwk8lOa4JiwgvT2z",
           "KIn3X/8i4peEH+ll74fg38FnSbNd67IJKusm7Xi+fT8r87cmNW1fiQG2SVufAQWbqz0lwcy2f8Lxb4bG",
           "+mRo64EtlOtCt/qMHt1i8b5QZ7dsvfPxH2sMNgcWfzd8qVttevESRmCD1ycEvkvOl77DZypoEd+A5wwz",
-          "Zr8TDRRu838fYxAe+o0bJW1sj6W3YQGx0qMmoRBxna3iw/nDmVG3KwcIzi7mULKn+gpFL6Lw8g=="
-        ].join("")
+          "Zr8TDRRu838fYxAe+o0bJW1sj6W3YQGx0qMmoRBxna3iw/nDmVG3KwcIzi7mULKn+gpFL6Lw8g==",
+        ].join(""),
       );
 
       rootCert = new x509.X509Certificate(
@@ -332,8 +291,8 @@ describe("SignatureBoxGroup", () => {
           "DgQWBBQs9JVbGFuyO7sJw3+GDolRftk0ujAfBgNVHSMEGDAWgBQs9JVbGFuyO7sJ",
           "w3+GDolRftk0ujAKBggqhkjOPQQDAgNJADBGAiEA37yRwv9/Z/IanoM/zkKgAAuv",
           "3psn+rLc1y2PAY7BhfwCIQCtZZ76VDAHlau1etKGyNuwEqxJLey1UxlzXR2274e3",
-          "+w=="
-        ].join("")
+          "+w==",
+        ].join(""),
       );
       rootCert.privateKey = await crypto.subtle.importKey(
         "pkcs8",
@@ -341,18 +300,15 @@ describe("SignatureBoxGroup", () => {
           [
             "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgXWn0lBforfLExCzT",
             "RB7I1DagoCYiy7UvTbnRMMzNks2hRANCAAQTwNTbv6m8/RV19Ce4m2n6/38lAuKS",
-            "LXI63HkuAKHDyy/38cmGsZMzW4suxxY9UQ57gN9Q8qBXLN4/EZP23Wgy"
-          ].join("")
+            "LXI63HkuAKHDyy/38cmGsZMzW4suxxY9UQ57gN9Q8qBXLN4/EZP23Wgy",
+          ].join(""),
         ),
         keyAlg,
         false,
-        ["sign"]
+        ["sign"],
       );
 
-      const intermediateKeys = await crypto.subtle.generateKey(keyAlg, false, [
-        "sign",
-        "verify"
-      ]);
+      const intermediateKeys = await crypto.subtle.generateKey(keyAlg, false, ["sign", "verify"]);
       intermediateCert = await x509.X509CertificateGenerator.create({
         subject: "CN=Test Intermediate, O=Signing",
         issuer: rootCert.subject,
@@ -363,21 +319,10 @@ describe("SignatureBoxGroup", () => {
         signingAlgorithm: signingAlg,
         extensions: [
           new x509.BasicConstraintsExtension(true, 0, true),
-          new x509.KeyUsagesExtension(
-            x509.KeyUsageFlags.digitalSignature |
-              x509.KeyUsageFlags.keyCertSign |
-              x509.KeyUsageFlags.cRLSign,
-            true
-          ),
-          await x509.AuthorityKeyIdentifierExtension.create(
-            rootCert.publicKey,
-            false
-          ),
-          await x509.SubjectKeyIdentifierExtension.create(
-            intermediateKeys.publicKey,
-            false
-          )
-        ]
+          new x509.KeyUsagesExtension(x509.KeyUsageFlags.digitalSignature | x509.KeyUsageFlags.keyCertSign | x509.KeyUsageFlags.cRLSign, true),
+          await x509.AuthorityKeyIdentifierExtension.create(rootCert.publicKey, false),
+          await x509.SubjectKeyIdentifierExtension.create(intermediateKeys.publicKey, false),
+        ],
       });
       intermediateCert.privateKey = intermediateKeys.privateKey;
 
@@ -386,7 +331,7 @@ describe("SignatureBoxGroup", () => {
         thisUpdate: new Date(),
         nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
         signingKey: rootCert.privateKey,
-        signingAlgorithm: signingAlg
+        signingAlgorithm: signingAlg,
       });
       intermediateCrl = CRL.fromBER(interCrl.rawData);
 
@@ -395,26 +340,19 @@ describe("SignatureBoxGroup", () => {
         producedAt: new Date(),
         responses: [
           {
-            certId: await CertificateID.create(
-              "SHA-1",
-              intermediateCert,
-              rootCert
-            ),
+            certId: await CertificateID.create("SHA-1", intermediateCert, rootCert),
             status: {
-              type: "good"
+              type: "good",
             },
             thisUpdate: new Date(),
-            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365) // 1 year
-          }
+            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
+          },
         ],
         signingKey: rootCert.privateKey,
-        signingAlgorithm: signingAlg
+        signingAlgorithm: signingAlg,
       });
 
-      const leafKeys = await crypto.subtle.generateKey(keyAlg, false, [
-        "sign",
-        "verify"
-      ]);
+      const leafKeys = await crypto.subtle.generateKey(keyAlg, false, ["sign", "verify"]);
       leafCert = await x509.X509CertificateGenerator.create({
         subject: "CN=Test Leaf, O=Signing",
         issuer: intermediateCert.subject,
@@ -425,29 +363,19 @@ describe("SignatureBoxGroup", () => {
         signingAlgorithm: signingAlg,
         extensions: [
           // new x509.BasicConstraintsExtension(false, undefined, true),
-          new x509.KeyUsagesExtension(
-            x509.KeyUsageFlags.digitalSignature |
-              x509.KeyUsageFlags.nonRepudiation,
-            true
-          ),
-          await x509.AuthorityKeyIdentifierExtension.create(
-            intermediateKeys.publicKey,
-            false
-          ),
-          await x509.SubjectKeyIdentifierExtension.create(
-            leafKeys.publicKey,
-            false
-          ),
+          new x509.KeyUsagesExtension(x509.KeyUsageFlags.digitalSignature | x509.KeyUsageFlags.nonRepudiation, true),
+          await x509.AuthorityKeyIdentifierExtension.create(intermediateKeys.publicKey, false),
+          await x509.SubjectKeyIdentifierExtension.create(leafKeys.publicKey, false),
           new x509.ExtendedKeyUsageExtension([
             x509.ExtendedKeyUsage.clientAuth,
             "1.3.6.1.4.1.311.10.3.12", // documentSigning
-            "1.2.840.113583.1.1.5" // pdfAuthenticDocumentsTrust
+            "1.2.840.113583.1.1.5", // pdfAuthenticDocumentsTrust
           ]),
           new x509.CRLDistributionPointsExtension(["http://leaf.cer/crl"]),
           new x509.AuthorityInfoAccessExtension({
-            ocsp: ["http://leaf.cer/ocsp"]
-          })
-        ]
+            ocsp: ["http://leaf.cer/ocsp"],
+          }),
+        ],
       });
       leafCert.privateKey = leafKeys.privateKey;
 
@@ -456,7 +384,7 @@ describe("SignatureBoxGroup", () => {
         thisUpdate: new Date(),
         nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
         signingKey: intermediateCert.privateKey,
-        signingAlgorithm: signingAlg
+        signingAlgorithm: signingAlg,
       });
       leafCrl = CRL.fromBER(crl.rawData);
 
@@ -465,20 +393,16 @@ describe("SignatureBoxGroup", () => {
         producedAt: new Date(),
         responses: [
           {
-            certId: await CertificateID.create(
-              "SHA-1",
-              leafCert,
-              intermediateCert
-            ),
+            certId: await CertificateID.create("SHA-1", leafCert, intermediateCert),
             status: {
-              type: "good"
+              type: "good",
             },
             thisUpdate: new Date(),
-            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365) // 1 year
-          }
+            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
+          },
         ],
         signingKey: intermediateCert.privateKey,
-        signingAlgorithm: signingAlg
+        signingAlgorithm: signingAlg,
       });
     });
 
@@ -489,7 +413,7 @@ describe("SignatureBoxGroup", () => {
         revocationStore?: "dss" | "cms" | "adobe-attr";
         signingTime?: "local" | "embedded" | "dss" | "empty";
         invalidateTimestamp?: boolean;
-      } = {}
+      } = {},
     ) {
       options.revocation ??= "crl";
       options.revocationStore ??= "dss";
@@ -513,11 +437,7 @@ describe("SignatureBoxGroup", () => {
         containerCreate: async (data) => {
           const signedData = new CMSSignedData();
           const hash = await crypto.subtle.digest("SHA-256", data);
-          const signedAttributes: CmsAttribute[] = [
-            new ContentTypeAttribute(CMSContentType.data),
-            new MessageDigestAttribute(hash),
-            await SigningCertificateV2Attribute.create("SHA-256", leafCert)
-          ];
+          const signedAttributes: CmsAttribute[] = [new ContentTypeAttribute(CMSContentType.data), new MessageDigestAttribute(hash), await SigningCertificateV2Attribute.create("SHA-256", leafCert)];
 
           if (options.revocationStore === "adobe-attr") {
             const revocations: RevocationData[] = [];
@@ -529,7 +449,7 @@ describe("SignatureBoxGroup", () => {
                 revocations.push(leafOcsp);
                 revocations.push({
                   type: "ocsp", // other revocation method
-                  value: intermediateOcsp
+                  value: intermediateOcsp,
                 });
                 break;
               case "one-missing":
@@ -543,7 +463,7 @@ describe("SignatureBoxGroup", () => {
 
           const signer = signedData.createSigner(leafCert, {
             digestAlgorithm: "SHA-256",
-            signedAttributes
+            signedAttributes,
           });
 
           signedData.certificates.push(leafCert);
@@ -566,24 +486,19 @@ describe("SignatureBoxGroup", () => {
 
           await signedData.sign(leafCert.privateKey!, signer);
 
-          if (
-            options.signingTime === "embedded" ||
-            options.signingTime === "dss"
-          ) {
+          if (options.signingTime === "embedded" || options.signingTime === "dss") {
             timeStampToken = await getTimeStampToken(
               options.invalidateTimestamp
                 ? new Uint8Array([0]) // invalid signature value
-                : signedData.signers[0].signatureValue
+                : signedData.signers[0].signatureValue,
             );
             if (options.signingTime === "embedded") {
-              signedData.signers[0].unsignedAttributes.push(
-                new TimeStampTokenAttribute(timeStampToken)
-              );
+              signedData.signers[0].unsignedAttributes.push(new TimeStampTokenAttribute(timeStampToken));
             }
           }
 
           return signedData.toBER();
-        }
+        },
       });
 
       const signatureThumbprint = await signature.thumbprint();
@@ -619,43 +534,35 @@ describe("SignatureBoxGroup", () => {
         trustedCertificates: [rootCert, digicertCaCert],
         revocations: {
           "http://leaf.cer/crl": leafCrl,
-          "http://leaf.cer/ocsp": leafOcsp
-        }
+          "http://leaf.cer/ocsp": leafOcsp,
+        },
       });
       return doc2.verify({
-        checkDate: date
+        checkDate: date,
       });
     }
 
     describe("signing time", () => {
       it("should verify signature with certificates, revocations and timestamp in DSS", async () => {
         const doc = await createSignedDocument({
-          signingTime: "dss"
+          signingTime: "dss",
         });
         const verify = await verifyDocument(doc);
 
-        const state = getSignatureState(
-          verify.items[0],
-          "signing_time"
-        ) as SigningTimeState;
+        const state = getSignatureState(verify.items[0], "signing_time") as SigningTimeState;
         expect(state.type).toBe("valid");
-        expect(state.text).toBe(
-          "The signature includes a timestamp embedded in the document"
-        );
+        expect(state.text).toBe("The signature includes a timestamp embedded in the document");
         expect(state.data.type).toBe("dss");
       });
 
       it("should verify signature with certificates, revocations and timestamp in CMS", async () => {
         const doc = await createSignedDocument({
           signingTime: "embedded",
-          revocation: "ocsp"
+          revocation: "ocsp",
         });
         const verify = await verifyDocument(doc);
 
-        const state = getSignatureState(
-          verify.items[0],
-          "signing_time"
-        ) as SigningTimeState;
+        const state = getSignatureState(verify.items[0], "signing_time") as SigningTimeState;
         expect(state.type).toBe("valid");
         expect(state.text).toBe("The signature includes an embedded timestamp");
         expect(state.data.type).toBe("embedded");
@@ -663,18 +570,13 @@ describe("SignatureBoxGroup", () => {
 
       it("should verify signature with signingTime in dictionary", async () => {
         const doc = await createSignedDocument({
-          signingTime: "local"
+          signingTime: "local",
         });
         const verify = await verifyDocument(doc);
 
-        const state = getSignatureState(
-          verify.items[0],
-          "signing_time"
-        ) as SigningTimeState;
+        const state = getSignatureState(verify.items[0], "signing_time") as SigningTimeState;
         expect(state.type).toBe("info");
-        expect(state.text).toBe(
-          "Signing time is from the clock on the signer's computer"
-        );
+        expect(state.text).toBe("Signing time is from the clock on the signer's computer");
         expect(state.data.type).toBe("local");
       });
 
@@ -682,10 +584,7 @@ describe("SignatureBoxGroup", () => {
         const doc = await createSignedDocument();
         const verify = await verifyDocument(doc);
 
-        const state = getSignatureState(
-          verify.items[0],
-          "signing_time"
-        ) as SigningTimeState;
+        const state = getSignatureState(verify.items[0], "signing_time") as SigningTimeState;
         expect(state.type).toBe("info");
         expect(state.text).toBe("Signing time is not available");
         expect(state.data.type).toBe("empty");
@@ -697,10 +596,7 @@ describe("SignatureBoxGroup", () => {
         const doc = await createSignedDocument({ signingTime: "dss" });
         const verify = await verifyDocument(doc, checkDate);
 
-        const state = getSignatureState(
-          verify.items[0],
-          "signing_time"
-        ) as EmbeddedSigningTimeState;
+        const state = getSignatureState(verify.items[0], "signing_time") as EmbeddedSigningTimeState;
         // app should ignore checkDate for timestamp verification
         expect(state.type).toBe("valid");
         expect(verify.items[0].checkDate).toBe(checkDate);
@@ -710,18 +606,13 @@ describe("SignatureBoxGroup", () => {
       it("should detect invalid timestamp signature", async () => {
         const doc = await createSignedDocument({
           signingTime: "dss",
-          invalidateTimestamp: true
+          invalidateTimestamp: true,
         });
         const verify = await verifyDocument(doc);
 
-        const state = getSignatureState(
-          verify.items[0],
-          "signing_time"
-        ) as SigningTimeState;
+        const state = getSignatureState(verify.items[0], "signing_time") as SigningTimeState;
         expect(state.type).toBe("invalid");
-        expect(state.text).toBe(
-          "The signature includes a timestamp embedded in the document but it is invalid"
-        );
+        expect(state.text).toBe("The signature includes a timestamp embedded in the document but it is invalid");
       });
     });
 
@@ -729,10 +620,7 @@ describe("SignatureBoxGroup", () => {
       it("should return valid formatting state", async () => {
         const doc = await createSignedDocument();
         const verify = await doc.verify();
-        const formattingState = getSignatureState(
-          verify.items[0],
-          "formatting"
-        ) as FormattingState;
+        const formattingState = getSignatureState(verify.items[0], "formatting") as FormattingState;
         expect(formattingState.type).toBe("valid");
         expect(formattingState.text).toBe("There are not errors in formatting");
       });
@@ -749,14 +637,9 @@ describe("SignatureBoxGroup", () => {
 
         // verify the signature
         const verify = await signature.verify();
-        const formattingState = getSignatureState(
-          verify,
-          "formatting"
-        ) as FormattingState;
+        const formattingState = getSignatureState(verify, "formatting") as FormattingState;
         expect(formattingState.type).toBe("invalid");
-        expect(formattingState.text).toBe(
-          "There are errors in the formatting or information contained in the signature"
-        );
+        expect(formattingState.text).toBe("There are errors in the formatting or information contained in the signature");
       });
 
       it("should return warn formatting state for wrong document structure", async () => {
@@ -765,14 +648,9 @@ describe("SignatureBoxGroup", () => {
 
         const verify = await doc.verify();
 
-        const formattingState = getSignatureState(
-          verify.items[0],
-          "formatting"
-        ) as FormattingState;
+        const formattingState = getSignatureState(verify.items[0], "formatting") as FormattingState;
         expect(formattingState.type).toBe("warn");
-        expect(formattingState.text).toBe(
-          "Document structure doesn't match PDF specification"
-        );
+        expect(formattingState.text).toBe("Document structure doesn't match PDF specification");
       });
     });
 
@@ -784,13 +662,13 @@ describe("SignatureBoxGroup", () => {
         expect(ltvState.type).toBe("info");
         expect(ltvState.text).toBe("Signature is LTV enabled");
         expect(ltvState.data).toEqual({
-          state: true
+          state: true,
         });
       });
 
       it("should return invalid ltv state", async () => {
         const doc = await createSignedDocument({
-          revocation: "none"
+          revocation: "none",
         });
         const verify = await doc.verify();
         const ltvState = getSignatureState(verify.items[0], "ltv") as LtvState;
@@ -798,13 +676,13 @@ describe("SignatureBoxGroup", () => {
         expect(ltvState.text).toBe("Signature is not LTV enabled");
         expect(ltvState.data).toEqual({
           state: false,
-          reason: "PDF document doesn't have revocation items"
+          reason: "PDF document doesn't have revocation items",
         });
       });
 
       it("should detect if one revocation item is missing", async () => {
         const doc = await createSignedDocument({
-          revocation: "one-missing"
+          revocation: "one-missing",
         });
         const verify = await verifyDocument(doc);
         const ltvState = getSignatureState(verify.items[0], "ltv") as LtvState;
@@ -812,8 +690,7 @@ describe("SignatureBoxGroup", () => {
         expect(ltvState.text).toBe("Signature is not LTV enabled");
         expect(ltvState.data).toEqual({
           state: false,
-          reason:
-            "No revocation values found for one of certificates: No CRLs for specific certificate issuer"
+          reason: "No revocation values found for one of certificates: No CRLs for specific certificate issuer",
         });
       });
     });
@@ -822,10 +699,7 @@ describe("SignatureBoxGroup", () => {
       it("should return valid document modification state", async () => {
         const doc = await createSignedDocument();
         const verify = await doc.verify();
-        const state = getSignatureState(
-          verify.items[0],
-          "document_modification"
-        ) as DocumentModificationState;
+        const state = getSignatureState(verify.items[0], "document_modification") as DocumentModificationState;
         expect(state.type).toBe("valid");
         expect(state.data.state).toBe("not_modified");
       });
@@ -835,10 +709,7 @@ describe("SignatureBoxGroup", () => {
         doc.target.view[12] = 0xf0; // modify the document
 
         const verify = await doc.verify();
-        const state = getSignatureState(
-          verify.items[0],
-          "document_modification"
-        ) as DocumentModificationState;
+        const state = getSignatureState(verify.items[0], "document_modification") as DocumentModificationState;
         expect(state.type).toBe("invalid");
         expect(state.data.state).toBe("error");
       });
@@ -847,17 +718,12 @@ describe("SignatureBoxGroup", () => {
         const doc = await createSignedDocument();
         const signature = doc.getSignatures()[0] as SignatureBoxGroup;
         const contents = signature.target.V!.Contents;
-        const signedData = CMSSignedData.fromBER(
-          Convert.FromBinary(contents.text)
-        );
+        const signedData = CMSSignedData.fromBER(Convert.FromBinary(contents.text));
         signedData.signers[0].asn.signature.valueBlock.valueHexView[0] = 0x00; // modify the signature
         contents.text = Convert.ToBinary(signedData.toBER());
 
         const verify = await signature.verify();
-        const state = getSignatureState(
-          verify,
-          "document_modification"
-        ) as DocumentModificationState;
+        const state = getSignatureState(verify, "document_modification") as DocumentModificationState;
         expect(state.type).toBe("invalid");
         expect(state.data.state).toBe("modified");
       });
@@ -866,31 +732,25 @@ describe("SignatureBoxGroup", () => {
     it("should return valid signature state with embedded revocations", async () => {
       // TODO: Acrobat does't use revocations from CAdES revocation info, it's not clear why
       const doc = await createSignedDocument({
-        revocationStore: "cms"
+        revocationStore: "cms",
       });
       const verify = await verifyDocument(doc);
       const ltvState = getSignatureState(verify.items[0], "ltv") as LtvState;
       expect(ltvState.type).toBe("info");
       expect(ltvState.data.state).toBe(true);
-      const identityState = getSignatureState(
-        verify.items[0],
-        "identity_verification"
-      ) as SignatureStates;
+      const identityState = getSignatureState(verify.items[0], "identity_verification") as SignatureStates;
       expect(identityState.type).toBe("valid");
     });
 
     it("should return valid signature state with Adobe Archive Attribute", async () => {
       const doc = await createSignedDocument({
-        revocationStore: "adobe-attr"
+        revocationStore: "adobe-attr",
       });
       const verify = await verifyDocument(doc);
       const ltvState = getSignatureState(verify.items[0], "ltv") as LtvState;
       expect(ltvState.type).toBe("info");
       expect(ltvState.data.state).toBe(true);
-      const identityState = getSignatureState(
-        verify.items[0],
-        "identity_verification"
-      ) as SignatureStates;
+      const identityState = getSignatureState(verify.items[0], "identity_verification") as SignatureStates;
       expect(identityState.type).toBe("valid");
     });
   });
