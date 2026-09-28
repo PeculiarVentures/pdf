@@ -45,7 +45,7 @@ describe("PDFDate", () => {
     it("should handle positive timezone", () => {
       const date = new PDFDate();
       const testDate = new Date();
-      jest.spyOn(testDate, "getTimezoneOffset").mockReturnValue(-180); // +03:00
+      vi.spyOn(testDate, "getTimezoneOffset").mockReturnValue(-180); // +03:00
       date.setDate(testDate);
       expect(date.toString()).toMatch(/\+03'00'\)$/);
     });
@@ -53,7 +53,7 @@ describe("PDFDate", () => {
     it("should handle negative timezone", () => {
       const date = new PDFDate();
       const testDate = new Date();
-      jest.spyOn(testDate, "getTimezoneOffset").mockReturnValue(180); // -03:00
+      vi.spyOn(testDate, "getTimezoneOffset").mockReturnValue(180); // -03:00
       date.setDate(testDate);
       expect(date.toString()).toMatch(/-03'00'\)$/);
     });
@@ -61,7 +61,7 @@ describe("PDFDate", () => {
     it("should handle UTC timezone", () => {
       const date = new PDFDate();
       const testDate = new Date();
-      jest.spyOn(testDate, "getTimezoneOffset").mockReturnValue(0); // UTC
+      vi.spyOn(testDate, "getTimezoneOffset").mockReturnValue(0); // UTC
       date.setDate(testDate);
       expect(date.toString()).toMatch(/Z\)$/);
     });

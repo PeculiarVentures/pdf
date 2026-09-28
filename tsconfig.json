@@ -14,7 +14,8 @@
       "@peculiar/pdf-form-json": ["./packages/form-json/src"],
       "@peculiar/pdf-repair": ["./packages/repair/src"],
       "@peculiar/pdf-tests": ["./packages/tests/src"]
-    }
+    },
+    "types": ["node", "vitest/globals"]
   },
-  "exclude": ["node_modules", "coverage", "packages/*/build", "packages/**/*/*.js", "packages/**/*/*.mjs", "jest.config.js"]
+  "exclude": ["node_modules", "coverage", "packages/*/build", "packages/**/*/*.js", "packages/**/*/*.mjs", "vitest.config.ts"]
 }

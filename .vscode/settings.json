@@ -19,6 +19,5 @@
   "[typescript]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
-  "oxc.enable": true,
-  "jest.runMode": "on-demand"
+  "oxc.enable": true
 }
