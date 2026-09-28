@@ -243,6 +243,7 @@ export class PDFField extends objects.PDFDictionary implements IFieldDictionary 
    */
   public getFullName(): string {
     const parts = [];
+    // oxlint-disable-next-line typescript/no-this-alias -- walk Parent chain from current field
     let field: PDFField | null = this;
     while (field) {
       parts.unshift(field.t.text);

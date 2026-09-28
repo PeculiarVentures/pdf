@@ -1,3 +1,4 @@
+/* oxlint-disable eslint/no-sparse-arrays -- PDF encoding lookup tables use intentional sparse rows */
 type TextEncodingUnicode = number | undefined;
 interface TextEncodingTable {
   [key: number]: [TextEncodingUnicode, TextEncodingUnicode, TextEncodingUnicode, string];

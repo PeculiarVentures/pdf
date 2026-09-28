@@ -14,23 +14,22 @@ export class NameTree<T extends core.PDFObject = core.PDFObject> extends WrapObj
   [Symbol.iterator](): Iterator<[string, T], unknown, undefined> {
     let pointer = 0;
     const array = this.target.keys();
-    const _this = this;
 
     return {
-      next(): IteratorResult<[string, T]> {
+      next: (): IteratorResult<[string, T]> => {
         if (pointer < array.length) {
           const key = array[pointer++];
 
           return {
             done: false,
-            value: [key, _this.get(key)],
-          };
-        } else {
-          return {
-            done: true,
-            value: null,
+            value: [key, this.get(key)],
           };
         }
+
+        return {
+          done: true,
+          value: null,
+        };
       },
     };
   }

@@ -13,6 +13,7 @@ export class PDFLiteralString extends PDFTextString {
   public static readonly NAME = ObjectTypeEnum.LiteralString;
 
   // Cache regex patterns
+  // oxlint-disable-next-line eslint/no-control-regex -- PDF literal strings may contain control bytes
   private static readonly ESCAPE_PATTERN = /[\n\r\t\f\x08\\()]/gm;
   private static readonly OCTAL_PATTERN = /[0-7]{1,3}/;
   private static readonly PARSE_PATTERN = /\\([0-7]{1,3}|\r\n|\n|\r|.)/gm;

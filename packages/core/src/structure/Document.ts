@@ -256,7 +256,7 @@ export class PDFDocument {
   protected findIndex(cb: (c: number, i: number, array: Uint8Array) => boolean, options: FindIndexOptions = {}): number {
     const offset = options.offset || 0;
     const step = options.reversed ? -1 : 1;
-    for (let i = offset; true; i = i + step) {
+    for (let i = offset; ; i = i + step) {
       const value = this.view[i];
       if (value === undefined) {
         break;

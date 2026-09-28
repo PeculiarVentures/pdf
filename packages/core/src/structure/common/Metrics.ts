@@ -275,11 +275,8 @@ export class Metrics extends PDFArray {
       // XxZ & ZxY => XxY
       throw new Error("Number of columns in the first matrix should be the same as the number of rows in the second");
     }
-    const productRow = Array.apply(null, new Array(y)).map(Number.prototype.valueOf, 0);
-    const product = new Array(x);
-    for (let p = 0; p < x; p++) {
-      product[p] = productRow.slice();
-    }
+    const productRow = Array.from({ length: y }, () => 0);
+    const product = Array.from({ length: x }, () => productRow.slice());
     for (let i = 0; i < x; i++) {
       for (let j = 0; j < y; j++) {
         for (let k = 0; k < z; k++) {

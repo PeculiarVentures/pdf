@@ -215,6 +215,7 @@ export class PDFDocumentUpdate {
       this.#objects = [];
       const actual: string[] = [];
       const removed: string[] = [];
+      // oxlint-disable-next-line typescript/no-this-alias -- traverse update chain from head
       let update: PDFDocumentUpdate | null = this;
       while (update) {
         for (const item of update.items) {

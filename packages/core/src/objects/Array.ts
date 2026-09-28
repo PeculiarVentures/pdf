@@ -12,21 +12,20 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
 
   [Symbol.iterator](): Iterator<PDFObject, unknown, undefined> {
     let pointer = 0;
-    const _this = this;
 
     return {
-      next(): IteratorResult<PDFObject> {
-        if (pointer < _this.items.length) {
+      next: (): IteratorResult<PDFObject> => {
+        if (pointer < this.items.length) {
           return {
             done: false,
-            value: _this.get(pointer++),
-          };
-        } else {
-          return {
-            done: true,
-            value: null,
+            value: this.get(pointer++),
           };
         }
+
+        return {
+          done: true,
+          value: null,
+        };
       },
     };
   }
@@ -45,7 +44,7 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
       this.documentUpdate = items[0].documentUpdate;
       this.view = items[0].view;
     } else {
-      this.items = new Array(...items);
+      this.items = items;
     }
   }
 

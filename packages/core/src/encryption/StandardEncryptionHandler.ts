@@ -267,6 +267,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
 
   public async checkOwnerPassword(password: Password = ""): Promise<boolean> {
     const dict = this.dictionary;
+    const attempt = password || this.#ownerPassword || "";
     let res = false;
 
     switch (this.revision) {
@@ -277,7 +278,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
           crypto: this.crypto,
           revision: this.revision,
           user: await this.#getUserPassword(),
-          owner: password,
+          owner: attempt,
           length: dict.Length,
           o: dict.O.toUint8Array(),
         });
@@ -285,7 +286,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
       case 6:
         res = await StandardEncryptionAlgorithm.algorithm12({
           crypto: this.crypto,
-          password,
+          password: attempt,
           o: dict.O.toUint8Array(),
           u: dict.U.toUint8Array(),
         });
@@ -294,7 +295,9 @@ export class StandardEncryptionHandler extends EncryptionHandler {
         throw new Error("Cannot check the Owner password, unknown revision");
     }
 
-    this.#ownerPassword = password;
+    if (res) {
+      this.#ownerPassword = attempt;
+    }
 
     return res;
   }
@@ -333,20 +336,6 @@ export class StandardEncryptionHandler extends EncryptionHandler {
     }
 
     return this.#userPassword;
-  }
-
-  /**
-   * Returns the Owner cached password.
-   *
-   * If cache is empty, throws an error.
-   * @returns Password
-   */
-  #getOwnerPassword(): Password {
-    if (!this.#ownerPassword) {
-      throw new Error("Cannot get the Owner password. It is not set.");
-    }
-
-    return this.#ownerPassword;
   }
 
   /**

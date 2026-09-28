@@ -237,11 +237,6 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
         error: e instanceof Error ? e : new Error("Unknown error on CRL fetching"),
       };
     }
-
-    return {
-      result: null,
-      target: this,
-    };
   }
 
   public async requestCRL(uri: string): Promise<ArrayBuffer> {

@@ -25,22 +25,21 @@ export class FormComponentGroup<TTarget extends core.PDFField = core.PDFField, T
 
   [Symbol.iterator](): Iterator<TItem, unknown, undefined> {
     let pointer = 0;
-    const _this = this;
     const items = this.target.Kids.has() ? this.target.Kids.get() : this.document.target.createArray(this.target);
 
     return {
-      next(): IteratorResult<TItem> {
+      next: (): IteratorResult<TItem> => {
         if (pointer < items.length) {
           return {
             done: false,
-            value: _this.get(pointer++),
-          };
-        } else {
-          return {
-            done: true,
-            value: null,
+            value: this.get(pointer++),
           };
         }
+
+        return {
+          done: true,
+          value: null,
+        };
       },
     };
   }

@@ -51,7 +51,7 @@ export class ViewReader {
    */
   protected findIndexByCallback(cb: ViewReaderFindCallback): number {
     const step = this.backward ? -1 : 1;
-    for (this.position; true; this.position += step) {
+    for (; ; this.position += step) {
       const value = this.view[this.position];
       if (value === undefined) {
         break;

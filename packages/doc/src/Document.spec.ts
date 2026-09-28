@@ -72,6 +72,7 @@ describe("Document", () => {
         },
         {
           name: "range *-5",
+          // oxlint-disable-next-line eslint/no-sparse-arrays -- open-ended page range start
           params: [[, 5]],
           want: [1, 2, 3, 4, 5],
         },

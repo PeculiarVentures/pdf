@@ -91,10 +91,6 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
     switch (params.algorithm) {
       case CryptoFilterMethods.AES128:
         throw new Error("Cannot create PublicKeyEncryptionHandler. AES128 crypto mechanism is not supported");
-        // encrypt.SubFilter = "adbe.pkcs7.s4";
-        // encrypt.Length = 128;
-        // encrypt.V = 4; // CF, StmF, and StrF
-        break;
       case CryptoFilterMethods.AES256: {
         let encryptionKey: EncryptionKey | null = null;
         // create StdCF Crypto Filter

@@ -77,7 +77,7 @@ export class PDFDocumentObject implements PDFDocumentObjectParameters {
     });
 
     if (!this.#value && this.type !== PDFDocumentObjectTypes.free) {
-      this.value;
+      void this.value;
     }
     copy.#value = this.#value!.copy();
 

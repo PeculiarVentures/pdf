@@ -218,32 +218,30 @@ describe("StandardEncryptionAlgorithm", () => {
       params: src.StandardAlgorithm2AParams;
       want: string;
     }[] = [
-      ...[
-        {
-          name: "user password",
-          password: "",
+      {
+        name: "user password",
+        password: "",
+      },
+      {
+        name: "owner password",
+        password: "12345678",
+      },
+    ].map((o) => {
+      return {
+        name: o.name,
+        params: {
+          password: o.password,
+          o: Buffer.from(O_R6, "hex"),
+          oe: Buffer.from(OE_R6, "hex"),
+          u: Buffer.from(U_R6, "hex"),
+          ue: Buffer.from(UE_R6, "hex"),
+          perms: Buffer.from("0876362f837fbe43c2591387b4232f82", "hex"),
+          p: -2368,
+          crypto,
         },
-        {
-          name: "owner password",
-          password: "12345678",
-        },
-      ].map((o) => {
-        return {
-          name: o.name,
-          params: {
-            password: o.password,
-            o: Buffer.from(O_R6, "hex"),
-            oe: Buffer.from(OE_R6, "hex"),
-            u: Buffer.from(U_R6, "hex"),
-            ue: Buffer.from(UE_R6, "hex"),
-            perms: Buffer.from("0876362f837fbe43c2591387b4232f82", "hex"),
-            p: -2368,
-            crypto,
-          },
-          want: "6efde11f7aed6160973ff07b31c20f0b610e58a4edc1d8764a9029ce3333a417",
-        };
-      }),
-    ];
+        want: "6efde11f7aed6160973ff07b31c20f0b610e58a4edc1d8764a9029ce3333a417",
+      };
+    });
 
     for (const t of tests) {
       it(t.name, async () => {
