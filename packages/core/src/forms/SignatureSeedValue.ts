@@ -8,7 +8,7 @@ export enum SignatureSeedValueFlags {
   reasons = 0x08,
   legalAttestation = 0x10,
   addRevInfo = 0x20,
-  digestMethod = 0x40
+  digestMethod = 0x40,
 }
 
 export class SignatureSeedValueDictionary extends objects.PDFDictionary {
@@ -21,7 +21,7 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
     name: "Type",
     type: objects.PDFName,
     optional: true,
-    get: (o) => o.text
+    get: (o) => o.text,
   })
   public type!: objects.PDFName | null;
 
@@ -36,7 +36,7 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
     type: objects.PDFNumeric,
     optional: true,
     get: (o) => o.value,
-    defaultValue: 0
+    defaultValue: 0,
   })
   public ff!: SignatureSeedValueFlags;
 
@@ -47,7 +47,7 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
     name: "Filter",
     type: objects.PDFName,
     optional: true,
-    get: (o) => o.text
+    get: (o) => o.text,
   })
   public filter!: string | null;
 
@@ -57,7 +57,7 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "SubFilter",
     type: objects.PDFArray,
-    optional: true
+    optional: true,
   })
   public subFilter!: objects.PDFArray | null;
 
@@ -70,7 +70,7 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "DigestMethod",
     type: objects.PDFArray,
-    optional: true
+    optional: true,
   })
   public digestMethod!: objects.PDFArray | null;
 
@@ -84,7 +84,7 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "V",
     type: objects.PDFNumeric,
-    optional: true
+    optional: true,
   })
   public v!: number | null;
 
@@ -96,7 +96,7 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Cert",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public cert!: objects.PDFDictionary | null;
 
@@ -108,7 +108,7 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Reasons",
     type: objects.PDFArray,
-    optional: true
+    optional: true,
   })
   public reasons!: objects.PDFArray | null;
 
@@ -121,7 +121,7 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
     type: objects.PDFDictionary,
     optional: true,
     cache: true,
-    get: (o) => new SignatureMDPDictionary(o)
+    get: (o) => new SignatureMDPDictionary(o),
   })
   public mdp!: SignatureMDPDictionary | null;
 
@@ -131,7 +131,7 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "TimeStamp",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public timeStamp!: objects.PDFDictionary | null;
 
@@ -141,7 +141,7 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "LegalAttestation",
     type: objects.PDFArray,
-    optional: true
+    optional: true,
   })
   public legalAttestation!: objects.PDFArray | null;
 
@@ -152,7 +152,7 @@ export class SignatureSeedValueDictionary extends objects.PDFDictionary {
     name: "AddRevInfo",
     type: objects.PDFBoolean,
     optional: true,
-    defaultValue: false
+    defaultValue: false,
   })
   public addRevInfo!: boolean;
 }

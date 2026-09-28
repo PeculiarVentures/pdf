@@ -23,21 +23,17 @@ export interface CMSSignedDataCreateSignerParameters {
   unsignedAttributes?: CmsAttribute[];
 }
 
-export class CMSSignedData
-  extends CMSContentInfo
-  implements ICertificateStorage
-{
+export class CMSSignedData extends CMSContentInfo implements ICertificateStorage {
   public static readonly CONTENT_TYPE = CMSContentInfo.CONTENT_TYPE_SIGNED_DATA;
   public static readonly DIGEST_ALGORITHM = "SHA-1";
   public static readonly SIGNATURE_ALGORITHM: Algorithm = {
     name: "RSASSA-PKCS1-v1_5",
-    hash: { name: "SHA-1" }
+    hash: { name: "SHA-1" },
   } as Algorithm;
 
   protected signedData: pkijs.SignedData;
 
-  public certificateHandler: ICertificateStorageHandler =
-    new CmsCertificateStorageHandler(this);
+  public certificateHandler: ICertificateStorageHandler = new CmsCertificateStorageHandler(this);
 
   public signers: CMSSignerInfo[] = [];
   public certificates = new X509Certificates();
@@ -49,8 +45,8 @@ export class CMSSignedData
     this.signedData = new pkijs.SignedData({
       version: 1,
       encapContentInfo: new pkijs.EncapsulatedContentInfo({
-        eContentType: CMSContentInfo.CONTENT_TYPE_DATA
-      })
+        eContentType: CMSContentInfo.CONTENT_TYPE_DATA,
+      }),
     });
 
     this.asn.contentType = CMSSignedData.CONTENT_TYPE;
@@ -143,9 +139,7 @@ export class CMSSignedData
         } else if (revocation instanceof OCSP) {
           const otherRevInfo = new pkijs.OtherRevocationInfoFormat({
             otherRevInfoFormat: id_ri_ocsp_response,
-            otherRevInfo: pkijs.OCSPResponse.fromBER(
-              revocation.toOCSPResponse()
-            ).toSchema()
+            otherRevInfo: pkijs.OCSPResponse.fromBER(revocation.toOCSPResponse()).toSchema(),
           });
           crls.push(otherRevInfo);
         }
@@ -161,15 +155,11 @@ export class CMSSignedData
     return super.toSchema();
   }
 
-  public async verify(
-    data?: BufferSource,
-    checkDate = new Date(),
-    signer?: CMSSignerInfo
-  ): Promise<CMSSignedDataVerifyResult> {
+  public async verify(data?: BufferSource, checkDate = new Date(), signer?: CMSSignerInfo): Promise<CMSSignedDataVerifyResult> {
     const signedDataResult: CMSSignedDataVerifyResult = {
       date: checkDate,
       signatureVerified: true,
-      signers: []
+      signers: [],
     };
 
     if (signer) {
@@ -179,15 +169,14 @@ export class CMSSignedData
         signer: signerIndex,
         checkChain: false,
         checkDate,
-        extendedMode: true
+        extendedMode: true,
       };
 
       if (data) {
         params.data = BufferSourceConverter.toArrayBuffer(data);
       } else {
         if (this.content) {
-          params.data =
-            this.signedData.encapContentInfo.eContent!.valueBlock.valueHex; // TODO constructed OCTET STRING
+          params.data = this.signedData.encapContentInfo.eContent!.valueBlock.valueHex; // TODO constructed OCTET STRING
         }
       }
 
@@ -197,9 +186,7 @@ export class CMSSignedData
       try {
         const signingCertificate = await signer.getCertificate();
 
-        this.signedData.certificates = [
-          PKIUtils.x509ToCert(signingCertificate)
-        ];
+        this.signedData.certificates = [PKIUtils.x509ToCert(signingCertificate)];
       } catch (e) {
         const message = e instanceof Error ? e.message : `${e}`;
         pkiResult = {
@@ -209,22 +196,18 @@ export class CMSSignedData
           signatureVerified: false,
           signatureAlgorithm: {
             ...signer.signatureAlgorithm,
-            hash: signer.digestAlgorithm
-          } as HashedAlgorithm
+            hash: signer.digestAlgorithm,
+          } as HashedAlgorithm,
         };
       }
 
       if (!pkiResult) {
         try {
-          pkiResult = (await this.signedData.verify(
-            params
-          )) as unknown as CMSSignerInfoVerifyResult;
+          pkiResult = (await this.signedData.verify(params)) as unknown as CMSSignerInfoVerifyResult;
         } catch (e) {
           if (typeof e === "string") {
             this.signedData.certificates = cachedCerts;
-            throw new Error(
-              `Failed on PKI SignedData 'verify' method execution. ${e}`
-            );
+            throw new Error(`Failed on PKI SignedData 'verify' method execution. ${e}`);
           }
           if (e instanceof Error && !("certificatePath" in e)) {
             this.signedData.certificates = cachedCerts;
@@ -237,20 +220,16 @@ export class CMSSignedData
       this.signedData.certificates = cachedCerts;
 
       if (!pkiResult) {
-        throw new Error(
-          "PKI SignedData signature verification result is empty"
-        );
+        throw new Error("PKI SignedData signature verification result is empty");
       }
 
       if (pkiResult.signerCertificate) {
-        pkiResult.signerCertificate = PKIUtils.certTox509(
-          pkiResult.signerCertificate as unknown as pkijs.Certificate
-        );
+        pkiResult.signerCertificate = PKIUtils.certTox509(pkiResult.signerCertificate as unknown as pkijs.Certificate);
       }
 
       pkiResult.signatureAlgorithm = {
         ...signer.signatureAlgorithm,
-        hash: signer.digestAlgorithm
+        hash: signer.digestAlgorithm,
       } as HashedAlgorithm;
 
       signedDataResult.signers.push(pkiResult);
@@ -267,23 +246,12 @@ export class CMSSignedData
     return signedDataResult;
   }
 
-  public async sign(
-    key: CryptoKey,
-    signer: CMSSignerInfo,
-    data?: BufferSource
-  ): Promise<void> {
+  public async sign(key: CryptoKey, signer: CMSSignerInfo, data?: BufferSource): Promise<void> {
     const signerIndex = this.getSignerIndex(signer);
 
-    await this.signedData.sign(
-      key,
-      signerIndex,
-      signer.digestAlgorithm.name,
-      data
-    );
+    await this.signedData.sign(key, signerIndex, signer.digestAlgorithm.name, data);
 
-    const signerRaw = this.signedData.signerInfos[signerIndex]
-      .toSchema()
-      .toBER();
+    const signerRaw = this.signedData.signerInfos[signerIndex].toSchema().toBER();
     const signerAsn = pkijs.SignerInfo.fromBER(signerRaw);
     this.signedData.signerInfos[signerIndex] = signerAsn;
     signer.fromSchema(signerAsn);
@@ -299,10 +267,7 @@ export class CMSSignedData
   }
 
   // TODO Move to CMSSignerInfo static method
-  public createSigner(
-    source: BufferSource | X509Certificate,
-    params: CMSSignedDataCreateSignerParameters = {}
-  ): CMSSignerInfo {
+  public createSigner(source: BufferSource | X509Certificate, params: CMSSignedDataCreateSignerParameters = {}): CMSSignerInfo {
     if (BufferSourceConverter.isBufferSource(source)) {
       const cert = new X509Certificate(source);
 
@@ -314,7 +279,7 @@ export class CMSSignedData
     const pkiCert = PKIUtils.x509ToCert(source);
     signer.asn.sid = new pkijs.IssuerAndSerialNumber({
       issuer: pkiCert.issuer,
-      serialNumber: pkiCert.serialNumber
+      serialNumber: pkiCert.serialNumber,
     });
 
     if (params.signedAttributes) {
@@ -325,7 +290,7 @@ export class CMSSignedData
 
       signer.asn.signedAttrs = new pkijs.SignedAndUnsignedAttributes({
         type: 0,
-        attributes: attrs
+        attributes: attrs,
       });
     }
 
@@ -337,16 +302,14 @@ export class CMSSignedData
 
       signer.asn.unsignedAttrs = new pkijs.SignedAndUnsignedAttributes({
         type: 1,
-        attributes: attrs
+        attributes: attrs,
       });
     }
 
-    const digestAlgIdRaw = AlgorithmFactory.toBER(
-      params.digestAlgorithm || CMSSignedData.DIGEST_ALGORITHM
-    );
+    const digestAlgIdRaw = AlgorithmFactory.toBER(params.digestAlgorithm || CMSSignedData.DIGEST_ALGORITHM);
     const digestAlgIdAsn = asn1js.fromBER(digestAlgIdRaw);
     signer.asn.digestAlgorithm = new pkijs.AlgorithmIdentifier({
-      schema: digestAlgIdAsn.result
+      schema: digestAlgIdAsn.result,
     });
 
     // Assign signer to the signed data
@@ -359,22 +322,12 @@ export class CMSSignedData
 }
 
 import { PKIUtils } from "./PKIUtils";
-import {
-  CMSSignerInfo,
-  CMSSignerInfoVerifyResult,
-  CMSSignerInfoVerifyResultCodes
-} from "./SignerInfo";
+import { CMSSignerInfo, CMSSignerInfoVerifyResult, CMSSignerInfoVerifyResultCodes } from "./SignerInfo";
 import { CmsCertificateStorageHandler } from "./CertificateStorageHandler";
 import { CRL } from "./CRL";
 import { OCSP } from "./OCSP";
-import {
-  AdobeRevocationInfoArchival,
-  id_adbe_revocationInfoArchival
-} from "./AdobeRevocationInfoArchival";
+import { AdobeRevocationInfoArchival, id_adbe_revocationInfoArchival } from "./AdobeRevocationInfoArchival";
 import { AlgorithmFactory, HashedAlgorithm } from "./AlgorithmFactory";
 
 import type { CmsAttribute } from "./attributes";
-import type {
-  ICertificateStorage,
-  ICertificateStorageHandler
-} from "./ICertificateStorageHandler";
+import type { ICertificateStorage, ICertificateStorageHandler } from "./ICertificateStorageHandler";

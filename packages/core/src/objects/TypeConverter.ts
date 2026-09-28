@@ -1,12 +1,6 @@
 export class PDFTypeConverter {
   public static convert<T extends PDFObject>(target: T): T;
-  public static convert<T extends PDFObject>(
-    target: PDFObject,
-    type: abstract new () => T,
-    replace?: boolean
-  ): T;
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public static convert<T extends PDFObject>(target: PDFObject, type: abstract new () => T, replace?: boolean): T;
   public static convert(target: PDFObject, type?: any, replace = false): any {
     if (type) {
       if (

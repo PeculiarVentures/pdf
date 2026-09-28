@@ -5,14 +5,8 @@ import type { ViewWriter } from "../ViewWriter";
 import { ObjectTypeEnum } from "./internal";
 import { PDFObject, PDFObjectConstructor } from "./Object";
 
-const dictionaryLeftChars = new Uint8Array([
-  CharSet.lessThanChar,
-  CharSet.lessThanChar
-]);
-const dictionaryRightChars = new Uint8Array([
-  CharSet.greaterThanChar,
-  CharSet.greaterThanChar
-]);
+const dictionaryLeftChars = new Uint8Array([CharSet.lessThanChar, CharSet.lessThanChar]);
+const dictionaryRightChars = new Uint8Array([CharSet.greaterThanChar, CharSet.greaterThanChar]);
 
 export type PDFDictionaryKey = PDFName | string;
 
@@ -29,9 +23,7 @@ export class PDFDictionary extends PDFObject {
   public constructor();
   public constructor(dictionary: PDFDictionary);
   public constructor(items: [PDFDictionaryKey, PDFObjectTypes][]);
-  public constructor(
-    params?: [PDFDictionaryKey, PDFObjectTypes][] | PDFDictionary
-  ) {
+  public constructor(params?: [PDFDictionaryKey, PDFObjectTypes][] | PDFDictionary) {
     super();
 
     if (params) {
@@ -59,10 +51,7 @@ export class PDFDictionary extends PDFObject {
       writer.writeByte(CharSet.whiteSpaceChar);
       if (item.isIndirect()) {
         const indirect = item.getIndirect();
-        const indirectRef = new PDFIndirectReference(
-          indirect.id,
-          indirect.generation
-        );
+        const indirectRef = new PDFIndirectReference(indirect.id, indirect.generation);
         indirectRef.writePDF(writer);
       } else {
         item.writePDF(writer);
@@ -84,11 +73,7 @@ export class PDFDictionary extends PDFObject {
 
     while (true) {
       PDFObjectReader.skip(reader);
-      if (
-        dictionaryRightChars.every(
-          (c, i) => c === reader.view[reader.position + i]
-        )
-      ) {
+      if (dictionaryRightChars.every((c, i) => c === reader.view[reader.position + i])) {
         reader.read(2);
         break;
       }
@@ -97,24 +82,14 @@ export class PDFDictionary extends PDFObject {
       this.adoptChild(key);
       if (key instanceof PDFNull) {
         PDFObjectReader.skip(reader);
-        if (
-          !dictionaryRightChars.every(
-            (c, i) => c === reader.view[reader.position + i]
-          )
-        ) {
-          throw new ParsingError(
-            "Must be '>>' after the 'null' value",
-            reader.position
-          );
+        if (!dictionaryRightChars.every((c, i) => c === reader.view[reader.position + i])) {
+          throw new ParsingError("Must be '>>' after the 'null' value", reader.position);
         }
         reader.read(2);
         break;
       }
       if (!(key instanceof PDFName)) {
-        throw new ParsingError(
-          `Dictionary key at position ${reader.view.byteOffset} must be type of Name`,
-          reader.view.byteOffset
-        );
+        throw new ParsingError(`Dictionary key at position ${reader.view.byteOffset} must be type of Name`, reader.view.byteOffset);
       }
       const value = PDFObjectReader.read(reader, this.documentUpdate, this);
       this.adoptChild(value);
@@ -138,19 +113,12 @@ export class PDFDictionary extends PDFObject {
    * @param type Expected type of returning value
    * @param replace Replace the original item
    */
-  public get<T extends PDFObject>(
-    name: PDFDictionaryKey,
-    type: abstract new () => T,
-    replace?: boolean
-  ): T;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public get<T extends PDFObject>(name: PDFDictionaryKey, type: abstract new () => T, replace?: boolean): T;
   public get(name: PDFDictionaryKey, type?: any, replace = false): any {
     const pdfName = PDFDictionary.getName(name);
     let res = this.items.get(PDFDictionary.getName(pdfName));
     if (!res) {
-      throw new Error(
-        `Cannot get PDF Dictionary value by name '${pdfName.toString()}'`
-      );
+      throw new Error(`Cannot get PDF Dictionary value by name '${pdfName.toString()}'`);
     }
 
     if (res instanceof PDFIndirectReference) {
@@ -174,11 +142,7 @@ export class PDFDictionary extends PDFObject {
     try {
       resType = PDFTypeConverter.convert(res, type, replace);
     } catch {
-      throw new Error(
-        `Cannot convert PDF Dictionary value by name '${pdfName.toString()}' to type '${
-          type.name
-        }'`
-      );
+      throw new Error(`Cannot convert PDF Dictionary value by name '${pdfName.toString()}' to type '${type.name}'`);
     }
     if (replace && !resType.isIndirect) {
       this.set(name, resType as PDFObjectTypes);
@@ -199,11 +163,7 @@ export class PDFDictionary extends PDFObject {
   public set(name: PDFDictionaryKey, value: PDFObjectTypes): this {
     this.modify();
 
-    if (
-      value instanceof PDFObject &&
-      (value.constructor as PDFObjectConstructor<PDFObject>).NAME ===
-        ObjectTypeEnum.Stream
-    ) {
+    if (value instanceof PDFObject && (value.constructor as PDFObjectConstructor<PDFObject>).NAME === ObjectTypeEnum.Stream) {
       value.makeIndirect();
     }
 
@@ -260,10 +220,7 @@ export class PDFDictionary extends PDFObject {
         const ref = value.getIndirect();
         valueString = `${ref.id} ${ref.generation} R`;
       } else {
-        valueString =
-          value instanceof PDFDictionary
-            ? value.toString(depth + 1)
-            : value.toString();
+        valueString = value instanceof PDFDictionary ? value.toString(depth + 1) : value.toString();
       }
 
       records.push(`${padding}/${keyString} ${valueString}`);
@@ -273,10 +230,7 @@ export class PDFDictionary extends PDFObject {
   }
 
   protected onEqual(target: PDFObject): boolean {
-    if (
-      target instanceof PDFDictionary &&
-      target.items.size === this.items.size
-    ) {
+    if (target instanceof PDFDictionary && target.items.size === this.items.size) {
       for (const [key, item] of target.items) {
         if (this.items.has(key) && this.items.get(key)?.equal(item)) {
           continue;

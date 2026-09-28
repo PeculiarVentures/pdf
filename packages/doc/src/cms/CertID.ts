@@ -21,11 +21,7 @@ export class CertificateID extends AsnEncoded<pkijs.CertID> {
    * @returns A new CertificateID instance
    * @throws Error if the certificate was not signed by the specified issuer
    */
-  public static async create(
-    algorithm: AlgorithmIdentifier,
-    cert: X509Certificate,
-    issuer: X509Certificate
-  ): Promise<CertificateID> {
+  public static async create(algorithm: AlgorithmIdentifier, cert: X509Certificate, issuer: X509Certificate): Promise<CertificateID> {
     const pkiCertId = new pkijs.CertID();
 
     const engine = pkijs.getCrypto(true);
@@ -34,9 +30,9 @@ export class CertificateID extends AsnEncoded<pkijs.CertID> {
     const ok = await cert.verify(
       {
         signatureOnly: true,
-        publicKey: issuer
+        publicKey: issuer,
       },
-      engine.crypto
+      engine.crypto,
     );
     if (!ok) {
       throw new Error("Certificate was not signed by issuer");
@@ -44,7 +40,7 @@ export class CertificateID extends AsnEncoded<pkijs.CertID> {
 
     await pkiCertId.createForCertificate(PKIUtils.x509ToCert(cert), {
       hashAlgorithm: typeof algorithm === "string" ? algorithm : algorithm.name,
-      issuerCertificate: PKIUtils.x509ToCert(issuer)
+      issuerCertificate: PKIUtils.x509ToCert(issuer),
     });
 
     const res = new CertificateID();

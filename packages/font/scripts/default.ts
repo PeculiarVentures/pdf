@@ -21,7 +21,7 @@ const pdfFontNames: { [key: string]: string } = {
   TimesItalic: "Times-Italic",
   TimesRoman: "Times-Roman",
   ZapfDingbats: "ZapfDingbats",
-}
+};
 
 function main() {
   const filesDir = path.join(__dirname, "..", "fonts");
@@ -39,8 +39,8 @@ function main() {
     const fontInfo = FontFactory.create(fontRaw);
     // Use only ASCII unicode
     if (item.startsWith("C") || item.startsWith("H") || item.startsWith("T")) {
-      fontInfo.glyphs = fontInfo.glyphs.filter(o => {
-        const unicode = o.unicode.filter(c => c <= 0xff)
+      fontInfo.glyphs = fontInfo.glyphs.filter((o) => {
+        const unicode = o.unicode.filter((c) => c <= 0xff);
         if (unicode.length) {
           o.unicode = unicode;
           return true;

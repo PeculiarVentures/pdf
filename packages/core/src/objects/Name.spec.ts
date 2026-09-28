@@ -12,7 +12,7 @@ describe("Name", () => {
     ["/Lime#20Green", "Lime Green"],
     ["/paired#28#29parentheses", "paired()parentheses"],
     ["/The_Key_of_F#23_Minor", "The_Key_of_F#_Minor"],
-    ["/", ""]
+    ["/", ""],
   ];
 
   describe("fromPDF", () => {

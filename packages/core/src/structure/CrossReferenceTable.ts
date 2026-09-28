@@ -10,10 +10,7 @@ import { PDFDocumentObject, PDFDocumentObjectTypes } from "./DocumentObject";
 import { PDFDocumentObjectGrouper } from "./DocumentObjectGrouper";
 import type { CrossReferenceStream } from "./CrossReferenceStream";
 
-export class CrossReferenceTable
-  extends TrailerDictionary
-  implements CrossReference
-{
+export class CrossReferenceTable extends TrailerDictionary implements CrossReference {
   public objects: PDFDocumentObject[] = [];
   public xrefStream?: CrossReferenceStream;
 
@@ -54,16 +51,11 @@ export class CrossReferenceTable
         const matches = /([0-9]{10}) ([0-9]{5}) ([fn])/.exec(line);
         if (!matches) {
           const offset = reader.view.byteOffset + reader.position;
-          throw new ParsingError(
-            "Cross-reference entity doesn't match to required structure",
-            offset
-          );
+          throw new ParsingError("Cross-reference entity doesn't match to required structure", offset);
         }
 
         if (!this.documentUpdate) {
-          throw new Error(
-            "PDF DocumentUpdate must be assigned to the CrossReferenceTable"
-          );
+          throw new Error("PDF DocumentUpdate must be assigned to the CrossReferenceTable");
         }
 
         const offset = parseInt(matches[1], 10);
@@ -81,8 +73,8 @@ export class CrossReferenceTable
             id,
             generation,
             offset,
-            type: status
-          })
+            type: status,
+          }),
         );
       }
 

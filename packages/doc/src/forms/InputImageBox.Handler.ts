@@ -31,9 +31,7 @@ export class InputImageBoxHandler implements IInputImageHandler {
     const widget = core.SingleWidgetDictionary.create(update);
     widget.ft = "Btn";
     widget.ff = core.ButtonFlags.pushbutton;
-    widget.t = this.document.target.createString(
-      params.name || core.UUID.generate()
-    );
+    widget.t = this.document.target.createString(params.name || core.UUID.generate());
     widget.rect.llX = x;
     widget.rect.llY = y;
     widget.rect.urX = x + width;
@@ -59,10 +57,7 @@ export class InputImageBoxHandler implements IInputImageHandler {
     }
     const a = widget.A.get();
     a.s = "JavaScript";
-    a.set(
-      "JS",
-      this.document.target.createString("event.target.buttonImportIcon();")
-    );
+    a.set("JS", this.document.target.createString("event.target.buttonImportIcon();"));
 
     const acroForm = update.catalog!.AcroForm.get();
 

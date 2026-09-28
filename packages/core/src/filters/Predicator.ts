@@ -29,8 +29,7 @@ export abstract class Predictor {
       if (valueColors) this.colors = valueColors.value;
 
       const valueBitsPerComponent = params.get("BitsPerComponent", PDFNumeric);
-      if (valueBitsPerComponent)
-        this.bitsPerComponent = valueBitsPerComponent.value;
+      if (valueBitsPerComponent) this.bitsPerComponent = valueBitsPerComponent.value;
 
       const valueColumns = params.get("Columns", PDFNumeric);
       if (valueColumns) this.columns = valueColumns.value;

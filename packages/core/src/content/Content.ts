@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { EventEmitter } from "events";
 import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 
@@ -29,7 +28,7 @@ export enum LineCapStyle {
    * Projecting square cap. The stroke shall continue beyond the endpoint of the path
    * for a distance equal to half the line width and shall be squared off.
    */
-  projectingSquareCap = 2
+  projectingSquareCap = 2,
 }
 
 export enum LineJoinStyle {
@@ -54,7 +53,7 @@ export enum LineJoinStyle {
    * style") and the resulting notch beyond the ends of the segments shall be filled with
    * a triangle.
    */
-  bevelJoin = 2
+  bevelJoin = 2,
 }
 
 export interface ContentSetFontSizeParameters {
@@ -68,8 +67,7 @@ export interface ClippingAreaParams {
   width: TypographySize;
   height: TypographySize;
 }
-export interface ContentDrawTextParameters
-  extends ContentSetFontSizeParameters {
+export interface ContentDrawTextParameters extends ContentSetFontSizeParameters {
   graphicsState?: string;
   color: Colors;
   clippingArea?: ClippingAreaParams;
@@ -92,44 +90,23 @@ export class PDFContent extends EventEmitter {
   }
 
   public override emit(event: "clear"): boolean;
-  public override emit(
-    event: "push",
-    operator: PDFOperator | PDFContentScope
-  ): boolean;
+  public override emit(event: "push", operator: PDFOperator | PDFContentScope): boolean;
   public override emit(event: string | symbol, ...args: any[]): boolean;
   public override emit(event: string | symbol, ...args: any[]): boolean {
     return super.emit(event, ...args);
   }
 
   public override on(event: "clear", listener: () => void): this;
-  public override on(
-    event: "push",
-    listener: (operator: PDFOperator | PDFContentScope) => void
-  ): this;
-  public override on(
-    event: string | symbol,
-    listener: (...args: any[]) => void
-  ): this;
-  public override on(
-    event: string | symbol,
-    listener: (...args: any[]) => void
-  ): this {
+  public override on(event: "push", listener: (operator: PDFOperator | PDFContentScope) => void): this;
+  public override on(event: string | symbol, listener: (...args: any[]) => void): this;
+  public override on(event: string | symbol, listener: (...args: any[]) => void): this {
     return super.on(event, listener);
   }
 
   public override once(event: "clear", listener: () => void): this;
-  public override once(
-    event: "push",
-    listener: (operator: PDFOperator | PDFContentScope) => void
-  ): this;
-  public override once(
-    event: string | symbol,
-    listener: (...args: any[]) => void
-  ): this;
-  public override once(
-    event: string | symbol,
-    listener: (...args: any[]) => void
-  ): this {
+  public override once(event: "push", listener: (operator: PDFOperator | PDFContentScope) => void): this;
+  public override once(event: string | symbol, listener: (...args: any[]) => void): this;
+  public override once(event: string | symbol, listener: (...args: any[]) => void): this {
     return super.once(event, listener);
   }
 
@@ -186,9 +163,7 @@ export class PDFContent extends EventEmitter {
 
         args.push(arg);
       } catch {
-        const name = viewReader.read((v) =>
-          PDFContent.SPLITTERS.includes(String.fromCharCode(v))
-        );
+        const name = viewReader.read((v) => PDFContent.SPLITTERS.includes(String.fromCharCode(v)));
         if (!name.length) {
           break;
         }
@@ -210,11 +185,7 @@ export class PDFContent extends EventEmitter {
   }
 
   public setFontAndSize(params: ContentSetFontSizeParameters): this {
-    return this.push([
-      "Tf",
-      new objects.PDFName(params.font),
-      new objects.PDFNumeric(params.size)
-    ]);
+    return this.push(["Tf", new objects.PDFName(params.font), new objects.PDFNumeric(params.size)]);
   }
 
   public toArrayBuffer(): ArrayBuffer {
@@ -262,14 +233,7 @@ export class PDFContent extends EventEmitter {
    * @param f Operand in matrix
    * @returns
    */
-  public concatMatrix(
-    a: TypographySize,
-    b: TypographySize,
-    c: TypographySize,
-    d: TypographySize,
-    e: TypographySize,
-    f: TypographySize
-  ): this {
+  public concatMatrix(a: TypographySize, b: TypographySize, c: TypographySize, d: TypographySize, e: TypographySize, f: TypographySize): this {
     this.push([
       "cm",
       TypographyConverter.toPDFNumeric(a),
@@ -277,7 +241,7 @@ export class PDFContent extends EventEmitter {
       TypographyConverter.toPDFNumeric(c),
       TypographyConverter.toPDFNumeric(d),
       TypographyConverter.toPDFNumeric(e),
-      TypographyConverter.toPDFNumeric(f)
+      TypographyConverter.toPDFNumeric(f),
     ]);
 
     return this;
@@ -325,11 +289,7 @@ export class PDFContent extends EventEmitter {
    * @param y Typography size of Y coordinate
    */
   public moveTo(x: TypographySize, y: TypographySize): this {
-    this.push([
-      "m",
-      TypographyConverter.toPDFNumeric(x),
-      TypographyConverter.toPDFNumeric(y)
-    ]);
+    this.push(["m", TypographyConverter.toPDFNumeric(x), TypographyConverter.toPDFNumeric(y)]);
 
     return this;
   }
@@ -339,11 +299,7 @@ export class PDFContent extends EventEmitter {
    * point shall be (x, y).
    */
   public lineTo(x: TypographySize, y: TypographySize): this {
-    this.push([
-      "l",
-      TypographyConverter.toPDFNumeric(x),
-      TypographyConverter.toPDFNumeric(y)
-    ]);
+    this.push(["l", TypographyConverter.toPDFNumeric(x), TypographyConverter.toPDFNumeric(y)]);
 
     return this;
   }
@@ -353,14 +309,7 @@ export class PDFContent extends EventEmitter {
    * point to the point (x3 , y3), using (x1, y1 ) and (x2, y2 ) as the Bézier control points (see 8.5.2.2,
    * y3 "Cubic Bézier curves"). The new current point shall be (x3 , y3 ).
    */
-  public curveTo(
-    x1: TypographySize,
-    y1: TypographySize,
-    x2: TypographySize,
-    y2: TypographySize,
-    x3: TypographySize,
-    y3: TypographySize
-  ): this {
+  public curveTo(x1: TypographySize, y1: TypographySize, x2: TypographySize, y2: TypographySize, x3: TypographySize, y3: TypographySize): this {
     this.push([
       "c",
       TypographyConverter.toPDFNumeric(x1),
@@ -368,7 +317,7 @@ export class PDFContent extends EventEmitter {
       TypographyConverter.toPDFNumeric(x2),
       TypographyConverter.toPDFNumeric(y2),
       TypographyConverter.toPDFNumeric(x3),
-      TypographyConverter.toPDFNumeric(y3)
+      TypographyConverter.toPDFNumeric(y3),
     ]);
 
     return this;
@@ -418,7 +367,7 @@ export class PDFContent extends EventEmitter {
       TypographyConverter.toPDFNumeric(params.x),
       TypographyConverter.toPDFNumeric(params.y),
       TypographyConverter.toPDFNumeric(params.width),
-      TypographyConverter.toPDFNumeric(params.height)
+      TypographyConverter.toPDFNumeric(params.height),
     ]);
     this.clip();
     this.pathEnd();
@@ -525,11 +474,7 @@ export class PDFContent extends EventEmitter {
    * @param size Font size
    */
   public textFont(font: string, size: TypographySize): this {
-    this.push([
-      "Tf",
-      new objects.PDFName(font),
-      TypographyConverter.toPDFNumeric(size)
-    ]);
+    this.push(["Tf", new objects.PDFName(font), TypographyConverter.toPDFNumeric(size)]);
 
     return this;
   }
@@ -568,11 +513,7 @@ export class PDFContent extends EventEmitter {
    * @param y
    */
   public textMove(x: TypographySize, y: TypographySize): this {
-    this.push([
-      "Td",
-      TypographyConverter.toPDFNumeric(x),
-      TypographyConverter.toPDFNumeric(y)
-    ]);
+    this.push(["Td", TypographyConverter.toPDFNumeric(x), TypographyConverter.toPDFNumeric(y)]);
 
     return this;
   }
@@ -584,11 +525,7 @@ export class PDFContent extends EventEmitter {
    * @param x
    */
   public textMoveLeading(x: TypographySize, y: TypographySize): this {
-    this.push([
-      "TD",
-      TypographyConverter.toPDFNumeric(x),
-      TypographyConverter.toPDFNumeric(y)
-    ]);
+    this.push(["TD", TypographyConverter.toPDFNumeric(x), TypographyConverter.toPDFNumeric(y)]);
 
     return this;
   }
@@ -602,23 +539,9 @@ export class PDFContent extends EventEmitter {
    * @param e
    * @param f
    */
-  public textMatrix(
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    e: number,
-    f: number
-  ): this;
+  public textMatrix(a: number, b: number, c: number, d: number, e: number, f: number): this;
   public textMatrix(matrix: Metrics): this;
-  public textMatrix(
-    a: number | Metrics,
-    b = 0,
-    c = 0,
-    d = 1,
-    e = 0,
-    f = 0
-  ): this {
+  public textMatrix(a: number | Metrics, b = 0, c = 0, d = 1, e = 0, f = 0): this {
     if (a instanceof Metrics) {
       this.push(["Tm", a]);
     } else {
@@ -629,7 +552,7 @@ export class PDFContent extends EventEmitter {
         TypographyConverter.toPDFNumeric(c),
         TypographyConverter.toPDFNumeric(d),
         TypographyConverter.toPDFNumeric(e),
-        TypographyConverter.toPDFNumeric(f)
+        TypographyConverter.toPDFNumeric(f),
       ]);
     }
 
@@ -641,14 +564,7 @@ export class PDFContent extends EventEmitter {
 
     matrix.transform(transforms);
 
-    return this.textMatrix(
-      matrix.a,
-      matrix.b,
-      matrix.c,
-      matrix.d,
-      matrix.e,
-      matrix.f
-    );
+    return this.textMatrix(matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f);
   }
 
   /**
@@ -669,13 +585,7 @@ export class PDFContent extends EventEmitter {
    * Show a text string
    * @param text
    */
-  public textShow(
-    text:
-      | string
-      | objects.PDFLiteralString
-      | objects.PDFHexString
-      | BufferSource
-  ): this {
+  public textShow(text: string | objects.PDFLiteralString | objects.PDFHexString | BufferSource): this {
     if (typeof text === "string") {
       text = new objects.PDFLiteralString(text);
     } else if (BufferSourceConverter.isBufferSource(text)) {
@@ -751,10 +661,7 @@ export class PDFContent extends EventEmitter {
    * @param tag
    * @param properties
    */
-  public markedContentBegin(
-    tag: string,
-    properties?: objects.PDFDictionary
-  ): this {
+  public markedContentBegin(tag: string, properties?: objects.PDFDictionary): this {
     if (properties) {
       this.push(["BMC", new objects.PDFName(tag), properties]);
     } else {
@@ -781,11 +688,7 @@ export class PDFContent extends EventEmitter {
    * @param y Y coordinate of the circle center
    * @param r Radius of the circle
    */
-  public drawCircle(
-    x: TypographySize,
-    y: TypographySize,
-    r: TypographySize
-  ): this {
+  public drawCircle(x: TypographySize, y: TypographySize, r: TypographySize): this {
     const curvePt = 0.5523;
 
     const xPt = TypographyConverter.toPoint(x);
@@ -793,38 +696,10 @@ export class PDFContent extends EventEmitter {
     const rPt = TypographyConverter.toPoint(r);
 
     return this.moveTo(xPt + rPt, yPt)
-      .curveTo(
-        xPt + rPt,
-        yPt + rPt * curvePt,
-        xPt + rPt * curvePt,
-        yPt + rPt,
-        xPt,
-        yPt + rPt
-      )
-      .curveTo(
-        xPt - rPt * curvePt,
-        yPt + rPt,
-        xPt - rPt,
-        yPt + rPt * curvePt,
-        xPt - rPt,
-        yPt
-      )
-      .curveTo(
-        xPt - rPt,
-        yPt - rPt * curvePt,
-        xPt - rPt * curvePt,
-        yPt - rPt,
-        xPt,
-        yPt - rPt
-      )
-      .curveTo(
-        xPt + rPt * curvePt,
-        yPt - rPt,
-        xPt + rPt,
-        yPt - rPt * curvePt,
-        xPt + rPt,
-        yPt
-      );
+      .curveTo(xPt + rPt, yPt + rPt * curvePt, xPt + rPt * curvePt, yPt + rPt, xPt, yPt + rPt)
+      .curveTo(xPt - rPt * curvePt, yPt + rPt, xPt - rPt, yPt + rPt * curvePt, xPt - rPt, yPt)
+      .curveTo(xPt - rPt, yPt - rPt * curvePt, xPt - rPt * curvePt, yPt - rPt, xPt, yPt - rPt)
+      .curveTo(xPt + rPt * curvePt, yPt - rPt, xPt + rPt, yPt - rPt * curvePt, xPt + rPt, yPt);
   }
 
   /**
@@ -835,24 +710,13 @@ export class PDFContent extends EventEmitter {
    * @param height Height
    * @returns
    */
-  public drawRectangle(
-    x: TypographySize,
-    y: TypographySize,
-    width: TypographySize,
-    height: TypographySize
-  ): this {
+  public drawRectangle(x: TypographySize, y: TypographySize, width: TypographySize, height: TypographySize): this {
     const xPt = TypographyConverter.toPoint(x);
     const yPt = TypographyConverter.toPoint(y);
     const heightPt = TypographyConverter.toPoint(height);
     const widthPt = TypographyConverter.toPoint(width);
 
-    this.push([
-      "re",
-      new objects.PDFNumeric(xPt),
-      new objects.PDFNumeric(yPt),
-      new objects.PDFNumeric(widthPt),
-      new objects.PDFNumeric(heightPt)
-    ]);
+    this.push(["re", new objects.PDFNumeric(xPt), new objects.PDFNumeric(yPt), new objects.PDFNumeric(widthPt), new objects.PDFNumeric(heightPt)]);
 
     return this;
   }
@@ -866,27 +730,13 @@ export class PDFContent extends EventEmitter {
   }
 
   public skew(a: number, b: number): this {
-    return this.concatMatrix(
-      1,
-      Math.tan(Metrics.toRadians(a)),
-      Math.tan(Metrics.toRadians(b)),
-      1,
-      0,
-      0
-    );
+    return this.concatMatrix(1, Math.tan(Metrics.toRadians(a)), Math.tan(Metrics.toRadians(b)), 1, 0, 0);
   }
 
   public rotate(angle: number): this {
     const radians = Metrics.toRadians(angle);
 
-    return this.concatMatrix(
-      Math.cos(radians),
-      Math.sin(radians),
-      -Math.sin(radians),
-      Math.cos(radians),
-      0,
-      0
-    );
+    return this.concatMatrix(Math.cos(radians), Math.sin(radians), -Math.sin(radians), Math.cos(radians), 0, 0);
   }
 
   public transform(params: Transformations): this {
@@ -908,12 +758,7 @@ export class PDFContent extends EventEmitter {
   }
 
   public text(variable = false): PDFTextScope {
-    const scope = variable
-      ? new PDFContentScope(
-          PDFOperator.fromString("/Tx BMC"),
-          PDFOperator.fromString("EMC")
-        )
-      : new PDFTextScope();
+    const scope = variable ? new PDFContentScope(PDFOperator.fromString("/Tx BMC"), PDFOperator.fromString("EMC")) : new PDFTextScope();
     this.push(scope);
 
     return scope;
@@ -923,7 +768,7 @@ export class PDFContent extends EventEmitter {
 export class PDFContentScope extends PDFContent {
   constructor(
     public begin: PDFOperator,
-    public end: PDFOperator
+    public end: PDFOperator,
   ) {
     super();
 

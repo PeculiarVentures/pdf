@@ -21,9 +21,7 @@ export class AlgorithmFactory {
     this.converters.push(converter);
   }
 
-  public static prepareAlgorithm(
-    algorithm: AlgorithmIdentifier | HashedAlgorithmIdentifier
-  ): Algorithm | HashedAlgorithm {
+  public static prepareAlgorithm(algorithm: AlgorithmIdentifier | HashedAlgorithmIdentifier): Algorithm | HashedAlgorithm {
     if (typeof algorithm === "string") {
       return { name: algorithm };
     }
@@ -32,17 +30,15 @@ export class AlgorithmFactory {
       return {
         name: algorithm.name,
         hash: {
-          name: algorithm.hash
-        }
+          name: algorithm.hash,
+        },
       };
     }
 
     return algorithm;
   }
 
-  public static toBER(
-    algorithm: AlgorithmIdentifier | HashedAlgorithmIdentifier
-  ): ArrayBuffer {
+  public static toBER(algorithm: AlgorithmIdentifier | HashedAlgorithmIdentifier): ArrayBuffer {
     const alg = this.prepareAlgorithm(algorithm);
 
     for (let i = this.converters.length; i > 0; i--) {
@@ -53,9 +49,7 @@ export class AlgorithmFactory {
       }
     }
 
-    throw new Error(
-      "Cannot encode Algorithm to BER format. Unsupported algorithm."
-    );
+    throw new Error("Cannot encode Algorithm to BER format. Unsupported algorithm.");
   }
 
   public static fromBER(raw: BufferSource): Algorithm {
@@ -69,8 +63,6 @@ export class AlgorithmFactory {
       }
     }
 
-    throw new Error(
-      "Cannot decode BER format to Algorithm. Unsupported algorithm identifier."
-    );
+    throw new Error("Cannot decode BER format to Algorithm. Unsupported algorithm identifier.");
   }
 }

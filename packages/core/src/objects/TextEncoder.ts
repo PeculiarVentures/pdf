@@ -11,9 +11,7 @@ export abstract class TextEncoder {
    */
   public static from(text: string): string {
     if (text.startsWith(this.UTF16)) {
-      return Convert.ToUtf16String(
-        Convert.FromBinary(text.substring(this.UTF16.length))
-      );
+      return Convert.ToUtf16String(Convert.FromBinary(text.substring(this.UTF16.length)));
     } else if (text.startsWith(this.UTF8)) {
       return text.substring(this.UTF8.length);
     }

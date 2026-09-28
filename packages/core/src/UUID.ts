@@ -8,9 +8,7 @@ export class UUID {
       .replace(/[018]/g, (c) => {
         const n = parseInt(c, 10);
 
-        return (n ^ (((Math.random() * 256) | 0) & (15 >> (n / 4)))).toString(
-          16
-        );
+        return (n ^ (((Math.random() * 256) | 0) & (15 >> (n / 4)))).toString(16);
       })
       .toLocaleUpperCase();
   }

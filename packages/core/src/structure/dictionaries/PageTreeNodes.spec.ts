@@ -9,30 +9,14 @@ describe("PageTreeNodes", () => {
     const tree = PageTreeNodesDictionary.createWithData(
       doc,
       PageObjectDictionary.create(doc),
-      PageTreeNodesDictionary.createWithData(
-        doc,
-        PageObjectDictionary.create(doc),
-        PageObjectDictionary.create(doc)
-      ),
-      PageTreeNodesDictionary.createWithData(
-        doc,
-        PageTreeNodesDictionary.createWithData(
-          doc,
-          PageObjectDictionary.create(doc)
-        )
-      )
+      PageTreeNodesDictionary.createWithData(doc, PageObjectDictionary.create(doc), PageObjectDictionary.create(doc)),
+      PageTreeNodesDictionary.createWithData(doc, PageTreeNodesDictionary.createWithData(doc, PageObjectDictionary.create(doc))),
     );
 
     assert.strictEqual(tree.Count, 4);
     assert.strictEqual(tree.Kids.get(1, PageTreeNodesDictionary).Count, 2);
     assert.strictEqual(tree.Kids.get(2, PageTreeNodesDictionary).Count, 1);
-    assert.strictEqual(
-      tree.Kids.get(2, PageTreeNodesDictionary).Kids.get(
-        0,
-        PageTreeNodesDictionary
-      ).Count,
-      1
-    );
+    assert.strictEqual(tree.Kids.get(2, PageTreeNodesDictionary).Kids.get(0, PageTreeNodesDictionary).Count, 1);
 
     // append
     const page = PageObjectDictionary.create(doc);
@@ -40,26 +24,14 @@ describe("PageTreeNodes", () => {
     assert.strictEqual(tree.Count, 5);
     assert.strictEqual(tree.Kids.get(1, PageTreeNodesDictionary).Count, 2);
     assert.strictEqual(tree.Kids.get(2, PageTreeNodesDictionary).Count, 2);
-    assert.strictEqual(
-      tree.Kids.get(2, PageTreeNodesDictionary).Kids.get(
-        0,
-        PageTreeNodesDictionary
-      ).Count,
-      1
-    );
+    assert.strictEqual(tree.Kids.get(2, PageTreeNodesDictionary).Kids.get(0, PageTreeNodesDictionary).Count, 1);
 
     // remove
     tree.Kids.get(2, PageTreeNodesDictionary).remove(page);
     assert.strictEqual(tree.Count, 4);
     assert.strictEqual(tree.Kids.get(1, PageTreeNodesDictionary).Count, 2);
     assert.strictEqual(tree.Kids.get(2, PageTreeNodesDictionary).Count, 1);
-    assert.strictEqual(
-      tree.Kids.get(2, PageTreeNodesDictionary).Kids.get(
-        0,
-        PageTreeNodesDictionary
-      ).Count,
-      1
-    );
+    assert.strictEqual(tree.Kids.get(2, PageTreeNodesDictionary).Kids.get(0, PageTreeNodesDictionary).Count, 1);
   });
 
   describe("getPages", () => {
@@ -97,23 +69,23 @@ describe("PageTreeNodes", () => {
       {
         name: "root",
         tree: pages1,
-        pages: 13
+        pages: 13,
       },
       {
         name: "tree with internal trees",
         tree: pages1_1,
-        pages: 9
+        pages: 9,
       },
       {
         name: "tree with pages only",
         tree: pages1_2,
-        pages: 3
+        pages: 3,
       },
       {
         name: "tree without pages",
         tree: pages1_3,
-        pages: 0
-      }
+        pages: 0,
+      },
     ];
 
     for (const t of tests) {

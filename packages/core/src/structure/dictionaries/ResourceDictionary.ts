@@ -9,7 +9,7 @@ export class ResourceDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "ExtGState",
     type: PDFDictionary,
-    optional: true
+    optional: true,
   })
   public extGState!: PDFDictionary | null;
 
@@ -20,7 +20,7 @@ export class ResourceDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "ColorSpace",
     type: PDFDictionary,
-    optional: true
+    optional: true,
   })
   public colorSpace!: PDFDictionary | null;
 
@@ -30,7 +30,7 @@ export class ResourceDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "Pattern",
     type: PDFDictionary,
-    optional: true
+    optional: true,
   })
   public pattern!: PDFDictionary | null;
 
@@ -40,7 +40,7 @@ export class ResourceDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "Shading",
     type: PDFDictionary,
-    optional: true
+    optional: true,
   })
   public Shading!: PDFDictionary | null;
 
@@ -50,7 +50,7 @@ export class ResourceDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "XObject",
     type: PDFDictionary,
-    optional: true
+    optional: true,
   })
   public XObject!: PDFDictionary | null;
 
@@ -60,7 +60,7 @@ export class ResourceDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "Font",
     type: PDFDictionary,
-    optional: true
+    optional: true,
   })
   public font!: PDFDictionary | null;
 
@@ -71,7 +71,7 @@ export class ResourceDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "ProcSet",
     type: PDFDictionary,
-    optional: true
+    optional: true,
   })
   public procSet!: PDFArray | null;
 
@@ -81,7 +81,7 @@ export class ResourceDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "Properties",
     type: PDFDictionary,
-    optional: true
+    optional: true,
   })
   public properties!: PDFDictionary | null;
 }

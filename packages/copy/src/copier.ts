@@ -58,16 +58,9 @@ export interface PDFCopierCreateParams {
 export type PDFObjectMap = Map<core.IPDFIndirect, core.PDFObjectTypes>;
 
 export class PDFCopier {
-  public static async create(
-    params?: PDFCopierCreateParams
-  ): Promise<PDFCopier>;
-  public static async create(
-    doc: core.PDFDocument,
-    params?: PDFCopierAppendParams
-  ): Promise<PDFCopier>;
-  public static async create(
-    arg1: PDFCopierCreateParams | core.PDFDocument = {}
-  ): Promise<PDFCopier> {
+  public static async create(params?: PDFCopierCreateParams): Promise<PDFCopier>;
+  public static async create(doc: core.PDFDocument, params?: PDFCopierAppendParams): Promise<PDFCopier>;
+  public static async create(arg1: PDFCopierCreateParams | core.PDFDocument = {}): Promise<PDFCopier> {
     let doc: core.PDFDocument;
 
     if (arg1 instanceof core.PDFDocument) {
@@ -79,9 +72,7 @@ export class PDFCopier {
       doc.options.disableAscii85Encoding = !!arg1.disableAscii85Encoding;
       doc.options.disableCompressedObjects = !!arg1.disableCompressedObjects;
       doc.options.disableCompressedStreams = !!arg1.disableCompressedStreams;
-      doc.options.xref = arg1.useXRefTable
-        ? core.XrefStructure.Table
-        : core.XrefStructure.Stream;
+      doc.options.xref = arg1.useXRefTable ? core.XrefStructure.Table : core.XrefStructure.Stream;
 
       if (arg1.algorithm) {
         doc.encryptHandler = await core.StandardEncryptionHandler.create({
@@ -89,7 +80,7 @@ export class PDFCopier {
           algorithm: core.CryptoFilterMethods[arg1.algorithm],
           userPassword: arg1.userPassword,
           ownerPassword: arg1.ownerPassword,
-          permission: arg1.permission
+          permission: arg1.permission,
         });
       }
     }
@@ -113,10 +104,7 @@ export class PDFCopier {
     this.document = document;
   }
 
-  protected findRef<T extends core.PDFObjectTypes>(
-    map: PDFObjectMap,
-    target: T
-  ): T | null {
+  protected findRef<T extends core.PDFObjectTypes>(map: PDFObjectMap, target: T): T | null {
     // Don't copy objects if we already did it
     let ref: core.PDFObjectTypes | undefined;
     if (target instanceof core.PDFIndirect && map.has(target)) {
@@ -128,10 +116,7 @@ export class PDFCopier {
     return (ref as T | undefined) || null;
   }
 
-  protected copyObject(
-    map: PDFObjectMap,
-    target: core.PDFObjectTypes
-  ): core.PDFObjectTypes {
+  protected copyObject(map: PDFObjectMap, target: core.PDFObjectTypes): core.PDFObjectTypes {
     const ref = this.findRef(map, target);
     if (ref) {
       return ref;
@@ -160,9 +145,7 @@ export class PDFCopier {
     } else if (target instanceof core.PDFNull) {
       res = this.copyNull(map, target);
     } else {
-      throw new Error(
-        "Cannot copy the object. Unsupported type of the object."
-      );
+      throw new Error("Cannot copy the object. Unsupported type of the object.");
     }
 
     if (target.isIndirect() && !res.isIndirect()) {
@@ -173,10 +156,7 @@ export class PDFCopier {
     return res;
   }
 
-  protected copyBoolean(
-    map: PDFObjectMap,
-    target: core.PDFBoolean
-  ): core.PDFBoolean {
+  protected copyBoolean(map: PDFObjectMap, target: core.PDFBoolean): core.PDFBoolean {
     const ref = this.findRef(map, target);
     if (ref) {
       return ref;
@@ -185,10 +165,7 @@ export class PDFCopier {
     return this.document.createBoolean(target.value);
   }
 
-  protected copyNumber(
-    map: PDFObjectMap,
-    target: core.PDFNumeric
-  ): core.PDFNumeric {
+  protected copyNumber(map: PDFObjectMap, target: core.PDFNumeric): core.PDFNumeric {
     const ref = this.findRef(map, target);
     if (ref) {
       return ref;
@@ -197,10 +174,7 @@ export class PDFCopier {
     return this.document.createNumber(target.value);
   }
 
-  protected copyLiteralString(
-    map: PDFObjectMap,
-    target: core.PDFLiteralString
-  ): core.PDFLiteralString {
+  protected copyLiteralString(map: PDFObjectMap, target: core.PDFLiteralString): core.PDFLiteralString {
     const ref = this.findRef(map, target);
     if (ref) {
       return ref;
@@ -209,10 +183,7 @@ export class PDFCopier {
     return this.document.createString(target.text);
   }
 
-  protected copyHexString(
-    map: PDFObjectMap,
-    target: core.PDFHexString
-  ): core.PDFHexString {
+  protected copyHexString(map: PDFObjectMap, target: core.PDFHexString): core.PDFHexString {
     const ref = this.findRef(map, target);
     if (ref) {
       return ref;
@@ -230,11 +201,7 @@ export class PDFCopier {
     return this.document.createName(target.text);
   }
 
-  protected copyStream(
-    map: PDFObjectMap,
-    target: core.PDFStream,
-    ...skipFields: string[]
-  ): core.PDFStream {
+  protected copyStream(map: PDFObjectMap, target: core.PDFStream, ...skipFields: string[]): core.PDFStream {
     const ref = this.findRef(map, target);
     if (ref) {
       return ref;
@@ -263,11 +230,7 @@ export class PDFCopier {
     return res;
   }
 
-  protected copyDictionary(
-    map: PDFObjectMap,
-    target: core.PDFDictionary,
-    ...skipFields: string[]
-  ): core.PDFDictionary {
+  protected copyDictionary(map: PDFObjectMap, target: core.PDFDictionary, ...skipFields: string[]): core.PDFDictionary {
     const ref = this.findRef(map, target);
     if (ref) {
       return ref;
@@ -315,20 +278,8 @@ export class PDFCopier {
     return this.document.createNull();
   }
 
-  protected appendPage(
-    map: PDFObjectMap,
-    target: core.PageObjectDictionary,
-    parasm: PDFCopierAppendPageParams = {}
-  ): void {
-    const page = this.copyDictionary(
-      map,
-      target,
-      "Parent",
-      "Annots",
-      "PageItemUIDToLocationDataMap"
-    )
-      .to(core.PageObjectDictionary)
-      .makeIndirect();
+  protected appendPage(map: PDFObjectMap, target: core.PageObjectDictionary, parasm: PDFCopierAppendPageParams = {}): void {
+    const page = this.copyDictionary(map, target, "Parent", "Annots", "PageItemUIDToLocationDataMap").to(core.PageObjectDictionary).makeIndirect();
     map.set(target.getIndirect(), page);
 
     // Copy annotations
@@ -354,9 +305,7 @@ export class PDFCopier {
         }
 
         // Copy annotation
-        const annot = this.copyDictionary(map, item)
-          .to(core.AnnotationDictionary)
-          .makeIndirect();
+        const annot = this.copyDictionary(map, item).to(core.AnnotationDictionary).makeIndirect();
         if (item.isIndirect()) {
           map.set(item.getIndirect(), annot);
         }
@@ -387,10 +336,7 @@ export class PDFCopier {
     this.catalog.Pages.addPage(page);
   }
 
-  public append(
-    document: core.PDFDocument,
-    params: PDFCopierAppendParams = {}
-  ): void {
+  public append(document: core.PDFDocument, params: PDFCopierAppendParams = {}): void {
     if (!document.update.xref) {
       return;
     }
@@ -400,20 +346,13 @@ export class PDFCopier {
     // Copy AcroForm (without fields)
     if (document.update.catalog?.AcroForm.has()) {
       const acroForm = document.update.catalog.AcroForm.get();
-      const acroFormCopy = this.copyDictionary(
-        map,
-        acroForm,
-        "Fields",
-        "XFA"
-      ).makeIndirect();
+      const acroFormCopy = this.copyDictionary(map, acroForm, "Fields", "XFA").makeIndirect();
       acroFormCopy.set("Fields", this.document.createArray());
       this.catalog.set("AcroForm", acroFormCopy);
     }
 
     const root = document.update.xref.Root;
-    const pages = params.pages
-      ? this.filterPages(root.Pages.getPages(), params.pages)
-      : root.Pages.getPages();
+    const pages = params.pages ? this.filterPages(root.Pages.getPages(), params.pages) : root.Pages.getPages();
 
     for (const page of pages) {
       this.appendPage(map, page, params);
@@ -428,7 +367,7 @@ export class PDFCopier {
       }
 
       params.progressCallback({
-        changedIndexes: indexes
+        changedIndexes: indexes,
       });
     }
   }
@@ -450,10 +389,7 @@ export class PDFCopier {
    * @param filters The set of filters to apply to the pages.
    * @returns The filtered collection of pages.
    */
-  private filterPages(
-    pages: core.PageObjectDictionary[],
-    filters: PageFilter[]
-  ): core.PageObjectDictionary[] {
+  private filterPages(pages: core.PageObjectDictionary[], filters: PageFilter[]): core.PageObjectDictionary[] {
     const filteredPages: core.PageObjectDictionary[] = [];
 
     // Loop through each filter in the set of filters.

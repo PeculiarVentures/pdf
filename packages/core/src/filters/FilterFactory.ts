@@ -27,7 +27,7 @@ export class FilterFactory {
     [JPXFilter.NAME, JPXFilter],
     [LZWFilter.NAME, LZWFilter],
     [RunLengthFilter.NAME, RunLengthFilter],
-    [CryptFilter.NAME, CryptFilter]
+    [CryptFilter.NAME, CryptFilter],
   ]);
 
   public static register(filter: FilterConstructor): void {

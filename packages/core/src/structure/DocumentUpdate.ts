@@ -51,14 +51,8 @@ export class PDFDocumentUpdate {
   public fromPDF(reader: ViewReader): Promise<number>;
   public fromPDF(data: Uint8Array, offset?: number): Promise<number>;
   public fromPDF(text: string): Promise<number>;
-  public fromPDF(
-    data: string | Uint8Array | ViewReader,
-    offset?: number
-  ): Promise<number>;
-  public async fromPDF(
-    data: string | Uint8Array | ViewReader,
-    offset?: number
-  ): Promise<number> {
+  public fromPDF(data: string | Uint8Array | ViewReader, offset?: number): Promise<number>;
+  public async fromPDF(data: string | Uint8Array | ViewReader, offset?: number): Promise<number> {
     const reader = objects.PDFObject.getReader(data, offset);
     this.startXref = reader.position;
 
@@ -101,9 +95,7 @@ export class PDFDocumentUpdate {
         // Add objects from xref stream to xref table
         xref.xrefStream = xRefStm;
         for (const obj of xRefStm.objects) {
-          const index = xref.objects.findIndex(
-            (o) => o.id === obj.id && o.generation === obj.generation
-          );
+          const index = xref.objects.findIndex((o) => o.id === obj.id && o.generation === obj.generation);
           if (index !== -1) {
             xref.objects[index] = obj;
           } else {
@@ -179,10 +171,7 @@ export class PDFDocumentUpdate {
 
     // check if the last char in the document is not a new line
     // then add a new line before the update section
-    if (
-      this.document.view.length &&
-      this.document.view[this.document.view.length - 1] !== 0x0a
-    ) {
+    if (this.document.view.length && this.document.view[this.document.view.length - 1] !== 0x0a) {
       writer.writeLine();
     }
 
@@ -226,17 +215,12 @@ export class PDFDocumentUpdate {
       this.#objects = [];
       const actual: string[] = [];
       const removed: string[] = [];
-
-      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      // oxlint-disable-next-line typescript/no-this-alias -- traverse update chain from head
       let update: PDFDocumentUpdate | null = this;
       while (update) {
         for (const item of update.items) {
           const id = `${item.id}.${item.generation}`;
-          if (
-            item.type !== PDFDocumentObjectTypes.free &&
-            !actual.includes(id) &&
-            !removed.includes(id)
-          ) {
+          if (item.type !== PDFDocumentObjectTypes.free && !actual.includes(id) && !removed.includes(id)) {
             this.#objects.push(item);
             actual.push(id);
           } else {
@@ -253,14 +237,8 @@ export class PDFDocumentUpdate {
 
   public getObject(obj: objects.PDFIndirect): PDFDocumentObject;
   public getObject(id: number, generation?: number): PDFDocumentObject;
-  public getObject(
-    param: number | objects.PDFIndirect,
-    generation?: number
-  ): PDFDocumentObject;
-  public getObject(
-    param: number | objects.PDFIndirect,
-    generation = 65535
-  ): PDFDocumentObject {
+  public getObject(param: number | objects.PDFIndirect, generation?: number): PDFDocumentObject;
+  public getObject(param: number | objects.PDFIndirect, generation = 65535): PDFDocumentObject {
     if (param instanceof objects.PDFIndirect) {
       return this.getObject(param.id, param.generation);
     }
@@ -286,7 +264,7 @@ export class PDFDocumentUpdate {
       generation: 0,
       offset: 0,
       type: PDFDocumentObjectTypes.null,
-      documentUpdate: this
+      documentUpdate: this,
     });
   }
 
@@ -353,9 +331,7 @@ export class PDFDocumentUpdate {
     }
 
     if (this.document.encryptHandler) {
-      throw new Error(
-        "Cannot decompress the update section, document is encrypted. Call decrypt() first."
-      );
+      throw new Error("Cannot decompress the update section, document is encrypted. Call decrypt() first.");
     }
 
     const compressedObjects = this.getCompressedObjects();
@@ -398,15 +374,11 @@ export class PDFDocumentUpdate {
 
   protected getOrCreateXref(): CrossReference {
     if (!this.xref) {
-      if (
-        this.document.options &&
-        this.document.options.xref === XrefStructure.Table
-      ) {
+      if (this.document.options && this.document.options.xref === XrefStructure.Table) {
         this.xref = this.createCrossReferenceTable();
       } else {
         this.xref = this.createCrossReferenceStream();
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (this.xref as any).onCreate();
     }
 
@@ -437,9 +409,7 @@ export class PDFDocumentUpdate {
     }
   }
 
-  public createPDFDocumentObject(
-    element: objects.PDFObject
-  ): PDFDocumentObject {
+  public createPDFDocumentObject(element: objects.PDFObject): PDFDocumentObject {
     const xref = this.getOrCreateXref();
 
     let size = xref.Size;
@@ -450,7 +420,7 @@ export class PDFDocumentUpdate {
         generation: 65535,
         offset: 0,
         type: PDFDocumentObjectTypes.free,
-        documentUpdate: this
+        documentUpdate: this,
       });
       size++;
 
@@ -479,7 +449,7 @@ export class PDFDocumentUpdate {
       generation: 65535,
       id: obj.id,
       offset: 0,
-      type: PDFDocumentObjectTypes.free
+      type: PDFDocumentObjectTypes.free,
     });
 
     const xref = this.getOrCreateXref();
@@ -490,10 +460,7 @@ export class PDFDocumentUpdate {
     const xref = this.getOrCreateXref();
     for (const object of xref.objects) {
       // TODO Should we have something for getting nullable value?
-      if (
-        object.type !== PDFDocumentObjectTypes.free &&
-        object.value instanceof CompressedObject
-      ) {
+      if (object.type !== PDFDocumentObjectTypes.free && object.value instanceof CompressedObject) {
         // Return if exists
         return object;
       }
@@ -505,10 +472,7 @@ export class PDFDocumentUpdate {
     return this.append(compressedStream);
   }
 
-  public append(
-    element: objects.PDFObject | PDFDocumentObject,
-    compressed?: boolean
-  ): PDFDocumentObject {
+  public append(element: objects.PDFObject | PDFDocumentObject, compressed?: boolean): PDFDocumentObject {
     let docObject: PDFDocumentObject;
     const xref = this.getOrCreateXref();
     if (element instanceof PDFDocumentObject) {
@@ -516,12 +480,7 @@ export class PDFDocumentUpdate {
     } else {
       docObject = this.createPDFDocumentObject(element);
 
-      if (
-        this.document.version >= 1.5 &&
-        !this.document.options.disableCompressedObjects &&
-        compressed === undefined &&
-        this.document.options?.xref !== XrefStructure.Table
-      ) {
+      if (this.document.version >= 1.5 && !this.document.options.disableCompressedObjects && compressed === undefined && this.document.options?.xref !== XrefStructure.Table) {
         // Set compressed for all objects which are not PDF streams
         if (!(element instanceof objects.PDFStream)) {
           docObject.type = PDFDocumentObjectTypes.compressed;
@@ -536,10 +495,7 @@ export class PDFDocumentUpdate {
       docObject.value.documentUpdate = this;
     }
 
-    if (
-      this.document.options.xref === XrefStructure.Stream &&
-      (docObject.type === PDFDocumentObjectTypes.compressed || compressed)
-    ) {
+    if (this.document.options.xref === XrefStructure.Stream && (docObject.type === PDFDocumentObjectTypes.compressed || compressed)) {
       const compressedObject = this.getOrCreateCompressedObject();
       // TODO Don't use objects with generation number greater than 0 !!!
       (compressedObject.value as CompressedObject).setValue(docObject.id);
@@ -561,10 +517,7 @@ export class PDFDocumentUpdate {
 
     if (this.xref) {
       for (const object of this.xref.objects) {
-        if (
-          object.type !== PDFDocumentObjectTypes.free &&
-          object.value instanceof objects.PDFStream
-        ) {
+        if (object.type !== PDFDocumentObjectTypes.free && object.value instanceof objects.PDFStream) {
           await object.value.decode();
         }
         res.push(object.toString());
@@ -597,17 +550,12 @@ export class PDFDocumentUpdate {
     return root;
   }
 
-  protected getObjectReferences(
-    obj: objects.PDFObject,
-    refs: objects.PDFIndirect[] = []
-  ): objects.PDFIndirect[] {
+  protected getObjectReferences(obj: objects.PDFObject, refs: objects.PDFIndirect[] = []): objects.PDFIndirect[] {
     if (obj instanceof objects.PDFDictionary) {
       for (const [key, item] of obj.items) {
         if (item.isIndirect()) {
           const ref = item.getIndirect();
-          if (
-            refs.find((o) => o.id === ref.id && o.generation === ref.generation)
-          ) {
+          if (refs.find((o) => o.id === ref.id && o.generation === ref.generation)) {
             continue;
           }
 
@@ -634,12 +582,7 @@ export class PDFDocumentUpdate {
       const items = this.xref.objects;
       for (const obj of items) {
         // decrypt
-        if (
-          obj.type !== PDFDocumentObjectTypes.inUse ||
-          (encryptRef &&
-            encryptRef.id === obj.id &&
-            encryptRef.generation === obj.generation)
-        ) {
+        if (obj.type !== PDFDocumentObjectTypes.inUse || (encryptRef && encryptRef.id === obj.id && encryptRef.generation === obj.generation)) {
           continue;
         }
 
@@ -667,11 +610,7 @@ export class PDFDocumentUpdate {
         const value = obj.value;
 
         // encrypt
-        if (
-          encryptRef &&
-          encryptRef.id === obj.id &&
-          encryptRef.generation === obj.generation
-        ) {
+        if (encryptRef && encryptRef.id === obj.id && encryptRef.generation === obj.generation) {
           continue;
         }
 
@@ -684,10 +623,7 @@ export class PDFDocumentUpdate {
 
   protected async decryptObject(value: objects.PDFObject): Promise<void> {
     try {
-      if (
-        value instanceof objects.PDFStream ||
-        value instanceof objects.PDFTextString
-      ) {
+      if (value instanceof objects.PDFStream || value instanceof objects.PDFTextString) {
         await value.decode();
       } else if (value instanceof objects.PDFDictionary) {
         for (const [key, item] of value.items) {
@@ -709,10 +645,7 @@ export class PDFDocumentUpdate {
     }
   }
 
-  protected async encryptObject(
-    value: objects.PDFObject,
-    skipIndirect = false
-  ): Promise<void> {
+  protected async encryptObject(value: objects.PDFObject, skipIndirect = false): Promise<void> {
     try {
       if (value instanceof Maybe && value.has()) {
         // Receive value from Maybe
@@ -723,17 +656,10 @@ export class PDFDocumentUpdate {
         return;
       }
 
-      if (
-        value instanceof objects.PDFStream ||
-        value instanceof objects.PDFTextString
-      ) {
+      if (value instanceof objects.PDFStream || value instanceof objects.PDFTextString) {
         await value.encode();
       } else if (value instanceof objects.PDFDictionary) {
-        if (
-          value instanceof PDFDictionary &&
-          value.has("Type") &&
-          value.get("Type", PDFName).text === "XRef"
-        ) {
+        if (value instanceof PDFDictionary && value.has("Type") && value.get("Type", PDFName).text === "XRef") {
           for (const [key, item] of value.items) {
             if (key === "Encrypt" || key === "ID") {
               continue;

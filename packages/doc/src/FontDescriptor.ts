@@ -2,7 +2,6 @@ import * as core from "@peculiar/pdf-core";
 import { WrapObject } from "./WrapObject";
 
 function flag(f: core.FontDescriptorFlags): PropertyDecorator {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (target: any, propertyKey: string | symbol) => {
     Object.defineProperty(target, propertyKey, {
       get: function (this: FontDescriptorComponent): boolean {
@@ -14,7 +13,7 @@ function flag(f: core.FontDescriptorFlags): PropertyDecorator {
         } else {
           this.target.flags ^= f;
         }
-      }
+      },
     });
   };
 }

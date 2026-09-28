@@ -10,7 +10,7 @@ export class Maybe<T extends PDFObject> {
     public parent: PDFDictionary,
     public name: string,
     public indirect: boolean,
-    private _type: PDFObjectConstructor<T>
+    private _type: PDFObjectConstructor<T>,
   ) {}
 
   /**
@@ -21,19 +21,12 @@ export class Maybe<T extends PDFObject> {
    * @returns returns internal value
    */
   public get(required = false, compressed?: boolean): T {
-    if (
-      !this.parent.has(this.name) ||
-      this.parent.get(this.name) instanceof PDFNull
-    ) {
+    if (!this.parent.has(this.name) || this.parent.get(this.name) instanceof PDFNull) {
       if (required) {
-        throw new Error(
-          `Cannot get required field '${this.name}'. Field is empty.`
-        );
+        throw new Error(`Cannot get required field '${this.name}'. Field is empty.`);
       }
       if (!this.parent.documentUpdate) {
-        throw new Error(
-          "Parent object doesn't assigned to PDF document update."
-        );
+        throw new Error("Parent object doesn't assigned to PDF document update.");
       }
 
       const value = this._type.create(this.parent.documentUpdate);
@@ -41,10 +34,7 @@ export class Maybe<T extends PDFObject> {
         value.makeIndirect(compressed);
       }
 
-      this.parent
-        .modify()
-        .set(this.name, value as unknown as PDFObjectTypes).view =
-        Maybe.DEFAULT_VIEW;
+      this.parent.modify().set(this.name, value as unknown as PDFObjectTypes).view = Maybe.DEFAULT_VIEW;
 
       return value;
     }

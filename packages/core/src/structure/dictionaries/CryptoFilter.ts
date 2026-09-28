@@ -36,7 +36,7 @@ export enum CryptoFilterMethods {
    * shall be 256 bits.
    * @since PDF 2.0
    */
-  AES256 = "AESV3"
+  AES256 = "AESV3",
 }
 
 export class CryptoFilterDictionary extends PDFDictionary {

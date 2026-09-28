@@ -123,7 +123,7 @@ export class ExtGStateDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     name: "BG",
-    optional: true
+    optional: true,
   })
   public BG!: objects.PDFObjectTypes;
 
@@ -138,7 +138,7 @@ export class ExtGStateDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     name: "BG2",
-    optional: true
+    optional: true,
   })
   public BG2!: objects.PDFObjectTypes;
 
@@ -151,7 +151,7 @@ export class ExtGStateDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     name: "UCR",
-    optional: true
+    optional: true,
   })
   public UCR!: objects.PDFObjectTypes;
 
@@ -166,7 +166,7 @@ export class ExtGStateDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     name: "UCR2",
-    optional: true
+    optional: true,
   })
   public UCR2!: objects.PDFObjectTypes;
 
@@ -182,7 +182,7 @@ export class ExtGStateDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     name: "TR",
-    optional: true
+    optional: true,
   })
   public TR!: objects.PDFObjectTypes;
 
@@ -198,7 +198,7 @@ export class ExtGStateDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     name: "TR2",
-    optional: true
+    optional: true,
   })
   public TR2!: objects.PDFObjectTypes;
 
@@ -210,7 +210,7 @@ export class ExtGStateDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     name: "HT",
-    optional: true
+    optional: true,
   })
   public HT!: objects.PDFDictionary | objects.PDFStream | objects.PDFName;
 
@@ -248,7 +248,7 @@ export class ExtGStateDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     name: "BM",
-    optional: true
+    optional: true,
   })
   public BM!: objects.PDFArray | objects.PDFName;
 
@@ -266,7 +266,7 @@ export class ExtGStateDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     name: "SMask",
-    optional: true
+    optional: true,
   })
   public SMask!: objects.PDFDictionary | objects.PDFName;
 

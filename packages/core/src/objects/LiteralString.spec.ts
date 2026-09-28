@@ -12,10 +12,7 @@ describe("LiteralString", () => {
     };
 
     it("should parse literal string correctly", () => {
-      check(
-        "(literal string with \\(escaped\\) characters)",
-        "literal string with (escaped) characters"
-      );
+      check("(literal string with \\(escaped\\) characters)", "literal string with (escaped) characters");
     });
 
     it("should throw error on missing '(' character", () => {
@@ -31,24 +28,15 @@ describe("LiteralString", () => {
     });
 
     it("should parse (Strings may contain newlines\\nand such.) correctly", () => {
-      check(
-        "(Strings may contain newlines\nand such.)",
-        "Strings may contain newlines\nand such."
-      );
+      check("(Strings may contain newlines\nand such.)", "Strings may contain newlines\nand such.");
     });
 
     it("should parse (Strings may contain balanced parentheses ( ) and special characters (*!&}^% and so on).) correctly", () => {
-      check(
-        "(Strings may contain balanced parentheses ( ) and special characters (*!&}^% and so on).)",
-        "Strings may contain balanced parentheses ( ) and special characters (*!&}^% and so on)."
-      );
+      check("(Strings may contain balanced parentheses ( ) and special characters (*!&}^% and so on).)", "Strings may contain balanced parentheses ( ) and special characters (*!&}^% and so on).");
     });
 
     it("should parse (String with escaped char at the end\\\\) correctly", () => {
-      check(
-        "(String with escaped char at the end\\\\)",
-        "String with escaped char at the end\\"
-      );
+      check("(String with escaped char at the end\\\\)", "String with escaped char at the end\\");
     });
 
     it("should parse (String with escaped \\) char) correctly", () => {
@@ -64,17 +52,11 @@ describe("LiteralString", () => {
     });
 
     it("should parse (This string contains \\\nat the \\\r\nend-of-line) correctly", () => {
-      check(
-        "(This string contains \\\nat the \\\r\nend-of-line)",
-        "This string contains at the end-of-line"
-      );
+      check("(This string contains \\\nat the \\\r\nend-of-line)", "This string contains at the end-of-line");
     });
 
     it("should parse (This string contains \\245two octal characters\\307) correctly", () => {
-      check(
-        "(This string contains \\245two octal characters\\307)",
-        "This string contains ¥two octal charactersÇ"
-      );
+      check("(This string contains \\245two octal characters\\307)", "This string contains ¥two octal charactersÇ");
     });
 
     it("should parse (\\0053) correctly", () => {
@@ -110,17 +92,11 @@ describe("LiteralString", () => {
     });
 
     it("should escape special chars and convert to PDF format correctly", () => {
-      check(
-        "All escaped chars \n\r\t\b\f()\\+",
-        "(All escaped chars \\n\\r\\t\\b\\f\\(\\)\\\\+)"
-      );
+      check("All escaped chars \n\r\t\b\f()\\+", "(All escaped chars \\n\\r\\t\\b\\f\\(\\)\\\\+)");
     });
 
     it("should convert non-utf-8 string to PDF format correctly", () => {
-      check(
-        "\x43\xaf\xc9\x7f\xef\xff\xe6\xa8\xcb\x5c\xaf\xd0",
-        "(\x43\xaf\xc9\x7f\xef\xff\xe6\xa8\xcb\x5c\x5c\xaf\xd0)"
-      );
+      check("\x43\xaf\xc9\x7f\xef\xff\xe6\xa8\xcb\x5c\xaf\xd0", "(\x43\xaf\xc9\x7f\xef\xff\xe6\xa8\xcb\x5c\x5c\xaf\xd0)");
     });
   });
 

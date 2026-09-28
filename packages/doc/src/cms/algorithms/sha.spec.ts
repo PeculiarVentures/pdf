@@ -11,23 +11,23 @@ const testVectors: TestVector[] = [
   {
     name: "SHA-1",
     webAlg: { name: "SHA-1" },
-    asnAlg: "300906052b0e03021a0500"
+    asnAlg: "300906052b0e03021a0500",
   },
   {
     name: "SHA-256",
     webAlg: { name: "SHA-256" },
-    asnAlg: "300d06096086480165030402010500"
+    asnAlg: "300d06096086480165030402010500",
   },
   {
     name: "SHA-384",
     webAlg: { name: "SHA-384" },
-    asnAlg: "300d06096086480165030402020500"
+    asnAlg: "300d06096086480165030402020500",
   },
   {
     name: "SHA-512",
     webAlg: { name: "SHA-512" },
-    asnAlg: "300d06096086480165030402030500"
-  }
+    asnAlg: "300d06096086480165030402030500",
+  },
 ];
 
 describe("shaAlgorithmConverter", () => {

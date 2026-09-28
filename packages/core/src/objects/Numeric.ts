@@ -14,9 +14,7 @@ import { PDFObject } from "./Object";
 export class PDFNumeric extends PDFObject {
   public static readonly NAME = ObjectTypeEnum.Numeric;
 
-  public static assertPositiveInteger(
-    number: PDFNumeric
-  ): asserts number is PDFNumeric {
+  public static assertPositiveInteger(number: PDFNumeric): asserts number is PDFNumeric {
     if (!(number.value >>> 0 === parseFloat(number.value.toString()))) {
       throw new Error("Number is not a positive integer");
     }
@@ -39,10 +37,7 @@ export class PDFNumeric extends PDFObject {
     const view = reader.read((c) => !isDigit(c));
 
     if (!view.length) {
-      throw new ParsingError(
-        `Numeric sequence not found at position ${reader.position}`,
-        reader.position
-      );
+      throw new ParsingError(`Numeric sequence not found at position ${reader.position}`, reader.position);
     }
 
     const value = new Number(Convert.ToUtf8String(view));

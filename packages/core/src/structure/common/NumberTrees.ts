@@ -1,11 +1,4 @@
-import {
-  PDFArray,
-  PDFArrayField,
-  PDFDictionary,
-  PDFDictionaryField,
-  PDFIndirectReference,
-  PDFLiteralString
-} from "../../objects";
+import { PDFArray, PDFArrayField, PDFDictionary, PDFDictionaryField, PDFIndirectReference, PDFLiteralString } from "../../objects";
 
 export class NumberTrees extends PDFDictionary {
   /**
@@ -15,7 +8,7 @@ export class NumberTrees extends PDFDictionary {
     name: "Kids",
     type: PDFArray,
     optional: true,
-    get: (o) => o.items
+    get: (o) => o.items,
   })
   public Kids!: null | PDFIndirectReference[];
 
@@ -34,7 +27,7 @@ export class NumberTrees extends PDFDictionary {
     name: "Limits",
     type: PDFArray,
     optional: true,
-    get: (o) => o.items
+    get: (o) => o.items,
   })
   public Limits!: null | PDFLiteralString[];
 }

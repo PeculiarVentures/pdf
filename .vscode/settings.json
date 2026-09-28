@@ -1,7 +1,5 @@
 {
-  "cSpell.words": [
-    "identificator"
-  ],
+  "cSpell.words": ["identificator"],
   "conventionalCommits.scopes": [],
   "typescript.format.semicolons": "insert",
   "editor.formatOnSave": true,
@@ -13,13 +11,14 @@
     "**/CVS": true,
     "**/.DS_Store": true,
     "**/node_modules": true,
-    "**/build": true,
+    "**/build": true
     // Hide all spec files
     // "packages/*/src/**/*.spec.ts": true,
   },
   "typescript.tsdk": "node_modules/typescript/lib",
   "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
-  "jest.runMode": "on-demand",
+  "oxc.enable": true,
+  "jest.runMode": "on-demand"
 }

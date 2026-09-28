@@ -14,7 +14,7 @@ describe("AlgorithmFactory", () => {
         return { name: "MOCK-ALG" };
       }
       return null;
-    }
+    },
   };
 
   beforeEach(() => {
@@ -38,18 +38,18 @@ describe("AlgorithmFactory", () => {
     it("should handle algorithm with string hash", () => {
       const result = AlgorithmFactory.prepareAlgorithm({
         name: "RSASSA-PKCS1-v1_5",
-        hash: "SHA-256"
+        hash: "SHA-256",
       });
       expect(result).toEqual({
         name: "RSASSA-PKCS1-v1_5",
-        hash: { name: "SHA-256" }
+        hash: { name: "SHA-256" },
       });
     });
 
     it("should pass through complete algorithm object", () => {
       const alg = {
         name: "RSASSA-PKCS1-v1_5",
-        hash: { name: "SHA-256" }
+        hash: { name: "SHA-256" },
       };
       const result = AlgorithmFactory.prepareAlgorithm(alg);
       expect(result).toEqual(alg);
@@ -69,28 +69,22 @@ describe("AlgorithmFactory", () => {
     it("should throw error for unsupported algorithm", () => {
       expect(() => {
         AlgorithmFactory.toBER({ name: "UNKNOWN-ALG" });
-      }).toThrow(
-        "Cannot encode Algorithm to BER format. Unsupported algorithm."
-      );
+      }).toThrow("Cannot encode Algorithm to BER format. Unsupported algorithm.");
     });
 
     it("should handle string algorithm input", () => {
       expect(() => {
         AlgorithmFactory.toBER("UNKNOWN-ALG");
-      }).toThrow(
-        "Cannot encode Algorithm to BER format. Unsupported algorithm."
-      );
+      }).toThrow("Cannot encode Algorithm to BER format. Unsupported algorithm.");
     });
 
     it("should handle algorithm with string hash", () => {
       expect(() => {
         AlgorithmFactory.toBER({
           name: "UNKNOWN-ALG",
-          hash: "SHA-256"
+          hash: "SHA-256",
         });
-      }).toThrow(
-        "Cannot encode Algorithm to BER format. Unsupported algorithm."
-      );
+      }).toThrow("Cannot encode Algorithm to BER format. Unsupported algorithm.");
     });
   });
 
@@ -109,9 +103,7 @@ describe("AlgorithmFactory", () => {
       const invalidBer = new Uint8Array([4, 5, 6, 7]);
       expect(() => {
         AlgorithmFactory.fromBER(invalidBer);
-      }).toThrow(
-        "Cannot decode BER format to Algorithm. Unsupported algorithm identifier."
-      );
+      }).toThrow("Cannot decode BER format to Algorithm. Unsupported algorithm identifier.");
     });
 
     it("should handle ArrayBuffer input", () => {

@@ -21,7 +21,7 @@ export class WatermarkDictionary extends AnnotationDictionary {
   @objects.PDFDictionaryField({
     name: "FixedPrint",
     optional: true,
-    type: FixedPrintDictionary
+    type: FixedPrintDictionary,
   })
   public FixedPrint!: FixedPrintDictionary | null;
 

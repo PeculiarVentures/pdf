@@ -5,7 +5,7 @@ export enum ResourceType {
   xObject = "XObject",
   font = "Font",
   colorSpace = "ColorSpace",
-  extGState = "ExtGState"
+  extGState = "ExtGState",
 }
 
 export interface Resource {
@@ -37,10 +37,7 @@ export class ResourceManager extends WrapObject<core.ResourceDictionary> {
       dict = this.target.get(resource.type, core.PDFDictionary);
     }
     // Add resource to map dictionary
-    dict.set(
-      resource.name,
-      resource.target.makeIndirect() as core.PDFObjectTypes
-    );
+    dict.set(resource.name, resource.target.makeIndirect() as core.PDFObjectTypes);
 
     this.items.push(resource);
 
@@ -96,10 +93,7 @@ export class ResourceManager extends WrapObject<core.ResourceDictionary> {
     return null;
   }
 
-  public set(
-    resource: core.PDFObject,
-    preferredName = core.UUID.generate()
-  ): Resource {
+  public set(resource: core.PDFObject, preferredName = core.UUID.generate()): Resource {
     this.loadItems();
 
     let result: Resource | null = null;
@@ -112,37 +106,32 @@ export class ResourceManager extends WrapObject<core.ResourceDictionary> {
           result = {
             name: preferredName,
             target: resource,
-            type: ResourceType.xObject
+            type: ResourceType.xObject,
           };
         } else if (type === "Font") {
           result = {
             name: preferredName,
             target: resource,
-            type: ResourceType.font
+            type: ResourceType.font,
           };
         } else if (type === "ExtGState") {
           result = {
             name: preferredName,
             target: resource,
-            type: ResourceType.extGState
+            type: ResourceType.extGState,
           };
         }
       }
     }
 
     if (!result) {
-      throw new TypeError(
-        "Cannot add the resource to the page. Unsupported type of the resource."
-      );
+      throw new TypeError("Cannot add the resource to the page. Unsupported type of the resource.");
     }
 
     return this.setResource(result);
   }
 
-  protected loadItemsFromMap(
-    map: core.PDFDictionary,
-    type: ResourceType
-  ): void {
+  protected loadItemsFromMap(map: core.PDFDictionary, type: ResourceType): void {
     for (const [key] of map.items) {
       const item = map.get(key);
       if (!item) {
@@ -151,7 +140,7 @@ export class ResourceManager extends WrapObject<core.ResourceDictionary> {
       this.items.push({
         type,
         name: key,
-        target: item
+        target: item,
       });
     }
   }

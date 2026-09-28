@@ -1,16 +1,10 @@
 import * as core from "@peculiar/pdf-core";
 import { RadioButtonGroup } from "./RadioButton.Group";
-import {
-  CheckBoxHandler,
-  ICheckBoxCreateParameters,
-  ICheckBoxHandler,
-  ICheckBoxParameters
-} from "./CheckBox.Handler";
+import { CheckBoxHandler, ICheckBoxCreateParameters, ICheckBoxHandler, ICheckBoxParameters } from "./CheckBox.Handler";
 import { IFormComponentParameters } from "./FormComponent.Handler";
 import { FormObject } from "../FormObject";
 
-export interface IRadioButtonCreateParameters
-  extends ICheckBoxCreateParameters {
+export interface IRadioButtonCreateParameters extends ICheckBoxCreateParameters {
   value: string;
   group?: string;
 }
@@ -24,22 +18,17 @@ export interface IRadioButtonHandler extends ICheckBoxHandler {
   create(params: IRadioButtonCreateParameters): core.WidgetDictionary;
 }
 
-export class RadioButtonHandler
-  extends CheckBoxHandler
-  implements IRadioButtonHandler
-{
+export class RadioButtonHandler extends CheckBoxHandler implements IRadioButtonHandler {
   /**
    * Point size in percents. Should be from 0 to 1
    */
   public POINT_SIZE = 0.5;
 
-  public override getParameters(
-    params: IRadioButtonCreateParameters
-  ): IRadioButtonParameters {
+  public override getParameters(params: IRadioButtonCreateParameters): IRadioButtonParameters {
     return {
       ...super.getParameters(params),
       value: params.value,
-      group: params.group || core.UUID.generate()
+      group: params.group || core.UUID.generate(),
     };
   }
 
@@ -49,9 +38,7 @@ export class RadioButtonHandler
     field.ff = core.ButtonFlags.radio;
     field.t = this.document.target.createString(name);
 
-    this.document.target.update
-      .catalog!.AcroForm.get()
-      .Fields.push(field.makeIndirect());
+    this.document.target.update.catalog!.AcroForm.get().Fields.push(field.makeIndirect());
 
     return new RadioButtonGroup(field, this.document);
   }
@@ -64,17 +51,13 @@ export class RadioButtonHandler
     }
 
     if (!(group instanceof RadioButtonGroup)) {
-      throw new TypeError(
-        `Cannot set RadioBaton to the group '${name}'. Group is not a RadioButtonGroup component.`
-      );
+      throw new TypeError(`Cannot set RadioBaton to the group '${name}'. Group is not a RadioButtonGroup component.`);
     }
 
     return group;
   }
 
-  protected override createWidget(
-    params: IRadioButtonParameters
-  ): core.WidgetDictionary {
+  protected override createWidget(params: IRadioButtonParameters): core.WidgetDictionary {
     const update = this.document.target.update;
 
     // Create radio button widget
@@ -84,23 +67,14 @@ export class RadioButtonHandler
     return widget;
   }
 
-  protected override fillField(
-    field: core.IFieldDictionary,
-    params: IRadioButtonParameters
-  ): void {
+  protected override fillField(field: core.IFieldDictionary, params: IRadioButtonParameters): void {
     if (params.enabled) {
       field.V = this.document.target.createName(params.value);
     }
   }
 
-  public override drawCheck(
-    object: FormObject,
-    params: IFormComponentParameters
-  ): void {
-    const size =
-      ((params.width - params.height > 0 ? params.height : params.width) -
-        params.borderWidth * 2) *
-      this.POINT_SIZE;
+  public override drawCheck(object: FormObject, params: IFormComponentParameters): void {
+    const size = ((params.width - params.height > 0 ? params.height : params.width) - params.borderWidth * 2) * this.POINT_SIZE;
 
     object
       .graphics()
@@ -109,12 +83,8 @@ export class RadioButtonHandler
       .fill();
   }
 
-  public override drawBox(
-    object: FormObject,
-    params: IFormComponentParameters
-  ): void {
-    const size =
-      params.width - params.height > 0 ? params.height : params.width;
+  public override drawBox(object: FormObject, params: IFormComponentParameters): void {
+    const size = params.width - params.height > 0 ? params.height : params.width;
 
     const ctx = object
       .graphics()
@@ -128,18 +98,12 @@ export class RadioButtonHandler
       ctx
         .strokeColor(params.borderColor)
         .lineWidth(params.borderWidth)
-        .circle(
-          params.width / 2,
-          params.height / 2,
-          (size - params.borderWidth) / 2
-        )
+        .circle(params.width / 2, params.height / 2, (size - params.borderWidth) / 2)
         .stroke(true);
     }
   }
 
-  public override create(
-    params: IRadioButtonCreateParameters
-  ): core.WidgetDictionary {
+  public override create(params: IRadioButtonCreateParameters): core.WidgetDictionary {
     return super.create(params);
   }
 }

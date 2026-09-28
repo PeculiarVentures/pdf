@@ -12,7 +12,7 @@ export enum SignatureLockAction {
   /**
    * All fields except those specified in Fields
    */
-  exclude = "Exclude"
+  exclude = "Exclude",
 }
 
 /**

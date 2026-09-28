@@ -1,28 +1,11 @@
 import { BufferSource, BufferSourceConverter } from "pvtsutils";
 import * as pkijs from "pkijs";
 
-import {
-  CryptoFilterMethods,
-  CryptoFilterDictionary,
-  EncryptDictionary,
-  StandardEncryptDictionary,
-  TrailerDictionary,
-  UserAccessPermissionFlags
-} from "../structure/dictionaries";
+import { CryptoFilterMethods, CryptoFilterDictionary, EncryptDictionary, StandardEncryptDictionary, TrailerDictionary, UserAccessPermissionFlags } from "../structure/dictionaries";
 import { PDFTextString, PDFStream, PDFHexString, PDFArray } from "../objects";
-import {
-  EncryptionHandler,
-  EncryptionHandlerCreateParams
-} from "./EncryptionHandler";
-import {
-  EncryptionAlgorithms,
-  EncryptionKey,
-  EncryptionKeys
-} from "./EncryptionAlgorithms";
-import {
-  Password,
-  StandardEncryptionAlgorithm
-} from "./StandardEncryptionAlgorithms";
+import { EncryptionHandler, EncryptionHandlerCreateParams } from "./EncryptionHandler";
+import { EncryptionAlgorithms, EncryptionKey, EncryptionKeys } from "./EncryptionAlgorithms";
+import { Password, StandardEncryptionAlgorithm } from "./StandardEncryptionAlgorithms";
 
 export interface StandardEncryptionHandlerCreateCommonParams {
   permission?: UserAccessPermissionFlags;
@@ -31,22 +14,18 @@ export interface StandardEncryptionHandlerCreateCommonParams {
   encryptMetadata?: boolean;
 }
 
-export interface StandardEncryptionHandlerCreateParamsV4
-  extends EncryptionHandlerCreateParams,
-    StandardEncryptionHandlerCreateCommonParams {
+export interface StandardEncryptionHandlerCreateParamsV4 extends EncryptionHandlerCreateParams, StandardEncryptionHandlerCreateCommonParams {
   algorithm: CryptoFilterMethods;
 }
 
 export enum PasswordReason {
   first,
-  incorrect
+  incorrect,
 }
 
 const STD_CF = "StdCF";
 
-export interface StandardEncryptionHandlerCreateParams
-  extends EncryptionHandlerCreateParams,
-    StandardEncryptionHandlerCreateCommonParams {
+export interface StandardEncryptionHandlerCreateParams extends EncryptionHandlerCreateParams, StandardEncryptionHandlerCreateCommonParams {
   algorithm: CryptoFilterMethods;
 }
 
@@ -55,9 +34,7 @@ export type UserPasswordHandle = (reason: PasswordReason) => Promise<Password>;
 export class StandardEncryptionHandler extends EncryptionHandler {
   public static readonly NAME = "Standard";
 
-  public static async create(
-    params: StandardEncryptionHandlerCreateParams
-  ): Promise<StandardEncryptionHandler> {
+  public static async create(params: StandardEncryptionHandlerCreateParams): Promise<StandardEncryptionHandler> {
     const doc = params.document;
     const crypto = params.crypto || pkijs.getCrypto(true);
 
@@ -122,9 +99,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
 
     // get xref for ID getting
     if (!doc.update.xref) {
-      throw new Error(
-        "Cannot set ID for the PDF document handler. The XRef object is empty."
-      );
+      throw new Error("Cannot set ID for the PDF document handler. The XRef object is empty.");
     }
     const xref = doc.update.xref as unknown as TrailerDictionary;
 
@@ -132,13 +107,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
     let id = crypto.getRandomValues(new Uint8Array(16));
     if (!xref.has("ID")) {
       // Create ID object
-      xref.set(
-        "ID",
-        doc.createArray(
-          doc.createHexString(id),
-          doc.createHexString(crypto.getRandomValues(new Uint8Array(16)))
-        )
-      );
+      xref.set("ID", doc.createArray(doc.createHexString(id), doc.createHexString(crypto.getRandomValues(new Uint8Array(16)))));
     } else {
       id = xref.get("ID", PDFArray).get(0, PDFHexString).toUint8Array();
     }
@@ -152,7 +121,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
           length: encrypt.Length,
           revision: encrypt.R,
           user: userPassword,
-          owner: ownerPassword
+          owner: ownerPassword,
         });
         encrypt.set("O", doc.createHexString(o));
 
@@ -165,7 +134,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
           length: encrypt.Length,
           password: userPassword,
           permissions: encrypt.P,
-          revision: encrypt.R
+          revision: encrypt.R,
         });
         encrypt.set("U", doc.createHexString(u));
         break;
@@ -176,7 +145,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
         const { u, ue } = await StandardEncryptionAlgorithm.algorithm8({
           password: userPassword,
           key: encryptionKey,
-          crypto
+          crypto,
         });
         encrypt.set("U", doc.createHexString(u));
         encrypt.set("UE", doc.createHexString(ue));
@@ -185,7 +154,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
           u,
           password: ownerPassword,
           key: encryptionKey,
-          crypto
+          crypto,
         });
         encrypt.set("O", doc.createHexString(o));
         encrypt.set("OE", doc.createHexString(oe));
@@ -194,7 +163,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
           permissions: encrypt.P,
           key: encryptionKey,
           encryptMetadata: encrypt.EncryptMetadata,
-          crypto
+          crypto,
         });
         encrypt.set("Perms", doc.createHexString(perms));
 
@@ -277,14 +246,14 @@ export class StandardEncryptionHandler extends EncryptionHandler {
           id: this.id,
           revision: dict.R,
           permissions: dict.P,
-          encryptMetadata: dict.EncryptMetadata
+          encryptMetadata: dict.EncryptMetadata,
         });
         break;
       case 6:
         res = await StandardEncryptionAlgorithm.algorithm11({
           crypto: this.crypto,
           password,
-          u: dict.U.toUint8Array()
+          u: dict.U.toUint8Array(),
         });
         break;
       default:
@@ -296,8 +265,15 @@ export class StandardEncryptionHandler extends EncryptionHandler {
     return res;
   }
 
+  /**
+   * Verifies the document owner password.
+   *
+   * When `password` is empty, the last successfully verified owner password is reused.
+   * The cache is updated only after a successful check so a failed guess does not stick.
+   */
   public async checkOwnerPassword(password: Password = ""): Promise<boolean> {
     const dict = this.dictionary;
+    const attempt = password || this.#ownerPassword || "";
     let res = false;
 
     switch (this.revision) {
@@ -308,24 +284,26 @@ export class StandardEncryptionHandler extends EncryptionHandler {
           crypto: this.crypto,
           revision: this.revision,
           user: await this.#getUserPassword(),
-          owner: password,
+          owner: attempt,
           length: dict.Length,
-          o: dict.O.toUint8Array()
+          o: dict.O.toUint8Array(),
         });
         break;
       case 6:
         res = await StandardEncryptionAlgorithm.algorithm12({
           crypto: this.crypto,
-          password,
+          password: attempt,
           o: dict.O.toUint8Array(),
-          u: dict.U.toUint8Array()
+          u: dict.U.toUint8Array(),
         });
         break;
       default:
         throw new Error("Cannot check the Owner password, unknown revision");
     }
 
-    this.#ownerPassword = password;
+    if (res) {
+      this.#ownerPassword = attempt;
+    }
 
     return res;
   }
@@ -367,34 +345,16 @@ export class StandardEncryptionHandler extends EncryptionHandler {
   }
 
   /**
-   * Returns the Owner cached password.
-   *
-   * If cache is empty, throws an error.
-   * @returns Password
-   */
-  // eslint-disable-next-line no-unused-private-class-members
-  #getOwnerPassword(): Password {
-    if (!this.#ownerPassword) {
-      throw new Error("Cannot get the Owner password. It is not set.");
-    }
-
-    return this.#ownerPassword;
-  }
-
-  /**
    * Returns encryption file key for specified Crypto Filter Name (eg CFStd)
    * @param password Password
    * @param filterName Filter name
    * @returns Encryption key
    */
-  protected async getKeyF(
-    password: Password,
-    filterName: string
-  ): Promise<EncryptionKey> {
+  protected async getKeyF(password: Password, filterName: string): Promise<EncryptionKey> {
     if (filterName === EncryptDictionary.IDENTITY) {
       return {
         type: CryptoFilterMethods.None,
-        raw: new Uint8Array()
+        raw: new Uint8Array(),
       };
     }
 
@@ -417,12 +377,8 @@ export class StandardEncryptionHandler extends EncryptionHandler {
     // compute the encryption file
     let encKey: ArrayBuffer;
     if (this.revision === 6) {
-      if (
-        !(this.dictionary.UE && this.dictionary.OE && this.dictionary.Perms)
-      ) {
-        throw new Error(
-          "Cannot get required filed from Standard Encrypt dictionary for Revision 6"
-        );
+      if (!(this.dictionary.UE && this.dictionary.OE && this.dictionary.Perms)) {
+        throw new Error("Cannot get required filed from Standard Encrypt dictionary for Revision 6");
       }
       encKey = await StandardEncryptionAlgorithm.algorithm2A({
         password,
@@ -432,7 +388,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
         oe: this.dictionary.OE.toUint8Array(),
         p: this.dictionary.P,
         perms: this.dictionary.Perms.toUint8Array(),
-        crypto: this.crypto
+        crypto: this.crypto,
       });
     } else {
       encKey = await StandardEncryptionAlgorithm.algorithm2({
@@ -443,13 +399,13 @@ export class StandardEncryptionHandler extends EncryptionHandler {
         permissions: this.dictionary.P,
         o: this.dictionary.O.toUint8Array(),
         length,
-        crypto: this.crypto
+        crypto: this.crypto,
       });
     }
 
     return {
       type: filter.CFM as CryptoFilterMethods,
-      raw: BufferSourceConverter.toUint8Array(encKey)
+      raw: BufferSourceConverter.toUint8Array(encKey),
     };
   }
 
@@ -470,17 +426,14 @@ export class StandardEncryptionHandler extends EncryptionHandler {
 
         this.#keys = {
           stream: key,
-          string: key
+          string: key,
         };
       } else {
-        const keys = await Promise.all([
-          this.getKeyF(password, this.dictionary.StmF),
-          this.getKeyF(password, this.dictionary.StrF)
-        ]);
+        const keys = await Promise.all([this.getKeyF(password, this.dictionary.StmF), this.getKeyF(password, this.dictionary.StrF)]);
 
         this.#keys = {
           stream: keys[0],
-          string: keys[1]
+          string: keys[1],
         };
       }
     } else {
@@ -492,16 +445,16 @@ export class StandardEncryptionHandler extends EncryptionHandler {
         permissions: this.dictionary.P,
         o: this.dictionary.O.toUint8Array(),
         length: this.dictionary.Length,
-        crypto: this.crypto
+        crypto: this.crypto,
       });
       const key: EncryptionKey = {
         type: CryptoFilterMethods.RC4,
-        raw: BufferSourceConverter.toUint8Array(encKeyRaw)
+        raw: BufferSourceConverter.toUint8Array(encKeyRaw),
       };
 
       this.#keys = {
         stream: key,
-        string: key
+        string: key,
       };
     }
 
@@ -526,27 +479,21 @@ export class StandardEncryptionHandler extends EncryptionHandler {
     await this.#getKeys();
   }
 
-  public async decrypt(
-    stream: BufferSource,
-    target: PDFStream | PDFTextString
-  ): Promise<ArrayBuffer> {
+  public async decrypt(stream: BufferSource, target: PDFStream | PDFTextString): Promise<ArrayBuffer> {
     return EncryptionAlgorithms.decrypt({
       key: await this.#getKey(target),
       data: stream,
       target,
-      crypto: this.crypto
+      crypto: this.crypto,
     });
   }
 
-  public async encrypt(
-    stream: BufferSource,
-    target: PDFStream | PDFTextString
-  ): Promise<ArrayBuffer> {
+  public async encrypt(stream: BufferSource, target: PDFStream | PDFTextString): Promise<ArrayBuffer> {
     return EncryptionAlgorithms.encrypt({
       key: await this.#getKey(target),
       data: stream,
       target,
-      crypto: this.crypto
+      crypto: this.crypto,
     });
   }
 }

@@ -7,7 +7,7 @@ const registry = new converters.ComponentConverterFactory(
   new converters.TextEditorConverter(),
   new converters.ComboBoxConverter(),
   new converters.ComboBoxConverter(),
-  new converters.RadioButtonGroupConverter()
+  new converters.RadioButtonGroupConverter(),
 );
 
 /**

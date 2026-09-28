@@ -1,10 +1,4 @@
-import {
-  PDFDictionary,
-  PDFNameField,
-  PDFNumberField,
-  PDFTextString,
-  PDFTextStringField
-} from "../../objects";
+import { PDFDictionary, PDFNameField, PDFNumberField, PDFTextString, PDFTextStringField } from "../../objects";
 
 export class DeveloperExtensionsDictionary extends PDFDictionary {
   public static readonly TYPE = "DeveloperExtensions";

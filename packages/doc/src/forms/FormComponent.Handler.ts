@@ -67,24 +67,13 @@ export abstract class FormComponentHandler implements IFormComponentHandler {
 
   public constructor(public document: PDFDocument) {}
 
-  public abstract create(
-    params: IFormComponentCreateParameters
-  ): core.WidgetDictionary;
+  public abstract create(params: IFormComponentCreateParameters): core.WidgetDictionary;
 
-  public getParameters(
-    params: IFormComponentCreateParameters
-  ): IFormComponentParameters {
+  public getParameters(params: IFormComponentCreateParameters): IFormComponentParameters {
     const left = core.TypographyConverter.toPoint(params.left || 0);
-    const width = core.TypographyConverter.toPoint(
-      params.width || this.DEFAULT_WIDTH
-    );
-    const height = core.TypographyConverter.toPoint(
-      params.height || this.DEFAULT_HEIGHT
-    );
-    const top =
-      left | width | height
-        ? core.TypographyConverter.toPoint(params.top || 0)
-        : 0;
+    const width = core.TypographyConverter.toPoint(params.width || this.DEFAULT_WIDTH);
+    const height = core.TypographyConverter.toPoint(params.height || this.DEFAULT_HEIGHT);
+    const top = left | width | height ? core.TypographyConverter.toPoint(params.top || 0) : 0;
 
     return {
       name: params.name || core.UUID.generate(),
@@ -95,12 +84,10 @@ export abstract class FormComponentHandler implements IFormComponentHandler {
       height,
       // border
       borderColor: params.borderColor ?? this.DEFAULT_BORDER_COLOR,
-      borderWidth: core.TypographyConverter.toPoint(
-        params.borderWidth ?? this.DEFAULT_BORDER_WIDTH
-      ),
+      borderWidth: core.TypographyConverter.toPoint(params.borderWidth ?? this.DEFAULT_BORDER_WIDTH),
       // colors
       backgroundColor: params.backgroundColor ?? this.DEFAULT_BACKGROUND_COLOR,
-      foreColor: params.foreColor ?? this.DEFAULT_FORE_COLOR
+      foreColor: params.foreColor ?? this.DEFAULT_FORE_COLOR,
     };
   }
 
@@ -109,10 +96,7 @@ export abstract class FormComponentHandler implements IFormComponentHandler {
    * @param widget
    * @param params
    */
-  protected setStyle(
-    widget: core.WidgetDictionary,
-    params: IFormComponentParameters
-  ): void {
+  protected setStyle(widget: core.WidgetDictionary, params: IFormComponentParameters): void {
     const mk = widget.MK.get();
     mk.BG = core.ColorConverter.toPDFArray(params.backgroundColor);
     if (params.borderWidth) {
@@ -125,10 +109,7 @@ export abstract class FormComponentHandler implements IFormComponentHandler {
     this.setFontStyle(widget, params);
   }
 
-  protected setFontStyle(
-    widget: core.WidgetDictionary,
-    params: IFormComponentParameters
-  ): void {
+  protected setFontStyle(widget: core.WidgetDictionary, params: IFormComponentParameters): void {
     const content = new core.PDFContent();
     content.setColor(params.foreColor);
 

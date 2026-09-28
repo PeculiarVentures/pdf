@@ -17,7 +17,7 @@ describe("Numeric", () => {
       ["+123.6", 123.6],
       ["4.", 4],
       ["-.002", -0.002],
-      ["0.0", 0]
+      ["0.0", 0],
       //#endregion
     ];
     vector.forEach(([i, o]) => {
@@ -37,7 +37,7 @@ describe("Numeric", () => {
       [0, "0"],
       //#endregion
       //#region Real
-      [34.5, "34.5"]
+      [34.5, "34.5"],
       //#endregion
     ];
     vector.forEach(([i, o]) => {
@@ -55,7 +55,7 @@ describe("Numeric", () => {
       [34.5, "34.5"],
       [34.567, "34.567"],
       [34.5678, "34.568"], // rounds to 3 decimal places
-      [0.12345, "0.123"]
+      [0.12345, "0.123"],
     ];
     vector.forEach(([input, expected]) => {
       it(`should convert ${input} to string correctly`, () => {
@@ -103,30 +103,22 @@ describe("Numeric", () => {
 
     it("should throw for negative numbers", () => {
       const num = new PDFNumeric(-123);
-      expect(() => PDFNumeric.assertPositiveInteger(num)).toThrow(
-        "Number is not a positive integer"
-      );
+      expect(() => PDFNumeric.assertPositiveInteger(num)).toThrow("Number is not a positive integer");
     });
 
     it("should throw for decimals", () => {
       const num = new PDFNumeric(123.456);
-      expect(() => PDFNumeric.assertPositiveInteger(num)).toThrow(
-        "Number is not a positive integer"
-      );
+      expect(() => PDFNumeric.assertPositiveInteger(num)).toThrow("Number is not a positive integer");
     });
   });
 
   describe("fromPDF error cases", () => {
     it("should throw for empty input", () => {
-      expect(() => PDFNumeric.fromPDF("")).toThrow(
-        "Numeric sequence not found"
-      );
+      expect(() => PDFNumeric.fromPDF("")).toThrow("Numeric sequence not found");
     });
 
     it("should throw for non-numeric input", () => {
-      expect(() => PDFNumeric.fromPDF("abc")).toThrow(
-        "Numeric sequence not found at position 0 at position 0"
-      );
+      expect(() => PDFNumeric.fromPDF("abc")).toThrow("Numeric sequence not found at position 0 at position 0");
     });
   });
 });

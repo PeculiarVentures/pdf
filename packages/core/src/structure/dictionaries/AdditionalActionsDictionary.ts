@@ -9,7 +9,7 @@ export class AdditionalActionsDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "E",
     optional: true,
-    type: PDFDictionary
+    type: PDFDictionary,
   })
   public e!: PDFDictionary | null;
 
@@ -21,7 +21,7 @@ export class AdditionalActionsDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "X",
     optional: true,
-    type: PDFDictionary
+    type: PDFDictionary,
   })
   public x!: PDFDictionary | null;
 
@@ -33,7 +33,7 @@ export class AdditionalActionsDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "D",
     optional: true,
-    type: PDFDictionary
+    type: PDFDictionary,
   })
   public d!: PDFDictionary | null;
 
@@ -45,7 +45,7 @@ export class AdditionalActionsDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "U",
     optional: true,
-    type: PDFDictionary
+    type: PDFDictionary,
   })
   public u!: PDFDictionary | null;
 
@@ -56,7 +56,7 @@ export class AdditionalActionsDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "Fo",
     optional: true,
-    type: PDFDictionary
+    type: PDFDictionary,
   })
   public fo!: PDFDictionary | null;
 
@@ -69,7 +69,7 @@ export class AdditionalActionsDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "Bl",
     optional: true,
-    type: PDFDictionary
+    type: PDFDictionary,
   })
   public bl!: PDFDictionary | null;
 
@@ -80,7 +80,7 @@ export class AdditionalActionsDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "PO",
     optional: true,
-    type: PDFDictionary
+    type: PDFDictionary,
   })
   public po!: PDFDictionary | null;
 
@@ -91,7 +91,7 @@ export class AdditionalActionsDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "PC",
     optional: true,
-    type: PDFDictionary
+    type: PDFDictionary,
   })
   public pc!: PDFDictionary | null;
 
@@ -102,7 +102,7 @@ export class AdditionalActionsDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "PV",
     optional: true,
-    type: PDFDictionary
+    type: PDFDictionary,
   })
   public pv!: PDFDictionary | null;
 
@@ -114,7 +114,7 @@ export class AdditionalActionsDictionary extends PDFDictionary {
   @PDFDictionaryField({
     name: "PI",
     optional: true,
-    type: PDFDictionary
+    type: PDFDictionary,
   })
   public pi!: PDFDictionary | null;
 }

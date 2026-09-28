@@ -13,12 +13,10 @@ interface NodeCanvas {
 class NodeCanvasFactory {
   create(width: number, height: number): NodeCanvas {
     const canvas = createCanvas(width, height);
-    const context = canvas.getContext(
-      "2d"
-    ) as unknown as CanvasRenderingContext2D;
+    const context = canvas.getContext("2d") as unknown as CanvasRenderingContext2D;
     return {
       canvas,
-      context
+      context,
     };
   }
 
@@ -37,21 +35,18 @@ export class PdfRenderingHelper {
     canvasFactory: new NodeCanvasFactory(),
     url: {
       cMapUrl: `${__dirname}/../../../node_modules/pdfjs-dist/cmaps/`,
-      standardFontDataUrl: `${__dirname}/../../../node_modules/pdfjs-dist/standard_fonts/`
-    }
+      standardFontDataUrl: `${__dirname}/../../../node_modules/pdfjs-dist/standard_fonts/`,
+    },
   };
 
-  static async load(
-    buffer: BufferSource,
-    password?: string
-  ): Promise<PdfRenderingHelper> {
+  static async load(buffer: BufferSource, password?: string): Promise<PdfRenderingHelper> {
     const data = BufferSourceConverter.toUint8Array(buffer).slice(); // pdfjs modifies the buffer
     const doc = await pdfjs.getDocument({
       data,
       cMapUrl: this.CANVAS_PARAMS.url.cMapUrl,
       cMapPacked: true,
       password,
-      standardFontDataUrl: this.CANVAS_PARAMS.url.standardFontDataUrl
+      standardFontDataUrl: this.CANVAS_PARAMS.url.standardFontDataUrl,
     }).promise;
 
     return new PdfRenderingHelper(doc);
@@ -65,10 +60,7 @@ export class PdfRenderingHelper {
    */
   public static writeToFile(buffer: BufferSource, filePath?: string): void {
     filePath ??= path.resolve(__dirname, `../../../tmp.pdf`);
-    fs.writeFileSync(
-      filePath,
-      Buffer.from(BufferSourceConverter.toArrayBuffer(buffer))
-    );
+    fs.writeFileSync(filePath, Buffer.from(BufferSourceConverter.toArrayBuffer(buffer)));
   }
 
   /**
@@ -83,12 +75,7 @@ export class PdfRenderingHelper {
    * `writeFile` is set to `true`, it writes the image to a file in the workspace directory
    * with the name `page_<pageNumber>.png` and the PDF document to `tmp.pdf`.
    */
-  static async getPageHash(
-    buffer: BufferSource,
-    pageNumber = 1,
-    writeFile?: boolean,
-    password?: string
-  ): Promise<string> {
+  static async getPageHash(buffer: BufferSource, pageNumber = 1, writeFile?: boolean, password?: string): Promise<string> {
     const pdf = await PdfRenderingHelper.load(buffer, password);
     const hash = await pdf.getPageHash(pageNumber, writeFile);
 
@@ -109,15 +96,12 @@ export class PdfRenderingHelper {
     const page = await this.document.getPage(pageNumber);
     const viewport = page.getViewport({ scale });
     const canvasFactory = new NodeCanvasFactory();
-    const canvasAndContext = canvasFactory.create(
-      viewport.width,
-      viewport.height
-    );
+    const canvasAndContext = canvasFactory.create(viewport.width, viewport.height);
 
     const renderContext = {
       canvasContext: canvasAndContext.context,
       viewport,
-      canvasFactory
+      canvasFactory,
     };
 
     await page.render(renderContext).promise;
@@ -130,10 +114,7 @@ export class PdfRenderingHelper {
     const pageImage = await this.renderPageToImage(pageNumber);
 
     if (writeFile) {
-      fs.writeFileSync(
-        path.resolve(__dirname, `../../../page_${pageNumber}.png`),
-        pageImage
-      );
+      fs.writeFileSync(path.resolve(__dirname, `../../../page_${pageNumber}.png`), pageImage);
     }
 
     const hash = await crypto.subtle.digest("SHA-256", pageImage);

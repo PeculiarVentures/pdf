@@ -1,7 +1,5 @@
 {
   "extends": "../../tsconfig.compile.json",
   "include": ["src"],
-  "exclude": [
-    "src/**/*.spec.ts"
-  ]
+  "exclude": ["src/**/*.spec.ts"]
 }

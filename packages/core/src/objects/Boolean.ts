@@ -28,14 +28,16 @@ export class PDFBoolean extends PDFObject {
     const firstChar = reader.view[reader.position];
 
     switch (firstChar) {
-      case 0x74: { // t
+      case 0x74: {
+        // t
         if (!trueChars.every((c) => c === reader.readByte())) {
           throw new BadCharError(reader.position - 1);
         }
         this.value = true;
         break;
       }
-      case 0x66: { // f
+      case 0x66: {
+        // f
         if (!falseChars.every((c) => c === reader.readByte())) {
           throw new BadCharError(reader.position - 1);
         }

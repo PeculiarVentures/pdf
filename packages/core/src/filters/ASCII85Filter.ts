@@ -33,13 +33,7 @@ export class ASCII85Filter extends Filter {
         zeroCount++;
       }
     }
-    const res = new Uint8Array(
-      Math.floor(
-        (view.length * ASCII85_ENCODING_GROUP_LENGTH) /
-          ASCII85_DECODING_GROUP_LENGTH
-      ) +
-        zeroCount * ASCII85_ENCODING_GROUP_LENGTH
-    );
+    const res = new Uint8Array(Math.floor((view.length * ASCII85_ENCODING_GROUP_LENGTH) / ASCII85_DECODING_GROUP_LENGTH) + zeroCount * ASCII85_ENCODING_GROUP_LENGTH);
     let offset = 0;
     let state = 0;
     const bytes = new Uint8Array(ASCII85_DECODING_GROUP_LENGTH);
@@ -94,11 +88,7 @@ export class ASCII85Filter extends Filter {
 
     // estimate output length and alloc buffer for it.
     let offset = 0;
-    const len =
-      Math.ceil(
-        (view.length * ASCII85_DECODING_GROUP_LENGTH) /
-          ASCII85_ENCODING_GROUP_LENGTH
-      ) + ASCII85_ENCODING_GROUP_LENGTH;
+    const len = Math.ceil((view.length * ASCII85_DECODING_GROUP_LENGTH) / ASCII85_ENCODING_GROUP_LENGTH) + ASCII85_ENCODING_GROUP_LENGTH;
     const res = new Uint8Array(len + 2);
 
     // iterate over all data bytes.

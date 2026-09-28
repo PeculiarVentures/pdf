@@ -12,10 +12,7 @@ describe("Comment", () => {
     };
 
     it("should parse comment correctly", () => {
-      check(
-        "% comment (/%) blah blah blah\n123",
-        "comment (/%) blah blah blah"
-      );
+      check("% comment (/%) blah blah blah\n123", "comment (/%) blah blah blah");
     });
 
     it("should throw error on missing '%' character", () => {

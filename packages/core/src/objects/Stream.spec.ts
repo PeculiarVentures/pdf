@@ -7,42 +7,42 @@ describe("Stream", () => {
       [
         `<</Length 0>>stream
 endstream`,
-        0
+        0,
       ],
       [
         `<</Length 1>>stream
 1
 endstream`,
-        1
+        1,
       ],
       [
         `<</Length 1>>
 stream
 1
 endstream`,
-        1
+        1,
       ],
       [
         `<</Length 5>>
 stream
 12345
 endstream`,
-        5
+        5,
       ],
       [
         `<</Length 10>>
 stream
 12345
 endstream`,
-        5
+        5,
       ],
       [
         `<</Length 1>>
 stream
 12345
 endstream`,
-        5
-      ]
+        5,
+      ],
     ];
     vector.forEach(([i, o]) => {
       it(JSON.stringify(i), () => {
@@ -61,8 +61,8 @@ endstream`,
 >>
 stream
 sd
-endstream`
-      ]
+endstream`,
+      ],
     ];
     vector.forEach(([i, o]) => {
       it(i.toString(), () => {

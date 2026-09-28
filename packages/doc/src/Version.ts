@@ -6,5 +6,5 @@ export enum PDFVersion {
   v1_5 = 1.5,
   v1_6 = 1.6,
   v1_7 = 1.7,
-  v2_0 = 2.0
+  v2_0 = 2.0,
 }

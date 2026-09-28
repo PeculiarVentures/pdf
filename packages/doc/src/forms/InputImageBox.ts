@@ -20,15 +20,8 @@ export class InputImageBox extends FormComponent {
           if (resources.XObject && resources.XObject.items.size) {
             const firstKey = [...resources.XObject.items.keys()][0];
             const firstEntry = resources.XObject.get(firstKey);
-            if (
-              firstEntry instanceof core.PDFDictionary &&
-              firstEntry.has("Subtype") &&
-              firstEntry.get("Subtype", core.PDFName).text === "Image"
-            ) {
-              return new Image(
-                firstEntry.to(core.ImageDictionary),
-                this.document
-              );
+            if (firstEntry instanceof core.PDFDictionary && firstEntry.has("Subtype") && firstEntry.get("Subtype", core.PDFName).text === "Image") {
+              return new Image(firstEntry.to(core.ImageDictionary), this.document);
             }
           }
         }
@@ -57,19 +50,12 @@ export class InputImageBox extends FormComponent {
     } else {
       form.bBox.urX = value.width;
       form.bBox.urY = value.height;
-      const resources = new ResourceManager(
-        form.Resources.get(),
-        this.document
-      );
+      const resources = new ResourceManager(form.Resources.get(), this.document);
       const resource = resources.set(value.target);
 
       // Draw image
       const content = new core.PDFContent();
-      content
-        .graphicsBegin()
-        .concatMatrix(value.width, 0, 0, value.height, 0, 0)
-        .drawXObject(resource.name)
-        .graphicsEnd();
+      content.graphicsBegin().concatMatrix(value.width, 0, 0, value.height, 0, 0).drawXObject(resource.name).graphicsEnd();
       form.stream = content.toUint8Array();
 
       this.target.MK.get().I = form.makeIndirect();

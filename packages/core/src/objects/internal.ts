@@ -36,7 +36,7 @@ export enum ObjectTypeEnum {
   Array = "PDFArray",
   Dictionary = "PDFDictionary",
   Stream = "PDFStream",
-  Comment = "PDFComment"
+  Comment = "PDFComment",
 }
 
 /**
@@ -47,55 +47,17 @@ export enum ObjectTypeEnum {
  *
  * @remarks This method is internal to fix some circular dependencies.
  */
-export function typeOf(
-  data: unknown,
-  name: ObjectTypeEnum.Null
-): data is PDFNull;
-export function typeOf(
-  data: unknown,
-  name: ObjectTypeEnum.Boolean
-): data is PDFBoolean;
-export function typeOf(
-  data: unknown,
-  name: ObjectTypeEnum.Numeric
-): data is PDFNumeric;
-export function typeOf(
-  data: unknown,
-  name: ObjectTypeEnum.Name
-): data is PDFName;
-export function typeOf(
-  data: unknown,
-  name: ObjectTypeEnum.LiteralString
-): data is PDFLiteralString;
-export function typeOf(
-  data: unknown,
-  name: ObjectTypeEnum.HexString
-): data is PDFHexString;
-export function typeOf(
-  data: unknown,
-  name: ObjectTypeEnum.IndirectReference
-): data is PDFIndirectReference;
-export function typeOf(
-  data: unknown,
-  name: ObjectTypeEnum.Array
-): data is PDFArray;
-export function typeOf(
-  data: unknown,
-  name: ObjectTypeEnum.Dictionary
-): data is PDFDictionary;
-export function typeOf(
-  data: unknown,
-  name: ObjectTypeEnum.Stream
-): data is PDFStream;
-export function typeOf(
-  data: unknown,
-  name: ObjectTypeEnum.Comment
-): data is PDFComment;
+export function typeOf(data: unknown, name: ObjectTypeEnum.Null): data is PDFNull;
+export function typeOf(data: unknown, name: ObjectTypeEnum.Boolean): data is PDFBoolean;
+export function typeOf(data: unknown, name: ObjectTypeEnum.Numeric): data is PDFNumeric;
+export function typeOf(data: unknown, name: ObjectTypeEnum.Name): data is PDFName;
+export function typeOf(data: unknown, name: ObjectTypeEnum.LiteralString): data is PDFLiteralString;
+export function typeOf(data: unknown, name: ObjectTypeEnum.HexString): data is PDFHexString;
+export function typeOf(data: unknown, name: ObjectTypeEnum.IndirectReference): data is PDFIndirectReference;
+export function typeOf(data: unknown, name: ObjectTypeEnum.Array): data is PDFArray;
+export function typeOf(data: unknown, name: ObjectTypeEnum.Dictionary): data is PDFDictionary;
+export function typeOf(data: unknown, name: ObjectTypeEnum.Stream): data is PDFStream;
+export function typeOf(data: unknown, name: ObjectTypeEnum.Comment): data is PDFComment;
 export function typeOf(data: unknown, name: string): boolean {
-  return (
-    !!data &&
-    typeof data === "object" &&
-    "NAME" in data.constructor &&
-    data.constructor.NAME === name
-  );
+  return !!data && typeof data === "object" && "NAME" in data.constructor && data.constructor.NAME === name;
 }

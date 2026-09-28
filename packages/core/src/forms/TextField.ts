@@ -52,5 +52,5 @@ export enum TextFieldFlags {
    * dictionary ("Table 228: Additional entries common to all fields
    * containing variable text") shall specify the rich text string.
    */
-  richText = 1 << 25
+  richText = 1 << 25,
 }

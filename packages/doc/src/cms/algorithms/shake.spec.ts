@@ -11,13 +11,13 @@ const testVectors: TestVector[] = [
   {
     name: "SHAKE128",
     webAlg: { name: "shake128" },
-    asnAlg: "300B060960864801650304020B"
+    asnAlg: "300B060960864801650304020B",
   },
   {
     name: "SHAKE256",
     webAlg: { name: "shake256" },
-    asnAlg: "300B060960864801650304020C"
-  }
+    asnAlg: "300B060960864801650304020C",
+  },
 ];
 
 describe("shakeAlgorithmConverter", () => {

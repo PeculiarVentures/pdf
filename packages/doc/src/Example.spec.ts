@@ -9,7 +9,7 @@ const options: PDFDocumentCreateParameters = {
   version: PDFVersion.v1_6,
   disableCompressedStreams: true,
   disableCompressedObjects: true,
-  useXrefTable: true
+  useXrefTable: true,
 };
 
 // interface TableRow {
@@ -549,14 +549,14 @@ describe("Examples", () => {
           ["Milk 1 L", "$7.95"],
           ["Orvital Organic Medium Egg (53-62 G)", "$18.95"],
           ["Bread 400 Gr.", "$3.95"],
-          ["Книжка", "$2.95"]
+          ["Книжка", "$2.95"],
         ],
         bonus: [
           ["Subtotal", "$89.25"],
-          ["Shipping", "$5"]
+          ["Shipping", "$5"],
         ],
-        total: "$94.25"
-      }
+        total: "$94.25",
+      },
     };
 
     const themeColor: core.Colors = [0x66 / 0xff, 0xb2 / 0xff, 0xff / 0xff];
@@ -580,19 +580,9 @@ describe("Examples", () => {
 
     const rightSide = page.width - padding;
 
-    page
-      .graphics()
-      .strokeColor(themeColor)
-      .lineWidth(1)
-      .line(leftSide, 167, rightSide, 167)
-      .stroke();
+    page.graphics().strokeColor(themeColor).lineWidth(1).line(leftSide, 167, rightSide, 167).stroke();
 
-    page
-      .text()
-      .color(whiteColor)
-      .font(fontHelv, 18)
-      .move(leftSide, 44)
-      .show("INVOICE");
+    page.text().color(whiteColor).font(fontHelv, 18).move(leftSide, 44).show("INVOICE");
 
     const graphics = page.graphics();
     graphics.drawText(
@@ -605,13 +595,13 @@ describe("Examples", () => {
             font: fontHelvBold,
             style: {
               color: whiteColor,
-              size: 18
-            }
-          }
-        ]
+              size: 18,
+            },
+          },
+        ],
       },
       leftSide,
-      44
+      44,
     );
 
     graphics.drawText(
@@ -623,13 +613,13 @@ describe("Examples", () => {
             font: fontHelvBoldOblique,
             style: {
               color: themeColor,
-              size: 42
-            }
-          }
-        ]
+              size: 42,
+            },
+          },
+        ],
       },
       leftSide,
-      97
+      97,
     );
 
     graphics.drawText(
@@ -642,13 +632,13 @@ describe("Examples", () => {
             font: fontHelvBold,
             style: {
               color: blackColor,
-              size: 12
-            }
-          }
-        ]
+              size: 12,
+            },
+          },
+        ],
       },
       leftSide,
-      86
+      86,
     );
 
     graphics.drawText(
@@ -662,13 +652,13 @@ describe("Examples", () => {
             font: fontHelv,
             style: {
               color: grayColor,
-              size: 10
-            }
-          }
-        ]
+              size: 10,
+            },
+          },
+        ],
       },
       leftSide,
-      110
+      110,
     );
 
     graphics.drawText(
@@ -681,13 +671,13 @@ describe("Examples", () => {
             font: fontHelvBold,
             style: {
               color: themeColor,
-              size: 12
-            }
-          }
-        ]
+              size: 12,
+            },
+          },
+        ],
       },
       leftSide,
-      186
+      186,
     );
 
     graphics.drawText(
@@ -700,13 +690,13 @@ describe("Examples", () => {
             font: fontHelvBold,
             style: {
               color: blackColor,
-              size: 24
-            }
-          }
-        ]
+              size: 24,
+            },
+          },
+        ],
       },
       leftSide,
-      214
+      214,
     );
 
     graphics.drawText(
@@ -719,29 +709,26 @@ describe("Examples", () => {
             font: fontHelvBold,
             style: {
               color: blackColor,
-              size: 12
-            }
+              size: 12,
+            },
           },
           {
-            text: new Date("2025-01-06T00:00:00.000Z").toLocaleDateString(
-              "en-US",
-              {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric"
-              }
-            ),
+            text: new Date("2025-01-06T00:00:00.000Z").toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            }),
             font: fontHelv,
             style: {
               color: grayColor,
-              size: 12
-            }
-          }
-        ]
+              size: 12,
+            },
+          },
+        ],
       },
       leftSide,
-      264
+      264,
     );
 
     let currentTop = 292;
@@ -759,15 +746,12 @@ describe("Examples", () => {
       const columnWidth2 = tableWidth - columnWidth1;
       const textStyle = {
         size: fontSize,
-        color: blackColor
+        color: blackColor,
       };
       const totalPadding = 200;
 
       // Draw table header
-      tableGraphics
-        .fillColor(themeColor)
-        .rect(tableLeft, currentTop, tableWidth, tableRowHeight)
-        .fill();
+      tableGraphics.fillColor(themeColor).rect(tableLeft, currentTop, tableWidth, tableRowHeight).fill();
 
       tableGraphics.drawText(
         {
@@ -776,12 +760,12 @@ describe("Examples", () => {
             {
               text: "Description",
               font: fontHelvBold,
-              style: textStyle
-            }
-          ]
+              style: textStyle,
+            },
+          ],
         },
         tableLeft + cellPadding,
-        currentTop + cellPadding
+        currentTop + cellPadding,
       );
       tableGraphics.drawText(
         {
@@ -791,12 +775,12 @@ describe("Examples", () => {
             {
               text: "Amount",
               font: fontHelvBold,
-              style: textStyle
-            }
-          ]
+              style: textStyle,
+            },
+          ],
         },
         tableLeft + columnWidth1 + cellPadding,
-        currentTop + cellPadding
+        currentTop + cellPadding,
       );
 
       currentTop += tableRowHeight;
@@ -810,12 +794,12 @@ describe("Examples", () => {
               {
                 text: description,
                 font: fontHelvBold,
-                style: textStyle
-              }
-            ]
+                style: textStyle,
+              },
+            ],
           },
           tableLeft + cellPadding,
-          currentTop + cellPadding
+          currentTop + cellPadding,
         );
         tableGraphics.drawText(
           {
@@ -825,12 +809,12 @@ describe("Examples", () => {
               {
                 text: amount,
                 font: fontHelv,
-                style: textStyle
-              }
-            ]
+                style: textStyle,
+              },
+            ],
           },
           tableLeft + columnWidth1 + cellPadding,
-          currentTop + cellPadding
+          currentTop + cellPadding,
         );
 
         currentTop += tableRowHeight;
@@ -853,12 +837,12 @@ describe("Examples", () => {
               {
                 text: description,
                 font: fontHelv,
-                style: textStyle
-              }
-            ]
+                style: textStyle,
+              },
+            ],
           },
           tableLeft + cellPadding + totalPadding,
-          currentTop
+          currentTop,
         );
         tableGraphics.drawText(
           {
@@ -868,12 +852,12 @@ describe("Examples", () => {
               {
                 text: amount,
                 font: fontHelv,
-                style: textStyle
-              }
-            ]
+                style: textStyle,
+              },
+            ],
           },
           tableLeft + columnWidth1 + cellPadding,
-          currentTop
+          currentTop,
         );
 
         currentTop += bonusRowHeight;
@@ -882,12 +866,7 @@ describe("Examples", () => {
       currentTop += cellPadding;
       tableGraphics
         .strokeColor(grayColor)
-        .line(
-          tableLeft + totalPadding,
-          currentTop,
-          tableLeft + tableWidth,
-          currentTop
-        )
+        .line(tableLeft + totalPadding, currentTop, tableLeft + tableWidth, currentTop)
         .stroke();
 
       // Total
@@ -900,12 +879,12 @@ describe("Examples", () => {
             {
               text: "Total",
               font: fontHelv,
-              style: textStyle
-            }
-          ]
+              style: textStyle,
+            },
+          ],
         },
         tableLeft + cellPadding + totalPadding,
-        currentTop
+        currentTop,
       );
       tableGraphics.drawText(
         {
@@ -917,13 +896,13 @@ describe("Examples", () => {
               font: fontHelvBold,
               style: {
                 size: 17,
-                color: blackColor
-              }
-            }
-          ]
+                color: blackColor,
+              },
+            },
+          ],
         },
         tableLeft + columnWidth1 + cellPadding,
-        currentTop
+        currentTop,
       );
 
       currentTop += cellPadding;
@@ -945,21 +924,20 @@ describe("Examples", () => {
             font: fontHelvBold,
             style: {
               size: 12,
-              color: blackColor
-            }
-          }
-        ]
+              color: blackColor,
+            },
+          },
+        ],
       },
       leftSide,
-      thankYouTop + 10
+      thankYouTop + 10,
     );
 
     const pdf = await doc.save();
     const hash = await PdfRenderingHelper.getPageHash(pdf, 1);
     const expectedHash: Record<string, string> = {
-      darwin:
-        "c349c894252d13a6b733772f7f994c46399acaa94c169e6bc1c3e1eb4e5d9ff0",
-      linux: "065dc45d38816d08015c1faf5158449b9fffbec7e63aa095597e2d330e82d944"
+      darwin: "c349c894252d13a6b733772f7f994c46399acaa94c169e6bc1c3e1eb4e5d9ff0",
+      linux: "065dc45d38816d08015c1faf5158449b9fffbec7e63aa095597e2d330e82d944",
     };
     expect(hash).toEqual(expectedHash[process.platform]);
   });

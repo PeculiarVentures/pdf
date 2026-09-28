@@ -22,9 +22,7 @@ import type { PDFStream } from "./Stream";
 export abstract class PDFObjectReader {
   protected static items: Record<string, PDFObjectConstructor<PDFObject>> = {};
 
-  public static register<T extends PDFObject>(
-    type: PDFObjectConstructor<T>
-  ): void {
+  public static register<T extends PDFObject>(type: PDFObjectConstructor<T>): void {
     this.items[type.NAME] = type;
   }
 
@@ -32,21 +30,15 @@ export abstract class PDFObjectReader {
   public static get(name: ObjectTypeEnum.Boolean): typeof PDFBoolean;
   public static get(name: ObjectTypeEnum.Numeric): typeof PDFNumeric;
   public static get(name: ObjectTypeEnum.Name): typeof PDFName;
-  public static get(
-    name: ObjectTypeEnum.LiteralString
-  ): typeof PDFLiteralString;
+  public static get(name: ObjectTypeEnum.LiteralString): typeof PDFLiteralString;
   public static get(name: ObjectTypeEnum.HexString): typeof PDFHexString;
-  public static get(
-    name: ObjectTypeEnum.IndirectReference
-  ): typeof PDFIndirectReference;
+  public static get(name: ObjectTypeEnum.IndirectReference): typeof PDFIndirectReference;
   public static get(name: ObjectTypeEnum.Array): typeof PDFArray;
   public static get(name: ObjectTypeEnum.Dictionary): typeof PDFDictionary;
   public static get(name: ObjectTypeEnum.Stream): typeof PDFStream;
   public static get(name: ObjectTypeEnum.Comment): typeof PDFComment;
   public static get<T extends PDFObject>(name: string): PDFObjectConstructor<T>;
-  public static get<T extends PDFObject>(
-    name: string
-  ): PDFObjectConstructor<T> {
+  public static get<T extends PDFObject>(name: string): PDFObjectConstructor<T> {
     const Constructor = this.items[name];
     if (!Constructor) {
       throw new UnregisteredObjectTypeError(name);
@@ -55,16 +47,8 @@ export abstract class PDFObjectReader {
     return Constructor as PDFObjectConstructor<T>;
   }
 
-  public static read(
-    reader: ViewReader,
-    update?: PDFDocumentUpdate | null,
-    parent?: PDFObject | null
-  ): PDFObjectTypes;
-  public static read(
-    reader: ViewReader,
-    update: PDFDocumentUpdate | null = null,
-    parent: PDFObject | null = null
-  ): PDFObject {
+  public static read(reader: ViewReader, update?: PDFDocumentUpdate | null, parent?: PDFObject | null): PDFObjectTypes;
+  public static read(reader: ViewReader, update: PDFDocumentUpdate | null = null, parent: PDFObject | null = null): PDFObject {
     this.skip(reader);
 
     switch (true) {
@@ -135,10 +119,7 @@ export abstract class PDFObjectReader {
       }
     }
 
-    throw new ParsingError(
-      `Cannot read PDF object at position ${reader.position}`,
-      reader.position
-    );
+    throw new ParsingError(`Cannot read PDF object at position ${reader.position}`, reader.position);
   }
 
   /**

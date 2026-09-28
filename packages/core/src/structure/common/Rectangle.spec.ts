@@ -11,7 +11,7 @@ describe("PDFRectangle", () => {
       xref: XrefStructure.Table,
       disableAscii85Encoding: true,
       disableCompressedStreams: true,
-      disableCompressedObjects: true
+      disableCompressedObjects: true,
     });
   });
 
@@ -75,17 +75,13 @@ describe("PDFRectangle", () => {
     it("should throw error if rectangle does not have 4 coordinates", () => {
       const rect = PDFRectangle.create(doc.update);
       rect.items.pop(); // Remove one coordinate
-      expect(() => rect.toArray()).toThrow(
-        "The rectangle must have 4 coordinates"
-      );
+      expect(() => rect.toArray()).toThrow("The rectangle must have 4 coordinates");
     });
 
     it("should throw error if coordinates are not numbers", () => {
       const rect = PDFRectangle.create(doc.update);
       rect.items[0] = doc.createString("not a number");
-      expect(() => rect.toArray()).toThrow(
-        "All rectangle coordinates must be numbers"
-      );
+      expect(() => rect.toArray()).toThrow("All rectangle coordinates must be numbers");
     });
   });
 });

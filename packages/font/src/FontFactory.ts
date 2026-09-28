@@ -44,14 +44,9 @@ export abstract class FontFactory {
 
     const fontZip = DefaultFontsZip.get(source);
     if (!fontZip) {
-      throw new Error(
-        `Cannot get default font '${source}. ZIP cached value doesn't exist'`
-      );
+      throw new Error(`Cannot get default font '${source}. ZIP cached value doesn't exist'`);
     }
-    font = AsnConvert.parse(
-      pako.ungzip(new Uint8Array(Convert.FromBase64(fontZip))),
-      FontInfo
-    );
+    font = AsnConvert.parse(pako.ungzip(new Uint8Array(Convert.FromBase64(fontZip))), FontInfo);
 
     // Add font to cache
     this.cache.set(source, font);
@@ -67,23 +62,17 @@ export abstract class FontFactory {
    */
   public static createFile(source: BufferSource): FontInfo {
     const buffer = BufferSourceConverter.toArrayBuffer(source);
-    const font = fontjs.Font.fromStream(
-      new bs.SeqStream({ stream: new bs.ByteStream({ buffer }) })
-    );
+    const font = fontjs.Font.fromStream(new bs.SeqStream({ stream: new bs.ByteStream({ buffer }) }));
 
     const fontInfo = new FontInfo();
 
     // NAME
     const name = font.tables.get(fontjs.Tables.NAME.tag) as fontjs.Tables.NAME;
     if (name) {
-      fontInfo.name.fontFamily =
-        name.getName(fontjs.Tables.NameIDs.fontFamilyName) || "";
-      fontInfo.name.fontSubfamily =
-        name.getName(fontjs.Tables.NameIDs.fontSubFamilyName) || "";
-      fontInfo.name.fullName =
-        name.getName(fontjs.Tables.NameIDs.fullFontName) || "";
-      fontInfo.name.postScriptName =
-        name.getName(fontjs.Tables.NameIDs.postScriptFontName) || "";
+      fontInfo.name.fontFamily = name.getName(fontjs.Tables.NameIDs.fontFamilyName) || "";
+      fontInfo.name.fontSubfamily = name.getName(fontjs.Tables.NameIDs.fontSubFamilyName) || "";
+      fontInfo.name.fullName = name.getName(fontjs.Tables.NameIDs.fullFontName) || "";
+      fontInfo.name.postScriptName = name.getName(fontjs.Tables.NameIDs.postScriptFontName) || "";
     }
 
     // HEAD
@@ -123,7 +112,7 @@ export abstract class FontFactory {
       const glyph = new FontGlyph({
         index: i,
         advanceWidth: item.hAdvanceWidth || 0,
-        unicode: item.unicodes || []
+        unicode: item.unicodes || [],
       });
 
       fontInfo.glyphs.push(glyph);
@@ -165,9 +154,7 @@ export abstract class FontFactory {
    */
   public static subsetFont(source: BufferSource, text: string): ArrayBuffer {
     const buffer = BufferSourceConverter.toArrayBuffer(source);
-    const font = fontjs.Font.fromStream(
-      new bs.SeqStream({ stream: new bs.ByteStream({ buffer }) })
-    );
+    const font = fontjs.Font.fromStream(new bs.SeqStream({ stream: new bs.ByteStream({ buffer }) }));
 
     const gids = this.getIndexes(font, text);
 
@@ -194,21 +181,14 @@ export abstract class FontFactory {
     name2.nameRecords = [];
     for (const nameRecord of name.nameRecords) {
       // Copy only essential name records
-      if (
-        [
-          fontjs.Tables.NameIDs.fontFamilyName,
-          fontjs.Tables.NameIDs.fontSubFamilyName,
-          fontjs.Tables.NameIDs.fullFontName,
-          fontjs.Tables.NameIDs.postScriptFontName
-        ].includes(nameRecord.nameID)
-      ) {
+      if ([fontjs.Tables.NameIDs.fontFamilyName, fontjs.Tables.NameIDs.fontSubFamilyName, fontjs.Tables.NameIDs.fullFontName, fontjs.Tables.NameIDs.postScriptFontName].includes(nameRecord.nameID)) {
         // Create new record with original values
         const newRecord = {
           platformID: nameRecord.platformID,
           platformSpecificID: nameRecord.platformSpecificID,
           languageID: nameRecord.languageID,
           nameID: nameRecord.nameID,
-          value: nameRecord.value
+          value: nameRecord.value,
         };
         name2.nameRecords.push(newRecord);
       }
@@ -218,24 +198,24 @@ export abstract class FontFactory {
       tables: new Map([
         [fontjs.Tables.OS2.tag, font.tables.get(fontjs.Tables.OS2.tag)],
         [fontjs.Tables.POST.tag, post],
-        [fontjs.Tables.NAME.tag, name2]
+        [fontjs.Tables.NAME.tag, name2],
       ]),
       glyphIndexes: gids,
       fontValues: {
         unitsPerEm: head.unitsPerEm,
         ascent: hhea.ascent,
         descent: hhea.descent,
-        lineGap: hhea.lineGap
+        lineGap: hhea.lineGap,
       },
       cmaps: [
         {
           format: 4,
           language: 0,
           platformID: 3,
-          platformSpecificID: 1
-        }
+          platformSpecificID: 1,
+        },
       ],
-      cmapLanguage: 0
+      cmapLanguage: 0,
     });
 
     const newFontStream = new bs.SeqStream();

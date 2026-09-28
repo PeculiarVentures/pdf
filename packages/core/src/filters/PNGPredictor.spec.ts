@@ -23,9 +23,7 @@ describe("PNGPredictor", () => {
 
       const result = predictor.decode(input);
 
-      expect(Buffer.from(result).toString("hex")).toBe(
-        "000102030405060708090a0b0c0d0e0f1011121314151617"
-      );
+      expect(Buffer.from(result).toString("hex")).toBe("000102030405060708090a0b0c0d0e0f1011121314151617");
     });
 
     // Test Predictor Type 1 (Sub)
@@ -35,9 +33,7 @@ describe("PNGPredictor", () => {
 
       const result = predictor.decode(input);
 
-      expect(Buffer.from(result).toString("hex")).toBe(
-        "000102030405060708090a0b0c0d0e0f1011121314151617"
-      );
+      expect(Buffer.from(result).toString("hex")).toBe("000102030405060708090a0b0c0d0e0f1011121314151617");
     });
 
     // Test Predictor Type 2 (Up)
@@ -47,9 +43,7 @@ describe("PNGPredictor", () => {
 
       const result = predictor.decode(input);
 
-      expect(Buffer.from(result).toString("hex")).toBe(
-        "000102030405060708090a0b0c0d0e0f1011121314151617"
-      );
+      expect(Buffer.from(result).toString("hex")).toBe("000102030405060708090a0b0c0d0e0f1011121314151617");
     });
 
     // Test Predictor Type 3 (Average)
@@ -59,9 +53,7 @@ describe("PNGPredictor", () => {
 
       const result = predictor.decode(input);
 
-      expect(Buffer.from(result).toString("hex")).toBe(
-        "000102030405060708090a0b0c0d0e0f1011121314151617"
-      );
+      expect(Buffer.from(result).toString("hex")).toBe("000102030405060708090a0b0c0d0e0f1011121314151617");
     });
 
     // Test Predictor Type 4 (Paeth)
@@ -71,21 +63,14 @@ describe("PNGPredictor", () => {
 
       const result = predictor.decode(input);
 
-      expect(Buffer.from(result).toString("hex")).toBe(
-        "000102030405060708090a0b0c0d0e0f1011121314151617"
-      );
+      expect(Buffer.from(result).toString("hex")).toBe("000102030405060708090a0b0c0d0e0f1011121314151617");
     });
 
     // Test invalid predictor type
     it("should throw error for invalid predictor type", () => {
-      const input = Buffer.from(
-        "05000102030405060708090a0b0c0d0e0f1011121314151617",
-        "hex"
-      );
+      const input = Buffer.from("05000102030405060708090a0b0c0d0e0f1011121314151617", "hex");
 
-      expect(() => predictor.decode(input)).toThrow(
-        "Unsupported predictor type: 5"
-      );
+      expect(() => predictor.decode(input)).toThrow("Unsupported predictor type: 5");
     });
 
     // Test real PDF data with PNG Up predictor
@@ -93,26 +78,19 @@ describe("PNGPredictor", () => {
       predictor.columns = 4; // From DecodeParms
       predictor.colors = 1; // XRef stream uses 1 color
       predictor.bitsPerComponent = 8;
-      const input = Convert.FromHex(
-        "02010010000200038d000200005500020001b1000200012100020001a50002000a8500020004bc000200ecca000201024e0002000000010200000001020000000102ffff12fd"
-      );
+      const input = Convert.FromHex("02010010000200038d000200005500020001b1000200012100020001a50002000a8500020004bc000200ecca000201024e0002000000010200000001020000000102ffff12fd");
 
       const result = predictor.decode(new Uint8Array(input));
 
       // Convert result to hex string for comparison
       const hex = Buffer.from(result).toString("hex");
-      expect(hex).toBe(
-        "0100100001039d000103f2000104a3000105c400010669000110ee000114aa00010074000202c2000202c2010202c2020202c2030101d400"
-      );
+      expect(hex).toBe("0100100001039d000103f2000104a3000105c400010669000110ee000114aa00010074000202c2000202c2010202c2020202c2030101d400");
     });
   });
 
   describe("encode", () => {
     it("should return the same stream for encode method", () => {
-      const input = Buffer.from(
-        "000102030405060708090a0b0c0d0e0f1011121314151617",
-        "hex"
-      );
+      const input = Buffer.from("000102030405060708090a0b0c0d0e0f1011121314151617", "hex");
 
       const result = predictor.encode(input);
       expect(result).toBeDefined();

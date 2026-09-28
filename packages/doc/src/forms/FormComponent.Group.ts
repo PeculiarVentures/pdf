@@ -10,10 +10,7 @@ export interface IFormGroupedComponent extends IComponent {
   findGroup(): FormComponentGroup | null;
 }
 
-export class FormComponentGroup<
-    TTarget extends core.PDFField = core.PDFField,
-    TItem extends IFormGroupedComponent = IFormGroupedComponent
-  >
+export class FormComponentGroup<TTarget extends core.PDFField = core.PDFField, TItem extends IFormGroupedComponent = IFormGroupedComponent>
   extends WrapObject<TTarget>
   implements IComponent, Iterable<TItem>
 {
@@ -28,26 +25,22 @@ export class FormComponentGroup<
 
   [Symbol.iterator](): Iterator<TItem, unknown, undefined> {
     let pointer = 0;
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const _this = this;
-    const items = this.target.Kids.has()
-      ? this.target.Kids.get()
-      : this.document.target.createArray(this.target);
+    const items = this.target.Kids.has() ? this.target.Kids.get() : this.document.target.createArray(this.target);
 
     return {
-      next(): IteratorResult<TItem> {
+      next: (): IteratorResult<TItem> => {
         if (pointer < items.length) {
           return {
             done: false,
-            value: _this.get(pointer++)
-          };
-        } else {
-          return {
-            done: true,
-            value: null
+            value: this.get(pointer++),
           };
         }
-      }
+
+        return {
+          done: true,
+          value: null,
+        };
+      },
     };
   }
 
@@ -77,10 +70,7 @@ export class FormComponentGroup<
     if (this.target.Kids.has()) {
       const kids = this.target.Kids.get();
 
-      const component = FormComponentFactory.create(
-        kids.get(index, core.WidgetDictionary, true),
-        this.document
-      );
+      const component = FormComponentFactory.create(kids.get(index, core.WidgetDictionary, true), this.document);
       if (component instanceof FormComponent) {
         return component as unknown as TItem;
       }

@@ -25,7 +25,7 @@ export class OPIv1_3Dictionary extends objects.PDFDictionary {
    * OPI comment - %ALDImageFilename
    */
   @objects.PDFDictionaryField({
-    name: "F"
+    name: "F",
   })
   public f!: objects.PDFObject; // TODO implement File specification
 
@@ -66,7 +66,7 @@ export class OPIv1_3Dictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     name: "CropRect",
-    type: PDFRectangle
+    type: PDFRectangle,
   })
   public cropRect!: PDFRectangle;
 
@@ -246,7 +246,7 @@ export class OPIv2_0Dictionary extends objects.PDFDictionary {
    * OPI comment - %%ImageFilename
    */
   @objects.PDFDictionaryField({
-    name: "F"
+    name: "F",
   })
   public f!: objects.PDFObject; // TODO implement File specification
 
@@ -313,7 +313,7 @@ export class OPIv2_0Dictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "CropRect",
     type: PDFRectangle,
-    optional: true
+    optional: true,
   })
   public cropRect!: PDFRectangle | null;
 
@@ -342,7 +342,7 @@ export class OPIv2_0Dictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     name: "Inks",
-    optional: true
+    optional: true,
   })
   public Inks!: objects.PDFName | objects.PDFArray | null;
 
@@ -359,7 +359,7 @@ export class OPIv2_0Dictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "IncludedImageDimensions",
     type: objects.PDFArray,
-    optional: true
+    optional: true,
   })
   public includedImageDimensions!: objects.PDFArray | null;
 
@@ -384,14 +384,14 @@ export class OPIDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "1.3",
     optional: true,
-    type: OPIv1_3Dictionary
+    type: OPIv1_3Dictionary,
   })
   public v1_3!: OPIv1_3Dictionary | null;
 
   @objects.PDFDictionaryField({
     name: "1.3",
     optional: true,
-    type: OPIv2_0Dictionary
+    type: OPIv2_0Dictionary,
   })
   public v2_0!: OPIv2_0Dictionary | null;
 }

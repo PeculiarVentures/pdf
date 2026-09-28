@@ -12,10 +12,7 @@ export class ComboBoxConverter extends WidgetConverter<pdfDoc.ComboBox> {
     super(pdfDoc.ComboBox);
   }
 
-  protected onExport(
-    component: pdfDoc.ComboBox,
-    json: Record<string, unknown>
-  ): void {
+  protected onExport(component: pdfDoc.ComboBox, json: Record<string, unknown>): void {
     let flags: Record<string, unknown> = {};
     if (json.flags && typeof json.flags === "object") {
       flags = json.flags as Record<string, unknown>;
@@ -28,17 +25,14 @@ export class ComboBoxConverter extends WidgetConverter<pdfDoc.ComboBox> {
       sort: component.sort,
       multiSelect: component.multiSelect,
       doNotSpellCheck: component.doNotSpellCheck,
-      commitOnSelChange: component.commitOnSelChange
+      commitOnSelChange: component.commitOnSelChange,
     };
 
     json.options = component.options;
     json.selected = component.selected;
   }
 
-  public override setValue(
-    component: pdfDoc.ComboBox,
-    data: JsonComboBoxUpdate
-  ): void {
+  public override setValue(component: pdfDoc.ComboBox, data: JsonComboBoxUpdate): void {
     component.selected = data.selected;
   }
 }

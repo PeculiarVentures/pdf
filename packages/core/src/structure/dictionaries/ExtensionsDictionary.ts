@@ -1,9 +1,4 @@
-import {
-  Maybe,
-  PDFDictionary,
-  PDFMaybeField,
-  PDFNameField
-} from "../../objects";
+import { Maybe, PDFDictionary, PDFMaybeField, PDFNameField } from "../../objects";
 import { DeveloperExtensionsDictionary } from "./DeveloperExtensionsDictionary";
 
 export class ExtensionsDictionary extends PDFDictionary {

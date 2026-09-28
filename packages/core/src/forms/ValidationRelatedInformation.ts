@@ -1,13 +1,4 @@
-import {
-  Maybe,
-  PDFArray,
-  PDFDateField,
-  PDFDictionary,
-  PDFMaybeField,
-  PDFNameField,
-  PDFStream,
-  PDFStreamField
-} from "../objects";
+import { Maybe, PDFArray, PDFDateField, PDFDictionary, PDFMaybeField, PDFNameField, PDFStream, PDFStreamField } from "../objects";
 import { PDFDate } from "../structure/common/Date";
 
 export class ValidationRelatedInformationDictionary extends PDFDictionary {

@@ -3,11 +3,7 @@ import * as x509 from "@peculiar/x509";
 import * as pkijs from "pkijs";
 import { Convert } from "pvtsutils";
 import "./algorithms";
-import {
-  ContentTypeAttribute,
-  MessageDigestAttribute,
-  SigningTimeAttribute
-} from "./attributes";
+import { ContentTypeAttribute, MessageDigestAttribute, SigningTimeAttribute } from "./attributes";
 import { CMSSignedData } from "./SignedData";
 import { cms, data } from "./SignedData.vector.spec";
 import { CMSContentType } from "./SignerInfo";
@@ -43,40 +39,34 @@ describe("SignedData", () => {
     beforeAll(async () => {
       algorithm = {
         name: "ECDSA",
-        namedCurve: "P-256"
+        namedCurve: "P-256",
       };
       signingAlgorithm = {
         name: "ECDSA",
-        hash: "SHA-256"
+        hash: "SHA-256",
       };
 
       // create CA
-      const caKeys = await crypto.subtle.generateKey(algorithm, false, [
-        "sign",
-        "verify"
-      ]);
+      const caKeys = await crypto.subtle.generateKey(algorithm, false, ["sign", "verify"]);
       caCert = await x509.X509CertificateGenerator.createSelfSigned(
         {
           name: "CN=CA Test",
           keys: caKeys,
           signingAlgorithm,
-          notAfter: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365) // 1 year
+          notAfter: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
         },
-        crypto
+        crypto,
       );
       caCert.privateKey = caKeys.privateKey;
 
       // create leaf
-      const leafKeys = await crypto.subtle.generateKey(algorithm, false, [
-        "sign",
-        "verify"
-      ]);
+      const leafKeys = await crypto.subtle.generateKey(algorithm, false, ["sign", "verify"]);
       leafCert = await x509.X509CertificateGenerator.create({
         issuer: caCert.issuer,
         subject: "CN=Leaf Test",
         publicKey: leafKeys.publicKey,
         signingKey: caKeys.privateKey,
-        signingAlgorithm
+        signingAlgorithm,
       });
       leafCert.privateKey = leafKeys.privateKey;
 
@@ -89,13 +79,13 @@ describe("SignedData", () => {
           {
             certId: await CertificateID.create("SHA-256", leafCert, caCert),
             status: {
-              type: "good"
+              type: "good",
             },
             thisUpdate: new Date(),
-            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24) // 1 day
-          }
+            nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24), // 1 day
+          },
         ],
-        producedAt: new Date()
+        producedAt: new Date(),
       });
 
       // create CRL
@@ -104,7 +94,7 @@ describe("SignedData", () => {
         thisUpdate: new Date(),
         nextUpdate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
         signingKey: caKeys.privateKey,
-        signingAlgorithm
+        signingAlgorithm,
       });
       crl = CRL.fromBER(x50Crl.rawData);
     });
@@ -123,11 +113,7 @@ describe("SignedData", () => {
         const signer = signedData.createSigner(leafCert, {
           digestAlgorithm,
           signatureAlgorithm: signingAlgorithm,
-          signedAttributes: [
-            new ContentTypeAttribute(CMSContentType.data),
-            new SigningTimeAttribute(),
-            new MessageDigestAttribute(digest)
-          ]
+          signedAttributes: [new ContentTypeAttribute(CMSContentType.data), new SigningTimeAttribute(), new MessageDigestAttribute(digest)],
         });
         await signedData.sign(leafCert.privateKey!, signer);
         cms = signedData.toBER();
@@ -168,10 +154,10 @@ describe("SignedData", () => {
               ocsp,
               {
                 type: "ocsp",
-                value: ocsp
-              }
-            ])
-          ]
+                value: ocsp,
+              },
+            ]),
+          ],
         });
         await signedData.sign(leafCert.privateKey!, signer);
         cms = signedData.toBER();
@@ -196,27 +182,24 @@ describe("SignedData", () => {
     beforeAll(async () => {
       algorithm = {
         name: "ECDSA",
-        namedCurve: "P-256"
+        namedCurve: "P-256",
       };
       signingAlgorithm = {
         name: "ECDSA",
-        hash: "SHA-256"
+        hash: "SHA-256",
       };
       data = Convert.FromUtf8String("Hello");
       dataHash = await crypto.subtle.digest("SHA-256", data);
 
-      const keys = await crypto.subtle.generateKey(algorithm, false, [
-        "sign",
-        "verify"
-      ]);
+      const keys = await crypto.subtle.generateKey(algorithm, false, ["sign", "verify"]);
       cert = await x509.X509CertificateGenerator.createSelfSigned(
         {
           name: "CN=Test",
           keys,
           signingAlgorithm,
-          notAfter: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365) // 1 year
+          notAfter: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
         },
-        crypto
+        crypto,
       );
       cert.privateKey = keys.privateKey;
     });
@@ -227,11 +210,7 @@ describe("SignedData", () => {
       const signer = signedData.createSigner(cert, {
         digestAlgorithm: "SHA-256",
         signatureAlgorithm: signingAlgorithm,
-        signedAttributes: [
-          new ContentTypeAttribute(CMSContentType.data),
-          new SigningTimeAttribute(),
-          new MessageDigestAttribute(dataHash)
-        ]
+        signedAttributes: [new ContentTypeAttribute(CMSContentType.data), new SigningTimeAttribute(), new MessageDigestAttribute(dataHash)],
       });
       await signedData.sign(cert.privateKey!, signer);
 
@@ -251,11 +230,7 @@ describe("SignedData", () => {
       const signer = signedData.createSigner(cert, {
         digestAlgorithm: "SHA-256",
         signatureAlgorithm: signingAlgorithm,
-        signedAttributes: [
-          new ContentTypeAttribute(CMSContentType.data),
-          new SigningTimeAttribute(),
-          new MessageDigestAttribute(dataHash)
-        ]
+        signedAttributes: [new ContentTypeAttribute(CMSContentType.data), new SigningTimeAttribute(), new MessageDigestAttribute(dataHash)],
       });
       await signedData.sign(cert.privateKey!, signer);
 
@@ -269,20 +244,14 @@ describe("SignedData", () => {
       const signer = signedData.createSigner(cert, {
         digestAlgorithm: "SHA-256",
         signatureAlgorithm: signingAlgorithm,
-        signedAttributes: [
-          new ContentTypeAttribute(CMSContentType.data),
-          new SigningTimeAttribute(),
-          new MessageDigestAttribute(dataHash)
-        ]
+        signedAttributes: [new ContentTypeAttribute(CMSContentType.data), new SigningTimeAttribute(), new MessageDigestAttribute(dataHash)],
       });
       await signedData.sign(cert.privateKey!, signer);
 
       const result = await signedData.verify(data);
       expect(result.signatureVerified).toBe(false);
       expect(result.signers[0].code).toBe(3);
-      expect(result.signers[0].message).toBe(
-        "Unable to find signer certificate"
-      );
+      expect(result.signers[0].message).toBe("Unable to find signer certificate");
     });
   });
 });

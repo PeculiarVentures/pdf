@@ -10,7 +10,7 @@ describe("NumberTrees", () => {
       disableAscii85Encoding: true,
       disableCompressedStreams: true,
       disableCompressedObjects: true,
-      xref: XrefStructure.Table
+      xref: XrefStructure.Table,
     });
   });
 

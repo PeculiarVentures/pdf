@@ -28,7 +28,7 @@ export class ActionDictionary extends PDFDictionary {
    */
   @PDFDictionaryField({
     name: "Next",
-    optional: true
+    optional: true,
   })
   public next!: PDFDictionary | PDFArray | null;
 

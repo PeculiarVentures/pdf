@@ -9,14 +9,10 @@ describe("PDFRepair:RemoveNeedAppearances", () => {
     const acroForm = doc.target.update.catalog!.AcroForm.get();
     acroForm.needAppearances = true;
 
-    const repair = new PDFRepair(
-      globalRepairRegistry.filter((o) => o.id === "removeNeedAppearances")
-    );
+    const repair = new PDFRepair(globalRepairRegistry.filter((o) => o.id === "removeNeedAppearances"));
     const notes = await repair.repairDocument(doc);
     expect(Object.keys(notes).length).toBe(1);
-    expect(notes.removeNeedAppearances[0]).toBe(
-      "Removed NeedAppearances from AcroForm."
-    );
+    expect(notes.removeNeedAppearances[0]).toBe("Removed NeedAppearances from AcroForm.");
     expect(acroForm.has("NeedAppearances")).toBe(false);
   });
 
@@ -28,9 +24,7 @@ describe("PDFRepair:RemoveNeedAppearances", () => {
       const acroForm = doc.target.update.catalog!.AcroForm.get();
       acroForm.needAppearances = false;
 
-      const repair = new PDFRepair(
-        globalRepairRegistry.filter((o) => o.id === "removeNeedAppearances")
-      );
+      const repair = new PDFRepair(globalRepairRegistry.filter((o) => o.id === "removeNeedAppearances"));
       const notes = await repair.repairDocument(doc);
       expect(Object.keys(notes).length).toBe(0);
     });
@@ -39,9 +33,7 @@ describe("PDFRepair:RemoveNeedAppearances", () => {
       const doc = await PDFDocument.create();
       doc.pages.create();
 
-      const repair = new PDFRepair(
-        globalRepairRegistry.filter((o) => o.id === "removeNeedAppearances")
-      );
+      const repair = new PDFRepair(globalRepairRegistry.filter((o) => o.id === "removeNeedAppearances"));
       const notes = await repair.repairDocument(doc);
       expect(Object.keys(notes).length).toBe(0);
     });
@@ -50,9 +42,7 @@ describe("PDFRepair:RemoveNeedAppearances", () => {
       const doc = await PDFDocument.create();
       doc.pages.create();
 
-      const repair = new PDFRepair(
-        globalRepairRegistry.filter((o) => o.id === "removeNeedAppearances")
-      );
+      const repair = new PDFRepair(globalRepairRegistry.filter((o) => o.id === "removeNeedAppearances"));
       const notes = await repair.repairDocument(doc);
       expect(Object.keys(notes).length).toBe(0);
     });

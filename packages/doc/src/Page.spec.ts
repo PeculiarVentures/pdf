@@ -18,20 +18,14 @@ describe("Page", () => {
 
       const image = doc.createImage(imagePngRaw);
       page.graphics().translate("1cm", "1cm").drawImage(image, "20mm", "20mm");
-      page
-        .graphics()
-        .translate("3.5cm", "1cm")
-        .rotate(45)
-        .drawImage(image, "30mm", "30mm");
+      page.graphics().translate("3.5cm", "1cm").rotate(45).drawImage(image, "30mm", "30mm");
       const raw = await doc.save();
 
       const hash = await PdfRenderingHelper.getPageHash(raw, 1);
 
       const expectedHash: Record<string, string> = {
-        darwin:
-          "97afbc0da17a69ed79aa5833ffcb6e1d0bcba0cf9f0dbe8c22a01dac75ecebe7",
-        linux:
-          "9d1ee36dec23a7266823651855a44fc0e2b5bf2139d473a9d58224d4f6e9af13"
+        darwin: "97afbc0da17a69ed79aa5833ffcb6e1d0bcba0cf9f0dbe8c22a01dac75ecebe7",
+        linux: "9d1ee36dec23a7266823651855a44fc0e2b5bf2139d473a9d58224d4f6e9af13",
       };
       expect(hash).toEqual(expectedHash[process.platform]);
     });
@@ -52,10 +46,8 @@ describe("Page", () => {
       const hash = await PdfRenderingHelper.getPageHash(raw, 1);
 
       const expectedHash: Record<string, string> = {
-        darwin:
-          "dc7b5f4535ae3f4ba0295520277abcf28e0f89e5b663ac518ca1781f8354e31b",
-        linux:
-          "9ae286debf575276a966629d3a866a7a1f80fe471005905ef18661adff58e8b6"
+        darwin: "dc7b5f4535ae3f4ba0295520277abcf28e0f89e5b663ac518ca1781f8354e31b",
+        linux: "9ae286debf575276a966629d3a866a7a1f80fe471005905ef18661adff58e8b6",
       };
       expect(hash).toEqual(expectedHash[process.platform]);
     });
@@ -98,9 +90,8 @@ describe("Page", () => {
     const hash = await PdfRenderingHelper.getPageHash(raw, 1);
 
     const expectedHash: Record<string, string> = {
-      darwin:
-        "28ac1661e14138f24d788cb8936bc220debe081f5fc2ec80c8b63e9038ba5761",
-      linux: "2275593b3fbdbcaa0fcbb45d367ee6cbc99740be236a64e7cc7a05410577503d"
+      darwin: "28ac1661e14138f24d788cb8936bc220debe081f5fc2ec80c8b63e9038ba5761",
+      linux: "2275593b3fbdbcaa0fcbb45d367ee6cbc99740be236a64e7cc7a05410577503d",
     };
     expect(hash).toEqual(expectedHash[process.platform]);
   });
@@ -110,30 +101,13 @@ describe("Page", () => {
       const doc = await createPdfWithPage();
       const page = doc.pages.get(0);
 
-      const graphics = page
-        .graphics()
-        .fillColor([0x66 / 0xff, 0xb2 / 0xff, 0xff / 0xff]);
+      const graphics = page.graphics().fillColor([0x66 / 0xff, 0xb2 / 0xff, 0xff / 0xff]);
 
-      graphics
-        .graphics()
-        .translate(100, 100)
-        .rotate(45)
-        .rect(-50, -50, 100, 100, true)
-        .fill();
+      graphics.graphics().translate(100, 100).rotate(45).rect(-50, -50, 100, 100, true).fill();
 
-      graphics
-        .graphics()
-        .strokeColor(0)
-        .pathTo(100, 0)
-        .pathLine(100, 200)
-        .stroke();
+      graphics.graphics().strokeColor(0).pathTo(100, 0).pathLine(100, 200).stroke();
 
-      graphics
-        .graphics()
-        .strokeColor(0)
-        .pathTo(0, 100)
-        .pathLine(200, 100)
-        .stroke();
+      graphics.graphics().strokeColor(0).pathTo(0, 100).pathLine(200, 100).stroke();
 
       // graphics.rect("5cm", "5cm", "2cm", "2cm")
       //   .fill();
@@ -142,10 +116,8 @@ describe("Page", () => {
       const hash = await PdfRenderingHelper.getPageHash(raw, 1);
 
       const expectedHash: Record<string, string> = {
-        darwin:
-          "67e7ef2671f43a777b91f2c8238684badb60dab62c9d66fe362108f69fa04a19",
-        linux:
-          "c29308f76f37848b3f0080bdc99dedf1e605aeef05b1a5886736fc7896827cee"
+        darwin: "67e7ef2671f43a777b91f2c8238684badb60dab62c9d66fe362108f69fa04a19",
+        linux: "c29308f76f37848b3f0080bdc99dedf1e605aeef05b1a5886736fc7896827cee",
       };
       expect(hash).toEqual(expectedHash[process.platform]);
     });
@@ -169,9 +141,7 @@ describe("Page", () => {
 
       const pdf = await doc.save();
       const hash = await PdfRenderingHelper.getPageHash(pdf, 1);
-      expect(hash).toEqual(
-        "d58c01c637d40b292a43a737369b45bc358fa2bdbbec3e488f4aab00627342bf"
-      );
+      expect(hash).toEqual("d58c01c637d40b292a43a737369b45bc358fa2bdbbec3e488f4aab00627342bf");
     });
   });
 
@@ -181,7 +151,7 @@ describe("Page", () => {
 
       const page = doc.pages.create({
         width: 200,
-        height: 400
+        height: 400,
       });
 
       expect(page.leftPadding).toEqual(0);
@@ -195,7 +165,7 @@ describe("Page", () => {
 
       const page = doc.pages.create({
         width: 200,
-        height: 400
+        height: 400,
       });
 
       page.leftPadding = 10;

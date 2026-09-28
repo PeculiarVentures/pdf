@@ -36,7 +36,7 @@ export enum PageLayout {
    * (PDF 1.5) Display the pages two at a time,
    * with odd - numbered pages on the right
    */
-  twoPageRight = "TwoPageRight"
+  twoPageRight = "TwoPageRight",
 }
 
 /**
@@ -67,7 +67,7 @@ export enum PageMode {
   /**
    * (PDF 1.6) Attachments panel visible
    */
-  useAttachments = "UseAttachments"
+  useAttachments = "UseAttachments",
 }
 
 export class CatalogDictionary extends objects.PDFDictionary {
@@ -98,7 +98,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Pages",
     type: PageTreeNodesDictionary,
-    indirect: true
+    indirect: true,
   })
   public Pages!: PageTreeNodesDictionary;
 
@@ -109,7 +109,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "PageLabels",
     // TODO add number tree type
-    optional: true
+    optional: true,
   })
   public PageLabels!: objects.PDFObjectTypes | null;
 
@@ -128,7 +128,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
     name: "Dests",
     type: objects.PDFDictionary,
     optional: true,
-    indirect: true
+    indirect: true,
   })
   public Dests!: objects.PDFDictionary | null;
 
@@ -139,7 +139,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "ViewerPreferences",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public ViewerPreferences!: objects.PDFDictionary | null;
 
@@ -151,7 +151,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
     type: objects.PDFName,
     get: (o) => o.text as PageLayout,
     optional: true,
-    defaultValue: PageLayout.singlePage
+    defaultValue: PageLayout.singlePage,
   })
   public PageLayout!: PageLayout;
 
@@ -163,7 +163,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
     type: objects.PDFName,
     get: (o) => o.text as PageMode,
     optional: true,
-    defaultValue: PageMode.useNone
+    defaultValue: PageMode.useNone,
   })
   public PageMode!: PageMode;
 
@@ -174,7 +174,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
     name: "Outlines",
     type: objects.PDFDictionary,
     optional: true,
-    indirect: true
+    indirect: true,
   })
   public Outlines!: objects.PDFDictionary | null;
 
@@ -186,7 +186,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
     name: "Threads",
     type: objects.PDFArray,
     optional: true,
-    indirect: true
+    indirect: true,
   })
   public Threads!: objects.PDFArray | null;
 
@@ -197,7 +197,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     name: "OpenAction",
-    optional: true
+    optional: true,
   })
   public OpenAction!: objects.PDFDictionary | objects.PDFArray | null;
 
@@ -210,7 +210,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "AA",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public AA!: objects.PDFDictionary | null;
 
@@ -221,7 +221,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "URI",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public URI!: objects.PDFDictionary | null;
 
@@ -240,7 +240,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
     name: "Metadata",
     type: objects.PDFStream,
     optional: true,
-    indirect: true
+    indirect: true,
   })
   public Metadata!: objects.PDFStream | null;
 
@@ -251,7 +251,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "StructTreeRoot",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public StructTreeRoot!: objects.PDFDictionary | null;
 
@@ -263,7 +263,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "MarkInfo",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public MarkInfo!: objects.PDFDictionary | null;
 
@@ -285,7 +285,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "SpiderInfo",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public SpiderInfo!: objects.PDFDictionary | null;
 
@@ -305,7 +305,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "PieceInfo",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public PieceInfo!: objects.PDFDictionary | null;
 
@@ -316,7 +316,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "OCProperties",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public OCProperties!: objects.PDFDictionary | null;
 
@@ -327,7 +327,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Perms",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public Perms!: objects.PDFDictionary | null;
 
@@ -339,7 +339,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Legal",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public Legal!: objects.PDFDictionary | null;
 
@@ -360,7 +360,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Collection",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public Collection!: objects.PDFDictionary | null;
 
@@ -379,7 +379,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "DSS",
     type: DocumentSecurityStoreDictionary,
-    optional: true
+    optional: true,
   })
   public DSS!: DocumentSecurityStoreDictionary | null;
 

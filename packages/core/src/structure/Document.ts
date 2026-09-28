@@ -29,7 +29,7 @@ const defaultOptions: DocumentOptions = {
   xref: 0, // XRef Stream
   disableAscii85Encoding: false,
   disableCompressedStreams: false,
-  disableCompressedObjects: false
+  disableCompressedObjects: false,
 };
 
 export class PDFDocument {
@@ -45,19 +45,10 @@ export class PDFDocument {
   public wrongStructure = false;
 
   public static fromPDF(reader: ViewReader): Promise<PDFDocument>;
-  public static fromPDF(
-    data: BufferSource,
-    offset?: number
-  ): Promise<PDFDocument>;
+  public static fromPDF(data: BufferSource, offset?: number): Promise<PDFDocument>;
   public static fromPDF(text: string): Promise<PDFDocument>;
-  public static fromPDF(
-    data: BufferSource | ViewReader | string,
-    offset?: number
-  ): Promise<PDFDocument>;
-  public static async fromPDF(
-    data: BufferSource | ViewReader | string,
-    offset = 0
-  ): Promise<PDFDocument> {
+  public static fromPDF(data: BufferSource | ViewReader | string, offset?: number): Promise<PDFDocument>;
+  public static async fromPDF(data: BufferSource | ViewReader | string, offset = 0): Promise<PDFDocument> {
     const doc = new PDFDocument();
 
     await doc.fromPDF(data, offset);
@@ -69,7 +60,7 @@ export class PDFDocument {
     const doc = new PDFDocument();
     doc.options = {
       ...defaultOptions,
-      ...options
+      ...options,
     };
     doc.update.addCatalog();
 
@@ -100,10 +91,7 @@ export class PDFDocument {
       const encrypt = this.update.Encrypt;
       if (encrypt) {
         const encryptHandlerConstructor = EncryptionFactory.get(encrypt.Filter);
-        this.#encryptHandler = new encryptHandlerConstructor(
-          encrypt,
-          pkijs.getCrypto(true)
-        );
+        this.#encryptHandler = new encryptHandlerConstructor(encrypt, pkijs.getCrypto(true));
       }
     }
 
@@ -164,14 +152,8 @@ export class PDFDocument {
   public fromPDF(reader: ViewReader): Promise<number>;
   public fromPDF(data: BufferSource, offset?: number): Promise<number>;
   public fromPDF(text: string): Promise<number>;
-  public fromPDF(
-    data: BufferSource | ViewReader | string,
-    offset?: number
-  ): Promise<number>;
-  public async fromPDF(
-    data: BufferSource | ViewReader | string,
-    offset = 0
-  ): Promise<number> {
+  public fromPDF(data: BufferSource | ViewReader | string, offset?: number): Promise<number>;
+  public async fromPDF(data: BufferSource | ViewReader | string, offset = 0): Promise<number> {
     let reader = objects.PDFObject.getReader(data, offset);
 
     // Find out header %PDF-<version>
@@ -217,20 +199,14 @@ export class PDFDocument {
     // await this.update.decompress();
     reader.end();
 
-    this.options.xref =
-      this.update.xref instanceof CrossReferenceTable
-        ? XrefStructure.Table
-        : XrefStructure.Stream;
+    this.options.xref = this.update.xref instanceof CrossReferenceTable ? XrefStructure.Table : XrefStructure.Stream;
 
     return reader.position;
   }
 
   public getObject(ref: objects.IPDFIndirect): PDFDocumentObject;
   public getObject(id: number, generationNumber?: number): PDFDocumentObject;
-  public getObject(
-    id: number | objects.IPDFIndirect,
-    generationNumber?: number
-  ): PDFDocumentObject {
+  public getObject(id: number | objects.IPDFIndirect, generationNumber?: number): PDFDocumentObject {
     if (typeof id === "object") {
       return this.getObject(id.id, id.generation);
     } else {
@@ -242,21 +218,14 @@ export class PDFDocument {
     this.update.delete(element);
   }
 
-  public append(
-    element: objects.PDFObject | PDFDocumentObject,
-    compressed?: boolean
-  ): PDFDocumentObject {
+  public append(element: objects.PDFObject | PDFDocumentObject, compressed?: boolean): PDFDocumentObject {
     return this.update.append(element, compressed);
   }
 
   //#region Pages
 
-  public async addPage(
-    page?: PageObjectDictionary | PDFDocumentObject
-  ): Promise<PageObjectDictionary> {
-    const catalog = !this.update.catalog
-      ? this.update.addCatalog()
-      : this.update.catalog;
+  public async addPage(page?: PageObjectDictionary | PDFDocumentObject): Promise<PageObjectDictionary> {
+    const catalog = !this.update.catalog ? this.update.addCatalog() : this.update.catalog;
 
     const result = await catalog.Pages.addPageOld(page);
 
@@ -284,15 +253,10 @@ export class PDFDocument {
     return update;
   }
 
-  protected findIndex(
-    cb: (c: number, i: number, array: Uint8Array) => boolean,
-    options: FindIndexOptions = {}
-  ): number {
+  protected findIndex(cb: (c: number, i: number, array: Uint8Array) => boolean, options: FindIndexOptions = {}): number {
     const offset = options.offset || 0;
     const step = options.reversed ? -1 : 1;
-
-    // eslint-disable-next-line no-constant-condition
-    for (let i = offset; true; i = i + step) {
+    for (let i = offset; ; i = i + step) {
       const value = this.view[i];
       if (value === undefined) {
         break;
@@ -397,9 +361,7 @@ export class PDFDocument {
     return obj;
   }
 
-  public createDictionary(
-    ...items: [string, objects.PDFObjectTypes][]
-  ): objects.PDFDictionary {
+  public createDictionary(...items: [string, objects.PDFObjectTypes][]): objects.PDFDictionary {
     const obj = objects.PDFDictionary.create(this.update);
 
     for (const item of items) {
@@ -419,12 +381,7 @@ export class PDFDocument {
     return obj.makeIndirect();
   }
 
-  public createRectangle(
-    llX: number,
-    llY: number,
-    urX: number,
-    urY: number
-  ): PDFRectangle {
+  public createRectangle(llX: number, llY: number, urX: number, urY: number): PDFRectangle {
     return PDFRectangle.createWithData(this.update, llX, llY, urX, urY);
   }
 

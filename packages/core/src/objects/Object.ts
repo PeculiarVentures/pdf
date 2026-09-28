@@ -5,14 +5,7 @@ import { ViewReader } from "../ViewReader";
 import { ViewWriter } from "../ViewWriter";
 
 function isPdfIndirect(data: unknown): data is IPDFIndirect {
-  return (
-    typeof data === "object" &&
-    !!data &&
-    "id" in data &&
-    typeof data.id === "number" &&
-    "generation" in data &&
-    typeof data.generation === "number"
-  );
+  return typeof data === "object" && !!data && "id" in data && typeof data.id === "number" && "generation" in data && typeof data.generation === "number";
 }
 
 export interface PDFObjectConstructor<T extends PDFObject> {
@@ -23,11 +16,7 @@ export interface PDFObjectConstructor<T extends PDFObject> {
   fromPDF(this: new () => T, reader: ViewReader): T;
   fromPDF(this: new () => T, data: Uint8Array, offset?: number): T;
   fromPDF(this: new () => T, text: string): T;
-  fromPDF(
-    this: new () => T,
-    data: Uint8Array | ViewReader | string,
-    offset?: number
-  ): T;
+  fromPDF(this: new () => T, data: Uint8Array | ViewReader | string, offset?: number): T;
   create(this: new () => T, update: PDFDocumentUpdate): T;
 
   new (): T;
@@ -46,10 +35,7 @@ export abstract class PDFObject {
    * @param target PDF document or update
    * @returns
    */
-  public static create<T extends PDFObject>(
-    this: new () => T,
-    target: PDFDocument | PDFDocumentUpdate
-  ): T {
+  public static create<T extends PDFObject>(this: new () => T, target: PDFDocument | PDFDocumentUpdate): T {
     const obj = new this();
 
     obj.documentUpdate = "update" in target ? target.update : target;
@@ -65,46 +51,20 @@ export abstract class PDFObject {
   public static getReader(reader: ViewReader): ViewReader;
   public static getReader(text: string): ViewReader;
   public static getReader(data: BufferSource, offset?: number): ViewReader;
-  public static getReader(
-    data: BufferSource | ViewReader | string,
-    offset?: number
-  ): ViewReader;
-  public static getReader(
-    data: BufferSource | ViewReader | string,
-    offset = 0
-  ): ViewReader {
+  public static getReader(data: BufferSource | ViewReader | string, offset?: number): ViewReader;
+  public static getReader(data: BufferSource | ViewReader | string, offset = 0): ViewReader {
     return data instanceof ViewReader
       ? data
       : typeof data === "string"
         ? new ViewReader(new Uint8Array(Convert.FromBinary(data)))
-        : new ViewReader(
-            BufferSourceConverter.toUint8Array(data).subarray(offset)
-          );
+        : new ViewReader(BufferSourceConverter.toUint8Array(data).subarray(offset));
   }
 
-  public static fromPDF<T extends PDFObject>(
-    this: new () => T,
-    reader: ViewReader
-  ): T;
-  public static fromPDF<T extends PDFObject>(
-    this: new () => T,
-    data: Uint8Array,
-    offset?: number
-  ): T;
-  public static fromPDF<T extends PDFObject>(
-    this: new () => T,
-    text: string
-  ): T;
-  public static fromPDF<T extends PDFObject>(
-    this: new () => T,
-    data: Uint8Array | ViewReader | string,
-    offset?: number
-  ): T;
-  public static fromPDF<T extends PDFObject>(
-    this: new () => T,
-    data: Uint8Array | ViewReader | string,
-    offset = 0
-  ): T {
+  public static fromPDF<T extends PDFObject>(this: new () => T, reader: ViewReader): T;
+  public static fromPDF<T extends PDFObject>(this: new () => T, data: Uint8Array, offset?: number): T;
+  public static fromPDF<T extends PDFObject>(this: new () => T, text: string): T;
+  public static fromPDF<T extends PDFObject>(this: new () => T, data: Uint8Array | ViewReader | string, offset?: number): T;
+  public static fromPDF<T extends PDFObject>(this: new () => T, data: Uint8Array | ViewReader | string, offset = 0): T {
     const obj = new this();
     obj.fromPDF(data, offset);
 
@@ -198,20 +158,14 @@ export abstract class PDFObject {
     }
 
     writer.write(new Uint8Array(), (subarray) => {
-      this.view = new Uint8Array(subarray.buffer).subarray(
-        offset,
-        offset + length
-      );
+      this.view = new Uint8Array(subarray.buffer).subarray(offset, offset + length);
     });
   }
 
   public fromPDF(reader: ViewReader): number;
   public fromPDF(text: string): number;
   public fromPDF(data: Uint8Array, offset?: number): number;
-  public fromPDF(
-    data: Uint8Array | ViewReader | string,
-    offset?: number
-  ): number;
+  public fromPDF(data: Uint8Array | ViewReader | string, offset?: number): number;
   public fromPDF(data: Uint8Array | ViewReader | string, offset = 0): number {
     const reader = PDFObject.getReader(data, offset);
 
@@ -291,10 +245,7 @@ export abstract class PDFObject {
       } else {
         const indirect = this.findIndirect(true);
         if (indirect) {
-          const obj = this.documentUpdate.document.getObject(
-            indirect.id,
-            indirect.generation
-          );
+          const obj = this.documentUpdate.document.getObject(indirect.id, indirect.generation);
           if (obj.value.documentUpdate === lastUpdate) {
             this.documentUpdate = lastUpdate;
 
@@ -324,10 +275,7 @@ export abstract class PDFObject {
       const thisRef = this.getIndirect();
       const targetRef = target.getIndirect();
 
-      return (
-        thisRef.id === targetRef.id &&
-        thisRef.generation === targetRef.generation
-      );
+      return thisRef.id === targetRef.id && thisRef.generation === targetRef.generation;
     }
 
     return this.onEqual(target);

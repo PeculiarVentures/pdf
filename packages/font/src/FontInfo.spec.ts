@@ -13,7 +13,7 @@ describe("FontInfo", () => {
       new FontGlyph({ index: 2, advanceWidth: 600, unicode: [66] }), // 'B'
       new FontGlyph({ index: 3, advanceWidth: 600, unicode: [67] }), // 'C'
       new FontGlyph({ index: 4, advanceWidth: 600, unicode: [169] }), // '©'
-      new FontGlyph({ index: 5, advanceWidth: 600, unicode: [8364] }) // '€'
+      new FontGlyph({ index: 5, advanceWidth: 600, unicode: [8364] }), // '€'
     ];
   });
 

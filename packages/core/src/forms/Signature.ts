@@ -4,7 +4,7 @@ import { SignatureReferenceDictionary } from "./SignatureReference";
 
 export enum SignatureType {
   signature = "Sig",
-  timeStamp = "DocTimeStamp"
+  timeStamp = "DocTimeStamp",
 }
 
 export class SignatureDictionary extends objects.PDFDictionary {
@@ -47,7 +47,7 @@ export class SignatureDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     type: objects.PDFHexString,
-    name: "Contents"
+    name: "Contents",
   })
   public Contents!: objects.PDFHexString;
 
@@ -58,7 +58,7 @@ export class SignatureDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     name: "Cert",
-    optional: true
+    optional: true,
   })
   public cert!: objects.PDFArray | objects.PDFHexString | null;
 
@@ -84,7 +84,7 @@ export class SignatureDictionary extends objects.PDFDictionary {
 
         return new SignatureReferenceDictionary(ref);
       }),
-    optional: true
+    optional: true,
   })
   public reference!: SignatureReferenceDictionary[] | null;
 
@@ -96,7 +96,7 @@ export class SignatureDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Changes",
     type: objects.PDFArray,
-    optional: true
+    optional: true,
   })
   public changes?: objects.PDFArray;
 
@@ -108,7 +108,7 @@ export class SignatureDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Name",
     type: objects.PDFLiteralString,
-    optional: true
+    optional: true,
   })
   public name!: objects.PDFLiteralString | null;
 
@@ -119,7 +119,7 @@ export class SignatureDictionary extends objects.PDFDictionary {
     name: "M",
     type: objects.PDFLiteralString,
     get: (o) => new PDFDate(o),
-    optional: true
+    optional: true,
   })
   public signingTime!: PDFDate | null;
 
@@ -142,7 +142,7 @@ export class SignatureDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "ContactInfo",
     type: objects.PDFLiteralString,
-    optional: true
+    optional: true,
   })
   public contactInfo!: objects.PDFLiteralString | null;
 
@@ -153,7 +153,7 @@ export class SignatureDictionary extends objects.PDFDictionary {
     name: "R",
     type: objects.PDFNumeric,
     get: (o) => o.value,
-    optional: true
+    optional: true,
   })
   public r!: string | null;
 
@@ -164,7 +164,7 @@ export class SignatureDictionary extends objects.PDFDictionary {
     name: "V",
     type: objects.PDFNumeric,
     get: (o) => o.value,
-    optional: true
+    optional: true,
   })
   public v!: string | null;
 
@@ -178,7 +178,7 @@ export class SignatureDictionary extends objects.PDFDictionary {
   @objects.PDFDictionaryField({
     name: "Prop_Build",
     type: objects.PDFDictionary,
-    optional: true
+    optional: true,
   })
   public propBuild!: objects.PDFDictionary | null;
 
@@ -190,7 +190,7 @@ export class SignatureDictionary extends objects.PDFDictionary {
     name: "Prop_AuthTime",
     type: objects.PDFNumeric,
     get: (o) => o.value,
-    optional: true
+    optional: true,
   })
   public propAuthTime!: number | null;
 
@@ -202,7 +202,7 @@ export class SignatureDictionary extends objects.PDFDictionary {
     name: "Prop_AuthType",
     type: objects.PDFName,
     get: (o) => o.text,
-    optional: true
+    optional: true,
   })
   public propAuthType!: string | null;
 

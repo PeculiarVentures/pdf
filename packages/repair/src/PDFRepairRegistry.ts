@@ -63,9 +63,7 @@ export class PDFRepairRegistry {
    */
   public getRules(ids?: string[]): IRepairRule[] {
     if (ids) {
-      return ids
-        .map((id) => this.rules.get(id))
-        .filter((rule) => rule) as IRepairRule[];
+      return ids.map((id) => this.rules.get(id)).filter((rule) => rule) as IRepairRule[];
     }
 
     return Array.from(this.rules.values());

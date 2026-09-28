@@ -7,7 +7,7 @@ describe("Pages", () => {
     const a4P = doc.pages.get(0); // A4 portrait
     const a4L = doc.pages.create({
       // A4 landscape
-      orientation: PDFPageOrientation.landscape
+      orientation: PDFPageOrientation.landscape,
     });
     expect(a4P.height).toBe(a4L.width);
     expect(a4P.width).toBe(a4L.height);
@@ -15,7 +15,7 @@ describe("Pages", () => {
     doc.pages.create({
       // custom size
       width: "15cm",
-      height: "210mm"
+      height: "210mm",
     });
 
     const page = doc.pages.get(2);
@@ -33,7 +33,7 @@ describe("Pages", () => {
       // 3rd page
       // custom size
       width: "15cm",
-      height: "210mm"
+      height: "210mm",
     });
     expect(doc.pages.length).toBe(3);
 
@@ -52,7 +52,7 @@ describe("Pages", () => {
       // 3rd page
       // custom size
       width: "15cm",
-      height: "210mm"
+      height: "210mm",
     });
     expect(doc.pages.length).toBe(3);
 
@@ -71,7 +71,7 @@ describe("Pages", () => {
     expect(doc2.pages.length).toBe(3);
 
     await doc1.pages.append(doc2, {
-      pages: [2, 3]
+      pages: [2, 3],
     });
     expect(doc1.pages.length).toBe(4);
   });

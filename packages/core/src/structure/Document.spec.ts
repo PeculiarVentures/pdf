@@ -9,23 +9,7 @@ import { PageObjectDictionary } from "./dictionaries";
 describe("Document", () => {
   describe("fromPDF", () => {
     it("Simple", async () => {
-      const pdf = [
-        "%PDF-1.2",
-        "% comment",
-        "1 0 obj",
-        "3",
-        "endobj",
-        "xref",
-        "0 2",
-        "0000000000 65535 f ",
-        "0000000019 00000 n ",
-        "trailer",
-        "<<>>",
-        "startxref",
-        "36",
-        "%%EOF",
-        ""
-      ].join("\n");
+      const pdf = ["%PDF-1.2", "% comment", "1 0 obj", "3", "endobj", "xref", "0 2", "0000000000 65535 f ", "0000000019 00000 n ", "trailer", "<<>>", "startxref", "36", "%%EOF", ""].join("\n");
 
       const _doc = await PDFDocument.fromPDF(pdf);
     });
@@ -38,9 +22,7 @@ describe("Document", () => {
       const objNum = doc.append(new PDFNumeric(142));
       const pdf = await doc.toPDF();
 
-      const doc2 = await PDFDocument.fromPDF(
-        BufferSourceConverter.toUint8Array(pdf)
-      );
+      const doc2 = await PDFDocument.fromPDF(BufferSourceConverter.toUint8Array(pdf));
 
       const obj = doc2.getObject(objNum.id);
       const num = obj.value as PDFNumeric;
@@ -64,7 +46,7 @@ describe("Document", () => {
 
     it("should create with 2 xref stream sections", async () => {
       const doc = PDFDocument.create({
-        xref: XrefStructure.Stream
+        xref: XrefStructure.Stream,
       });
 
       doc.createNumber(142).makeIndirect();
@@ -90,7 +72,7 @@ describe("Document", () => {
 
     it("Delete obj", async () => {
       const doc = PDFDocument.create({
-        xref: XrefStructure.Table
+        xref: XrefStructure.Table,
       });
 
       const obj142 = doc.append(new PDFNumeric(142));
@@ -101,9 +83,7 @@ describe("Document", () => {
 
       const pdf = await doc.toPDF();
 
-      const doc2 = await PDFDocument.fromPDF(
-        BufferSourceConverter.toUint8Array(pdf)
-      );
+      const doc2 = await PDFDocument.fromPDF(BufferSourceConverter.toUint8Array(pdf));
 
       const obj = doc2.getObject(obj142.id);
       expect(obj.type).toBe(PDFDocumentObjectTypes.free);
@@ -114,16 +94,14 @@ describe("Document", () => {
 
     it("XRef Stream", async () => {
       const doc = PDFDocument.create({
-        xref: XrefStructure.Stream
+        xref: XrefStructure.Stream,
       });
 
       doc.append(new PDFNumeric(142));
       doc.append(new PDFNumeric(143));
       const pdf = await doc.toPDF();
 
-      const doc2 = await PDFDocument.fromPDF(
-        BufferSourceConverter.toUint8Array(pdf)
-      );
+      const doc2 = await PDFDocument.fromPDF(BufferSourceConverter.toUint8Array(pdf));
 
       expect(doc.update.xref).toBeTruthy();
       expect(doc2.update.xref).toBeTruthy();
@@ -204,7 +182,7 @@ describe("Document", () => {
       const array = doc
         .createArray(
           doc.createNumber(9), // direct
-          doc.createNumber(10).makeIndirect() // indirect
+          doc.createNumber(10).makeIndirect(), // indirect
         )
         .makeIndirect();
 
@@ -226,7 +204,7 @@ describe("Document", () => {
   describe("modify", () => {
     it("new update", async () => {
       const doc = PDFDocument.create({
-        xref: XrefStructure.Table
+        xref: XrefStructure.Table,
       });
 
       // create indirect object

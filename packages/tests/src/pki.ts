@@ -1,21 +1,9 @@
 import { id_sha256 } from "@peculiar/asn1-rsa";
 import { AsnConvert, OctetString } from "@peculiar/asn1-schema";
-import {
-  MessageImprint,
-  TimeStampReq,
-  TimeStampResp
-} from "@peculiar/asn1-tsp";
+import { MessageImprint, TimeStampReq, TimeStampResp } from "@peculiar/asn1-tsp";
 import { AlgorithmIdentifier } from "@peculiar/asn1-x509";
 import * as x509 from "@peculiar/x509";
-import {
-  CRL,
-  DefaultCertificateStorageHandler,
-  IResult,
-  IsTrustedResult,
-  OCSP,
-  RevocationType,
-  TimeStampToken
-} from "@peculiar/pdf-doc";
+import { CRL, DefaultCertificateStorageHandler, IResult, IsTrustedResult, OCSP, RevocationType, TimeStampToken } from "@peculiar/pdf-doc";
 
 interface RootCertificateStorageHandlerParams {
   trustedCertificates?: x509.X509Certificate[];
@@ -44,15 +32,13 @@ export class RootCertificateStorageHandler extends DefaultCertificateStorageHand
     }
   }
 
-  public override async isTrusted(
-    cert: x509.X509Certificate
-  ): Promise<IsTrustedResult> {
+  public override async isTrusted(cert: x509.X509Certificate): Promise<IsTrustedResult> {
     for (const trustedCert of this.trustedCertificates) {
       if (trustedCert.equal(cert)) {
         return {
           result: true,
           target: this,
-          source: "RootCertificateStorageHandler"
+          source: "RootCertificateStorageHandler",
         };
       }
     }
@@ -60,34 +46,22 @@ export class RootCertificateStorageHandler extends DefaultCertificateStorageHand
     return {
       result: false,
       target: this,
-      source: "RootCertificateStorageHandler"
+      source: "RootCertificateStorageHandler",
     };
   }
 
-  public override async fetchRevocation(
-    type: "crl",
-    cert: x509.X509Certificate
-  ): Promise<IResult<CRL | null>>;
-  public override async fetchRevocation(
-    type: "ocsp",
-    cert: x509.X509Certificate
-  ): Promise<IResult<OCSP | null>>;
-  public override async fetchRevocation(
-    type: RevocationType,
-    cert: x509.X509Certificate
-  ): Promise<IResult<CRL | OCSP | null>> {
+  public override async fetchRevocation(type: "crl", cert: x509.X509Certificate): Promise<IResult<CRL | null>>;
+  public override async fetchRevocation(type: "ocsp", cert: x509.X509Certificate): Promise<IResult<OCSP | null>>;
+  public override async fetchRevocation(type: RevocationType, cert: x509.X509Certificate): Promise<IResult<CRL | OCSP | null>> {
     if (type === "crl") {
-      const crlDistriPoints = cert.getExtension(
-        x509.CRLDistributionPointsExtension
-      );
+      const crlDistriPoints = cert.getExtension(x509.CRLDistributionPointsExtension);
       if (crlDistriPoints) {
         for (const point of crlDistriPoints.distributionPoints) {
-          const url =
-            point.distributionPoint?.fullName?.[0].uniformResourceIdentifier;
+          const url = point.distributionPoint?.fullName?.[0].uniformResourceIdentifier;
           if (url && this.revocations[url]) {
             return {
               result: this.revocations[url] as CRL,
-              target: this
+              target: this,
             };
           }
         }
@@ -100,7 +74,7 @@ export class RootCertificateStorageHandler extends DefaultCertificateStorageHand
           if (url && this.revocations[url]) {
             return {
               result: this.revocations[url] as OCSP,
-              target: this
+              target: this,
             };
           }
         }
@@ -108,35 +82,29 @@ export class RootCertificateStorageHandler extends DefaultCertificateStorageHand
     }
     return {
       result: null,
-      target: this
+      target: this,
     };
   }
 }
 
 // function to get TimeStampToken from http server
-export async function getTimeStampToken(
-  signatureValue: BufferSource,
-  url = "http://timestamp.digicert.com"
-): Promise<TimeStampToken> {
-  const signatureValueHash = await crypto.subtle.digest(
-    "SHA-256",
-    signatureValue
-  );
+export async function getTimeStampToken(signatureValue: BufferSource, url = "http://timestamp.digicert.com"): Promise<TimeStampToken> {
+  const signatureValueHash = await crypto.subtle.digest("SHA-256", signatureValue);
   const timeStampRequest = new TimeStampReq({
     version: 1,
     messageImprint: new MessageImprint({
       hashAlgorithm: new AlgorithmIdentifier({
         algorithm: id_sha256,
-        parameters: null
+        parameters: null,
       }),
-      hashedMessage: new OctetString(signatureValueHash)
+      hashedMessage: new OctetString(signatureValueHash),
     }),
-    certReq: true
+    certReq: true,
   });
   const timeStampRequestDer = AsnConvert.serialize(timeStampRequest);
   const timeStampResponse = await fetch(url, {
     method: "POST",
-    body: timeStampRequestDer
+    body: timeStampRequestDer,
   });
   const timeStampResponseDer = await timeStampResponse.arrayBuffer();
   const timeStampResp = AsnConvert.parse(timeStampResponseDer, TimeStampResp);

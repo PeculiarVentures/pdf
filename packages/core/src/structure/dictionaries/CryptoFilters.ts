@@ -8,25 +8,12 @@ export class CryptoFiltersDictionary extends PDFDictionary {
    * @returns returns {@link CryptoFilterDictionary} if it exists, otherwise `null`
    */
   public findItem(name: string): CryptoFilterDictionary | null;
-  public findItem<T extends CryptoFilterDictionary>(
-    name: string,
-    type: new () => T
-  ): T | null;
+  public findItem<T extends CryptoFilterDictionary>(name: string, type: new () => T): T | null;
   // @internal
-  public findItem(
-    name: string,
-    type?: new () => CryptoFilterDictionary
-  ): CryptoFilterDictionary | null;
-  public findItem(
-    name: string,
-    type?: new () => CryptoFilterDictionary
-  ): CryptoFilterDictionary | null {
+  public findItem(name: string, type?: new () => CryptoFilterDictionary): CryptoFilterDictionary | null;
+  public findItem(name: string, type?: new () => CryptoFilterDictionary): CryptoFilterDictionary | null {
     if (this.has(name)) {
-      return this.get(
-        name,
-        type || CryptoFilterDictionary,
-        true
-      ) as CryptoFilterDictionary;
+      return this.get(name, type || CryptoFilterDictionary, true) as CryptoFilterDictionary;
     }
 
     return null;
@@ -38,14 +25,8 @@ export class CryptoFiltersDictionary extends PDFDictionary {
    * @returns returns {@link CryptoFilterDictionary}
    */
   public getItem(name: string): CryptoFilterDictionary;
-  public getItem<T extends CryptoFilterDictionary>(
-    name: string,
-    type: new () => T
-  ): T;
-  public getItem(
-    name: string,
-    type?: new () => CryptoFilterDictionary
-  ): CryptoFilterDictionary {
+  public getItem<T extends CryptoFilterDictionary>(name: string, type: new () => T): T;
+  public getItem(name: string, type?: new () => CryptoFilterDictionary): CryptoFilterDictionary {
     const res = this.findItem(name, type);
 
     if (!res) {

@@ -156,9 +156,7 @@ export class Image extends WrapObject<core.ImageDictionary> {
 
       imageDict.stream = rgbView;
 
-      const sMaskDict = (imageDict.SMask = core.ImageDictionary.create(
-        document.target.update
-      ).makeIndirect());
+      const sMaskDict = (imageDict.SMask = core.ImageDictionary.create(document.target.update).makeIndirect());
       sMaskDict.Width = png.width;
       sMaskDict.Height = png.height;
       sMaskDict.ColorSpace = document.target.createName("DeviceGray");
@@ -183,7 +181,7 @@ export class Image extends WrapObject<core.ImageDictionary> {
           document.target.createName("Indexed"), // type
           document.target.createName("DeviceRGB"), // base
           document.target.createNumber(255), // hival
-          document.target.createStream(lookup).makeIndirect() // lookup
+          document.target.createStream(lookup).makeIndirect(), // lookup
         )
         .makeIndirect();
 
@@ -230,14 +228,11 @@ export class Image extends WrapObject<core.ImageDictionary> {
     const data = await this.target.decode();
     if (
       (filter instanceof core.PDFName && filter.text === core.DCTFilter.NAME) ||
-      (filter instanceof core.PDFArray &&
-        filter.items.some(
-          (o, i) => filter.get(i, core.PDFName).text === core.DCTFilter.NAME
-        ))
+      (filter instanceof core.PDFArray && filter.items.some((o, i) => filter.get(i, core.PDFName).text === core.DCTFilter.NAME))
     ) {
       return {
         type: "jpeg",
-        data
+        data,
       };
     } else {
       // PNG
@@ -272,22 +267,18 @@ export class Image extends WrapObject<core.ImageDictionary> {
           throw new Error("Unsupported type ColorSpace");
         }
 
-        const rgb = RGB(
-          new Uint8Array(data),
-          this.target.BitsPerComponent || 1,
-          palette
-        );
+        const rgb = RGB(new Uint8Array(data), this.target.BitsPerComponent || 1, palette);
         const img = fastPng.encode({
           data: rgb,
           height: this.target.Height,
           width: this.target.Width,
           channels: 3,
-          depth: 8
+          depth: 8,
         });
 
         return {
           type: "png",
-          data: img.buffer
+          data: img.buffer,
         };
       }
 
@@ -313,9 +304,7 @@ export class Image extends WrapObject<core.ImageDictionary> {
 
           const alpha = await this.target.SMask.decode();
           const alphaView = new Uint8Array(alpha);
-          const pixelsAlpha = new Uint8Array(
-            data.byteLength + alpha.byteLength
-          );
+          const pixelsAlpha = new Uint8Array(data.byteLength + alpha.byteLength);
 
           let alphaOffset = 0;
           let offset = 0;
@@ -339,12 +328,12 @@ export class Image extends WrapObject<core.ImageDictionary> {
           height: this.target.Height,
           width: this.target.Width,
           channels,
-          depth: this.target.BitsPerComponent as fastPng.BitDepth
+          depth: this.target.BitsPerComponent as fastPng.BitDepth,
         });
 
         return {
           type: "png",
-          data: img.buffer
+          data: img.buffer,
         };
       }
 

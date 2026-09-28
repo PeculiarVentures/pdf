@@ -13,7 +13,7 @@ export class PDFLiteralString extends PDFTextString {
   public static readonly NAME = ObjectTypeEnum.LiteralString;
 
   // Cache regex patterns
-  // eslint-disable-next-line no-control-regex
+  // oxlint-disable-next-line eslint/no-control-regex -- PDF literal strings may contain control bytes
   private static readonly ESCAPE_PATTERN = /[\n\r\t\f\x08\\()]/gm;
   private static readonly OCTAL_PATTERN = /[0-7]{1,3}/;
   private static readonly PARSE_PATTERN = /\\([0-7]{1,3}|\r\n|\n|\r|.)/gm;
@@ -27,7 +27,7 @@ export class PDFLiteralString extends PDFTextString {
     ["\f", "\\f"],
     ["(", "\\("],
     [")", "\\)"],
-    ["\\", "\\\\"]
+    ["\\", "\\\\"],
   ]);
 
   private static readonly READ_ESCAPE_MAP = new Map([
@@ -41,15 +41,12 @@ export class PDFLiteralString extends PDFTextString {
     ["\\\\", "\\"],
     ["\\\r\n", ""],
     ["\\\n", ""],
-    ["\\\r", ""]
+    ["\\\r", ""],
   ]);
 
   protected onWritePDF(writer: ViewWriter): void {
     const text = TextEncoder.to(this.text);
-    const escapedValue = text.replace(
-      PDFLiteralString.ESCAPE_PATTERN,
-      (char) => PDFLiteralString.WRITE_ESCAPE_MAP.get(char) || char
-    );
+    const escapedValue = text.replace(PDFLiteralString.ESCAPE_PATTERN, (char) => PDFLiteralString.WRITE_ESCAPE_MAP.get(char) || char);
     return writer.writeString(`(${escapedValue})`);
   }
 
@@ -82,21 +79,18 @@ export class PDFLiteralString extends PDFTextString {
       throw new Error("Missing closing parenthesis in literal string");
     }
 
-    const text = Convert.ToBinary(data).replace(
-      PDFLiteralString.PARSE_PATTERN,
-      (substring, group1: string) => {
-        const escaped = PDFLiteralString.READ_ESCAPE_MAP.get(substring);
-        if (escaped !== undefined) {
-          return escaped;
-        }
-
-        if (PDFLiteralString.OCTAL_PATTERN.test(group1)) {
-          return String.fromCharCode(parseInt(group1, 8));
-        }
-
-        return group1;
+    const text = Convert.ToBinary(data).replace(PDFLiteralString.PARSE_PATTERN, (substring, group1: string) => {
+      const escaped = PDFLiteralString.READ_ESCAPE_MAP.get(substring);
+      if (escaped !== undefined) {
+        return escaped;
       }
-    );
+
+      if (PDFLiteralString.OCTAL_PATTERN.test(group1)) {
+        return String.fromCharCode(parseInt(group1, 8));
+      }
+
+      return group1;
+    });
 
     this.text = TextEncoder.from(text);
     reader.readByte(); // )
@@ -129,10 +123,7 @@ export class PDFLiteralString extends PDFTextString {
         return false;
       }
 
-      if (
-        reverseSolidus &&
-        (c === leftParenthesisChar || c === rightParenthesisChar)
-      ) {
+      if (reverseSolidus && (c === leftParenthesisChar || c === rightParenthesisChar)) {
         reverseSolidus = 0;
         return false;
       }

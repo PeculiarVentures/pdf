@@ -3,8 +3,7 @@ import { PDFContent } from "./Content";
 
 describe("Content", () => {
   it("simple text", () => {
-    const text =
-      "BT\n/F13 12 Tf\n288 720 Td\n(Hello from @peculiar/pdf module) Tj\nET";
+    const text = "BT\n/F13 12 Tf\n288 720 Td\n(Hello from @peculiar/pdf module) Tj\nET";
 
     const content = PDFContent.fromString(text);
 
@@ -21,11 +20,7 @@ describe("Content", () => {
   });
 
   it("create", () => {
-    const content = PDFContent.create(
-      ["BT"],
-      ["Tf", new PDFName("F13"), new PDFNumeric(12)],
-      ["ET"]
-    );
+    const content = PDFContent.create(["BT"], ["Tf", new PDFName("F13"), new PDFNumeric(12)], ["ET"]);
 
     const multiLine = content.toString();
     expect(multiLine).toBe("BT\n/F13 12 Tf\nET");
@@ -42,16 +37,10 @@ describe("Content", () => {
 
       graphics.graphics().setColor(0).drawRectangle(0, 0, 10, 20).fill();
 
-      graphics
-        .graphics()
-        .setColor(0, true)
-        .drawRectangle(0, 0, 10, 20)
-        .stroke();
+      graphics.graphics().setColor(0, true).drawRectangle(0, 0, 10, 20).stroke();
 
       const singleLine = content.toString(true);
-      expect(singleLine).toBe(
-        "q q 0 g 0 0 10 20 re f Q q 0 G 0 0 10 20 re S Q Q"
-      );
+      expect(singleLine).toBe("q q 0 g 0 0 10 20 re f Q q 0 G 0 0 10 20 re S Q Q");
     });
   });
 });

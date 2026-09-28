@@ -16,12 +16,7 @@ describe("ColorConverter", () => {
     });
 
     it("converts CMYK color", () => {
-      const input = [
-        new PDFNumeric(0),
-        new PDFNumeric(1),
-        new PDFNumeric(1),
-        new PDFNumeric(0)
-      ];
+      const input = [new PDFNumeric(0), new PDFNumeric(1), new PDFNumeric(1), new PDFNumeric(0)];
       const result = ColorConverter.fromPDFNumberArray(input);
       expect(result).toEqual([0, 1, 1, 0]);
     });
@@ -35,21 +30,13 @@ describe("ColorConverter", () => {
     });
 
     it("converts array with numeric values", () => {
-      const input = new PDFArray(
-        new PDFNumeric(1),
-        new PDFNumeric(0),
-        new PDFNumeric(0)
-      );
+      const input = new PDFArray(new PDFNumeric(1), new PDFNumeric(0), new PDFNumeric(0));
       const result = ColorConverter.fromPDFArray(input);
       expect(result).toEqual([1, 0, 0]);
     });
 
     it("skips non-numeric values", () => {
-      const input = new PDFArray(
-        new PDFNumeric(1),
-        {} as unknown as PDFNumeric,
-        new PDFNumeric(0)
-      );
+      const input = new PDFArray(new PDFNumeric(1), {} as unknown as PDFNumeric, new PDFNumeric(0));
       const result = ColorConverter.fromPDFArray(input);
       expect(result).toEqual([1, 0]);
     });

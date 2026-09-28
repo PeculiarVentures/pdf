@@ -1,22 +1,14 @@
 import * as core from "@peculiar/pdf-core";
-import {
-  CMSSignedData,
-  DefaultCertificateStorageHandler,
-  ICertificateStorageHandler
-} from "./cms";
+import { CMSSignedData, DefaultCertificateStorageHandler, ICertificateStorageHandler } from "./cms";
 import { type PDFDocument } from "./Document";
 import { X509Certificate, X509Certificates } from "@peculiar/x509";
 
-export interface IPdfCertificateStorageHandler
-  extends ICertificateStorageHandler {
+export interface IPdfCertificateStorageHandler extends ICertificateStorageHandler {
   document: PDFDocument;
   load(): Promise<void>;
 }
 
-export class PDFCertificateStorageHandler
-  extends DefaultCertificateStorageHandler
-  implements IPdfCertificateStorageHandler
-{
+export class PDFCertificateStorageHandler extends DefaultCertificateStorageHandler implements IPdfCertificateStorageHandler {
   constructor(public document: PDFDocument) {
     super();
   }

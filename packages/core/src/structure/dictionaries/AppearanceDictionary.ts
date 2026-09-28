@@ -5,7 +5,7 @@ export class AppearanceDictionary extends objects.PDFDictionary {
    * The annotation’s normal appearance
    */
   @objects.PDFDictionaryField({
-    name: "N"
+    name: "N",
   })
   public N!: objects.PDFDictionary | objects.PDFArray;
 
@@ -16,7 +16,7 @@ export class AppearanceDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     name: "R",
-    optional: true
+    optional: true,
   })
   public r!: objects.PDFDictionary | objects.PDFArray | null;
 
@@ -27,7 +27,7 @@ export class AppearanceDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     name: "D",
-    optional: true
+    optional: true,
   })
   public D!: objects.PDFDictionary | objects.PDFArray | null;
 }

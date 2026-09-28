@@ -39,7 +39,7 @@ export enum WidgetHighlightingMode {
   /**
    * Same as P (which is preferred).
    */
-  toggle = "T"
+  toggle = "T",
 }
 
 export class WidgetDictionary extends AnnotationDictionary {
@@ -88,7 +88,7 @@ export class WidgetDictionary extends AnnotationDictionary {
   @objects.PDFDictionaryField({
     name: "AA",
     optional: true,
-    type: AdditionalActionsDictionary
+    type: AdditionalActionsDictionary,
   })
   public aa!: AdditionalActionsDictionary | null;
 
@@ -111,7 +111,7 @@ export class WidgetDictionary extends AnnotationDictionary {
     name: "Parent",
     optional: true,
     type: PDFField,
-    indirect: true
+    indirect: true,
   })
   public Parent!: PDFField | null;
 
@@ -122,10 +122,7 @@ export class WidgetDictionary extends AnnotationDictionary {
   }
 }
 
-export class SingleWidgetDictionary
-  extends WidgetDictionary
-  implements IFieldDictionary
-{
+export class SingleWidgetDictionary extends WidgetDictionary implements IFieldDictionary {
   @objects.PDFNameField("FT")
   public ft!: string;
 
@@ -138,14 +135,14 @@ export class SingleWidgetDictionary
   @objects.PDFDictionaryField({
     name: "TU",
     type: objects.PDFLiteralString,
-    optional: true
+    optional: true,
   })
   public TU!: objects.PDFLiteralString | null;
 
   @objects.PDFDictionaryField({
     name: "TM",
     type: objects.PDFLiteralString,
-    optional: true
+    optional: true,
   })
   public tm!: objects.PDFLiteralString | null;
 
@@ -154,13 +151,13 @@ export class SingleWidgetDictionary
 
   @objects.PDFDictionaryField({
     name: "V",
-    optional: true
+    optional: true,
   })
   public V!: objects.PDFObjectTypes | null;
 
   @objects.PDFDictionaryField({
     name: "DV",
-    optional: true
+    optional: true,
   })
   public dv!: objects.PDFObjectTypes | null;
 }

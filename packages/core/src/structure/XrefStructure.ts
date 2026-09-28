@@ -1,4 +1,4 @@
 export enum XrefStructure {
   Stream,
-  Table
+  Table,
 }

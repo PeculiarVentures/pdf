@@ -37,10 +37,7 @@ export interface EmbeddedFileMapAttachParams {
 /**
  * Represents an embedded file mapping of strings to {@link EmbeddedFile} objects.
  */
-export class EmbeddedFileMap
-  extends WrapObject<core.CatalogDictionary>
-  implements Iterable<[string, EmbeddedFile]>
-{
+export class EmbeddedFileMap extends WrapObject<core.CatalogDictionary> implements Iterable<[string, EmbeddedFile]> {
   #nameTree?: NameTree<core.FileSpecificationDictionary>;
 
   [Symbol.iterator](): Iterator<[string, EmbeddedFile], unknown, undefined> {
@@ -56,19 +53,19 @@ export class EmbeddedFileMap
           } else {
             return {
               done: false,
-              value: [res.value[0], new EmbeddedFile(res.value[1], doc)]
+              value: [res.value[0], new EmbeddedFile(res.value[1], doc)],
             };
           }
-        }
+        },
       };
     } else {
       return {
         next(): IteratorResult<[string, EmbeddedFile]> {
           return {
             done: true,
-            value: null
+            value: null,
           };
-        }
+        },
       };
     }
   }
@@ -106,11 +103,7 @@ export class EmbeddedFileMap
       if (names.EmbeddedFiles) {
         const nameTree = names.EmbeddedFiles;
         if (nameTree) {
-          this.#nameTree = new NameTree(
-            nameTree,
-            this.document,
-            core.FileSpecificationDictionary
-          );
+          this.#nameTree = new NameTree(nameTree, this.document, core.FileSpecificationDictionary);
         }
       }
     }
@@ -154,11 +147,7 @@ export class EmbeddedFileMap
       embeddedFiles.Names = this.document.target.createArray();
       this.target.Names.get().EmbeddedFiles = embeddedFiles;
 
-      this.nameTree = new NameTree(
-        embeddedFiles,
-        this.document,
-        core.FileSpecificationDictionary
-      );
+      this.nameTree = new NameTree(embeddedFiles, this.document, core.FileSpecificationDictionary);
     }
 
     this.nameTree.set(key, file.target);

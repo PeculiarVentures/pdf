@@ -32,10 +32,7 @@ export class PDFIndirectReference extends PDFIndirect {
     if (this.documentUpdate) {
       const value = this.documentUpdate.document.getObject(this).value;
 
-      return PDFTypeConverter.convert(
-        value,
-        type as new () => PDFObject
-      ) as PDFObjectTypes;
+      return PDFTypeConverter.convert(value, type as new () => PDFObject) as PDFObjectTypes;
     }
 
     throw new Error("IndirectReference is not assigned to DocumentUpdate");

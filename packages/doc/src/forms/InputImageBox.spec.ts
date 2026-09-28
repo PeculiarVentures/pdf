@@ -1,8 +1,4 @@
-import {
-  jpegImage,
-  PdfRenderingHelper,
-  xrefTableOptions
-} from "@peculiar/pdf-tests";
+import { jpegImage, PdfRenderingHelper, xrefTableOptions } from "@peculiar/pdf-tests";
 import { InputImageBox, PDFDocument } from "@peculiar/pdf-doc";
 
 describe("InputImageBox", () => {
@@ -23,7 +19,7 @@ describe("InputImageBox", () => {
       height: 109,
       name: "imageBox1",
       alt: "Test Image",
-      image: doc.createImage(testImageData)
+      image: doc.createImage(testImageData),
     });
 
     docRaw = await doc.save();
@@ -33,9 +29,8 @@ describe("InputImageBox", () => {
     const pageHash = await PdfRenderingHelper.getPageHash(docRaw, 1);
 
     const expectedHash: Record<string, string> = {
-      darwin:
-        "6260e999f887cfbc11d2f1e69f7b23e02c75e10e175ff1dae2592650a9a644d5",
-      linux: "5f58a94cbe7eb528ff12c2accf5f3e485333437d085ba85354563883b9fe089b"
+      darwin: "6260e999f887cfbc11d2f1e69f7b23e02c75e10e175ff1dae2592650a9a644d5",
+      linux: "5f58a94cbe7eb528ff12c2accf5f3e485333437d085ba85354563883b9fe089b",
     };
     expect(pageHash).toBe(expectedHash[process.platform]);
   });
@@ -52,10 +47,8 @@ describe("InputImageBox", () => {
       const pageHash = await PdfRenderingHelper.getPageHash(pdf, 1);
 
       const expectedHash: Record<string, string> = {
-        darwin:
-          "6260e999f887cfbc11d2f1e69f7b23e02c75e10e175ff1dae2592650a9a644d5",
-        linux:
-          "5f58a94cbe7eb528ff12c2accf5f3e485333437d085ba85354563883b9fe089b"
+        darwin: "6260e999f887cfbc11d2f1e69f7b23e02c75e10e175ff1dae2592650a9a644d5",
+        linux: "5f58a94cbe7eb528ff12c2accf5f3e485333437d085ba85354563883b9fe089b",
       };
       expect(pageHash).toBe(expectedHash[process.platform]);
     });
@@ -71,10 +64,8 @@ describe("InputImageBox", () => {
       let pageHash = await PdfRenderingHelper.getPageHash(pdf, 1);
 
       const expectedHash: Record<string, string> = {
-        darwin:
-          "6260e999f887cfbc11d2f1e69f7b23e02c75e10e175ff1dae2592650a9a644d5",
-        linux:
-          "5f58a94cbe7eb528ff12c2accf5f3e485333437d085ba85354563883b9fe089b"
+        darwin: "6260e999f887cfbc11d2f1e69f7b23e02c75e10e175ff1dae2592650a9a644d5",
+        linux: "5f58a94cbe7eb528ff12c2accf5f3e485333437d085ba85354563883b9fe089b",
       };
       expect(pageHash).toBe(expectedHash[process.platform]);
 
@@ -86,10 +77,8 @@ describe("InputImageBox", () => {
       pageHash = await PdfRenderingHelper.getPageHash(pdf, 1);
 
       const expectedHash2: Record<string, string> = {
-        darwin:
-          "f724162d629d671000f9dcaf9e81be20f45f8060b5f84b4a5d5b9794e096595e",
-        linux:
-          "f724162d629d671000f9dcaf9e81be20f45f8060b5f84b4a5d5b9794e096595e"
+        darwin: "f724162d629d671000f9dcaf9e81be20f45f8060b5f84b4a5d5b9794e096595e",
+        linux: "f724162d629d671000f9dcaf9e81be20f45f8060b5f84b4a5d5b9794e096595e",
       };
       expect(pageHash).toBe(expectedHash2[process.platform]);
     });
@@ -107,10 +96,8 @@ describe("InputImageBox", () => {
       const pageHash = await PdfRenderingHelper.getPageHash(pdf, 1);
 
       const expectedHash: Record<string, string> = {
-        darwin:
-          "5ecde8d63a7b1691efa9605f67cfb27c6e50786d40762a4449d3624b630cdf7c",
-        linux:
-          "9fdac3e477756d3d81091e7592d06c727b3523fe0f605fdc2eb0d1e3e52d2f85"
+        darwin: "5ecde8d63a7b1691efa9605f67cfb27c6e50786d40762a4449d3624b630cdf7c",
+        linux: "9fdac3e477756d3d81091e7592d06c727b3523fe0f605fdc2eb0d1e3e52d2f85",
       };
       expect(pageHash).toBe(expectedHash[process.platform]);
     });
@@ -126,10 +113,8 @@ describe("InputImageBox", () => {
       const pageHash = await PdfRenderingHelper.getPageHash(pdf, 1);
 
       const expectedHash: Record<string, string> = {
-        darwin:
-          "d2f4636657c6da5b1338b4838d4d36e0cace93e05cd5e58ca0f92b0424a094a4",
-        linux:
-          "79d863b1dd1ba1f8e50e8af569244908775fcefa8939fd6e658d335f19fa3675"
+        darwin: "d2f4636657c6da5b1338b4838d4d36e0cace93e05cd5e58ca0f92b0424a094a4",
+        linux: "79d863b1dd1ba1f8e50e8af569244908775fcefa8939fd6e658d335f19fa3675",
       };
       expect(pageHash).toBe(expectedHash[process.platform]);
     });
@@ -153,7 +138,7 @@ describe("InputImageBox", () => {
         width: 150,
         height: 150,
         name: "imageBox2",
-        alt: "Test Image 2"
+        alt: "Test Image 2",
       });
 
       expect(imageBox).toBeDefined();
@@ -174,7 +159,7 @@ describe("InputImageBox", () => {
         width: 150,
         height: 150,
         image,
-        alt: "Test Image With Data"
+        alt: "Test Image With Data",
       });
 
       expect(imageBox.image).toBeDefined();

@@ -51,7 +51,7 @@ doc.pages.create();
 
 // Clone with specific pages
 const newDoc = await doc.clone({
-  pages: [1, 2] // Select pages
+  pages: [1, 2], // Select pages
 });
 ```
 
