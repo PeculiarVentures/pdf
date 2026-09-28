@@ -14,7 +14,7 @@
     "rebuild": "lerna run rebuild",
     "pack": "lerna exec npm pack",
     "clear": "lerna run clear",
-    "upgrade": "yarn upgrade-interactive --latest",
+    "upgrade": "npx npm-check-updates -i",
     "test:watch": "jest --watch"
   },
   "repository": {
@@ -56,7 +56,7 @@
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.0"
   },
-  "resolutions": {
+  "overrides": {
     "pkijs": "^3.2.3"
   }
 }
