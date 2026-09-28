@@ -22,9 +22,6 @@ import { PDFContentStream } from "../content";
 import { ViewReader } from "../ViewReader";
 import { Password } from "./StandardEncryptionAlgorithms";
 
-// Set the security revert option to avoid the CVE-2023-46809 vulnerability
-process.env.NODE_OPTIONS = "--security-revert=CVE-2023-46809";
-
 describe("StandardEncryptionHandler", () => {
   it("test checkUserPassword", async () => {
     pkijs.setEngine(

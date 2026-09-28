@@ -3,9 +3,6 @@ import { BufferSourceConverter, Convert } from "pvtsutils";
 import * as src from "./StandardEncryptionAlgorithms";
 import { PDFCryptoEngine } from "../CryptoEngine";
 
-// Set the security revert option to avoid the CVE-2023-46809 vulnerability
-process.env.NODE_OPTIONS = "--security-revert=CVE-2023-46809";
-
 const U_R6 =
   "2c0d93dbc2af881b34939a8e8915c31f58da04e3c6cb6319855670d22fb5382b16565084e80fe283164672365d57c4da";
 const UE_R6 =
