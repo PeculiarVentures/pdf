@@ -18,9 +18,6 @@ import { PublicKeyEncryptionHandler } from "./PublicKeyEncryptionHandler";
 import { ViewReader } from "../ViewReader";
 import { PDFCryptoEngine } from "../CryptoEngine";
 
-// Set the security revert option to avoid the CVE-2023-46809 vulnerability
-process.env.NODE_OPTIONS = "--security-revert=CVE-2023-46809";
-
 describe("PublicKeyEncryptionHandler", () => {
   const crypto = new Crypto();
   pkijs.setEngine("PDF", new PDFCryptoEngine({ name: "PDF", crypto }));
