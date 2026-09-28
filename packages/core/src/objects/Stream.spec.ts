@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { PDFStream } from "./Stream";
 import "./register";
 

@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { JPEG } from "./JPEG";
 
 // Helper function to create mock JPEG data

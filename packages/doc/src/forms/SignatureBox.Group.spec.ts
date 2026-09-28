@@ -1,3 +1,4 @@
+import { describe, it, test, expect, afterEach, beforeAll } from "vitest";
 import * as x509 from "@peculiar/x509";
 import * as core from "@peculiar/pdf-core";
 import {

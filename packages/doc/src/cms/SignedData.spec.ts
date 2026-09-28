@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeAll } from "vitest";
 import { Crypto } from "@peculiar/webcrypto";
 import * as x509 from "@peculiar/x509";
 import * as pkijs from "pkijs";

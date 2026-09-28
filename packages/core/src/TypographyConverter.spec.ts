@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { TypographyConverter } from "./TypographyConverter";
 import { PDFNumeric } from "./objects/Numeric";
 

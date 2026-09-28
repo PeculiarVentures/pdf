@@ -1,3 +1,4 @@
+import { describe, it, expect, vi } from "vitest";
 import { PDFDate } from "./Date";
 import { PDFDocument } from "../Document";
 import { PDFLiteralString } from "../../objects";

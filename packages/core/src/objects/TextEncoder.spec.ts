@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { TextEncoder } from "./TextEncoder";
 
 describe("TextEncoder", () => {

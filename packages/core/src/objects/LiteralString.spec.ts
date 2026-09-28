@@ -1,3 +1,4 @@
+import { describe, it, test, expect } from "vitest";
 import { PDFLiteralString } from "./LiteralString";
 
 describe("LiteralString", () => {

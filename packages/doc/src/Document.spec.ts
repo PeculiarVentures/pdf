@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach } from "vitest";
 import * as core from "@peculiar/pdf-core";
 import { PageFilter } from "@peculiar/pdf-copy";
 import { PdfRenderingHelper } from "@peculiar/pdf-tests";

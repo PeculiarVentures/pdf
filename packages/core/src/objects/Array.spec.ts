@@ -1,3 +1,4 @@
+import { describe, it, test, expect, beforeEach } from "vitest";
 import { PDFDocument } from "../structure";
 import { ViewWriter } from "../ViewWriter";
 import { PDFArray } from "./Array";

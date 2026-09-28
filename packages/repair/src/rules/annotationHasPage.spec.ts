@@ -1,3 +1,4 @@
+import { describe, it, test, expect } from "vitest";
 import { PDFDocument } from "@peculiar/pdf-doc";
 import { PDFRepair, globalRepairRegistry } from "@peculiar/pdf-repair";
 

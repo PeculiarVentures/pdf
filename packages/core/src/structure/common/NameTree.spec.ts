@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, beforeAll } from "vitest";
 import { PDFDocument } from "../Document";
 import { PDFBoolean, PDFDictionary, PDFNumeric, PDFObject, PDFTextString } from "../../objects";
 import { NameTree } from "./NameTree";

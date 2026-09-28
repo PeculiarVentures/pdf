@@ -1,3 +1,4 @@
+import { describe, it, test, expect, beforeAll } from "vitest";
 import { jpegImage, PdfRenderingHelper, xrefTableOptions } from "@peculiar/pdf-tests";
 import { InputImageBox, PDFDocument } from "@peculiar/pdf-doc";
 

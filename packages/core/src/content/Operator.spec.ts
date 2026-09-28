@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { PDFArray, PDFHexString, PDFLiteralString, PDFName, PDFNumeric } from "../objects";
 import { PDFOperator } from "./Operator";
 

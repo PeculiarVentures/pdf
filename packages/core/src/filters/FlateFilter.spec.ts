@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach } from "vitest";
 import { FlateFilter } from "./FlateFilter";
 import * as pako from "pako";
 import { PDFDictionary } from "../objects/Dictionary";

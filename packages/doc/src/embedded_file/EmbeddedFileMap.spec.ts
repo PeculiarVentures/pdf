@@ -1,3 +1,4 @@
+import { describe, it, test, expect, beforeEach } from "vitest";
 import { PDFDocument } from "../Document";
 
 async function reloadDocument(doc: PDFDocument): Promise<PDFDocument> {

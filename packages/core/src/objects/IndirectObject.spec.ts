@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { PDFDictionary } from "./Dictionary";
 import { PDFIndirectObject } from "./IndirectObject";
 import { PDFStream } from "./Stream";
