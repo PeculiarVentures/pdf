@@ -65,6 +65,37 @@ describe("StandardEncryptionHandler", () => {
     expect(ok).toBe(true);
   });
 
+  it("checkOwnerPassword caches only successful verification", async () => {
+    pkijs.setEngine("PDF", new PDFCryptoEngine({ name: "PDF", crypto: new Crypto() }));
+
+    const doc = PDFDocument.create();
+    await StandardEncryptionHandler.create({
+      document: doc,
+      algorithm: CryptoFilterMethods.AES128,
+      userPassword: "12345",
+      ownerPassword: "54321",
+    });
+
+    const writer = new ViewWriter();
+    await doc.writePDF(writer);
+    const doc2 = await PDFDocument.fromPDF(new ViewReader(writer.toUint8Array()));
+    const handler = doc2.encryptHandler as StandardEncryptionHandler;
+
+    expect(await handler.checkUserPassword("12345")).toBe(true);
+
+    expect(await handler.checkOwnerPassword("54321")).toBe(true);
+    expect(await handler.checkOwnerPassword("")).toBe(true);
+
+    expect(await handler.checkOwnerPassword("wrong")).toBe(false);
+    expect(await handler.checkOwnerPassword("")).toBe(true);
+
+    const handlerFresh = (await PDFDocument.fromPDF(new ViewReader(writer.toUint8Array()))).encryptHandler as StandardEncryptionHandler;
+    await handlerFresh.checkUserPassword("12345");
+    expect(await handlerFresh.checkOwnerPassword("wrong")).toBe(false);
+    expect(await handlerFresh.checkOwnerPassword("54321")).toBe(true);
+    expect(await handlerFresh.checkOwnerPassword("")).toBe(true);
+  });
+
   describe("create and encrypt document", () => {
     pkijs.setEngine("PDF", new PDFCryptoEngine({ name: "PDF", crypto: new Crypto() }));
 
@@ -211,9 +242,8 @@ describe("StandardEncryptionHandler", () => {
           await doc2.decrypt();
 
           if (t.params.ownerPassword) {
-            // TODO not implemented
-            // const ok = await doc2.encryptHandler.checkOwnerPassword(t.params.ownerPassword);
-            // assert.ok(ok, "Owner password is incorrect");
+            const ownerOk = await standardEncryptHandler.checkOwnerPassword(t.params.ownerPassword);
+            expect(ownerOk).toBe(true);
           }
         }
       });

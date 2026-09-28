@@ -265,6 +265,12 @@ export class StandardEncryptionHandler extends EncryptionHandler {
     return res;
   }
 
+  /**
+   * Verifies the document owner password.
+   *
+   * When `password` is empty, the last successfully verified owner password is reused.
+   * The cache is updated only after a successful check so a failed guess does not stick.
+   */
   public async checkOwnerPassword(password: Password = ""): Promise<boolean> {
     const dict = this.dictionary;
     const attempt = password || this.#ownerPassword || "";

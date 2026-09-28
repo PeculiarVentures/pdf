@@ -44,7 +44,7 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
       this.documentUpdate = items[0].documentUpdate;
       this.view = items[0].view;
     } else {
-      this.items = items;
+      this.items = [...items];
     }
   }
 
