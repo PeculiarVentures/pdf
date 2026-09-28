@@ -33,7 +33,7 @@
     "test": "echo \"Error: run tests from root\" && exit 1",
     "clear": "rimraf build/*",
     "build": "rollup -c",
-    "rebuild": "yarn run clear && yarn run build",
+    "rebuild": "npm run clear && npm run build",
     "prepack": "npm run rebuild"
   },
   "bugs": {

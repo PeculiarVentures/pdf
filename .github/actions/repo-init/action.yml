@@ -8,11 +8,11 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v6
       with:
         node-version: 20
         registry-url: "https://registry.npmjs.org/"
-        cache: "yarn"
+        cache: "npm"
 
     - name: Setup .npmrc
       shell: bash
@@ -35,4 +35,4 @@ runs:
 
     - name: Install dependencies
       shell: bash
-      run: yarn install --frozen-lockfile
+      run: npm ci
