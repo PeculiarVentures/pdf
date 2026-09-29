@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import * as fs from "node:fs";
 import { X509Certificate } from "@peculiar/x509";
 import { Crypto } from "@peculiar/webcrypto";

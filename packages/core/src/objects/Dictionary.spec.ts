@@ -1,3 +1,4 @@
+import { describe, it, test, expect, beforeEach } from "vitest";
 import { Convert } from "pvtsutils";
 import { PDFDictionary } from "./Dictionary";
 import { PDFDictionaryField, PDFNumberField } from "./decorators";

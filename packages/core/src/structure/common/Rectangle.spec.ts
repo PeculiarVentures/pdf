@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, beforeAll } from "vitest";
 import { PDFDocument } from "../Document";
 import { PDFRectangle } from "./Rectangle";
 import { PDFNumeric } from "../../objects/Numeric";

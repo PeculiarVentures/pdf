@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import * as core from "@peculiar/pdf-core";
 import { DefaultFonts } from "@peculiar/pdf-font";
 import { PDFDocument, PDFDocumentCreateParameters } from "./Document";

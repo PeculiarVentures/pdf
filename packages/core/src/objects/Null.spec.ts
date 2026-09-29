@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { ParsingError } from "../errors";
 import { PDFNull } from "./Null";
 import { PDFNumeric } from "./Numeric";

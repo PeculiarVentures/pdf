@@ -16,5 +16,5 @@
       "@peculiar/pdf-tests": ["./packages/tests/src"]
     }
   },
-  "exclude": ["node_modules", "coverage", "packages/*/build", "packages/**/*/*.js", "packages/**/*/*.mjs", "jest.config.js"]
+  "exclude": ["node_modules", "coverage", "packages/*/build", "packages/**/*/*.js", "packages/**/*/*.mjs", "vitest.config.ts"]
 }

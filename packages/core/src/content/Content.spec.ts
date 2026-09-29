@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { PDFName, PDFNumeric } from "../objects";
 import { PDFContent } from "./Content";
 

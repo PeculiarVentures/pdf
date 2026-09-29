@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { Convert } from "pvtsutils";
 import { PDFDocument } from "./Document";
 import { FormObject } from "./FormObject";

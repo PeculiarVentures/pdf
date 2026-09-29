@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { Crypto } from "@peculiar/webcrypto";
 import * as pkijs from "pkijs";
 import { PDFCryptoEngine } from "./CryptoEngine";

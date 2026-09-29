@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { ColorConverter } from "./Color";
 import { PDFArray, PDFNumeric } from "../objects";
 

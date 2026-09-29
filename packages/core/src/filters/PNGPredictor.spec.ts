@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach } from "vitest";
 import { PNGPredictor } from "./PNGPredictor";
 import { Convert } from "pvtsutils";
 

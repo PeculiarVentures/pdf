@@ -1,6 +1,7 @@
 import * as core from "@peculiar/pdf-core";
 import { Convert } from "pvtsutils";
 
+import { createFormObject } from "./formObjectCreate";
 import { Image } from "./Image";
 import * as font from "./Font";
 import { ResourceManager } from "./ResourceManager";
@@ -194,7 +195,8 @@ export class Graphics extends WrapContentChild {
   public drawImage(image: Image, width?: core.TypographySize, height?: core.TypographySize): this {
     width = core.TypographyConverter.toPoint(width || image.width);
     height = core.TypographyConverter.toPoint(height || image.height);
-    const form = FormObject.create(this.parent.document, width, height);
+    // Avoid FormObject.create here: importing FormObject would cycle with this module under Vitest ESM.
+    const form = createFormObject(this.parent.document, width, height);
 
     if (image.target.ColorSpace instanceof core.PDFArray) {
       this.parent.resources.target.set("ColorSpace", this.parent.document.target.createDictionary([this.parent.resources.createNamePrefix(NAME_PREFIX_COLOR_SPEC), image.target.ColorSpace]));
@@ -420,5 +422,3 @@ export class Text extends WrapContentChild {
     return this;
   }
 }
-
-import { FormObject } from "./FormObject";

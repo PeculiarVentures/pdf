@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach } from "vitest";
 import { Convert } from "pvtsutils";
 import { JBIG2Filter } from "./JBIG2Filter";
 

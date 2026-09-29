@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { createPdfWithPage } from "@peculiar/pdf-tests";
 import { PDFPageOrientation } from "./Pages";
 

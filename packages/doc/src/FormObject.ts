@@ -1,18 +1,12 @@
 import * as core from "@peculiar/pdf-core";
 import { type PDFDocument } from "./Document";
+import { createFormObject, registerFormObjectClass } from "./formObjectCreate";
 import { ResourceManager } from "./ResourceManager";
 import { WrapContentObject } from "./WrapContentObject";
 
 export class FormObject extends WrapContentObject<core.FormDictionary> {
   public static create(document: PDFDocument, width: core.TypographySize = 0, height: core.TypographySize = 0): FormObject {
-    const formDict = core.FormDictionary.create(document.target.update).makeIndirect();
-
-    formDict.bBox.llX = 0;
-    formDict.bBox.llY = 0;
-    formDict.bBox.urX = core.TypographyConverter.toPoint(width);
-    formDict.bBox.urY = -core.TypographyConverter.toPoint(height);
-
-    return new FormObject(formDict, document);
+    return createFormObject(document, width, height);
   }
 
   protected get content(): core.PDFContent {
@@ -63,3 +57,5 @@ export class FormObject extends WrapContentObject<core.FormDictionary> {
     return minY;
   }
 }
+
+registerFormObjectClass(FormObject);

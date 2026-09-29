@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { BufferSourceConverter } from "pvtsutils";
 import { PDFArray, PDFDictionary, PDFNumeric } from "../objects";
 import { PDFDocument } from "./Document";

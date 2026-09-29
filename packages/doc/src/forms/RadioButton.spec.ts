@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeAll } from "vitest";
 import { PdfRenderingHelper, xrefTableOptions } from "@peculiar/pdf-tests";
 import { PDFDocument, RadioButtonGroup } from "@peculiar/pdf-doc";
 

@@ -1,3 +1,4 @@
+import { describe, it } from "vitest";
 import * as assert from "assert";
 import { PDFDocument } from "../Document";
 import { PageObjectDictionary } from "./PageObject";

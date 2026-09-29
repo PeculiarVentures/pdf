@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { PDFHexString } from "./HexString";
 
 describe("HexString", () => {

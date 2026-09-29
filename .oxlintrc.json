@@ -15,5 +15,5 @@
     "typescript/unified-signatures": "off",
     "unicorn/no-array-reverse": "off"
   },
-  "ignorePatterns": ["**/build/**", "packages/*/*.mjs", "jest.config.js"]
+  "ignorePatterns": ["**/build/**", "packages/*/*.mjs", "vitest.config.ts"]
 }
