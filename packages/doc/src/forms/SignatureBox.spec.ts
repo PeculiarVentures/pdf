@@ -1,4 +1,4 @@
-import { describe, it, test, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import * as core from "@peculiar/pdf-core";
 import { createPdfWithPage, reopenPdfDocument } from "@peculiar/pdf-tests";
 import { SignatureBox, SignatureBoxGroup } from "@peculiar/pdf-doc";
