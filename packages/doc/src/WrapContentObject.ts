@@ -195,6 +195,7 @@ export class Graphics extends WrapContentChild {
   public drawImage(image: Image, width?: core.TypographySize, height?: core.TypographySize): this {
     width = core.TypographyConverter.toPoint(width || image.width);
     height = core.TypographyConverter.toPoint(height || image.height);
+    // Avoid FormObject.create here: importing FormObject would cycle with this module under Vitest ESM.
     const form = createFormObject(this.parent.document, width, height);
 
     if (image.target.ColorSpace instanceof core.PDFArray) {

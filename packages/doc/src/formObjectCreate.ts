@@ -20,5 +20,9 @@ export function createFormObject(document: PDFDocument, width: core.TypographySi
   formDict.bBox.urX = core.TypographyConverter.toPoint(width);
   formDict.bBox.urY = -core.TypographyConverter.toPoint(height);
 
-  return new FormObjectClass!(formDict, document);
+  if (!FormObjectClass) {
+    throw new Error("FormObject is not registered; import the FormObject module before createFormObject.");
+  }
+
+  return new FormObjectClass(formDict, document);
 }
