@@ -16,9 +16,6 @@ export default defineConfig({
   // Generate TypeScript declaration files.
   dts: true,
 
-  // Generate source maps.
-  sourcemap: true,
-
   // Clean output directories before building.
   clean: true,
 
