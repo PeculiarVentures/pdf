@@ -2,7 +2,6 @@
   "extends": "./tsconfig.compile.json",
   "compilerOptions": {
     "incremental": true,
-    "importHelpers": false,
     "allowJs": true,
     "baseUrl": ".",
     "paths": {

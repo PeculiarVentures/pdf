@@ -5,9 +5,9 @@
   "author": "microshine <microshine@mail.ru>",
   "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/pdf-cli#readme",
   "license": "AGPL",
-  "main": "build/peculiar.pdf.cli.js",
+  "main": "./build/index.cjs",
   "bin": {
-    "pvpdf": "build/peculiar.pdf.cli.js"
+    "pvpdf": "./build/index.cjs"
   },
   "publishConfig": {
     "access": "public",
@@ -23,12 +23,7 @@
     "url": "git+https://github.com/PeculiarVentures/pdf.git"
   },
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1",
-    "clear": "rimraf build/*",
-    "build": "npm run build:module",
-    "build:module": "rollup -c",
-    "rebuild": "npm run clear && npm run build",
-    "prepack": "npm run rebuild"
+    "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "bugs": {
     "url": "https://github.com/PeculiarVentures/pdf/issues"

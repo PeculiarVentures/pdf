@@ -13,9 +13,9 @@
   "author": "microshine <microshine@mail.ru>",
   "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/copy#readme",
   "license": "AGPL",
-  "main": "build/peculiar.pdf.copy.js",
-  "module": "build/peculiar.pdf.copy.es.js",
-  "types": "build/index.d.ts",
+  "main": "./build/index.cjs",
+  "module": "./build/index.mjs",
+  "types": "./build/index.d.cts",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
@@ -30,17 +30,19 @@
     "url": "git+https://github.com/PeculiarVentures/pdf.git"
   },
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1",
-    "clear": "rimraf build/*",
-    "build": "rollup -c",
-    "rebuild": "npm run clear && npm run build",
-    "prepack": "npm run rebuild"
+    "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "bugs": {
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
   "dependencies": {
-    "@peculiar/pdf-core": "^1.17.1",
-    "tslib": "^2.8.1"
+    "@peculiar/pdf-core": "^1.17.1"
+  },
+  "exports": {
+    ".": {
+      "module": "./build/index.mjs",
+      "default": "./build/index.cjs"
+    },
+    "./package.json": "./package.json"
   }
 }
