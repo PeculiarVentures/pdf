@@ -4,7 +4,6 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "removeComments": true,
-    "importHelpers": true,
     "strict": true,
     "skipLibCheck": true,
     "experimentalDecorators": true,

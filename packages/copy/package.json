@@ -36,8 +36,7 @@
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
   "dependencies": {
-    "@peculiar/pdf-core": "^1.17.1",
-    "tslib": "^2.8.1"
+    "@peculiar/pdf-core": "^1.17.1"
   },
   "exports": {
     ".": {
