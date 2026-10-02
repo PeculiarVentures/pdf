@@ -10,6 +10,7 @@
     "coverage": "vitest run --coverage",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "build": "tsdown",
