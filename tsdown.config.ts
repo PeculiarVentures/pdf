@@ -33,9 +33,7 @@ export default defineConfig({
     customExports(exports) {
       return Object.fromEntries(
         Object.entries(exports).map(([key, value]) =>
-          value && typeof value === "object" && "import" in value && "require" in value
-            ? [key, { module: value.import, default: value.require }]
-            : [key, value],
+          value && typeof value === "object" && "import" in value && "require" in value ? [key, { module: value.import, default: value.require }] : [key, value],
         ),
       );
     },
