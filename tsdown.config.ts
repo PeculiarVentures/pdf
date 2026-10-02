@@ -1,0 +1,33 @@
+import { defineConfig } from "tsdown";
+
+export default defineConfig({
+  // Build all packages in the monorepo.
+  workspace: {
+    include: ["packages/*"],
+    exclude: ["packages/tests"],
+  },
+
+  // Required in workspace mode: package configs without `entry` are skipped.
+  entry: "src/index.ts",
+
+  // Every package is built as both ESM and CommonJS.
+  format: ["esm", "cjs"],
+
+  // Generate TypeScript declaration files.
+  dts: true,
+
+  // Generate source maps.
+  sourcemap: true,
+
+  // Clean output directories before building.
+  clean: true,
+
+  // Don't bundle dependencies from package.json.
+  deps: {
+    neverBundle: true,
+  },
+  exports: true,
+
+  outDir: "build",
+  tsconfig: "tsconfig.compile.json",
+});
