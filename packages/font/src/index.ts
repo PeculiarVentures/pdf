@@ -7,3 +7,4 @@ export * from "./IFontInfo";
 export * from "./FontInfo";
 export * from "./FontName";
 export * from "./FontOS2";
+export * from "./FontPost";
