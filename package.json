@@ -37,7 +37,7 @@
     "@types/pvutils": "^1.0.0",
     "@vitest/coverage-v8": "^3.2.4",
     "canvas": "^3.2.3",
-    "lerna": "^8.1.9",
+    "lerna": "^10.0.1",
     "oxfmt": "^0.63.0",
     "oxlint": "^1.78.0",
     "pdfjs-dist": "^3",
