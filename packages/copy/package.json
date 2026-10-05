@@ -40,8 +40,8 @@
   },
   "exports": {
     ".": {
-      "module": "./build/index.mjs",
-      "default": "./build/index.cjs"
+      "import": "./build/index.mjs",
+      "require": "./build/index.cjs"
     },
     "./package.json": "./package.json"
   }
