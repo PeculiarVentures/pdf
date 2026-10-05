@@ -38,9 +38,6 @@ jobs:
       - name: Check generated package exports are committed
         run: git diff --exit-code -- package.json packages/*/package.json
 
-      - name: Check package types
-        run: npm run package-types:check
-
       - name: Run tests with coverage
         run: npm run coverage
 
