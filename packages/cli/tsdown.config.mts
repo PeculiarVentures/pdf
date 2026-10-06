@@ -5,4 +5,5 @@ export default defineConfig({
   dts: false,
   banner: "#!/usr/bin/env node",
   exports: false,
+  attw: false,
 });

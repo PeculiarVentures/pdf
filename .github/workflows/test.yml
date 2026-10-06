@@ -32,6 +32,12 @@ jobs:
       - name: Check formatting
         run: npm run format:check
 
+      - name: Build packages
+        run: npm run build
+
+      - name: Check generated package exports are committed
+        run: git diff --exit-code -- package.json packages/*/package.json
+
       - name: Run tests with coverage
         run: npm run coverage
 

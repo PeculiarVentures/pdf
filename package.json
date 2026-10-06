@@ -15,7 +15,6 @@
     "format:check": "oxfmt --check",
     "build": "tsdown",
     "build:watch": "tsdown -w",
-    "pack": "npm run build && lerna exec npm pack",
     "upgrade": "npx npm-check-updates -i",
     "test:watch": "vitest"
   },
@@ -30,6 +29,7 @@
   },
   "homepage": "https://github.com/PeculiarVentures/pdf#readme",
   "devDependencies": {
+    "@arethetypeswrong/core": "^0.18.5",
     "@peculiar/webcrypto": "^1.4.3",
     "@peculiar/x509": "^1.12.3",
     "@types/node": "^24.0.0",
