@@ -30,7 +30,7 @@ export class TrailerDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     name: "Root",
-    type: () => CatalogDictionary,
+    type: objects.lazyType(() => CatalogDictionary),
     indirect: true,
   })
   public Root!: CatalogDictionary;
@@ -66,7 +66,7 @@ export class TrailerDictionary extends objects.PDFDictionary {
    * The document’s information dictionary.
    * @remarks Deprecated in PDF 2.0
    */
-  @objects.PDFMaybeField("Info", InformationDictionary, true)
+  @objects.PDFMaybeField("Info", objects.lazyType(() => InformationDictionary), true)
   public Info!: objects.Maybe<InformationDictionary>;
 
   /**

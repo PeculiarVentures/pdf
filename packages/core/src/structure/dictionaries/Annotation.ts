@@ -1,4 +1,4 @@
-import { Maybe, PDFArray, PDFArrayField, PDFDateField, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFMaybeField, PDFNameField, PDFTextString } from "../../objects";
+import { Maybe, PDFArray, PDFArrayField, PDFDateField, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFMaybeField, PDFNameField, PDFTextString, lazyType } from "../../objects";
 import { PDFRectangle } from "../common/Rectangle";
 import { AppearanceDictionary } from "./AppearanceDictionary";
 import { PageObjectDictionary } from "./PageObject";
@@ -249,7 +249,7 @@ export class AnnotationDictionary extends PDFDictionary {
    */
   @PDFDictionaryField({
     name: "P",
-    type: () => PageObjectDictionary,
+    type: lazyType(() => PageObjectDictionary),
     optional: true,
     indirect: true,
   })

@@ -5,15 +5,33 @@ import { Maybe } from "./Maybe";
 
 export type PDFObjectType<T extends PDFObjectTypes = PDFObjectTypes> = abstract new () => T;
 
+const lazyTypeKey = Symbol("PDFLazyObjectType");
+
+/** A class reference resolved on first use. Create it with {@link lazyType}. */
+export interface PDFLazyObjectType<T extends PDFObjectTypes = PDFObjectTypes> {
+  readonly [lazyTypeKey]: () => PDFObjectType<T>;
+}
+
 /**
- * A class, or a function returning it. Use the function form for classes from a module
+ * A class, or a lazy reference to it. Use {@link lazyType} for classes from a module
  * that imports this one back: the decorator runs while that module may still be loading.
  */
-export type PDFObjectTypeRef<T extends PDFObjectTypes = PDFObjectTypes> = PDFObjectType<T> | (() => PDFObjectType<T>);
+export type PDFObjectTypeRef<T extends PDFObjectTypes = PDFObjectTypes> = PDFObjectType<T> | PDFLazyObjectType<T>;
 
-/** Resolves a type reference. Classes have a `prototype`; arrow functions do not. */
+/**
+ * Wraps a function returning a class so that decorators resolve it on first use.
+ * @param factory Function returning the class
+ */
+export function lazyType<T extends PDFObjectTypes>(factory: () => PDFObjectType<T>): PDFLazyObjectType<T> {
+  return { [lazyTypeKey]: factory };
+}
+
+function isLazyType<T extends PDFObjectTypes>(ref: PDFObjectTypeRef<T>): ref is PDFLazyObjectType<T> {
+  return typeof ref === "object" && ref !== null && lazyTypeKey in ref;
+}
+
 function resolvePDFObjectType<T extends PDFObjectTypes>(ref: PDFObjectTypeRef<T>, name: string): PDFObjectType<T> {
-  const type = ref.prototype ? (ref as PDFObjectType<T>) : (ref as () => PDFObjectType<T>)();
+  const type = isLazyType(ref) ? ref[lazyTypeKey]() : ref;
   if (!type) {
     throw new Error(`Class not loaded for ${name}`);
   }

@@ -1,5 +1,5 @@
 import { Convert } from "pvtsutils";
-import { PDFArray, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFName, PDFNameField, PDFNumeric, PDFStream, Maybe, PDFMaybeField } from "../objects";
+import { PDFArray, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFName, PDFNameField, PDFNumeric, PDFStream, Maybe, PDFMaybeField, lazyType } from "../objects";
 import { CatalogDictionary } from "./dictionaries/Catalog";
 import { CrossReference } from "./CrossReference";
 import { PDFDocumentObject, PDFDocumentObjectTypes } from "./DocumentObject";
@@ -78,7 +78,7 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
    */
   @PDFDictionaryField({
     name: "Root",
-    type: () => CatalogDictionary,
+    type: lazyType(() => CatalogDictionary),
     indirect: true,
   })
   public Root!: CatalogDictionary;
@@ -113,7 +113,7 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
    * The document’s information dictionary.
    * @remarks Deprecated in PDF 2.0
    */
-  @PDFMaybeField("Info", () => InformationDictionary, true)
+  @PDFMaybeField("Info", lazyType(() => InformationDictionary), true)
   public Info!: Maybe<InformationDictionary>;
 
   /**
