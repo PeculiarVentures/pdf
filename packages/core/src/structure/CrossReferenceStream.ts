@@ -78,7 +78,7 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
    */
   @PDFDictionaryField({
     name: "Root",
-    type: CatalogDictionary,
+    type: () => CatalogDictionary,
     indirect: true,
   })
   public Root!: CatalogDictionary;
@@ -113,7 +113,7 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
    * The document’s information dictionary.
    * @remarks Deprecated in PDF 2.0
    */
-  @PDFMaybeField("Info", InformationDictionary, true)
+  @PDFMaybeField("Info", () => InformationDictionary, true)
   public Info!: Maybe<InformationDictionary>;
 
   /**

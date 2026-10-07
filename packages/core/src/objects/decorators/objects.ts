@@ -7,8 +7,7 @@ import { PDFArray } from "../Array";
 import { PDFTextString } from "../TextString";
 import { PDFDictionary } from "../Dictionary";
 import { PDFStream } from "../Stream";
-import { PDFObjectTypes } from "../ObjectTypes";
-import { PDFDictionaryField } from "./field";
+import { PDFDictionaryField, type PDFObjectTypeRef } from "./field";
 
 export function PDFNumberField(name: string, optional = false, defaultValue?: number): PropertyDecorator {
   return PDFDictionaryField({
@@ -119,7 +118,7 @@ export function PDFArrayOrDictionaryField(name: string, optional = false): Prope
   });
 }
 
-export function PDFMaybeField(name: string, type: abstract new () => PDFObjectTypes, indirect = false): PropertyDecorator {
+export function PDFMaybeField(name: string, type: PDFObjectTypeRef, indirect = false): PropertyDecorator {
   return PDFDictionaryField({
     name,
     type,

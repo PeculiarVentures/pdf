@@ -97,7 +97,7 @@ export class CatalogDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     name: "Pages",
-    type: PageTreeNodesDictionary,
+    type: () => PageTreeNodesDictionary,
     indirect: true,
   })
   public Pages!: PageTreeNodesDictionary;

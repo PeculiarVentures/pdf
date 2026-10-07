@@ -46,7 +46,7 @@ export class PageObjectDictionary extends PageDictionary {
    */
   @objects.PDFDictionaryField({
     name: "Parent",
-    type: PageTreeNodesDictionary,
+    type: () => PageTreeNodesDictionary,
     indirect: true,
   })
   public Parent!: PageTreeNodesDictionary;

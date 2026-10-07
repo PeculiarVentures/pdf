@@ -3,10 +3,28 @@ import type { PDFObjectTypes } from "../ObjectTypes";
 import { PDFObjectConstructor, PDFObject } from "../Object";
 import { Maybe } from "./Maybe";
 
+export type PDFObjectType<T extends PDFObjectTypes = PDFObjectTypes> = abstract new () => T;
+
+/**
+ * A class, or a function returning it. Use the function form for classes from a module
+ * that imports this one back: the decorator runs while that module may still be loading.
+ */
+export type PDFObjectTypeRef<T extends PDFObjectTypes = PDFObjectTypes> = PDFObjectType<T> | (() => PDFObjectType<T>);
+
+/** Resolves a type reference. Classes have a `prototype`; arrow functions do not. */
+function resolvePDFObjectType<T extends PDFObjectTypes>(ref: PDFObjectTypeRef<T>, name: string): PDFObjectType<T> {
+  const type = ref.prototype ? (ref as PDFObjectType<T>) : (ref as () => PDFObjectType<T>)();
+  if (!type) {
+    throw new Error(`Class not loaded for ${name}`);
+  }
+
+  return type;
+}
+
 export interface PDFDictionaryFieldParameters<T extends PDFObjectTypes, TReturn = any> {
   name: string;
   optional?: boolean;
-  type?: abstract new () => T;
+  type?: PDFObjectTypeRef<T>;
   indirect?: boolean;
   get?: (object: T) => TReturn;
   set?: (object: TReturn) => T;
@@ -26,6 +44,10 @@ export function PDFDictionaryField<T extends PDFObjectTypes = PDFObjectTypes, TR
       throw new Error("Parameter 'maybe' shall be used with parameter 'type'.");
     }
     //#endregion
+    const typeRef = parameters.type;
+    let resolvedType: PDFObjectType<T> | undefined;
+    const getType = () => (typeRef ? (resolvedType ??= resolvePDFObjectType(typeRef, parameters.name)) : undefined);
+
     Object.defineProperty(target, propertyKey, {
       enumerable: false,
       get: function (this: PDFDictionary) {
@@ -42,13 +64,14 @@ export function PDFDictionaryField<T extends PDFObjectTypes = PDFObjectTypes, TR
         }
 
         if (parameters.maybe) {
-          const type = parameters.type as PDFObjectConstructor<T>;
+          const type = getType() as PDFObjectConstructor<T>;
           const maybe = new Maybe(this, parameters.name, !!parameters.indirect, type);
 
           return maybe;
         } else {
           if (this.has(parameters.name)) {
-            const value = parameters.type ? this.get(parameters.name, parameters.type) : this.get(parameters.name);
+            const type = getType();
+            const value = type ? this.get(parameters.name, type) : this.get(parameters.name);
 
             // Apply callback function if exists
             const res = parameters.get ? parameters.get.call(this, value as any) : value;
@@ -72,7 +95,8 @@ export function PDFDictionaryField<T extends PDFObjectTypes = PDFObjectTypes, TR
         } else {
           const result = parameters.set ? parameters.set.call(this, value) : value;
 
-          if (parameters.type && !(result instanceof parameters.type)) {
+          const type = getType();
+          if (type && !(result instanceof type)) {
             throw new Error(`PDF Dictionary field '${parameters.name}' contains invalid data type`);
           } else if (!(result instanceof PDFObject)) {
             throw new Error(`PDF Dictionary field '${parameters.name}' must be PDF object`);

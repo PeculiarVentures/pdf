@@ -30,7 +30,7 @@ export class TrailerDictionary extends objects.PDFDictionary {
    */
   @objects.PDFDictionaryField({
     name: "Root",
-    type: CatalogDictionary,
+    type: () => CatalogDictionary,
     indirect: true,
   })
   public Root!: CatalogDictionary;

@@ -249,7 +249,7 @@ export class AnnotationDictionary extends PDFDictionary {
    */
   @PDFDictionaryField({
     name: "P",
-    type: PageObjectDictionary,
+    type: () => PageObjectDictionary,
     optional: true,
     indirect: true,
   })
