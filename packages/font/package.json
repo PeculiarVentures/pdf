@@ -13,9 +13,9 @@
   "author": "microshine <microshine@mail.ru>",
   "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/pdf-font#readme",
   "license": "AGPL",
-  "main": "./build/index.cjs",
+  "main": "./build/index.js",
   "module": "./build/index.mjs",
-  "types": "./build/index.d.cts",
+  "types": "./build/index.d.ts",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
@@ -46,7 +46,7 @@
   "exports": {
     ".": {
       "module": "./build/index.mjs",
-      "default": "./build/index.cjs"
+      "default": "./build/index.js"
     },
     "./package.json": "./package.json"
   }

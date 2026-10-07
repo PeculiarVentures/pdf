@@ -12,6 +12,9 @@ export default defineConfig({
   deps: {
     neverBundle: true,
   },
+  // Keep .js/.mjs/.d.ts output names (packages have no "type" field, so .js is
+  // CommonJS) instead of tsdown's node-platform default of .cjs/.mjs.
+  fixedExtension: false,
   // Node always resolves the CommonJS build and bundlers the ESM build (via the
   // `module` condition). Mapping `import`/`require` to different files would let
   // one process load two copies of a package and break `instanceof` checks.
