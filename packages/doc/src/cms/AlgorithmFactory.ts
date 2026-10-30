@@ -1,4 +1,4 @@
-import { toArrayBuffer } from "@peculiar/utils";
+import { toArrayBuffer, type BufferSource } from "@peculiar/utils";
 
 export interface HashedAlgorithm extends Algorithm {
   hash: Algorithm;

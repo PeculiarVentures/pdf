@@ -7,6 +7,7 @@ import { CryptoFilterMethods, EncryptDictionary, PublicKeyCryptoFilterDictionary
 import { staticDataFF } from "./Constants";
 import { EncryptionHandler, type EncryptionHandlerCreateParams } from "./EncryptionHandler";
 import { EncryptionAlgorithms, type EncryptionKey, type EncryptionKeys } from "./EncryptionAlgorithms";
+import { toCryptoBytes } from "./bytes";
 
 export interface PublicKeyEncryptionHandlerCreateParams extends EncryptionHandlerCreateParams {
   permission?: PublicKeyPermissionFlags;
@@ -305,7 +306,7 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
     const recipients = this.dictionary.SubFilter === "adbe.pkcs7.s5" ? (filter.Recipients instanceof PDFTextString ? new PDFArray(filter.Recipients) : filter.Recipients) : this.dictionary.Recipients;
 
     // Making "recipient's buffer" (for symmetric key generation)
-    const recipientViews: Uint8Array[] = [];
+    const recipientViews: Uint8Array<ArrayBuffer>[] = [];
     for (const recipient of recipients) {
       if (!(recipient instanceof PDFTextString)) {
         throw new Error("Item is not a string");
@@ -373,7 +374,7 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
         const decryptedKey = isBufferSource(recipient.key)
           ? await cmsEnveloped.decrypt(0, {
               recipientCertificate: pkijs.Certificate.fromBER(recipient.certificate.rawData),
-              recipientPrivateKey: recipient.key,
+              recipientPrivateKey: toCryptoBytes(recipient.key),
             })
           : await cmsEnveloped.decrypt(0, {
               recipientCertificate: pkijs.Certificate.fromBER(recipient.certificate.rawData),

@@ -49,7 +49,7 @@ export class PDFHexString extends PDFTextString {
     reader.readByte(); // >
   }
 
-  public get data(): Uint8Array {
+  public get data(): Uint8Array<ArrayBuffer> {
     return new Uint8Array(toArrayBuffer(binary.decode(this.text)));
   }
 

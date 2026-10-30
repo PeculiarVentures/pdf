@@ -1,3 +1,4 @@
+import type { BufferSource } from "@peculiar/utils";
 import type { X509Certificate } from "@peculiar/x509";
 
 import { DefaultCertificateStorageHandler } from "./DefaultCertificateStorageHandler";

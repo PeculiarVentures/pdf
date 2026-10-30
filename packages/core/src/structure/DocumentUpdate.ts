@@ -14,7 +14,7 @@ export class PDFDocumentUpdate {
 
   public static readonly DEFAULT_VIEW = new Uint8Array();
 
-  public view = PDFDocumentUpdate.DEFAULT_VIEW;
+  public view: Uint8Array = PDFDocumentUpdate.DEFAULT_VIEW;
   public document: PDFDocument;
   public xref: CrossReference | null = null;
   // public xrefTable: CrossReferenceTable | null = null;

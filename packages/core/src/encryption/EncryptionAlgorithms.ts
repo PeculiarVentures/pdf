@@ -1,8 +1,9 @@
 import type { ICryptoEngine } from "pkijs";
-import { bytes, toArrayBuffer, toUint8Array } from "@peculiar/utils";
+import { bytes, toArrayBuffer, type BufferSource } from "@peculiar/utils";
 import type { PDFStream, PDFTextString } from "../objects";
 import { CryptoFilterMethods } from "../structure/dictionaries";
 import { staticData } from "./Constants";
+import { toCryptoBytes } from "./bytes";
 
 export interface EncryptionKey {
   type: CryptoFilterMethods;
@@ -40,7 +41,7 @@ interface EncryptionAlgorithmsCipherParams extends EncryptionAlgorithmsParams {
 const keyUsages: KeyUsage[] = ["encrypt", "decrypt"];
 
 export abstract class EncryptionAlgorithms {
-  private static async getCutHashV2(combinedKey: BufferSource, stmKeyByteLength: number, crypto: ICryptoEngine): Promise<ArrayBuffer> {
+  private static async getCutHashV2(combinedKey: ArrayBuffer, stmKeyByteLength: number, crypto: ICryptoEngine): Promise<ArrayBuffer> {
     const md = await crypto.digest("MD5", combinedKey);
     const initialKeyLength = stmKeyByteLength + 5;
 
@@ -54,13 +55,13 @@ export abstract class EncryptionAlgorithms {
    */
   private static async cipher(params: EncryptionAlgorithmsCipherParams): Promise<ArrayBuffer> {
     const { crypto, encrypt, key, target, data } = params;
-    const view = toUint8Array(data);
+    const view = toCryptoBytes(data);
 
     if (key.type === CryptoFilterMethods.None) {
       return view.slice().buffer;
     }
 
-    let cipherData: Uint8Array;
+    let cipherData: Uint8Array<ArrayBuffer>;
     let iv: Uint8Array;
     if (encrypt) {
       iv = crypto.getRandomValues(new Uint8Array(16));
@@ -92,7 +93,7 @@ export abstract class EncryptionAlgorithms {
         return await crypto.decrypt(alg, cryptoKey, cipherData);
       }
       case CryptoFilterMethods.AES256: {
-        const cryptoKey = await crypto.importKey("raw", key.raw, alg.name, false, keyUsages);
+        const cryptoKey = await crypto.importKey("raw", toCryptoBytes(key.raw), alg.name, false, keyUsages);
 
         if (encrypt) {
           return toArrayBuffer(bytes.concat([iv, await crypto.encrypt(alg, cryptoKey, cipherData)]));
