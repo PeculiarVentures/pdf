@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from "vitest";
 import { Crypto } from "@peculiar/webcrypto";
 import * as x509 from "@peculiar/x509";
 import * as pkijs from "pkijs";
-import { Convert } from "pvtsutils";
+import { toArrayBuffer, utf8 } from "@peculiar/utils";
 import "./algorithms";
 import { ContentTypeAttribute, MessageDigestAttribute, SigningTimeAttribute } from "./attributes";
 import { CMSSignedData } from "./SignedData";
@@ -108,7 +108,7 @@ describe("SignedData", () => {
         signedData.certificates.push(leafCert);
         signedData.revocations.push(crl);
         signedData.revocations.push(ocsp);
-        const data = Convert.FromUtf8String("Hello");
+        const data = toArrayBuffer(utf8.encode("Hello"));
         const digestAlgorithm = "SHA-256";
         const digest = await crypto.subtle.digest(digestAlgorithm, data);
         const signer = signedData.createSigner(leafCert, {
@@ -136,7 +136,7 @@ describe("SignedData", () => {
 
       beforeAll(async () => {
         // create digest
-        const data = Convert.FromUtf8String("Hello");
+        const data = toArrayBuffer(utf8.encode("Hello"));
         const digestAlgorithm = "SHA-256";
         const digest = await crypto.subtle.digest(digestAlgorithm, data);
 
@@ -189,7 +189,7 @@ describe("SignedData", () => {
         name: "ECDSA",
         hash: "SHA-256",
       };
-      data = Convert.FromUtf8String("Hello");
+      data = toArrayBuffer(utf8.encode("Hello"));
       dataHash = await crypto.subtle.digest("SHA-256", data);
 
       const keys = await crypto.subtle.generateKey(algorithm, false, ["sign", "verify"]);

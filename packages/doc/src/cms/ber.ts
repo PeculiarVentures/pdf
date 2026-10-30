@@ -1,5 +1,5 @@
 import * as asn1js from "asn1js";
-import { type BufferSource, BufferSourceConverter } from "pvtsutils";
+import { toUint8Array, type BufferSource } from "@peculiar/utils";
 
 /**
  * BER decoder options for input that can carry revocation data. asn1js stops
@@ -10,7 +10,7 @@ import { type BufferSource, BufferSourceConverter } from "pvtsutils";
  * @returns Options for asn1js and `AsnConvert.parse`'s `berOptions`
  */
 export function berOptions(raw: BufferSource): asn1js.FromBerOptions {
-  return { maxNodes: Math.max(asn1js.DEFAULT_MAX_NODES, Math.ceil(BufferSourceConverter.toUint8Array(raw).byteLength / 2)) };
+  return { maxNodes: Math.max(asn1js.DEFAULT_MAX_NODES, Math.ceil(toUint8Array(raw).byteLength / 2)) };
 }
 
 /**

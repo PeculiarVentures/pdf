@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { BufferSourceConverter } from "pvtsutils";
+import { toUint8Array } from "@peculiar/utils";
 import { PDFArray, PDFDictionary, PDFNumeric } from "../objects";
 import { PDFDocument } from "./Document";
 import { XrefStructure } from "./XrefStructure";
@@ -23,7 +23,7 @@ describe("Document", () => {
       const objNum = doc.append(new PDFNumeric(142));
       const pdf = await doc.toPDF();
 
-      const doc2 = await PDFDocument.fromPDF(BufferSourceConverter.toUint8Array(pdf));
+      const doc2 = await PDFDocument.fromPDF(toUint8Array(pdf));
 
       const obj = doc2.getObject(objNum.id);
       const num = obj.value as PDFNumeric;
@@ -84,7 +84,7 @@ describe("Document", () => {
 
       const pdf = await doc.toPDF();
 
-      const doc2 = await PDFDocument.fromPDF(BufferSourceConverter.toUint8Array(pdf));
+      const doc2 = await PDFDocument.fromPDF(toUint8Array(pdf));
 
       const obj = doc2.getObject(obj142.id);
       expect(obj.type).toBe(PDFDocumentObjectTypes.free);
@@ -102,7 +102,7 @@ describe("Document", () => {
       doc.append(new PDFNumeric(143));
       const pdf = await doc.toPDF();
 
-      const doc2 = await PDFDocument.fromPDF(BufferSourceConverter.toUint8Array(pdf));
+      const doc2 = await PDFDocument.fromPDF(toUint8Array(pdf));
 
       expect(doc.update.xref).toBeTruthy();
       expect(doc2.update.xref).toBeTruthy();
@@ -164,7 +164,7 @@ describe("Document", () => {
       dict.set("Indirect", indirect);
 
       const pdf = await doc.toPDF();
-      // console.log(Convert.ToBinary(pdf));
+      // console.log(binary.encode(pdf));
 
       const doc2 = await PDFDocument.fromPDF(pdf);
 
@@ -188,7 +188,7 @@ describe("Document", () => {
         .makeIndirect();
 
       const pdf = await doc.toPDF();
-      // console.log(Convert.ToBinary(pdf));
+      // console.log(binary.encode(pdf));
 
       const doc2 = await PDFDocument.fromPDF(pdf);
 

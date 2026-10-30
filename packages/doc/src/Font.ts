@@ -1,6 +1,6 @@
 import * as core from "@peculiar/pdf-core";
 import * as pdfFont from "@peculiar/pdf-font";
-import { type BufferSource, BufferSourceConverter } from "pvtsutils";
+import { isBufferSource, type BufferSource } from "@peculiar/utils";
 import { type PDFDocument } from "./Document";
 import { TextEncoding, TextEncodingEnum } from "./TextEncoding";
 import { WrapObject } from "./WrapObject";
@@ -181,7 +181,7 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
   public static addFont(doc: PDFDocument, font: pdfFont.DefaultFonts | BufferSource = FontComponent.DEFAULT_FONT): FontComponent {
     let fontObj: FontComponent;
 
-    if (!BufferSourceConverter.isBufferSource(font)) {
+    if (!isBufferSource(font)) {
       fontObj = this.addDefault(font, doc);
     } else {
       fontObj = this.addComposite(font, doc);
@@ -288,7 +288,7 @@ export class FontComponent extends WrapObject<core.FontDictionary> {
     let fontInfo: pdfFont.FontInfo;
     let fontFile: core.PDFStream | null = null;
 
-    if (BufferSourceConverter.isBufferSource(font)) {
+    if (isBufferSource(font)) {
       fontInfo = pdfFont.FontFactory.create(font);
 
       // add font stream

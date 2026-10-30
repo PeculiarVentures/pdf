@@ -1,5 +1,5 @@
 import type { X509Certificate } from "@peculiar/x509";
-import type { BufferSource } from "pvtsutils";
+import type { BufferSource } from "@peculiar/utils";
 import * as pkijs from "pkijs";
 
 import { AsnEncoded } from "./AsnEncoded";

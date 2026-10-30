@@ -1,4 +1,4 @@
-import { type BufferSource, BufferSourceConverter } from "pvtsutils";
+import { toArrayBuffer, type BufferSource } from "@peculiar/utils";
 import { Filter } from "./Filter";
 
 export class CryptFilter extends Filter {
@@ -18,10 +18,10 @@ export class CryptFilter extends Filter {
   }
 
   public decodeSync(stream: BufferSource): ArrayBuffer {
-    return BufferSourceConverter.toArrayBuffer(stream);
+    return toArrayBuffer(stream);
   }
 
   public encodeSync(stream: Uint8Array): ArrayBuffer {
-    throw BufferSourceConverter.toArrayBuffer(stream);
+    throw toArrayBuffer(stream);
   }
 }

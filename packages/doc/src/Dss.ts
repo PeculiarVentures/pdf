@@ -1,6 +1,6 @@
 import * as core from "@peculiar/pdf-core";
 import { X509Certificate } from "@peculiar/x509";
-import { type BufferSource, BufferSourceConverter } from "pvtsutils";
+import { bytes, isBufferSource, toUint8Array, type BufferSource } from "@peculiar/utils";
 
 import * as cms from "./cms";
 import type { PDFDocument } from "./Document";
@@ -94,7 +94,7 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
   public add(view: BufferSource | X509Certificate | cms.CRL | cms.OCSP, vri?: string): void {
     this.addToCatalog();
 
-    if (BufferSourceConverter.isBufferSource(view)) {
+    if (isBufferSource(view)) {
       try {
         const cert = new X509Certificate(view);
         this.pushCert(cert, vri);
@@ -123,7 +123,7 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
   public addTimeStamp(token: cms.TimeStampToken | BufferSource, signatureThumbprint: string): void {
     signatureThumbprint = signatureThumbprint.toUpperCase();
 
-    if (BufferSourceConverter.isBufferSource(token)) {
+    if (isBufferSource(token)) {
       return this.addTimeStamp(cms.TimeStampToken.fromBER(token), signatureThumbprint);
     }
 
@@ -150,7 +150,7 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
 
   private createPDFStream(view: BufferSource): core.PDFStream {
     const obj = core.PDFStream.create(this.document.target.update);
-    obj.stream = BufferSourceConverter.toUint8Array(view);
+    obj.stream = toUint8Array(view);
 
     return obj;
   }
@@ -159,7 +159,7 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
     let stream: core.PDFStream | null = null;
     const certsArray = this.target.Certs.get();
     for (const item of certsArray) {
-      if (item instanceof core.PDFStream && BufferSourceConverter.isEqual(item.decodeSync(), cert.rawData)) {
+      if (item instanceof core.PDFStream && bytes.equal(item.decodeSync(), cert.rawData)) {
         stream = item;
         break;
       }
@@ -188,7 +188,7 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
     let stream: core.PDFStream | null = null;
     const crlArray = this.target.CRLs.get();
     for (const item of crlArray) {
-      if (item instanceof core.PDFStream && BufferSourceConverter.isEqual(item.decodeSync(), crl.toBER())) {
+      if (item instanceof core.PDFStream && bytes.equal(item.decodeSync(), crl.toBER())) {
         stream = item;
         break;
       }
@@ -217,7 +217,7 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
     const ocspArray = this.target.OCSPs.get();
     const ocspResp = ocsp.toOCSPResponse();
     for (const item of ocspArray) {
-      if (item instanceof core.PDFStream && BufferSourceConverter.isEqual(item.decodeSync(), ocspResp)) {
+      if (item instanceof core.PDFStream && bytes.equal(item.decodeSync(), ocspResp)) {
         stream = item;
         break;
       }

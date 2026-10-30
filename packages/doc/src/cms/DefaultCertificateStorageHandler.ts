@@ -2,8 +2,7 @@ import { AsnConvert, OctetString } from "@peculiar/asn1-schema";
 import { CertID, id_pkix_ocsp_nonce, OCSPRequest, OCSPResponse, OCSPResponseStatus, Request, TBSRequest } from "@peculiar/asn1-ocsp";
 import { id_ce_cRLDistributionPoints, CRLDistributionPoints, id_pe_authorityInfoAccess, AuthorityInfoAccessSyntax, id_ad_ocsp, Extension } from "@peculiar/asn1-x509";
 import { SubjectKeyIdentifierExtension, X509Certificate, X509Certificates } from "@peculiar/x509";
-import { isEqualBuffer } from "pvutils";
-import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { bytes, hex, toArrayBuffer, type BufferSource } from "@peculiar/utils";
 import * as pkijs from "pkijs";
 
 export class DefaultCertificateStorageHandler implements ICertificateStorageHandler {
@@ -12,7 +11,7 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
   public static async getSKI(cert: X509Certificate): Promise<ArrayBuffer> {
     const skiExt = cert.getExtension(SubjectKeyIdentifierExtension);
     if (skiExt) {
-      return Convert.FromHex(skiExt.keyId);
+      return toArrayBuffer(hex.decode(skiExt.keyId));
     }
     // compute SHA-1 digest from certificate's public key
     const crypto = pkijs.getCrypto(true).crypto;
@@ -34,7 +33,7 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
     if (akiExt) {
       const issuerSKI = await DefaultCertificateStorageHandler.getSKI(issuer);
       if ("keyIdentifier" in akiExt.parsedValue) {
-        if (!isEqualBuffer(akiExt.parsedValue.keyIdentifier.valueBlock.valueHex, issuerSKI)) {
+        if (!bytes.equal(akiExt.parsedValue.keyIdentifier.valueBlock.valueHex, issuerSKI)) {
           return false;
         }
       } else if ("authorityCertIssuer" in akiExt.parsedValue && "authorityCertSerialNumber" in akiExt.parsedValue) {
@@ -104,19 +103,19 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
   public async matchCertificate(cert: X509Certificate, serialNumber: BufferSource, issuer?: BufferSource): Promise<boolean> {
     if (serialNumber && issuer) {
       // serial number and issuer
-      serialNumber = BufferSourceConverter.toArrayBuffer(serialNumber);
-      issuer = BufferSourceConverter.toArrayBuffer(issuer);
+      serialNumber = toArrayBuffer(serialNumber);
+      issuer = toArrayBuffer(issuer);
 
       const pkiCert = PKIUtils.x509ToCert(cert);
-      if (isEqualBuffer(pkiCert.serialNumber.valueBeforeDecodeView, serialNumber) && isEqualBuffer(pkiCert.issuer.valueBeforeDecode, issuer)) {
+      if (bytes.equal(pkiCert.serialNumber.valueBeforeDecodeView, serialNumber) && bytes.equal(pkiCert.issuer.valueBeforeDecode, issuer)) {
         return true;
       }
     } else {
       // spki
-      serialNumber = BufferSourceConverter.toArrayBuffer(serialNumber);
+      serialNumber = toArrayBuffer(serialNumber);
       const ski = await DefaultCertificateStorageHandler.getSKI(cert);
 
-      if (isEqualBuffer(ski, serialNumber)) {
+      if (bytes.equal(ski, serialNumber)) {
         return true;
       }
     }
@@ -374,7 +373,7 @@ export class DefaultCertificateStorageHandler implements ICertificateStorageHand
       headers: {
         "content-type": "application/ocsp-request",
       },
-      body: BufferSourceConverter.toArrayBuffer(ocspRequest),
+      body: toArrayBuffer(ocspRequest),
     });
     if (resp.status === 200) {
       const ocspRespRaw = await resp.arrayBuffer();

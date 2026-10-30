@@ -1,5 +1,5 @@
 import { X509Certificate, X509Certificates } from "@peculiar/x509";
-import { BufferSourceConverter, type BufferSource } from "pvtsutils";
+import { isBufferSource, toArrayBuffer, type BufferSource } from "@peculiar/utils";
 
 import * as asn1js from "asn1js";
 import * as pkijs from "pkijs";
@@ -173,7 +173,7 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
       };
 
       if (data) {
-        params.data = BufferSourceConverter.toArrayBuffer(data);
+        params.data = toArrayBuffer(data);
       } else {
         if (this.content) {
           params.data = this.signedData.encapContentInfo.eContent!.valueBlock.valueHex; // TODO constructed OCTET STRING
@@ -268,7 +268,7 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
 
   // TODO Move to CMSSignerInfo static method
   public createSigner(source: BufferSource | X509Certificate, params: CMSSignedDataCreateSignerParameters = {}): CMSSignerInfo {
-    if (BufferSourceConverter.isBufferSource(source)) {
+    if (isBufferSource(source)) {
       const cert = new X509Certificate(source);
 
       return this.createSigner(cert, params);

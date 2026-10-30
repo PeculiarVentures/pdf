@@ -1,4 +1,4 @@
-import { Convert } from "pvtsutils";
+import { binary, toArrayBuffer, utf16 } from "@peculiar/utils";
 
 export abstract class TextEncoder {
   public static readonly UTF8 = "\xEF\xBB\xBF";
@@ -11,7 +11,7 @@ export abstract class TextEncoder {
    */
   public static from(text: string): string {
     if (text.startsWith(this.UTF16)) {
-      return Convert.ToUtf16String(Convert.FromBinary(text.substring(this.UTF16.length)));
+      return utf16.decode(toArrayBuffer(binary.decode(text.substring(this.UTF16.length))));
     } else if (text.startsWith(this.UTF8)) {
       return text.substring(this.UTF8.length);
     }
@@ -37,6 +37,6 @@ export abstract class TextEncoder {
       return text;
     }
 
-    return `${this.UTF16}${Convert.ToBinary(Convert.FromUtf8String(text, "utf16be"))}`;
+    return `${this.UTF16}${binary.encode(toArrayBuffer(utf16.encode(text)))}`;
   }
 }

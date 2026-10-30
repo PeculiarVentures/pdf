@@ -1,4 +1,4 @@
-import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { binary, toArrayBuffer, toUint8Array, type BufferSource } from "@peculiar/utils";
 
 import { ParsingError } from "../errors";
 import { ViewReader } from "../ViewReader";
@@ -53,11 +53,7 @@ export abstract class PDFObject {
   public static getReader(data: BufferSource, offset?: number): ViewReader;
   public static getReader(data: BufferSource | ViewReader | string, offset?: number): ViewReader;
   public static getReader(data: BufferSource | ViewReader | string, offset = 0): ViewReader {
-    return data instanceof ViewReader
-      ? data
-      : typeof data === "string"
-        ? new ViewReader(new Uint8Array(Convert.FromBinary(data)))
-        : new ViewReader(BufferSourceConverter.toUint8Array(data).subarray(offset));
+    return data instanceof ViewReader ? data : typeof data === "string" ? new ViewReader(new Uint8Array(toArrayBuffer(binary.decode(data)))) : new ViewReader(toUint8Array(data).subarray(offset));
   }
 
   public static fromPDF<T extends PDFObject>(this: new () => T, reader: ViewReader): T;

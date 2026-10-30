@@ -1,4 +1,4 @@
-import { BufferSourceConverter } from "pvtsutils";
+import { toArrayBuffer } from "@peculiar/utils";
 
 export interface HashedAlgorithm extends Algorithm {
   hash: Algorithm;
@@ -53,7 +53,7 @@ export class AlgorithmFactory {
   }
 
   public static fromBER(raw: BufferSource): Algorithm {
-    const arrayBuffer = BufferSourceConverter.toArrayBuffer(raw);
+    const arrayBuffer = toArrayBuffer(raw);
 
     for (let i = this.converters.length; i > 0; i--) {
       const converter = this.converters[i - 1];

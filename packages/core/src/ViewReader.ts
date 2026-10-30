@@ -1,4 +1,4 @@
-import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { binary, toArrayBuffer, toUint8Array, utf8, type BufferSource } from "@peculiar/utils";
 
 export type ViewReaderFindCallback = (value: number, index: number, array: Uint8Array, reader: ViewReader) => boolean;
 
@@ -12,7 +12,7 @@ export class ViewReader {
   }
 
   constructor(view: BufferSource) {
-    this.view = BufferSourceConverter.toUint8Array(view);
+    this.view = toUint8Array(view);
   }
 
   /**
@@ -70,7 +70,7 @@ export class ViewReader {
    * @returns Returns index of the first element that satisfies the text. If not found, returns -1.
    */
   protected findIndexByString(text: string): number {
-    const buffer = Convert.FromUtf8String(text);
+    const buffer = toArrayBuffer(utf8.encode(text));
     const view = new Uint8Array(buffer);
 
     return this.findIndexByView(view);
@@ -131,7 +131,7 @@ export class ViewReader {
   public readString(size: number): string {
     const bytes = this.read(size);
 
-    return Convert.ToBinary(bytes);
+    return binary.encode(bytes);
   }
 
   public read(): Uint8Array;

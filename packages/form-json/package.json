@@ -41,7 +41,6 @@
   "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/form-json#readme",
   "dependencies": {
     "@peculiar/pdf-core": "^1.17.1",
-    "@peculiar/pdf-doc": "^1.17.2",
-    "pvtsutils": "^1.3.6"
+    "@peculiar/pdf-doc": "^1.17.2"
   }
 }

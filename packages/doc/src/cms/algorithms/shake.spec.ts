@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Convert } from "pvtsutils";
+import { hex, toArrayBuffer } from "@peculiar/utils";
 import { shakeAlgorithmConverter } from "./shake";
 
 type TestVector = {
@@ -27,8 +27,8 @@ describe("shakeAlgorithmConverter", () => {
       it(`should convert ${name} to BER`, () => {
         const ber = shakeAlgorithmConverter.toBER(webAlg)!;
         expect(ber).toBeTruthy();
-        const expectedBer = Convert.FromHex(asnAlg);
-        expect(Convert.ToHex(ber)).toBe(Convert.ToHex(expectedBer));
+        const expectedBer = toArrayBuffer(hex.decode(asnAlg));
+        expect(hex.encode(ber)).toBe(hex.encode(expectedBer));
       });
     });
 
@@ -41,14 +41,14 @@ describe("shakeAlgorithmConverter", () => {
   describe("fromBER", () => {
     testVectors.forEach(({ name, webAlg, asnAlg }) => {
       it(`should convert ${name} from BER`, () => {
-        const ber = Convert.FromHex(asnAlg);
+        const ber = toArrayBuffer(hex.decode(asnAlg));
         const algorithm = shakeAlgorithmConverter.fromBER(ber);
         expect(algorithm).toEqual(webAlg);
       });
     });
 
     it("should return null for unsupported algorithm ID", () => {
-      const invalidBer = Convert.FromHex("300B060960864801650304020F");
+      const invalidBer = toArrayBuffer(hex.decode("300B060960864801650304020F"));
       const result = shakeAlgorithmConverter.fromBER(invalidBer);
       expect(result).toBeNull();
     });

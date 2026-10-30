@@ -1,4 +1,4 @@
-import { BufferSourceConverter } from "pvtsutils";
+import { toUint8Array } from "@peculiar/utils";
 import { PDFDictionaryField, PDFName, PDFNumeric, PDFObjectReader, type PDFObjectTypes, PDFStream } from "../objects";
 import { ViewReader } from "../ViewReader";
 import { ViewWriter } from "../ViewWriter";
@@ -104,7 +104,7 @@ export class CompressedObject extends PDFStream {
       reader.readByte(); // white space
     }
 
-    this.#decodedValue = BufferSourceConverter.toUint8Array(v);
+    this.#decodedValue = toUint8Array(v);
   }
 
   public override async decode(): Promise<ArrayBuffer> {
@@ -113,7 +113,7 @@ export class CompressedObject extends PDFStream {
     }
 
     const buffer = await super.decode();
-    this.decodedValue = BufferSourceConverter.toUint8Array(buffer);
+    this.decodedValue = toUint8Array(buffer);
 
     return buffer;
   }
@@ -124,7 +124,7 @@ export class CompressedObject extends PDFStream {
     }
 
     const buffer = super.decodeSync();
-    this.decodedValue = BufferSourceConverter.toUint8Array(buffer);
+    this.decodedValue = toUint8Array(buffer);
 
     return buffer;
   }

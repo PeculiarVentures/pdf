@@ -1,4 +1,4 @@
-import { Convert } from "pvtsutils";
+import { hex } from "@peculiar/utils";
 import { PDFArray, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFName, PDFNameField, PDFNumeric, PDFStream, type Maybe, PDFMaybeField } from "../objects";
 import { CatalogDictionary } from "./dictionaries/Catalog";
 import type { CrossReference } from "./CrossReference";
@@ -228,8 +228,9 @@ export class CrossReferenceStream extends PDFStream implements CrossReference {
 
   private numberToUint8Array(number: number, size: number): Uint8Array {
     const res = new Uint8Array(size);
-    const numberArray = Convert.FromHex(number.toString(16));
-    res.set(new Uint8Array(numberArray), res.byteLength - numberArray.byteLength);
+    // Odd-length hex gets a leading zero, so the bytes are the number in big-endian order.
+    const numberArray = hex.decode(number.toString(16), { allowOddLength: true });
+    res.set(numberArray, res.byteLength - numberArray.byteLength);
 
     return res;
   }

@@ -3,7 +3,7 @@ import { AlgorithmIdentifier } from "@peculiar/asn1-x509";
 import { AsnConvert } from "@peculiar/asn1-schema";
 import * as asn1js from "asn1js";
 import * as pkijs from "pkijs";
-import { Convert } from "pvtsutils";
+import { hex, toArrayBuffer } from "@peculiar/utils";
 import { AlgorithmFactory, type AlgorithmConverter, type HashedAlgorithm } from "../AlgorithmFactory";
 
 const id_pkcs_1 = "1.2.840.113549.1.1";
@@ -15,11 +15,11 @@ const id_sha512WithRSAEncryption = `${id_pkcs_1}.13`;
 const id_rsaPSS = `${id_pkcs_1}.10`;
 const id_mgf1 = `${id_pkcs_1}.8`;
 
-const ber_rsaEncryption = Convert.FromHex("300d06092a864886f70d0101010500");
-const ber_sha1WithRSAEncryption = Convert.FromHex("300d06092a864886f70d0101050500");
-const ber_sha256WithRSAEncryption = Convert.FromHex("300d06092a864886f70d01010b0500");
-const ber_sha384WithRSAEncryption = Convert.FromHex("300d06092a864886f70d01010c0500");
-const ber_sha512WithRSAEncryption = Convert.FromHex("300d06092a864886f70d01010d0500");
+const ber_rsaEncryption = toArrayBuffer(hex.decode("300d06092a864886f70d0101010500"));
+const ber_sha1WithRSAEncryption = toArrayBuffer(hex.decode("300d06092a864886f70d0101050500"));
+const ber_sha256WithRSAEncryption = toArrayBuffer(hex.decode("300d06092a864886f70d01010b0500"));
+const ber_sha384WithRSAEncryption = toArrayBuffer(hex.decode("300d06092a864886f70d01010c0500"));
+const ber_sha512WithRSAEncryption = toArrayBuffer(hex.decode("300d06092a864886f70d01010d0500"));
 
 function getHashAlgorithmIdentifier(hashAlgorithmName: string): AlgorithmIdentifier {
   switch (hashAlgorithmName.toUpperCase()) {

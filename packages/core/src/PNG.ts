@@ -1,4 +1,4 @@
-import type { BufferSource } from "pvtsutils";
+import type { BufferSource } from "@peculiar/utils";
 import { ViewReader } from "./ViewReader";
 import { ViewWriter } from "./ViewWriter";
 

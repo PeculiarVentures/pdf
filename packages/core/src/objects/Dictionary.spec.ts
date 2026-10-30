@@ -1,5 +1,5 @@
 import { describe, it, test, expect, beforeEach } from "vitest";
-import { Convert } from "pvtsutils";
+import { binary } from "@peculiar/utils";
 import { PDFDictionary } from "./Dictionary";
 import { PDFDictionaryField, PDFNumberField } from "./decorators";
 import { PDFLiteralString } from "./LiteralString";
@@ -157,7 +157,7 @@ describe("Dictionary", () => {
         test.Point.get().Top = 2;
 
         const view = test.toPDF();
-        expect(Convert.ToBinary(view)).toBe("<<\n/Point <<\n/Left 1\n/Top 2\n>>\n>>");
+        expect(binary.encode(view)).toBe("<<\n/Point <<\n/Left 1\n/Top 2\n>>\n>>");
       });
     });
   });

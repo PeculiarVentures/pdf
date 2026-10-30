@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { PNGPredictor } from "./PNGPredictor";
-import { Convert } from "pvtsutils";
+import { hex, toArrayBuffer } from "@peculiar/utils";
 
 describe("PNGPredictor", () => {
   let predictor: PNGPredictor;
@@ -79,13 +79,13 @@ describe("PNGPredictor", () => {
       predictor.columns = 4; // From DecodeParms
       predictor.colors = 1; // XRef stream uses 1 color
       predictor.bitsPerComponent = 8;
-      const input = Convert.FromHex("02010010000200038d000200005500020001b1000200012100020001a50002000a8500020004bc000200ecca000201024e0002000000010200000001020000000102ffff12fd");
+      const input = toArrayBuffer(hex.decode("02010010000200038d000200005500020001b1000200012100020001a50002000a8500020004bc000200ecca000201024e0002000000010200000001020000000102ffff12fd"));
 
       const result = predictor.decode(new Uint8Array(input));
 
       // Convert result to hex string for comparison
-      const hex = Buffer.from(result).toString("hex");
-      expect(hex).toBe("0100100001039d000103f2000104a3000105c400010669000110ee000114aa00010074000202c2000202c2010202c2020202c2030101d400");
+      const actual = Buffer.from(result).toString("hex");
+      expect(actual).toBe("0100100001039d000103f2000104a3000105c400010669000110ee000114aa00010074000202c2000202c2010202c2020202c2030101d400");
     });
   });
 

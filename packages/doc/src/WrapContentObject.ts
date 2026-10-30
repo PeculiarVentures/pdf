@@ -1,5 +1,5 @@
 import * as core from "@peculiar/pdf-core";
-import { Convert } from "pvtsutils";
+import { hex, toArrayBuffer, utf8 } from "@peculiar/utils";
 
 import { createFormObject } from "./formObjectCreate";
 import type { Image } from "./Image";
@@ -374,11 +374,11 @@ export class Text extends WrapContentChild {
         buffer += (glyph ? glyph.index : 0).toString(16).padStart(4, "0");
       }
 
-      this.content.textShow(Convert.FromHex(buffer));
+      this.content.textShow(toArrayBuffer(hex.decode(buffer)));
     } else {
       const maxUnicode = core.PDFLiteralString.getMaxUnicode(text);
       if (maxUnicode > 0xff) {
-        this.content.textShow(Convert.FromString(text));
+        this.content.textShow(toArrayBuffer(utf8.encode(text)));
       } else {
         this.content.textShow(text);
       }

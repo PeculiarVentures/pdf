@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Crypto } from "@peculiar/webcrypto";
-import { BufferSourceConverter, Convert } from "pvtsutils";
+import { bytes, hex, toArrayBuffer } from "@peculiar/utils";
 import * as src from "./StandardEncryptionAlgorithms";
 import { PDFCryptoEngine } from "../CryptoEngine";
 
@@ -23,9 +23,9 @@ describe("StandardEncryptionAlgorithm", () => {
       {
         name: "default password",
         params: {
-          id: Convert.FromHex("8D966A6EA9AE43E68A5B5E262C0AFEB5"),
+          id: toArrayBuffer(hex.decode("8D966A6EA9AE43E68A5B5E262C0AFEB5")),
           length: 128,
-          o: Convert.FromHex("DDBC87D3B71D554BB67A4B42C2FE9212A5C2BD37CAF1127469340E8425CD2FA0"),
+          o: toArrayBuffer(hex.decode("DDBC87D3B71D554BB67A4B42C2FE9212A5C2BD37CAF1127469340E8425CD2FA0")),
           permissions: -3392,
           password: "",
           encryptMetadata: true,
@@ -37,9 +37,9 @@ describe("StandardEncryptionAlgorithm", () => {
       {
         name: "default password",
         params: {
-          id: Convert.FromHex("A204AB6AF65984019767B91004A5BE10"),
+          id: toArrayBuffer(hex.decode("A204AB6AF65984019767B91004A5BE10")),
           length: 128,
-          o: Convert.FromHex("36451BD39D753B7C1D10922C28E6665AA4F3353FB0348B536893E3B1DB5C579B"),
+          o: toArrayBuffer(hex.decode("36451BD39D753B7C1D10922C28E6665AA4F3353FB0348B536893E3B1DB5C579B")),
           permissions: -4076,
           password: "",
           encryptMetadata: false,
@@ -53,7 +53,7 @@ describe("StandardEncryptionAlgorithm", () => {
     for (const t of tests) {
       it(`${t.name}, revision: ${t.params.revision}, encryptMetadata: ${t.params.encryptMetadata}, length: ${t.params.length}`, async () => {
         const v = await src.StandardEncryptionAlgorithm.algorithm2(t.params);
-        expect(Convert.ToHex(v)).toBe(t.want.toLocaleLowerCase());
+        expect(hex.encode(v)).toBe(t.want.toLocaleLowerCase());
       });
     }
   });
@@ -70,9 +70,9 @@ describe("StandardEncryptionAlgorithm", () => {
       {
         name: "default password",
         params: {
-          id: Convert.FromHex("8D966A6EA9AE43E68A5B5E262C0AFEB5"),
+          id: toArrayBuffer(hex.decode("8D966A6EA9AE43E68A5B5E262C0AFEB5")),
           length: 128,
-          o: Convert.FromHex("DDBC87D3B71D554BB67A4B42C2FE9212A5C2BD37CAF1127469340E8425CD2FA0"),
+          o: toArrayBuffer(hex.decode("DDBC87D3B71D554BB67A4B42C2FE9212A5C2BD37CAF1127469340E8425CD2FA0")),
           permissions: -3392,
           password: "",
           encryptMetadata: true,
@@ -89,8 +89,8 @@ describe("StandardEncryptionAlgorithm", () => {
     for (const t of tests) {
       it(`${t.name}, revision: ${t.params.revision}`, async () => {
         const v = await src.StandardEncryptionAlgorithm.algorithm5(t.params);
-        const result = Convert.FromHex(t.want.result).slice(0, t.want.length);
-        expect(Convert.ToHex(v.slice(0, t.want.length))).toBe(Convert.ToHex(result));
+        const result = toArrayBuffer(hex.decode(t.want.result)).slice(0, t.want.length);
+        expect(hex.encode(v.slice(0, t.want.length))).toBe(hex.encode(result));
       });
     }
   });
@@ -147,8 +147,8 @@ describe("StandardEncryptionAlgorithm", () => {
     for (const t of tests) {
       it(t.name, async () => {
         const res = await src.StandardEncryptionAlgorithm.algorithm8(t.params);
-        expect(Convert.ToHex(res.ue)).toBe(t.want.ue);
-        expect(Convert.ToHex(res.u)).toBe(t.want.u);
+        expect(hex.encode(res.ue)).toBe(t.want.ue);
+        expect(hex.encode(res.u)).toBe(t.want.u);
       });
     }
   });
@@ -181,8 +181,8 @@ describe("StandardEncryptionAlgorithm", () => {
     for (const t of tests) {
       it(t.name, async () => {
         const res = await src.StandardEncryptionAlgorithm.algorithm9(t.params);
-        expect(Convert.ToHex(res.oe)).toBe(t.want.oe);
-        expect(Convert.ToHex(res.o)).toBe(t.want.o);
+        expect(hex.encode(res.oe)).toBe(t.want.oe);
+        expect(hex.encode(res.o)).toBe(t.want.o);
       });
     }
   });
@@ -247,7 +247,7 @@ describe("StandardEncryptionAlgorithm", () => {
     for (const t of tests) {
       it(t.name, async () => {
         const eKey = await src.StandardEncryptionAlgorithm.algorithm2A(t.params);
-        expect(Convert.ToHex(eKey)).toBe(t.want);
+        expect(hex.encode(eKey)).toBe(t.want);
       });
     }
   });
@@ -260,28 +260,28 @@ describe("StandardEncryptionAlgorithm", () => {
     }[] = [
       {
         name: "password is undefined",
-        want: Convert.FromHex("28bf4e5e4e758a4164004e56fffa01082e2e00b6d0683e802f0ca9fe6453697a"),
+        want: toArrayBuffer(hex.decode("28bf4e5e4e758a4164004e56fffa01082e2e00b6d0683e802f0ca9fe6453697a")),
       },
       {
         name: "password is shorter than 32-bytes",
         args: new Uint8Array([1, 2, 3, 4, 5]),
-        want: Convert.FromHex("010203040528bf4e5e4e758a4164004e56fffa01082e2e00b6d0683e802f0ca9"),
+        want: toArrayBuffer(hex.decode("010203040528bf4e5e4e758a4164004e56fffa01082e2e00b6d0683e802f0ca9")),
       },
       {
         name: "password is 32-bytes",
-        args: Convert.FromHex("0102030405010203040501020304050102030405010203040501020304050102"),
-        want: Convert.FromHex("0102030405010203040501020304050102030405010203040501020304050102"),
+        args: toArrayBuffer(hex.decode("0102030405010203040501020304050102030405010203040501020304050102")),
+        want: toArrayBuffer(hex.decode("0102030405010203040501020304050102030405010203040501020304050102")),
       },
       {
         name: "password is longer than 32-bytes",
-        args: Convert.FromHex("0102030405010203040501020304050102030405010203040501020304050102030405"),
-        want: Convert.FromHex("0102030405010203040501020304050102030405010203040501020304050102"),
+        args: toArrayBuffer(hex.decode("0102030405010203040501020304050102030405010203040501020304050102030405")),
+        want: toArrayBuffer(hex.decode("0102030405010203040501020304050102030405010203040501020304050102")),
       },
     ];
     for (const t of tests) {
       it(t.name, () => {
         const v = src.padPassword(t.args);
-        expect(BufferSourceConverter.isEqual(v, t.want)).toBe(true);
+        expect(bytes.equal(v, t.want)).toBe(true);
       });
     }
   });

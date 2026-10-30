@@ -1,4 +1,4 @@
-import { Convert } from "pvtsutils";
+import { utf8 } from "@peculiar/utils";
 
 import { BadCharError } from "../errors";
 import type { ViewReader } from "../ViewReader";
@@ -36,7 +36,7 @@ export class PDFName extends PDFString {
     }
 
     const textView = reader.read((v) => !PDFName.isNameChar(v));
-    this.text = Convert.ToUtf8String(textView).replace(
+    this.text = utf8.decode(textView).replace(
       /#([0-9A-F]{2})/gim,
       (
         substring,

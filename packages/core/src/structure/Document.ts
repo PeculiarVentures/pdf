@@ -1,4 +1,4 @@
-import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { binary, isBufferSource, toArrayBuffer, toUint8Array, utf8, type BufferSource } from "@peculiar/utils";
 import * as pkijs from "pkijs";
 
 import type { clientSideParametersPublicKey } from "../encryption/Constants";
@@ -23,7 +23,7 @@ export interface DocumentOptions {
   crypto?: clientSideParametersPublicKey;
 }
 
-const headerChars = new Uint8Array(Convert.FromUtf8String("%PDF-"));
+const headerChars = new Uint8Array(toArrayBuffer(utf8.encode("%PDF-")));
 
 const defaultOptions: DocumentOptions = {
   xref: 0, // XRef Stream
@@ -334,8 +334,8 @@ export class PDFDocument {
   public createString(text: string | BufferSource): objects.PDFLiteralString {
     const obj = objects.PDFLiteralString.create(this.update);
 
-    if (BufferSourceConverter.isBufferSource(text)) {
-      obj.text = Convert.ToBinary(text);
+    if (isBufferSource(text)) {
+      obj.text = binary.encode(text);
     } else {
       obj.text = text;
     }
@@ -347,7 +347,7 @@ export class PDFDocument {
     const obj = objects.PDFHexString.create(this.update);
 
     if (data) {
-      obj.text = Convert.ToBinary(data);
+      obj.text = binary.encode(data);
     }
 
     return obj;
@@ -375,7 +375,7 @@ export class PDFDocument {
     const obj = objects.PDFStream.create(this.update);
 
     if (view) {
-      obj.stream = BufferSourceConverter.toUint8Array(view);
+      obj.stream = toUint8Array(view);
     }
 
     return obj.makeIndirect();

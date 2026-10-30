@@ -45,10 +45,10 @@
     "scripts:default": "node scripts/default.ts"
   },
   "dependencies": {
+    "@peculiar/utils": "^4.1.0",
     "bytestreamjs": "^3.0.0",
     "fontjs": "^3.0.1",
-    "pako": "^2.1.0",
-    "pvtsutils": "^1.3.6"
+    "pako": "^2.1.0"
   },
   "peerDependencies": {
     "@peculiar/asn1-schema": "^3.0.0"

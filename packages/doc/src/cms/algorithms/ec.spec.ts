@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Convert } from "pvtsutils";
+import { hex, toArrayBuffer } from "@peculiar/utils";
 import { ecAlgorithmConverter } from "./ec";
 
 type TestVector = {
@@ -47,8 +47,8 @@ describe("ecAlgorithmConverter", () => {
       it(`should convert ${name} to BER`, () => {
         const ber = ecAlgorithmConverter.toBER(webAlg)!;
         expect(ber).toBeTruthy();
-        const expectedBer = Convert.FromHex(asnAlg);
-        expect(Convert.ToHex(ber)).toBe(Convert.ToHex(expectedBer));
+        const expectedBer = toArrayBuffer(hex.decode(asnAlg));
+        expect(hex.encode(ber)).toBe(hex.encode(expectedBer));
       });
     });
 
@@ -74,14 +74,14 @@ describe("ecAlgorithmConverter", () => {
   describe("fromBER", () => {
     testVectors.forEach(({ name, webAlg, asnAlg }) => {
       it(`should convert ${name} from BER`, () => {
-        const ber = Convert.FromHex(asnAlg);
+        const ber = toArrayBuffer(hex.decode(asnAlg));
         const algorithm = ecAlgorithmConverter.fromBER(ber);
         expect(algorithm).toEqual(webAlg);
       });
     });
 
     it("should return null for unsupported algorithm ID", () => {
-      const invalidBer = Convert.FromHex("300b06072a8648ce3d040f0500");
+      const invalidBer = toArrayBuffer(hex.decode("300b06072a8648ce3d040f0500"));
       const result = ecAlgorithmConverter.fromBER(invalidBer);
       expect(result).toBeNull();
     });

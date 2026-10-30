@@ -1,6 +1,6 @@
 import { Filter } from "./Filter";
 import * as pako from "pako";
-import { BufferSourceConverter } from "pvtsutils";
+import { toArrayBuffer } from "@peculiar/utils";
 import { PDFNumeric } from "../objects/Numeric";
 import { TIFFPredictor } from "./TIFFPredictor";
 import { PNGPredictor } from "./PNGPredictor";
@@ -65,7 +65,7 @@ export class FlateFilter extends Filter {
     }
 
     if (!result) {
-      return BufferSourceConverter.toArrayBuffer(stream);
+      return toArrayBuffer(stream);
     }
 
     if (predictor > 1) {

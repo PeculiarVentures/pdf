@@ -1,4 +1,4 @@
-import { Convert } from "pvtsutils";
+import { binary, hex, toArrayBuffer } from "@peculiar/utils";
 import { BadCharError } from "../errors";
 import { CharSet } from "../CharSet";
 import type { ViewReader } from "../ViewReader";
@@ -12,7 +12,7 @@ export class PDFHexString extends PDFTextString {
 
   protected onWritePDF(writer: ViewWriter): void {
     const encText = TextEncoder.to(this.text);
-    writer.writeString(`<${Convert.ToHex(Convert.FromBinary(encText))}>`);
+    writer.writeString(`<${hex.encode(toArrayBuffer(binary.decode(encText)))}>`);
   }
 
   protected onFromPDF(reader: ViewReader): void {
@@ -40,20 +40,20 @@ export class PDFHexString extends PDFTextString {
     });
 
     // Set values
-    const hexString = Convert.ToBinary(new Uint8Array(hexStrings));
+    const hexString = binary.encode(new Uint8Array(hexStrings));
     // If odd length, append '0'
     const hexText = hexString + (hexString.length % 2 ? "0" : "");
-    const hexView = Convert.FromHex(hexText);
-    this.text = TextEncoder.from(Convert.ToBinary(hexView));
+    const hexView = toArrayBuffer(hex.decode(hexText));
+    this.text = TextEncoder.from(binary.encode(hexView));
 
     reader.readByte(); // >
   }
 
   public get data(): Uint8Array {
-    return new Uint8Array(Convert.FromBinary(this.text));
+    return new Uint8Array(toArrayBuffer(binary.decode(this.text)));
   }
 
   public override toString(): string {
-    return `<${Convert.ToHex(this.toUint8Array())}>`;
+    return `<${hex.encode(this.toUint8Array())}>`;
   }
 }

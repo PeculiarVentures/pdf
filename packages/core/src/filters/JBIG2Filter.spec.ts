@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { Convert } from "pvtsutils";
+import { hex } from "@peculiar/utils";
 import { JBIG2Filter } from "./JBIG2Filter";
 
 describe("JBIG2Filter", () => {
@@ -25,24 +25,24 @@ describe("JBIG2Filter", () => {
   describe("decode methods", () => {
     it("should decode data asynchronously", async () => {
       const result = await filter.decode(testData);
-      expect(Convert.ToHex(result)).toBe("0102030405");
+      expect(hex.encode(result)).toBe("0102030405");
     });
 
     it("should decode data synchronously", () => {
       const result = filter.decodeSync(testData);
-      expect(Convert.ToHex(result)).toBe("0102030405");
+      expect(hex.encode(result)).toBe("0102030405");
     });
   });
 
   describe("encode methods", () => {
     it("should encode data asynchronously", async () => {
       const result = await filter.encode(testData);
-      expect(Convert.ToHex(result)).toBe("0102030405");
+      expect(hex.encode(result)).toBe("0102030405");
     });
 
     it("should encode data synchronously", () => {
       const result = filter.encodeSync(testData);
-      expect(Convert.ToHex(result)).toBe("0102030405");
+      expect(hex.encode(result)).toBe("0102030405");
     });
   });
 
@@ -52,7 +52,7 @@ describe("JBIG2Filter", () => {
 
     for (const result of [filter.decodeSync(view), filter.encodeSync(view), await filter.decode(view), await filter.encode(view)]) {
       expect(result).toBeInstanceOf(ArrayBuffer);
-      expect(Convert.ToHex(result)).toBe("0102030405");
+      expect(hex.encode(result)).toBe("0102030405");
     }
   });
 });

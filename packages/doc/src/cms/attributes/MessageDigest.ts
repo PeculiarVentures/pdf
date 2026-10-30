@@ -1,6 +1,6 @@
 import { AsnConvert, OctetString } from "@peculiar/asn1-schema";
 import * as asn1js from "asn1js";
-import { BufferSourceConverter, type BufferSource } from "pvtsutils";
+import { toArrayBuffer, type BufferSource } from "@peculiar/utils";
 
 import { CmsAttribute } from "./Attribute";
 import { CmsAttributeFactory } from "./AttributeFactory";
@@ -25,7 +25,7 @@ export class MessageDigestAttribute extends CmsAttribute {
     this.asn.type = MessageDigestAttribute.DEFAULT_IDENTIFIER;
     this.asn.values.push(
       new asn1js.OctetString({
-        valueHex: BufferSourceConverter.toArrayBuffer(digest),
+        valueHex: toArrayBuffer(digest),
       }),
     );
   }

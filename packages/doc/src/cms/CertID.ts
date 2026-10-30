@@ -1,5 +1,5 @@
 import type { X509Certificate } from "@peculiar/x509";
-import { Convert } from "pvtsutils";
+import { hex } from "@peculiar/utils";
 import * as pkijs from "pkijs";
 
 import { AsnEncoded } from "./AsnEncoded";
@@ -80,7 +80,7 @@ export class CertificateID extends AsnEncoded<pkijs.CertID> {
    * Gets the certificate serial number as a hexadecimal string
    */
   public get serialNumber(): string {
-    return Convert.ToHex(this.asn.serialNumber.valueBlock.valueHex);
+    return hex.encode(this.asn.serialNumber.valueBlock.valueHex);
   }
 
   /**

@@ -4,7 +4,7 @@ import * as asnSchema from "@peculiar/asn1-schema";
 import type * as x509 from "@peculiar/x509";
 import * as asn1js from "asn1js";
 import * as pkijs from "pkijs";
-import { type BufferSource, BufferSourceConverter } from "pvtsutils";
+import { isBufferSource, type BufferSource } from "@peculiar/utils";
 import type { ICertificateStorage, ICertificateStorageHandler } from "./ICertificateStorageHandler";
 import { AsnEncoded } from "./AsnEncoded";
 
@@ -104,7 +104,7 @@ export class OCSP extends AsnEncoded<pkijs.BasicOCSPResponse> implements ICertif
   }
 
   public static fromOCSPResponse(data: BufferSource | pkijs.OCSPResponse): OCSP {
-    const ocspResp: pkijs.OCSPResponse = BufferSourceConverter.isBufferSource(data) ? pkijs.OCSPResponse.fromBER(data) : data;
+    const ocspResp: pkijs.OCSPResponse = isBufferSource(data) ? pkijs.OCSPResponse.fromBER(data) : data;
 
     if (ocspResp.responseBytes && ocspResp.responseBytes.responseType === "1.3.6.1.5.5.7.48.1.1") {
       const asnBasicResp = asn1js.fromBER(ocspResp.responseBytes.response.valueBlock.valueHex);
