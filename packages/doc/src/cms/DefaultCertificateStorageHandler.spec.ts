@@ -177,6 +177,10 @@ describe("DefaultCertificateStorageHandler", () => {
             };
             const issuerKeys = await crypto.subtle.generateKey(algorithm, false, ["sign", "verify"]);
             issuer = await x509.X509CertificateGenerator.createSelfSigned({
+              // A fixed serial below 0x80: AuthorityKeyIdentifierExtension.create writes the serial
+              // without the leading zero byte DER needs when the high bit is set, so a random
+              // serial made this test fail about half of the time.
+              serialNumber: "01",
               name: "CN=Issuer",
               keys: issuerKeys,
               signingAlgorithm: algorithm,
