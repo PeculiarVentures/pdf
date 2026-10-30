@@ -1,4 +1,4 @@
-import { utf8 } from "@peculiar/utils";
+import { binary } from "@peculiar/utils";
 import { BadCharError } from "../errors";
 import { CharSet } from "../CharSet";
 import type { ViewReader } from "../ViewReader";
@@ -18,8 +18,9 @@ export class PDFComment extends PDFString {
       throw new BadCharError(reader.position - 1);
     }
 
+    // Comments are bytes, written back one byte per character (see ViewWriter.writeString).
     const textView = reader.read((c) => c === 0x0d || c === 0x0a);
-    this.text = utf8.decode(textView).trim();
+    this.text = binary.encode(textView).trim();
   }
 
   public override toString(): string {
