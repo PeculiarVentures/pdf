@@ -31,7 +31,7 @@
   },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
-    "scripts:default": "ts-node scripts/default"
+    "scripts:default": "node scripts/default.ts"
   },
   "bugs": {
     "url": "https://github.com/PeculiarVentures/pdf/issues"

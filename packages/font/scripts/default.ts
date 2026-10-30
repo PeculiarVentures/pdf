@@ -1,10 +1,9 @@
 import { AsnConvert } from "@peculiar/asn1-schema";
-import * as fs from "fs";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import { FontFactory, type FontInfo } from "@peculiar/pdf-font";
 import * as pako from "pako";
-import * as path from "path";
 import { Convert } from "pvtsutils";
-import { FontFactory } from "../src/FontFactory";
-import { FontInfo } from "../src/FontInfo";
 
 const pdfFontNames: { [key: string]: string } = {
   Courier: "Courier",
@@ -24,8 +23,8 @@ const pdfFontNames: { [key: string]: string } = {
 };
 
 function main() {
-  const filesDir = path.join(__dirname, "..", "fonts");
-  const srcDir = path.join(__dirname, "..", "src");
+  const filesDir = path.join(import.meta.dirname, "..", "fonts");
+  const srcDir = path.join(import.meta.dirname, "..", "src");
   const filesDirInfo = fs.readdirSync(filesDir);
   const map = new Map<string, FontInfo>();
   for (const item of filesDirInfo) {

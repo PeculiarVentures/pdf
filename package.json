@@ -34,17 +34,15 @@
     "@peculiar/x509": "^1.12.3",
     "@types/node": "^24.0.0",
     "@types/pako": "^2.0.0",
-    "@types/pvutils": "^1.0.0",
     "@vitest/coverage-v8": "^5.0.3",
     "canvas": "^3.2.3",
     "lerna": "^10.0.1",
     "oxfmt": "^0.72.0",
     "oxlint": "^1.87.0",
     "pdfjs-dist": "^3",
-    "ts-node": "^10.9.1",
     "tsdown": "^0.23.0",
     "typescript": "^5.7.2",
-    "vite-tsconfig-paths": "^6.1.1",
+    "vite": "^8.3.5",
     "vitest": "^5.0.3"
   },
   "overrides": {
