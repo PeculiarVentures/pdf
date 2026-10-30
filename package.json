@@ -1,5 +1,6 @@
 {
   "name": "pdf",
+  "version": "1.17.2",
   "private": true,
   "description": "",
   "workspaces": [
@@ -36,7 +37,6 @@
     "@types/pako": "^2.0.0",
     "@vitest/coverage-v8": "^5.0.3",
     "canvas": "^3.2.3",
-    "lerna": "^10.0.1",
     "oxfmt": "^0.72.0",
     "oxlint": "^1.87.0",
     "pdfjs-dist": "^3",
