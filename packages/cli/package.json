@@ -34,7 +34,7 @@
   "bugs": {
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
-  "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/pdf-cli#readme",
+  "homepage": "https://github.com/PeculiarVentures/pdf/tree/main/packages/cli#readme",
   "dependencies": {
     "@peculiar/asn1-schema": "^3.0.0",
     "@peculiar/pdf-core": "^1.17.1",

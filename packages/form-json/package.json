@@ -38,7 +38,7 @@
   "bugs": {
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
-  "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/form-json#readme",
+  "homepage": "https://github.com/PeculiarVentures/pdf/tree/main/packages/form-json#readme",
   "dependencies": {
     "@peculiar/pdf-core": "^1.17.1",
     "@peculiar/pdf-doc": "^1.17.2"
