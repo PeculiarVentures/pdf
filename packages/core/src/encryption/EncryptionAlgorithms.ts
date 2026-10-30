@@ -57,7 +57,7 @@ export abstract class EncryptionAlgorithms {
     const view = BufferSourceConverter.toUint8Array(data);
 
     if (key.type === CryptoFilterMethods.None) {
-      return view;
+      return view.slice().buffer;
     }
 
     let cipherData: Uint8Array;

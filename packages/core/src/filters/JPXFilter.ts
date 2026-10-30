@@ -17,10 +17,10 @@ export class JPXFilter extends Filter {
   }
 
   public decodeSync(stream: Uint8Array): ArrayBuffer {
-    return stream.buffer;
+    return stream.slice().buffer;
   }
 
   public encodeSync(stream: Uint8Array): ArrayBuffer {
-    return stream.buffer;
+    return stream.slice().buffer;
   }
 }

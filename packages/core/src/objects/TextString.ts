@@ -24,7 +24,7 @@ export abstract class PDFTextString extends PDFString implements EncryptionObjec
 
     const textView = this.toUint8Array();
     if (!parent || !this.documentUpdate?.document.encryptHandler) {
-      return textView;
+      return textView.slice().buffer;
     }
 
     return this.documentUpdate.document.encryptHandler.decrypt(textView, this);

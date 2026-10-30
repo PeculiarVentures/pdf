@@ -124,7 +124,7 @@ export function padPassword(password: Password = new Uint8Array(0)): ArrayBuffer
 
   const passwordView = passwordToView(password).subarray(0, 32);
   if (passwordView.length === 32) {
-    return passwordView;
+    return passwordView.slice().buffer;
   }
 
   const result = new Uint8Array(32);
@@ -135,7 +135,7 @@ export function padPassword(password: Password = new Uint8Array(0)): ArrayBuffer
     result.set(passwordPadding.subarray(0, 32 - passwordView.length), passwordView.length);
   }
 
-  return result;
+  return result.buffer;
 }
 
 interface CycleParams extends StandardAlgorithmParams {
@@ -284,10 +284,10 @@ export class StandardEncryptionAlgorithm {
     //    the value of the encryption dictionary’s Length entry.
     const hashView = new Uint8Array(hash);
     if (params.revision >= 3) {
-      return hashView.slice(0, params.length >> 3);
+      return hashView.slice(0, params.length >> 3).buffer;
     }
 
-    return hashView.slice(0, 5);
+    return hashView.slice(0, 5).buffer;
   }
 
   /**
@@ -580,7 +580,7 @@ export class StandardEncryptionAlgorithm {
     const res = new Uint8Array(32);
     res.set(new Uint8Array(checkData));
 
-    return res;
+    return res.buffer;
   }
 
   /**

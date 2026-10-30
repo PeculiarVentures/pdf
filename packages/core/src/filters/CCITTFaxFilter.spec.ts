@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
+import { Convert } from "pvtsutils";
 import { CCITTFaxFilter } from "./CCITTFaxFilter";
 
 describe("CCITTFaxFilter", () => {
@@ -47,5 +48,15 @@ describe("CCITTFaxFilter", () => {
       const result = filter.encodeSync(testData);
       expect(new Uint8Array(result)).toEqual(testData);
     });
+  });
+
+  it("should return an ArrayBuffer with only the bytes of a subarray", async () => {
+    const file = new Uint8Array([0xff, 1, 2, 3, 4, 5, 0xff]);
+    const view = file.subarray(1, 6);
+
+    for (const result of [filter.decodeSync(view), filter.encodeSync(view), await filter.decode(view), await filter.encode(view)]) {
+      expect(result).toBeInstanceOf(ArrayBuffer);
+      expect(Convert.ToHex(result)).toBe("0102030405");
+    }
   });
 });

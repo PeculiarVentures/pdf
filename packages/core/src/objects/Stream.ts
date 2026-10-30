@@ -245,12 +245,12 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
     if (filters.find((f) => f.name === "Crypt")) {
       this.encrypted = true;
 
-      return this.stream;
+      return this.stream.slice().buffer;
     }
 
     this.encrypted = true;
 
-    return this.stream;
+    return this.stream.slice().buffer;
   }
 
   public decodeSync(): ArrayBuffer {
@@ -267,7 +267,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
 
     this.encrypted = false;
 
-    return this.stream.slice();
+    return this.stream.slice().buffer;
   }
 
   public async encode(): Promise<ArrayBuffer> {
@@ -287,7 +287,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
     if (filters.find((f) => f.name === "Crypt")) {
       this.encrypted = true;
 
-      return this.stream;
+      return this.stream.slice().buffer;
     }
 
     if (!this.encrypted) {
@@ -301,7 +301,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
     }
     this.encrypted = true;
 
-    return this.stream;
+    return this.stream.slice().buffer;
   }
 
   public async decode(): Promise<ArrayBuffer> {
@@ -340,7 +340,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
 
     this.encrypted = false;
 
-    return this.stream.slice();
+    return this.stream.slice().buffer;
   }
 
   public async encryptAsync(): Promise<ArrayBuffer> {
