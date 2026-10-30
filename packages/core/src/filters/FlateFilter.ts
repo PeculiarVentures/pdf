@@ -21,6 +21,11 @@ export class FlateFilter extends Filter {
   public static readonly FIELD_COLORS = "Colors";
   public static readonly FIELD_BITS_PER_COMPONENT = "BitsPerComponent";
 
+  /**
+   * pako's message for zlib's Z_BUF_ERROR: the input ended before the stream did.
+   */
+  private static readonly BUFFER_ERROR = "buffer error";
+
   public static readonly NAME = "FlateDecode";
   public name = FlateFilter.NAME;
 
@@ -57,6 +62,11 @@ export class FlateFilter extends Filter {
     try {
       result = pako.ungzip(stream);
     } catch (e) {
+      // pako 2.1 returned nothing for empty or incomplete input and the stream was kept as is;
+      // pako 2.2 throws "buffer error" (as a string; pako 3 as an Error) in that case.
+      if (e === FlateFilter.BUFFER_ERROR || (e instanceof Error && e.message === FlateFilter.BUFFER_ERROR)) {
+        return toArrayBuffer(stream.slice());
+      }
       if (e instanceof Error) {
         throw e;
       }
