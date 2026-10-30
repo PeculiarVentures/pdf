@@ -48,8 +48,8 @@
   "dependencies": {
     "@peculiar/utils": "^4.1.0",
     "@types/events": "^3.0.0",
-    "events": "3.3.0",
-    "pako": "^2.1.0"
+    "events": "^3.3.0",
+    "pako": "^2.2.0"
   },
   "peerDependencies": {
     "@peculiar/x509": "^3.1.0",
