@@ -1,5 +1,5 @@
 import * as objects from "../../objects";
-import { PDFDocument } from "../Document";
+import type { PDFDocument } from "../Document";
 import { PDFDocumentObject } from "../DocumentObject";
 import type { PDFDocumentUpdate } from "../DocumentUpdate";
 import { PageDictionary } from "./Page";

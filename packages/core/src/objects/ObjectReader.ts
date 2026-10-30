@@ -5,7 +5,7 @@ import type { PDFObject, PDFObjectConstructor } from "./Object";
 import { ParsingError, UnregisteredObjectTypeError } from "../errors";
 import { CharSet } from "../CharSet";
 import { isDigit, ObjectTypeEnum } from "./internal";
-import { PDFObjectTypes } from "./ObjectTypes";
+import type { PDFObjectTypes } from "./ObjectTypes";
 
 import type { PDFArray } from "./Array";
 import type { PDFBoolean } from "./Boolean";

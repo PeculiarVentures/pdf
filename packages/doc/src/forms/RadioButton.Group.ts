@@ -1,5 +1,5 @@
 import * as core from "@peculiar/pdf-core";
-import { RadioButton } from "./RadioButton";
+import type { RadioButton } from "./RadioButton";
 import { FormComponentGroup } from "./FormComponent.Group";
 
 export class RadioButtonGroup extends FormComponentGroup<core.ButtonDictionary, RadioButton> {

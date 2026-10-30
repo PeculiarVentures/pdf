@@ -1,7 +1,7 @@
-import * as pkijs from "pkijs";
-import { BufferSource } from "pvtsutils";
-import { PDFStream, PDFTextString } from "../objects";
-import { type PDFDocument, EncryptDictionary } from "../structure";
+import type * as pkijs from "pkijs";
+import type { BufferSource } from "pvtsutils";
+import type { PDFStream, PDFTextString } from "../objects";
+import type { PDFDocument, EncryptDictionary } from "../structure";
 
 export interface EncryptionHandlerCreateParams {
   document: PDFDocument;

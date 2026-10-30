@@ -1,4 +1,4 @@
-import { PDFArray, PDFNumberField, PDFArrayField } from "../../objects";
+import { type PDFArray, PDFNumberField, PDFArrayField } from "../../objects";
 import { EncryptDictionary } from "./Encrypt";
 
 export enum PublicKeyPermissionFlags {

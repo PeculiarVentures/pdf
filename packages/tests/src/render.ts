@@ -1,4 +1,4 @@
-import { createCanvas, Canvas } from "canvas";
+import { createCanvas, type Canvas } from "canvas";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as pdfjs from "pdfjs-dist";

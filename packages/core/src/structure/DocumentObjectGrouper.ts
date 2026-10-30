@@ -1,4 +1,4 @@
-import { PDFDocumentObject } from "./DocumentObject";
+import type { PDFDocumentObject } from "./DocumentObject";
 
 function sortById(a: PDFDocumentObject, b: PDFDocumentObject): number {
   if (a.id > b.id) {

@@ -1,13 +1,13 @@
-import { type CheckBox } from "./CheckBox";
-import { type ComboBox } from "./ComboBox";
-import { type FormComponent } from "./FormComponent";
-import { type FormComponentGroup } from "./FormComponent.Group";
-import { type InputImageBox } from "./InputImageBox";
-import { type RadioButton } from "./RadioButton";
-import { type RadioButtonGroup } from "./RadioButton.Group";
-import { type SignatureBox } from "./SignatureBox";
-import { type SignatureBoxGroup } from "./SignatureBox.Group";
-import { type TextEditor } from "./TextEditor";
+import type { CheckBox } from "./CheckBox";
+import type { ComboBox } from "./ComboBox";
+import type { FormComponent } from "./FormComponent";
+import type { FormComponentGroup } from "./FormComponent.Group";
+import type { InputImageBox } from "./InputImageBox";
+import type { RadioButton } from "./RadioButton";
+import type { RadioButtonGroup } from "./RadioButton.Group";
+import type { SignatureBox } from "./SignatureBox";
+import type { SignatureBoxGroup } from "./SignatureBox.Group";
+import type { TextEditor } from "./TextEditor";
 
 export enum FormComponentType {
   form = "form",

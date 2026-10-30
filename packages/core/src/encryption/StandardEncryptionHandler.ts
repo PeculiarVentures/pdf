@@ -1,11 +1,11 @@
-import { BufferSource, BufferSourceConverter } from "pvtsutils";
+import { type BufferSource, BufferSourceConverter } from "pvtsutils";
 import * as pkijs from "pkijs";
 
-import { CryptoFilterMethods, CryptoFilterDictionary, EncryptDictionary, StandardEncryptDictionary, TrailerDictionary, UserAccessPermissionFlags } from "../structure/dictionaries";
-import { PDFTextString, PDFStream, PDFHexString, PDFArray } from "../objects";
-import { EncryptionHandler, EncryptionHandlerCreateParams } from "./EncryptionHandler";
-import { EncryptionAlgorithms, EncryptionKey, EncryptionKeys } from "./EncryptionAlgorithms";
-import { Password, StandardEncryptionAlgorithm } from "./StandardEncryptionAlgorithms";
+import { CryptoFilterMethods, CryptoFilterDictionary, EncryptDictionary, StandardEncryptDictionary, type TrailerDictionary, type UserAccessPermissionFlags } from "../structure/dictionaries";
+import { type PDFTextString, PDFStream, PDFHexString, PDFArray } from "../objects";
+import { EncryptionHandler, type EncryptionHandlerCreateParams } from "./EncryptionHandler";
+import { EncryptionAlgorithms, type EncryptionKey, type EncryptionKeys } from "./EncryptionAlgorithms";
+import { type Password, StandardEncryptionAlgorithm } from "./StandardEncryptionAlgorithms";
 
 export interface StandardEncryptionHandlerCreateCommonParams {
   permission?: UserAccessPermissionFlags;

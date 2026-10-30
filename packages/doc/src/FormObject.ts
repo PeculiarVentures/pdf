@@ -1,5 +1,5 @@
 import * as core from "@peculiar/pdf-core";
-import { type PDFDocument } from "./Document";
+import type { PDFDocument } from "./Document";
 import { createFormObject, registerFormObjectClass } from "./formObjectCreate";
 import { ResourceManager } from "./ResourceManager";
 import { WrapContentObject } from "./WrapContentObject";

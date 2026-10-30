@@ -1,7 +1,7 @@
 import type { PDFDictionary } from "../Dictionary";
 import type { PDFObject, PDFObjectConstructor } from "../Object";
 import { PDFNull } from "../Null";
-import { PDFObjectTypes } from "../ObjectTypes";
+import type { PDFObjectTypes } from "../ObjectTypes";
 
 export class Maybe<T extends PDFObject> {
   public static readonly DEFAULT_VIEW = new Uint8Array(0);

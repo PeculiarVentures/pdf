@@ -1,4 +1,4 @@
-import { X509Certificate, X509Certificates } from "@peculiar/x509";
+import { type X509Certificate, X509Certificates } from "@peculiar/x509";
 import { DefaultCertificateStorageHandler } from "./DefaultCertificateStorageHandler";
 import type { OCSP } from "./OCSP";
 

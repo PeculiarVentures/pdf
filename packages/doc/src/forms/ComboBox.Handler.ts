@@ -1,9 +1,9 @@
 import * as core from "@peculiar/pdf-core";
-import { IFormComponentCreateParameters } from "./FormComponent.Handler";
-import { PDFDocument } from "../Document";
-import { FontComponent } from "../Font";
-import { FormObject } from "../FormObject";
-import { ComboBox } from "./ComboBox";
+import type { IFormComponentCreateParameters } from "./FormComponent.Handler";
+import type { PDFDocument } from "../Document";
+import type { FontComponent } from "../Font";
+import type { FormObject } from "../FormObject";
+import type { ComboBox } from "./ComboBox";
 export interface ComboBoxCreateParameters extends IFormComponentCreateParameters {
   options?: Record<string, string> | string[];
   selected?: string | string[];

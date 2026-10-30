@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { PDFDocument } from "@peculiar/pdf-doc";
+import type { PDFDocument } from "@peculiar/pdf-doc";
 import { createPdfWithPage, PdfRenderingHelper } from "@peculiar/pdf-tests";
 import { DefaultFonts } from "@peculiar/pdf-font";
 import { globalFormConverter } from "./registry";

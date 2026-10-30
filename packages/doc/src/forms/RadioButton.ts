@@ -1,8 +1,8 @@
-import * as core from "@peculiar/pdf-core";
-import { IRadioButtonHandler } from "./RadioButton.Handler";
+import type * as core from "@peculiar/pdf-core";
+import type { IRadioButtonHandler } from "./RadioButton.Handler";
 import { CheckBox } from "./CheckBox";
 import { RadioButtonGroup } from "./RadioButton.Group";
-import { IFormGroupedComponent } from "./FormComponent.Group";
+import type { IFormGroupedComponent } from "./FormComponent.Group";
 
 export class RadioButton extends CheckBox implements IFormGroupedComponent {
   public override get checked(): boolean {

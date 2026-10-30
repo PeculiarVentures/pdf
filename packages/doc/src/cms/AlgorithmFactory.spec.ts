@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { AlgorithmFactory, AlgorithmConverter } from "./AlgorithmFactory";
+import { AlgorithmFactory, type AlgorithmConverter } from "./AlgorithmFactory";
 
 describe("AlgorithmFactory", () => {
   const mockConverter: AlgorithmConverter = {

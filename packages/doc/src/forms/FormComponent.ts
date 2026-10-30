@@ -1,8 +1,8 @@
 import * as core from "@peculiar/pdf-core";
-import { type PDFDocument } from "../Document";
+import type { PDFDocument } from "../Document";
 import { WrapObject } from "../WrapObject";
 import { annotFlag, fieldFlag } from "./decorators";
-import { IComponent } from "./IComponent";
+import type { IComponent } from "./IComponent";
 
 export class FormComponent extends WrapObject<core.WidgetDictionary> implements IComponent {
   public static readonly COLOR_OPERATORS = ["g", "rg", "k"];

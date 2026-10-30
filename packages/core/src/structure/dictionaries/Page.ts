@@ -1,5 +1,5 @@
 import * as objects from "../../objects";
-import { TypographyConverter, TypographySize } from "../../TypographyConverter";
+import { TypographyConverter, type TypographySize } from "../../TypographyConverter";
 import { UUID } from "../../UUID";
 import { PDFRectangle } from "../common";
 import { ResourceDictionary } from "./ResourceDictionary";

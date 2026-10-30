@@ -1,5 +1,5 @@
 import * as pdfDoc from "@peculiar/pdf-doc";
-import { JsonComboBoxUpdate } from "../types";
+import type { JsonComboBoxUpdate } from "../types";
 import { WidgetConverter } from "./WidgetConverter";
 
 /**

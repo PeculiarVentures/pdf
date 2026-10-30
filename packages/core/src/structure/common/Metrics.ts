@@ -1,6 +1,6 @@
 import { PDFNumeric } from "../../objects/Numeric";
 import { PDFArray } from "../../objects/Array";
-import { TypographyConverter, TypographySize } from "../../TypographyConverter";
+import { TypographyConverter, type TypographySize } from "../../TypographyConverter";
 
 /** Array of 6 numbers representing a transformation matrix [a,b,c,d,e,f] */
 export type MetricsNumberArray = [number, number, number, number, number, number];

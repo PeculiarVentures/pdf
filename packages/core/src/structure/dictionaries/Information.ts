@@ -1,5 +1,5 @@
 import { PDFDateField, PDFDictionary, PDFLiteralStringField, PDFNameField } from "../../objects";
-import { PDFDate } from "../common/Date";
+import type { PDFDate } from "../common/Date";
 
 export class InformationDictionary extends PDFDictionary {
   @PDFLiteralStringField("Title", true)

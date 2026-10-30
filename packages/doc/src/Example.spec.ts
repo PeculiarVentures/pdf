@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import * as core from "@peculiar/pdf-core";
+import type * as core from "@peculiar/pdf-core";
 import { DefaultFonts } from "@peculiar/pdf-font";
-import { PDFDocument, PDFDocumentCreateParameters } from "./Document";
+import { PDFDocument, type PDFDocumentCreateParameters } from "./Document";
 import { PDFVersion } from "./Version";
 import { PdfRenderingHelper } from "@peculiar/pdf-tests";
 import { TextAlignment } from "./Font";

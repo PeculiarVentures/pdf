@@ -1,6 +1,6 @@
-import { ICryptoEngine } from "pkijs";
+import type { ICryptoEngine } from "pkijs";
 import { BufferSourceConverter } from "pvtsutils";
-import { PDFStream, PDFTextString } from "../objects";
+import type { PDFStream, PDFTextString } from "../objects";
 import { CryptoFilterMethods } from "../structure/dictionaries";
 import { staticData } from "./Constants";
 

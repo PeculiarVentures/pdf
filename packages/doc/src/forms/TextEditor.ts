@@ -1,7 +1,7 @@
 import * as core from "@peculiar/pdf-core";
-import { TextEditorDrawParameters } from "./TextEditor.Handler";
+import type { TextEditorDrawParameters } from "./TextEditor.Handler";
 import { FormObject } from "../FormObject";
-import { Resource, ResourceManager } from "../ResourceManager";
+import { type Resource, ResourceManager } from "../ResourceManager";
 import { FontComponent } from "../Font";
 import { fieldFlag } from "./decorators";
 import { FormComponent } from "./FormComponent";

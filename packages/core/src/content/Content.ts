@@ -1,12 +1,12 @@
 import { EventEmitter } from "events";
-import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 
 import { ViewReader } from "../ViewReader";
 import * as objects from "../objects";
-import { TypographyConverter, TypographySize } from "../TypographyConverter";
-import { Metrics, Transformations } from "../structure/common/Metrics";
+import { TypographyConverter, type TypographySize } from "../TypographyConverter";
+import { Metrics, type Transformations } from "../structure/common/Metrics";
 import { PDFOperator } from "./Operator";
-import { Colors } from "./Color";
+import type { Colors } from "./Color";
 
 export type PDFContentCreateParams = [string, ...objects.PDFObjectTypes[]];
 

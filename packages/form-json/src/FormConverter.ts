@@ -1,6 +1,6 @@
-import * as pdfDoc from "@peculiar/pdf-doc";
-import { IComponentConstructor, JsonComponent, JsonForm, JsonUpdateMixed } from "./types";
-import { ComponentConverterFactory } from "./converters";
+import type * as pdfDoc from "@peculiar/pdf-doc";
+import type { IComponentConstructor, JsonComponent, JsonForm, JsonUpdateMixed } from "./types";
+import type { ComponentConverterFactory } from "./converters";
 
 /**
  * A utility class for exporting and updating PDF form components.

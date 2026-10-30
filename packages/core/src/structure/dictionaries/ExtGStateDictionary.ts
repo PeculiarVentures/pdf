@@ -1,4 +1,4 @@
-import { LineCapStyle, LineJoinStyle } from "../../content";
+import type { LineCapStyle, LineJoinStyle } from "../../content";
 import * as objects from "../../objects";
 
 export class ExtGStateDictionary extends objects.PDFDictionary {

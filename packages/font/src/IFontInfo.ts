@@ -1,4 +1,4 @@
-import { IFontGlyph } from "./IFontGlyph";
+import type { IFontGlyph } from "./IFontGlyph";
 
 /**
  * Information about a font.

@@ -1,4 +1,4 @@
-import { PDFArray, PDFDictionary, PDFDictionaryField } from "../../objects";
+import { type PDFArray, PDFDictionary, PDFDictionaryField } from "../../objects";
 
 export class ResourceDictionary extends PDFDictionary {
   /**

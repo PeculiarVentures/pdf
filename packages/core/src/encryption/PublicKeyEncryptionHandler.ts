@@ -1,12 +1,12 @@
-import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 import * as pkijs from "pkijs";
-import { Name, X509Certificate } from "@peculiar/x509";
+import { Name, type X509Certificate } from "@peculiar/x509";
 
 import { PDFArray, PDFHexString, PDFStream, PDFTextString } from "../objects";
-import { CryptoFilterMethods, EncryptDictionary, PublicKeyCryptoFilterDictionary, PublicKeyEncryptDictionary, PublicKeyPermissionFlags, TrailerDictionary } from "../structure/dictionaries";
+import { CryptoFilterMethods, EncryptDictionary, PublicKeyCryptoFilterDictionary, PublicKeyEncryptDictionary, type PublicKeyPermissionFlags, type TrailerDictionary } from "../structure/dictionaries";
 import { staticDataFF } from "./Constants";
-import { EncryptionHandler, EncryptionHandlerCreateParams } from "./EncryptionHandler";
-import { EncryptionAlgorithms, EncryptionKey, EncryptionKeys } from "./EncryptionAlgorithms";
+import { EncryptionHandler, type EncryptionHandlerCreateParams } from "./EncryptionHandler";
+import { EncryptionAlgorithms, type EncryptionKey, type EncryptionKeys } from "./EncryptionAlgorithms";
 
 export interface PublicKeyEncryptionHandlerCreateParams extends EncryptionHandlerCreateParams {
   permission?: PublicKeyPermissionFlags;

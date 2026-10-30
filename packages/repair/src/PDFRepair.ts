@@ -1,5 +1,5 @@
-import { PDFDocument } from "@peculiar/pdf-doc";
-import { PDFRepairRegistry, IRepairRule, globalRepairRegistry } from "./PDFRepairRegistry";
+import type { PDFDocument } from "@peculiar/pdf-doc";
+import { type PDFRepairRegistry, type IRepairRule, globalRepairRegistry } from "./PDFRepairRegistry";
 
 /**
  * An object that records repair notes for a PDF file. The keys are rule IDs and the values are arrays of strings

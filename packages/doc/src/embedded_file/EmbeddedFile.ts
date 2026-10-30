@@ -1,4 +1,4 @@
-import * as core from "@peculiar/pdf-core";
+import type * as core from "@peculiar/pdf-core";
 import { WrapObject } from "../WrapObject";
 
 /**

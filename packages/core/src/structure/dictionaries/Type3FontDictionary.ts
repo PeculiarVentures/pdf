@@ -1,4 +1,4 @@
-import { PDFArray, PDFArrayField, PDFDictionary, PDFDictionaryField, PDFNameField, PDFNumberField, PDFStream } from "../../objects";
+import { type PDFArray, PDFArrayField, PDFDictionary, PDFDictionaryField, PDFNameField, PDFNumberField, PDFStream } from "../../objects";
 import { Metrics, PDFRectangle } from "../common";
 import { FontDictionary } from "./FontDictionary";
 

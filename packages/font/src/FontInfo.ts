@@ -4,7 +4,7 @@ import { FontHead } from "./FontHead";
 import { FontName } from "./FontName";
 import { FontOS2 } from "./FontOS2";
 import { FontPost } from "./FontPost";
-import { IFontInfo } from "./IFontInfo";
+import type { IFontInfo } from "./IFontInfo";
 
 /**
  * Implementation of IFontInfo interface that provides comprehensive information about a font.

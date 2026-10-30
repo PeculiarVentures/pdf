@@ -3,13 +3,13 @@ import * as fs from "node:fs";
 import { Convert } from "pvtsutils";
 import * as pkijs from "pkijs";
 import { Crypto } from "@peculiar/webcrypto";
-import { CryptoFilterMethods, PageObjectDictionary, PDFDate, PDFDocument, StandardEncryptDictionary, TrailerDictionary, UserAccessPermissionFlags, XrefStructure } from "../structure";
+import { CryptoFilterMethods, PageObjectDictionary, PDFDate, PDFDocument, StandardEncryptDictionary, type TrailerDictionary, UserAccessPermissionFlags, XrefStructure } from "../structure";
 import { PasswordReason, StandardEncryptionHandler } from "./StandardEncryptionHandler";
 import { PDFCryptoEngine } from "../CryptoEngine";
 import { ViewWriter } from "../ViewWriter";
 import { PDFContentStream } from "../content";
 import { ViewReader } from "../ViewReader";
-import { Password } from "./StandardEncryptionAlgorithms";
+import type { Password } from "./StandardEncryptionAlgorithms";
 
 describe("StandardEncryptionHandler", () => {
   it("test checkUserPassword", async () => {

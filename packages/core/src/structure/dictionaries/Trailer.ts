@@ -1,6 +1,6 @@
 import * as objects from "../../objects";
 import { CatalogDictionary } from "./Catalog";
-import { EncryptDictionary } from "./Encrypt";
+import type { EncryptDictionary } from "./Encrypt";
 import { InformationDictionary } from "./Information";
 import { PublicKeyEncryptDictionary } from "./PublicKeyEncrypt";
 import { StandardEncryptDictionary } from "./StandardEncrypt";

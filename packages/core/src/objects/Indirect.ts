@@ -1,7 +1,7 @@
 import { BadCharError } from "../errors";
 import { CharSet } from "../CharSet";
 import type { ViewReader } from "../ViewReader";
-import { IPDFIndirect, PDFObject } from "./Object";
+import { type IPDFIndirect, PDFObject } from "./Object";
 
 export abstract class PDFIndirect extends PDFObject implements IPDFIndirect {
   public constructor();

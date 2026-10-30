@@ -1,5 +1,5 @@
 import * as core from "@peculiar/pdf-core";
-import { PDFDocument } from "../Document";
+import type { PDFDocument } from "../Document";
 
 export interface IFormComponentCreateParameters {
   /**

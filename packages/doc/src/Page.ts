@@ -1,8 +1,8 @@
 import * as core from "@peculiar/pdf-core";
 import * as fonts from "@peculiar/pdf-font";
 import { ResourceManager } from "./ResourceManager";
-import { FontComponent } from "./Font";
-import { Watermark } from "./Watermark";
+import type { FontComponent } from "./Font";
+import type { Watermark } from "./Watermark";
 import { WrapContentObject } from "./WrapContentObject";
 import * as forms from "./forms";
 

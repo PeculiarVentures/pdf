@@ -3,7 +3,7 @@ import { CertID, id_pkix_ocsp_nonce, OCSPRequest, OCSPResponse, OCSPResponseStat
 import { id_ce_cRLDistributionPoints, CRLDistributionPoints, id_pe_authorityInfoAccess, AuthorityInfoAccessSyntax, id_ad_ocsp, Extension } from "@peculiar/asn1-x509";
 import { SubjectKeyIdentifierExtension, X509Certificate, X509Certificates } from "@peculiar/x509";
 import { isEqualBuffer } from "pvutils";
-import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 import * as pkijs from "pkijs";
 
 export class DefaultCertificateStorageHandler implements ICertificateStorageHandler {

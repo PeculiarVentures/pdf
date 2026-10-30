@@ -1,8 +1,8 @@
 import * as core from "@peculiar/pdf-core";
 import { RadioButtonGroup } from "./RadioButton.Group";
-import { CheckBoxHandler, ICheckBoxCreateParameters, ICheckBoxHandler, ICheckBoxParameters } from "./CheckBox.Handler";
-import { IFormComponentParameters } from "./FormComponent.Handler";
-import { FormObject } from "../FormObject";
+import { CheckBoxHandler, type ICheckBoxCreateParameters, type ICheckBoxHandler, type ICheckBoxParameters } from "./CheckBox.Handler";
+import type { IFormComponentParameters } from "./FormComponent.Handler";
+import type { FormObject } from "../FormObject";
 
 export interface IRadioButtonCreateParameters extends ICheckBoxCreateParameters {
   value: string;

@@ -5,7 +5,7 @@ import { Crypto } from "@peculiar/webcrypto";
 import * as pkijs from "pkijs";
 import { Convert } from "pvtsutils";
 import { PDFContentStream } from "../content";
-import { CryptoFilterMethods, PageObjectDictionary, PDFDate, PDFDocument, PublicKeyPermissionFlags, TrailerDictionary, XrefStructure } from "../structure";
+import { CryptoFilterMethods, PageObjectDictionary, PDFDate, PDFDocument, PublicKeyPermissionFlags, type TrailerDictionary, XrefStructure } from "../structure";
 import { ViewWriter } from "../ViewWriter";
 import { PublicKeyEncryptionHandler } from "./PublicKeyEncryptionHandler";
 import { ViewReader } from "../ViewReader";

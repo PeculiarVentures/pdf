@@ -1,4 +1,4 @@
-import { X509Certificate, X509Certificates } from "@peculiar/x509";
+import { type X509Certificate, X509Certificates } from "@peculiar/x509";
 import * as pkijs from "pkijs";
 
 export enum CertificateChainStatusCode {

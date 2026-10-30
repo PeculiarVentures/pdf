@@ -1,4 +1,4 @@
-import { CmsAttribute, CmsAttributeConstructor } from "./Attribute";
+import { CmsAttribute, type CmsAttributeConstructor } from "./Attribute";
 
 export class CmsAttributeFactory {
   public static items = new Map<string, CmsAttributeConstructor>();

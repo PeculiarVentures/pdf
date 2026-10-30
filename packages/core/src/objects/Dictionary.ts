@@ -3,7 +3,7 @@ import { CharSet } from "../CharSet";
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
 import { ObjectTypeEnum } from "./internal";
-import { PDFObject, PDFObjectConstructor } from "./Object";
+import { PDFObject, type PDFObjectConstructor } from "./Object";
 
 const dictionaryLeftChars = new Uint8Array([CharSet.lessThanChar, CharSet.lessThanChar]);
 const dictionaryRightChars = new Uint8Array([CharSet.greaterThanChar, CharSet.greaterThanChar]);
@@ -255,4 +255,4 @@ import { PDFNull } from "./Null";
 import { PDFIndirectReference } from "./IndirectReference";
 import { PDFTypeConverter } from "./TypeConverter";
 import { PDFObjectReader } from "./ObjectReader";
-import { PDFObjectTypes } from "./ObjectTypes";
+import type { PDFObjectTypes } from "./ObjectTypes";

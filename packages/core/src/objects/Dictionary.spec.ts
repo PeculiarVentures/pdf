@@ -3,7 +3,7 @@ import { Convert } from "pvtsutils";
 import { PDFDictionary } from "./Dictionary";
 import { PDFDictionaryField, PDFNumberField } from "./decorators";
 import { PDFLiteralString } from "./LiteralString";
-import { Maybe } from "./decorators";
+import type { Maybe } from "./decorators";
 import { PDFName } from "./Name";
 import { PDFNumeric } from "./Numeric";
 import { PDFDocument } from "../structure/Document";

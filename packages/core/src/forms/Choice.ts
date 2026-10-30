@@ -1,5 +1,5 @@
-import { PDFArray, PDFArrayField, PDFNumberField } from "../objects";
-import { FieldFlags, PDFField } from "./Field";
+import { type PDFArray, PDFArrayField, PDFNumberField } from "../objects";
+import { type FieldFlags, PDFField } from "./Field";
 
 export enum ChoiceFlags {
   /**

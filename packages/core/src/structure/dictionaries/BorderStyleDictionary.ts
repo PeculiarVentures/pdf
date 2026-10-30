@@ -1,4 +1,4 @@
-import { PDFArray, PDFArrayField, PDFDictionary, PDFNumberField, PDFNameField } from "../../objects";
+import { type PDFArray, PDFArrayField, PDFDictionary, PDFNumberField, PDFNameField } from "../../objects";
 
 export enum BorderStyle {
   /**

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from "vitest";
 import * as x509 from "@peculiar/x509";
 import * as pkijs from "pkijs";
 import { Convert } from "pvtsutils";
-import { CertificateID, CRL, DefaultCertificateStorageHandler, ICertificateStorageHandler, IResult, IsTrustedResult, OCSP, RevocationType } from "@peculiar/pdf-doc";
+import { CertificateID, CRL, DefaultCertificateStorageHandler, type ICertificateStorageHandler, type IResult, type IsTrustedResult, OCSP, type RevocationType } from "@peculiar/pdf-doc";
 
 describe("DefaultCertificateStorageHandler", () => {
   beforeAll(() => {

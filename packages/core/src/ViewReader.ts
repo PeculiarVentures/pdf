@@ -1,4 +1,4 @@
-import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 
 export type ViewReaderFindCallback = (value: number, index: number, array: Uint8Array, reader: ViewReader) => boolean;
 

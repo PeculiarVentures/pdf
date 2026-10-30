@@ -7,7 +7,7 @@ import { PDFDictionary } from "./Dictionary";
 import { PDFLiteralString } from "./LiteralString";
 import { PDFName } from "./Name";
 import { PDFNumeric } from "./Numeric";
-import { PDFObjectTypes } from "./ObjectTypes";
+import type { PDFObjectTypes } from "./ObjectTypes";
 import "./register";
 
 describe("PDFArray", () => {

@@ -1,4 +1,4 @@
-import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 import { CharSet } from "./CharSet";
 
 export type ViewWriterCallback = (subarray: Uint8Array) => void;

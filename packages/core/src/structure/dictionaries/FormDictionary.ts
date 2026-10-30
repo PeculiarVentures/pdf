@@ -1,12 +1,12 @@
 import { PDFContentStream } from "../../content";
 import * as objects from "../../objects";
-import { Metrics, PDFDate, PDFRectangle } from "../common";
-import { FileSpecificationDictionary } from "./FileSpecification";
+import { Metrics, type PDFDate, PDFRectangle } from "../common";
+import type { FileSpecificationDictionary } from "./FileSpecification";
 import { MeasureDictionary, MeasureFactory } from "./MeasureDictionary";
 import { OPIDictionary } from "./OPIDictionary";
 import { PointDataDictionary } from "./PointDataDictionary";
 import { ResourceDictionary } from "./ResourceDictionary";
-import { XObjectDictionary, XOBJECT_TYPE } from "./XObjectDictionary";
+import { type XObjectDictionary, XOBJECT_TYPE } from "./XObjectDictionary";
 
 export class FormDictionary extends PDFContentStream implements XObjectDictionary {
   public static readonly SUBTYPE = "Form";

@@ -1,5 +1,5 @@
 import * as objects from "../../objects";
-import { XObjectDictionary, XOBJECT_TYPE } from "./XObjectDictionary";
+import { type XObjectDictionary, XOBJECT_TYPE } from "./XObjectDictionary";
 
 export class ImageDictionary extends objects.PDFStream implements XObjectDictionary {
   public static readonly SUBTYPE = "Image";

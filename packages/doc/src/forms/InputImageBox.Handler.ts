@@ -1,6 +1,6 @@
 import * as core from "@peculiar/pdf-core";
-import { PDFDocument } from "../Document";
-import { Image } from "../Image";
+import type { PDFDocument } from "../Document";
+import type { Image } from "../Image";
 
 export interface InputImageBoxCreateParameters {
   left?: core.TypographySize;
