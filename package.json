@@ -2,6 +2,7 @@
   "name": "pdf",
   "version": "1.17.2",
   "private": true,
+  "type": "module",
   "description": "",
   "workspaces": [
     "packages/*"
@@ -9,15 +10,12 @@
   "scripts": {
     "test": "vitest run",
     "coverage": "vitest run --coverage",
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
     "format": "oxfmt",
-    "format:check": "oxfmt --check",
-    "build": "tsdown",
-    "build:watch": "tsdown -w",
-    "upgrade": "npx npm-check-updates -i",
-    "test:watch": "vitest"
+    "format:check": "oxfmt --check"
   },
   "repository": {
     "type": "git",
