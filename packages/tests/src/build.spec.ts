@@ -64,7 +64,8 @@ function shapeOf(m: Record<string, unknown>): ExportShape {
 }
 
 function runNode(script: string): string {
-  return execFileSync(process.execPath, ["--input-type=module", "-e", script], {
+  // @peculiar/x509 3 needs a Reflect polyfill, which apps load before it.
+  return execFileSync(process.execPath, ["--import", "reflect-metadata", "--input-type=module", "-e", script], {
     cwd: root,
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"],

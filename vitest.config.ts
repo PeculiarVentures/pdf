@@ -5,6 +5,8 @@ export default defineConfig({
   resolve: { tsconfigPaths: true },
   test: {
     environment: "node",
+    // @peculiar/x509 3 needs a Reflect polyfill, which apps import before it.
+    setupFiles: ["reflect-metadata"],
     include: ["packages/**/*.spec.ts"],
     pool: "forks",
     coverage: {

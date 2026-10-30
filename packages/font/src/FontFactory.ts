@@ -7,6 +7,16 @@ import { type DefaultFonts, DefaultFontsZip } from "./DefaultFonts";
 import { FontGlyph } from "./FontGlyph";
 import { FontInfo } from "./FontInfo";
 
+type FontjsSeqStream = Parameters<typeof fontjs.Font.fromStream>[0];
+
+/**
+ * fontjs 3 is typed against bytestreamjs 2. It only calls `SeqStream` methods,
+ * which bytestreamjs 3 keeps, so a bytestreamjs 3 stream works at runtime.
+ */
+function toFontjsStream(stream: bs.SeqStream): FontjsSeqStream {
+  return stream as unknown as FontjsSeqStream;
+}
+
 /**
  * Factory class for creating and managing font objects.
  * Provides functionality to create fonts from different sources,
@@ -62,7 +72,7 @@ export abstract class FontFactory {
    */
   public static createFile(source: BufferSource): FontInfo {
     const buffer = BufferSourceConverter.toArrayBuffer(source);
-    const font = fontjs.Font.fromStream(new bs.SeqStream({ stream: new bs.ByteStream({ buffer }) }));
+    const font = fontjs.Font.fromStream(toFontjsStream(new bs.SeqStream({ stream: new bs.ByteStream({ buffer }) })));
 
     const fontInfo = new FontInfo();
 
@@ -154,7 +164,7 @@ export abstract class FontFactory {
    */
   public static subsetFont(source: BufferSource, text: string): ArrayBuffer {
     const buffer = BufferSourceConverter.toArrayBuffer(source);
-    const font = fontjs.Font.fromStream(new bs.SeqStream({ stream: new bs.ByteStream({ buffer }) }));
+    const font = fontjs.Font.fromStream(toFontjsStream(new bs.SeqStream({ stream: new bs.ByteStream({ buffer }) })));
 
     const gids = this.getIndexes(font, text);
 
@@ -219,7 +229,7 @@ export abstract class FontFactory {
     });
 
     const newFontStream = new bs.SeqStream();
-    newFont.toStream(newFontStream);
+    newFont.toStream(toFontjsStream(newFontStream));
 
     return newFontStream.buffer;
   }

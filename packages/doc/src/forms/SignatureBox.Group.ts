@@ -7,6 +7,7 @@ import type { FormObject } from "../FormObject";
 import { FormComponentGroup } from "./FormComponent.Group";
 import type { SignatureBox } from "./SignatureBox";
 import type * as types from "./SignatureBox.Types";
+import { berOptions } from "../cms/ber";
 
 const ERR_INCORRECT_BYTE_RANGE = "The range of bytes points to an incorrect data";
 
@@ -808,7 +809,7 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureField, S
         if (attr.type === cms.id_adbe_revocationInfoArchival) {
           const attrValue = attr.values[0];
           if (attrValue) {
-            const adobeAttr = AsnConvert.parse(attrValue, cms.RevocationInfoArchival);
+            const adobeAttr = AsnConvert.parse(attrValue, cms.RevocationInfoArchival, { berOptions: berOptions(attrValue) });
             if ((adobeAttr.crl && adobeAttr.crl.length) || (adobeAttr.ocsp && adobeAttr.ocsp.length)) {
               return true;
             }
