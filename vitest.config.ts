@@ -1,8 +1,8 @@
-import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  plugins: [tsconfigPaths()],
+  // Resolve @peculiar/pdf-* imports to the package sources through the tsconfig paths.
+  resolve: { tsconfigPaths: true },
   test: {
     environment: "node",
     include: ["packages/**/*.spec.ts"],
