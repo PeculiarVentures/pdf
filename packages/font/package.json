@@ -47,7 +47,7 @@
   "dependencies": {
     "@peculiar/utils": "^4.1.0",
     "bytestreamjs": "^3.0.0",
-    "fontjs": "^3.0.1",
+    "fontjs": "^4.0.0",
     "pako": "^2.2.0"
   },
   "peerDependencies": {
