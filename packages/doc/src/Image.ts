@@ -278,7 +278,7 @@ export class Image extends WrapObject<core.ImageDictionary> {
 
         return {
           type: "png",
-          data: img.buffer,
+          data: img.slice().buffer,
         };
       }
 
@@ -333,7 +333,7 @@ export class Image extends WrapObject<core.ImageDictionary> {
 
         return {
           type: "png",
-          data: img.buffer,
+          data: img.slice().buffer,
         };
       }
 

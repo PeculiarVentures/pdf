@@ -380,7 +380,7 @@ export class PDFCopier {
     const writer = new core.ViewWriter();
     await this.document.writePDF(writer);
 
-    return writer.toUint8Array();
+    return writer.toArrayBuffer();
   }
 
   /**

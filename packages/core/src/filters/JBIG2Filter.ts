@@ -17,10 +17,10 @@ export class JBIG2Filter extends Filter {
   }
 
   public decodeSync(stream: Uint8Array): ArrayBuffer {
-    return stream;
+    return stream.slice().buffer;
   }
 
   public encodeSync(stream: Uint8Array): ArrayBuffer {
-    return stream;
+    return stream.slice().buffer;
   }
 }

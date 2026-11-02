@@ -79,7 +79,7 @@ export class ASCII85Filter extends Filter {
       }
     }
 
-    return new Uint8Array(res.buffer.slice(0, offset));
+    return res.buffer.slice(0, offset);
   }
 
   public encodeSync(view: Uint8Array): ArrayBuffer {

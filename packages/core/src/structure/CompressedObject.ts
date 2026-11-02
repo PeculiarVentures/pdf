@@ -109,7 +109,7 @@ export class CompressedObject extends PDFStream {
 
   public override async decode(): Promise<ArrayBuffer> {
     if (this.#decodedValue) {
-      return this.#decodedValue.buffer;
+      return this.#decodedValue.slice().buffer;
     }
 
     const buffer = await super.decode();
@@ -120,7 +120,7 @@ export class CompressedObject extends PDFStream {
 
   public override decodeSync(): ArrayBuffer {
     if (this.#decodedValue) {
-      return this.#decodedValue.buffer;
+      return this.#decodedValue.slice().buffer;
     }
 
     const buffer = super.decodeSync();
