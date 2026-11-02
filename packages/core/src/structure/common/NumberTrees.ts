@@ -1,4 +1,4 @@
-import { PDFArray, PDFArrayField, PDFDictionary, PDFDictionaryField, PDFIndirectReference, PDFLiteralString } from "../../objects";
+import { PDFArray, PDFArrayField, PDFDictionary, PDFDictionaryField, type PDFIndirectReference, type PDFLiteralString } from "../../objects";
 
 export class NumberTrees extends PDFDictionary {
   /**

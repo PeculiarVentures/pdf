@@ -1,7 +1,7 @@
 import * as asn1js from "asn1js";
 import * as pkijs from "pkijs";
 import { Convert } from "pvtsutils";
-import { AlgorithmFactory, AlgorithmConverter, HashedAlgorithm } from "../AlgorithmFactory";
+import { AlgorithmFactory, type AlgorithmConverter, type HashedAlgorithm } from "../AlgorithmFactory";
 
 const id_shake128 = "2.16.840.1.101.3.4.2.11";
 const id_shake256 = "2.16.840.1.101.3.4.2.12";

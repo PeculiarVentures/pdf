@@ -1,10 +1,10 @@
-import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 import * as pkijs from "pkijs";
 
 import type { clientSideParametersPublicKey } from "../encryption/Constants";
 import type { CatalogDictionary, PageObjectDictionary } from "./dictionaries";
 import type { ViewReader } from "../ViewReader";
-import { EncryptionFactory, EncryptionHandler } from "../encryption";
+import { EncryptionFactory, type EncryptionHandler } from "../encryption";
 
 export interface FindIndexOptions {
   reversed?: boolean;
@@ -428,5 +428,5 @@ import { PDFDocumentUpdate } from "./DocumentUpdate";
 import { PDFDate, PDFRectangle } from "./common";
 import { CrossReferenceTable } from "./CrossReferenceTable";
 import { CharSet } from "../CharSet";
-import { PDFDocumentObject } from "./DocumentObject";
+import type { PDFDocumentObject } from "./DocumentObject";
 import { XrefStructure } from "./XrefStructure";

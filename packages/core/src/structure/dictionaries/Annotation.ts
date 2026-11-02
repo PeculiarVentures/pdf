@@ -1,4 +1,4 @@
-import { Maybe, PDFArray, PDFArrayField, PDFDateField, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFMaybeField, PDFNameField, PDFTextString } from "../../objects";
+import { type Maybe, type PDFArray, PDFArrayField, PDFDateField, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFMaybeField, PDFNameField, PDFTextString } from "../../objects";
 import { PDFRectangle } from "../common/Rectangle";
 import { AppearanceDictionary } from "./AppearanceDictionary";
 import { PageObjectDictionary } from "./PageObject";

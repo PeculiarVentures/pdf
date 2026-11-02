@@ -1,6 +1,6 @@
-import * as pkijs from "pkijs";
-import { EncryptDictionary } from "../structure";
-import { EncryptionHandler } from "./EncryptionHandler";
+import type * as pkijs from "pkijs";
+import type { EncryptDictionary } from "../structure";
+import type { EncryptionHandler } from "./EncryptionHandler";
 import { PublicKeyEncryptionHandler } from "./PublicKeyEncryptionHandler";
 import { StandardEncryptionHandler } from "./StandardEncryptionHandler";
 

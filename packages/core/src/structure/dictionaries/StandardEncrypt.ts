@@ -1,5 +1,5 @@
 import { PDFBooleanField, PDFNumberField, PDFTextStringField } from "../../objects";
-import { PDFTextString } from "../../objects/TextString";
+import type { PDFTextString } from "../../objects/TextString";
 import { EncryptDictionary } from "./Encrypt";
 
 export enum UserAccessPermissionFlags {

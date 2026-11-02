@@ -1,5 +1,5 @@
 import * as core from "@peculiar/pdf-core";
-import { PDFDocument } from "../Document";
+import type { PDFDocument } from "../Document";
 import { WrapObject } from "../WrapObject";
 
 export class NameTree<T extends core.PDFObject = core.PDFObject> extends WrapObject<core.NameTree> implements Iterable<[string, T]> {

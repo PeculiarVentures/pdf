@@ -1,8 +1,8 @@
 import { AsnConvert } from "@peculiar/asn1-schema";
 import { TSTInfo } from "@peculiar/asn1-tsp";
-import * as pkijs from "pkijs";
+import type * as pkijs from "pkijs";
 
-import { CMSSignedData, CMSSignedDataVerifyResult } from "./SignedData";
+import { CMSSignedData, type CMSSignedDataVerifyResult } from "./SignedData";
 
 export interface TimeStampVerifyResult extends CMSSignedDataVerifyResult {
   info: TSTInfo;

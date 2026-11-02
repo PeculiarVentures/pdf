@@ -1,5 +1,5 @@
 import * as pdfDoc from "@peculiar/pdf-doc";
-import { JsonRadioButtonUpdate } from "../types";
+import type { JsonRadioButtonUpdate } from "../types";
 import { WidgetConverter } from "./WidgetConverter";
 
 /**

@@ -1,4 +1,4 @@
-import { BufferSource, BufferSourceConverter } from "pvtsutils";
+import { type BufferSource, BufferSourceConverter } from "pvtsutils";
 import { Filter } from "./Filter";
 
 export class CryptFilter extends Filter {

@@ -2,9 +2,9 @@ import * as core from "@peculiar/pdf-core";
 import { Convert } from "pvtsutils";
 
 import { createFormObject } from "./formObjectCreate";
-import { Image } from "./Image";
+import type { Image } from "./Image";
 import * as font from "./Font";
-import { ResourceManager } from "./ResourceManager";
+import type { ResourceManager } from "./ResourceManager";
 import { WrapObject } from "./WrapObject";
 
 export enum OpacityModes {

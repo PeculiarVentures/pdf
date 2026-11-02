@@ -1,4 +1,4 @@
-import { CRL } from "./cms/CRL";
+import type { CRL } from "./cms/CRL";
 import type { OCSP } from "./cms/OCSP";
 
 /**

@@ -1,4 +1,4 @@
-import * as pkijs from "pkijs";
+import type * as pkijs from "pkijs";
 import { BufferSourceConverter, Convert } from "pvtsutils";
 import { algorithms } from "./Constants";
 

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import * as core from "@peculiar/pdf-core";
 import { PDFDocument } from "../Document";
 import { FormComponent } from "./FormComponent";
-import { PDFPage } from "../Page";
+import type { PDFPage } from "../Page";
 
 describe("FormComponent", () => {
   let doc: PDFDocument;

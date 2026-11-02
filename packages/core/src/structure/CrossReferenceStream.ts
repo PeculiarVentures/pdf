@@ -1,10 +1,10 @@
 import { Convert } from "pvtsutils";
-import { PDFArray, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFName, PDFNameField, PDFNumeric, PDFStream, Maybe, PDFMaybeField } from "../objects";
+import { PDFArray, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFName, PDFNameField, PDFNumeric, PDFStream, type Maybe, PDFMaybeField } from "../objects";
 import { CatalogDictionary } from "./dictionaries/Catalog";
-import { CrossReference } from "./CrossReference";
+import type { CrossReference } from "./CrossReference";
 import { PDFDocumentObject, PDFDocumentObjectTypes } from "./DocumentObject";
-import { EncryptDictionary, InformationDictionary, PublicKeyEncryptDictionary, StandardEncryptDictionary, TrailerDictionary } from "./dictionaries";
-import { PDFTextString } from "../objects/TextString";
+import { type EncryptDictionary, InformationDictionary, PublicKeyEncryptDictionary, StandardEncryptDictionary, TrailerDictionary } from "./dictionaries";
+import type { PDFTextString } from "../objects/TextString";
 import { ViewWriter } from "../ViewWriter";
 import { PDFDocumentObjectGrouper } from "./DocumentObjectGrouper";
 import { ViewReader } from "../ViewReader";

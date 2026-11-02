@@ -2,8 +2,8 @@ import { AsnConvert } from "@peculiar/asn1-schema";
 import * as bs from "bytestreamjs";
 import * as fontjs from "fontjs";
 import * as pako from "pako";
-import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
-import { DefaultFonts, DefaultFontsZip } from "./DefaultFonts";
+import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { type DefaultFonts, DefaultFontsZip } from "./DefaultFonts";
 import { FontGlyph } from "./FontGlyph";
 import { FontInfo } from "./FontInfo";
 

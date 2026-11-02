@@ -1,6 +1,6 @@
 import * as objects from "../../objects";
-import { PDFContent } from "../../content";
-import { PDFDate, PDFRectangle } from "../common";
+import type { PDFContent } from "../../content";
+import { type PDFDate, PDFRectangle } from "../common";
 import type { AnnotationDictionary } from "./Annotation";
 import { ResourceDictionary } from "./ResourceDictionary";
 import { PageTreeNodesDictionary } from "./PageTreeNodes";

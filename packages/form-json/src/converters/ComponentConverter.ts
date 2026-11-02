@@ -1,5 +1,5 @@
-import * as pdfDoc from "@peculiar/pdf-doc";
-import { JsonComponent, JsonComponentUpdate } from "../types";
+import type * as pdfDoc from "@peculiar/pdf-doc";
+import type { JsonComponent, JsonComponentUpdate } from "../types";
 
 /**
  * Abstract class representing a ComponentConverter for an IComponent type.

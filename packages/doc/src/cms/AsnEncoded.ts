@@ -1,6 +1,6 @@
 import * as asn1js from "asn1js";
-import * as pkijs from "pkijs";
-import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import type * as pkijs from "pkijs";
+import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 
 export type AsnEncodedStringFormat = "hex" | "base64" | "base64url";
 

@@ -1,4 +1,4 @@
-import { PDFArray, PDFArrayField, PDFBooleanField, PDFDictionary, PDFNameField } from "../../objects";
+import { type PDFArray, PDFArrayField, PDFBooleanField, PDFDictionary, PDFNameField } from "../../objects";
 
 export class IconFitDictionary extends PDFDictionary {
   /**

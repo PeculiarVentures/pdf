@@ -5,9 +5,9 @@ import { PDFHexString } from "../HexString";
 import { PDFBoolean } from "../Boolean";
 import { PDFArray } from "../Array";
 import { PDFTextString } from "../TextString";
-import { PDFDictionary } from "../Dictionary";
+import type { PDFDictionary } from "../Dictionary";
 import { PDFStream } from "../Stream";
-import { PDFObjectTypes } from "../ObjectTypes";
+import type { PDFObjectTypes } from "../ObjectTypes";
 import { PDFDictionaryField } from "./field";
 
 export function PDFNumberField(name: string, optional = false, defaultValue?: number): PropertyDecorator {

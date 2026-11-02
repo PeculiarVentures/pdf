@@ -1,4 +1,4 @@
-import * as core from "@peculiar/pdf-core";
+import type * as core from "@peculiar/pdf-core";
 import type { PDFDocument } from "../Document";
 
 export interface IComponent {

@@ -1,5 +1,5 @@
 import * as objects from "../../objects";
-import * as common from "../common";
+import type * as common from "../common";
 
 export class EmbeddedFileParams extends objects.PDFDictionary {
   /**

@@ -1,5 +1,5 @@
 import * as asn from "@peculiar/asn1-schema";
-import { IFontGlyph } from "./IFontGlyph";
+import type { IFontGlyph } from "./IFontGlyph";
 
 @asn.AsnType({ type: asn.AsnTypeTypes.Sequence })
 export class FontGlyph implements IFontGlyph {

@@ -1,5 +1,5 @@
-import { Maybe, PDFArray, PDFDateField, PDFDictionary, PDFMaybeField, PDFNameField, PDFStream, PDFStreamField } from "../objects";
-import { PDFDate } from "../structure/common/Date";
+import { type Maybe, PDFArray, PDFDateField, PDFDictionary, PDFMaybeField, PDFNameField, type PDFStream, PDFStreamField } from "../objects";
+import type { PDFDate } from "../structure/common/Date";
 
 export class ValidationRelatedInformationDictionary extends PDFDictionary {
   public static readonly TYPE = "VRI";

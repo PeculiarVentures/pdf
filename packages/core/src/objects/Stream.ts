@@ -1,4 +1,4 @@
-import { BufferSource, Convert, BufferSourceConverter } from "pvtsutils";
+import { type BufferSource, Convert, BufferSourceConverter } from "pvtsutils";
 
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
@@ -448,6 +448,6 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
 }
 
 import { PDFObjectReader } from "./ObjectReader";
-import { PDFObjectTypes } from "./ObjectTypes";
-import { Filter, FilterFactory } from "../filters";
+import type { PDFObjectTypes } from "./ObjectTypes";
+import { type Filter, FilterFactory } from "../filters";
 import { PDFIndirectObject } from "./IndirectObject";

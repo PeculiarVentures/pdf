@@ -1,10 +1,10 @@
-import { PDFDictionary } from "../objects/Dictionary";
+import type { PDFDictionary } from "../objects/Dictionary";
 import { ASCII85Filter } from "./ASCII85Filter";
 import { ASCIIHexFilter } from "./ASCIIHexFilter";
 import { CCITTFaxFilter } from "./CCITTFaxFilter";
 import { CryptFilter } from "./CryptFilter";
 import { DCTFilter } from "./DCTFilter";
-import { Filter } from "./Filter";
+import type { Filter } from "./Filter";
 import { FlateFilter } from "./FlateFilter";
 import { JBIG2Filter } from "./JBIG2Filter";
 import { JPXFilter } from "./JPXFilter";

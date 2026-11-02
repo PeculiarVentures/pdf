@@ -56,5 +56,5 @@ export class PDFOperator {
   }
 }
 
-import { PDFObjectReader, PDFObjectTypes } from "../objects";
+import { PDFObjectReader, type PDFObjectTypes } from "../objects";
 import { ViewReader } from "../ViewReader";

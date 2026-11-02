@@ -1,4 +1,4 @@
-import { PDFArray, PDFArrayField, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFNameField, PDFTextString, PDFTextStringField } from "../../objects";
+import { type PDFArray, PDFArrayField, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFNameField, type PDFTextString, PDFTextStringField } from "../../objects";
 
 export class MeasureDictionary extends PDFDictionary {
   public static readonly TYPE = "PtData";

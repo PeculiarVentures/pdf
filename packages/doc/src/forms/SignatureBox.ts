@@ -1,8 +1,8 @@
 import * as core from "@peculiar/pdf-core";
 import { FormObject } from "../FormObject";
 import { FormComponent } from "./FormComponent";
-import { IFormGroupedComponent } from "./FormComponent.Group";
-import { SignatureBoxSignParameters, SignatureBoxGroupVerifyParams, SignatureVerifyResult } from "./SignatureBox.Types";
+import type { IFormGroupedComponent } from "./FormComponent.Group";
+import type { SignatureBoxSignParameters, SignatureBoxGroupVerifyParams, SignatureVerifyResult } from "./SignatureBox.Types";
 import { SignatureBoxGroup } from "./SignatureBox.Group";
 
 export class SignatureBox extends FormComponent implements IFormGroupedComponent {

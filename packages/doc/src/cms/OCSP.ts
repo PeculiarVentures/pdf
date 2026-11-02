@@ -1,11 +1,11 @@
 import * as asnOcsp from "@peculiar/asn1-ocsp";
 import { AlgorithmIdentifier, CRLReason, CRLReasons, Name } from "@peculiar/asn1-x509";
 import * as asnSchema from "@peculiar/asn1-schema";
-import * as x509 from "@peculiar/x509";
+import type * as x509 from "@peculiar/x509";
 import * as asn1js from "asn1js";
 import * as pkijs from "pkijs";
-import { BufferSource, BufferSourceConverter } from "pvtsutils";
-import { ICertificateStorage, ICertificateStorageHandler } from "./ICertificateStorageHandler";
+import { type BufferSource, BufferSourceConverter } from "pvtsutils";
+import type { ICertificateStorage, ICertificateStorageHandler } from "./ICertificateStorageHandler";
 import { AsnEncoded } from "./AsnEncoded";
 
 export interface OCSPResponse {
@@ -186,5 +186,5 @@ export class OCSP extends AsnEncoded<pkijs.BasicOCSPResponse> implements ICertif
 
 import { AlgorithmFactory } from "./AlgorithmFactory";
 import { PKIUtils } from "./PKIUtils";
-import { CertificateID } from "./CertID";
+import type { CertificateID } from "./CertID";
 import { OCSPCertificateStorageHandler } from "./OCSPCertificateStorageHandler";

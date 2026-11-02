@@ -1,9 +1,9 @@
-import * as core from "@peculiar/pdf-core";
-import { TSTInfo } from "@peculiar/asn1-tsp";
-import { X509Certificate, X509Certificates } from "@peculiar/x509";
-import * as cms from "../cms";
-import { FormObject } from "../FormObject";
-import { type SignatureBoxGroup } from "./SignatureBox.Group";
+import type * as core from "@peculiar/pdf-core";
+import type { TSTInfo } from "@peculiar/asn1-tsp";
+import type { X509Certificate, X509Certificates } from "@peculiar/x509";
+import type * as cms from "../cms";
+import type { FormObject } from "../FormObject";
+import type { SignatureBoxGroup } from "./SignatureBox.Group";
 
 export type SignatureBoxCreateImageCallback = (this: SignatureBoxGroup) => FormObject;
 export type SignatureDictionaryUpdateCallback = (this: SignatureBoxGroup, filed: core.SignatureDictionary) => Promise<void>;

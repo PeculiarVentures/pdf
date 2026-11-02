@@ -1,4 +1,4 @@
-import { PDFArray, PDFArrayField, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFStream, PDFTextString, PDFTextStringField } from "../../objects";
+import { type PDFArray, PDFArrayField, PDFDictionary, PDFDictionaryField, PDFNumberField, PDFStream, type PDFTextString, PDFTextStringField } from "../../objects";
 import { IconFitDictionary } from "./IconFitDictionary";
 
 export enum CaptionPosition {

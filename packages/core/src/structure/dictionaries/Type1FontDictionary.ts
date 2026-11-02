@@ -1,4 +1,4 @@
-import { PDFArray, PDFArrayField, PDFDictionary, PDFDictionaryField, PDFName, PDFNameField, PDFNumberField, PDFStream } from "../../objects";
+import { type PDFArray, PDFArrayField, type PDFDictionary, PDFDictionaryField, type PDFName, PDFNameField, PDFNumberField, PDFStream } from "../../objects";
 import { FontDictionary } from "./FontDictionary";
 
 export class Type1FontDictionary extends FontDictionary {

@@ -1,4 +1,4 @@
-import { Maybe, PDFArray, PDFDictionary, PDFMaybeField, PDFNameField } from "../objects";
+import { type Maybe, PDFArray, PDFDictionary, PDFMaybeField, PDFNameField } from "../objects";
 
 export class DocumentSecurityStoreDictionary extends PDFDictionary {
   public static readonly TYPE = "DSS";

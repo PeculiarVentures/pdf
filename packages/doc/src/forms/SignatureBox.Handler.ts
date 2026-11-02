@@ -1,7 +1,7 @@
 import * as core from "@peculiar/pdf-core";
 import { SignatureBoxGroup } from "./SignatureBox.Group";
-import { PDFDocument } from "../Document";
-import { FormComponentHandler, IFormComponentCreateParameters, IFormComponentHandler, IFormComponentParameters } from "./FormComponent.Handler";
+import type { PDFDocument } from "../Document";
+import { FormComponentHandler, type IFormComponentCreateParameters, type IFormComponentHandler, type IFormComponentParameters } from "./FormComponent.Handler";
 import { SignatureBox } from "./SignatureBox";
 
 export interface ISignatureBoxCreateParameters extends IFormComponentCreateParameters {

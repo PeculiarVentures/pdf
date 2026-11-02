@@ -1,8 +1,8 @@
 import * as core from "@peculiar/pdf-core";
-import { PDFDocument } from "../Document";
+import type { PDFDocument } from "../Document";
 import { FontComponent } from "../Font";
 import { FormObject } from "../FormObject";
-import { PDFPage } from "../Page";
+import type { PDFPage } from "../Page";
 import { FormComponentFactory } from "./FormComponent.Factory";
 import { TextEditorAlignment } from "./TextEditor";
 

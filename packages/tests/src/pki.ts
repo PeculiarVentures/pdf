@@ -3,7 +3,7 @@ import { AsnConvert, OctetString } from "@peculiar/asn1-schema";
 import { MessageImprint, TimeStampReq, TimeStampResp } from "@peculiar/asn1-tsp";
 import { AlgorithmIdentifier } from "@peculiar/asn1-x509";
 import * as x509 from "@peculiar/x509";
-import { CRL, DefaultCertificateStorageHandler, IResult, IsTrustedResult, OCSP, RevocationType, TimeStampToken } from "@peculiar/pdf-doc";
+import { type CRL, DefaultCertificateStorageHandler, type IResult, type IsTrustedResult, type OCSP, type RevocationType, TimeStampToken } from "@peculiar/pdf-doc";
 
 interface RootCertificateStorageHandlerParams {
   trustedCertificates?: x509.X509Certificate[];

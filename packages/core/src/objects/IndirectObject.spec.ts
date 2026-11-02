@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { PDFDictionary } from "./Dictionary";
 import { PDFIndirectObject } from "./IndirectObject";
 import { PDFStream } from "./Stream";
-import { PDFObject } from "./Object";
+import type { PDFObject } from "./Object";
 import "./register";
 
 describe("IndirectReference", () => {

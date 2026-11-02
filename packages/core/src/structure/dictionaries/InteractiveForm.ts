@@ -1,4 +1,4 @@
-import { IFieldDictionary, PDFField } from "../../forms";
+import { type IFieldDictionary, PDFField } from "../../forms";
 import * as objects from "../../objects";
 import { ResourceDictionary } from "./ResourceDictionary";
 

@@ -1,5 +1,5 @@
-import * as core from "@peculiar/pdf-core";
-import { type FormComponent } from "./FormComponent";
+import type * as core from "@peculiar/pdf-core";
+import type { FormComponent } from "./FormComponent";
 
 function flag(f: core.AnnotationFlags, fieldFlag = false, repaint = false): PropertyDecorator {
   return (target: object, propertyKey: string | symbol) => {

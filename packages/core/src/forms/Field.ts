@@ -1,5 +1,5 @@
 import * as objects from "../objects";
-import { PDFDictionary } from "../objects";
+import type { PDFDictionary } from "../objects";
 import type { WidgetDictionary } from "../structure/dictionaries/Widget";
 import { AdditionalActionsDictionary } from "../structure/dictionaries/AdditionalActionsDictionary";
 import { UUID } from "../UUID";

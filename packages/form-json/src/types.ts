@@ -1,5 +1,5 @@
-import * as pdfDoc from "@peculiar/pdf-doc";
-import { FormComponentType } from "@peculiar/pdf-doc";
+import type * as pdfDoc from "@peculiar/pdf-doc";
+import type { FormComponentType } from "@peculiar/pdf-doc";
 
 /**
  * Type representing a constructor for an IComponent instance.

@@ -1,4 +1,4 @@
-import * as objects from "../../objects";
+import type * as objects from "../../objects";
 
 export const XOBJECT_TYPE = "XObject";
 

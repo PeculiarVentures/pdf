@@ -1,6 +1,6 @@
 import * as core from "@peculiar/pdf-core";
-import { type PDFDocument } from "../Document";
-import { IComponent } from "./IComponent";
+import type { PDFDocument } from "../Document";
+import type { IComponent } from "./IComponent";
 import { FormComponentRegistry, FormComponentType } from "./FormComponent.Registry";
 
 function wrapWidget(type: FormComponentType, widget: core.WidgetDictionary, doc: PDFDocument): IComponent {

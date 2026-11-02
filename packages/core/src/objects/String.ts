@@ -1,4 +1,4 @@
-import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 import { PDFObject } from "./Object";
 
 export abstract class PDFString extends PDFObject {

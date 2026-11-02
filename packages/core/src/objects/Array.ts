@@ -283,4 +283,4 @@ export class PDFArray extends PDFObject implements Iterable<PDFObject> {
 
 import { PDFTypeConverter } from "./TypeConverter";
 import { PDFObjectReader } from "./ObjectReader";
-import { PDFObjectTypes } from "./ObjectTypes";
+import type { PDFObjectTypes } from "./ObjectTypes";

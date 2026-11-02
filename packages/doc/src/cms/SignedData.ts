@@ -1,5 +1,5 @@
 import { X509Certificate, X509Certificates } from "@peculiar/x509";
-import { BufferSourceConverter, BufferSource } from "pvtsutils";
+import { BufferSourceConverter, type BufferSource } from "pvtsutils";
 
 import * as asn1js from "asn1js";
 import * as pkijs from "pkijs";
@@ -322,12 +322,12 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
 }
 
 import { PKIUtils } from "./PKIUtils";
-import { CMSSignerInfo, CMSSignerInfoVerifyResult, CMSSignerInfoVerifyResultCodes } from "./SignerInfo";
+import { CMSSignerInfo, type CMSSignerInfoVerifyResult, CMSSignerInfoVerifyResultCodes } from "./SignerInfo";
 import { CmsCertificateStorageHandler } from "./CertificateStorageHandler";
 import { CRL } from "./CRL";
 import { OCSP } from "./OCSP";
-import { AdobeRevocationInfoArchival, id_adbe_revocationInfoArchival } from "./AdobeRevocationInfoArchival";
-import { AlgorithmFactory, HashedAlgorithm } from "./AlgorithmFactory";
+import { type AdobeRevocationInfoArchival, id_adbe_revocationInfoArchival } from "./AdobeRevocationInfoArchival";
+import { AlgorithmFactory, type HashedAlgorithm } from "./AlgorithmFactory";
 
 import type { CmsAttribute } from "./attributes";
 import type { ICertificateStorage, ICertificateStorageHandler } from "./ICertificateStorageHandler";

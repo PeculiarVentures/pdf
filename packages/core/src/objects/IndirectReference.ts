@@ -2,7 +2,7 @@ import { BadCharError } from "../errors";
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
 import type { PDFObject } from "./Object";
-import { PDFObjectTypes } from "./ObjectTypes";
+import type { PDFObjectTypes } from "./ObjectTypes";
 
 import { ObjectTypeEnum } from "./internal";
 import { PDFIndirect } from "./Indirect";

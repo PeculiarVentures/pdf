@@ -1,5 +1,5 @@
 import { BufferSourceConverter } from "pvtsutils";
-import { PDFDictionaryField, PDFName, PDFNumeric, PDFObjectReader, PDFObjectTypes, PDFStream } from "../objects";
+import { PDFDictionaryField, PDFName, PDFNumeric, PDFObjectReader, type PDFObjectTypes, PDFStream } from "../objects";
 import { ViewReader } from "../ViewReader";
 import { ViewWriter } from "../ViewWriter";
 

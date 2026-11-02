@@ -1,5 +1,5 @@
-import { X509Certificate } from "@peculiar/x509";
-import { BufferSource } from "pvtsutils";
+import type { X509Certificate } from "@peculiar/x509";
+import type { BufferSource } from "pvtsutils";
 import * as pkijs from "pkijs";
 
 import { AsnEncoded } from "./AsnEncoded";
@@ -187,7 +187,7 @@ export class CMSSignerInfo extends AsnEncoded<pkijs.SignerInfo> {
   }
 }
 
-import { CmsAttribute } from "./attributes/Attribute";
+import type { CmsAttribute } from "./attributes/Attribute";
 import { CmsAttributeFactory } from "./attributes/AttributeFactory";
 import { AlgorithmFactory } from "./AlgorithmFactory";
 

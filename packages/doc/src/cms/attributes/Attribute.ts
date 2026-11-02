@@ -1,5 +1,5 @@
 import * as asn1js from "asn1js";
-import { BufferSource, BufferSourceConverter } from "pvtsutils";
+import { type BufferSource, BufferSourceConverter } from "pvtsutils";
 import * as pkijs from "pkijs";
 
 import { AsnEncoded } from "../AsnEncoded";

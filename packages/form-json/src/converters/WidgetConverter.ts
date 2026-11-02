@@ -1,5 +1,5 @@
-import * as pdfDoc from "@peculiar/pdf-doc";
-import { JsonComponent } from "../types";
+import type * as pdfDoc from "@peculiar/pdf-doc";
+import type { JsonComponent } from "../types";
 import { ComponentConverter } from "./ComponentConverter";
 
 /**

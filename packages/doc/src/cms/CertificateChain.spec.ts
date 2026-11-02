@@ -4,7 +4,7 @@ import * as pkijs from "pkijs";
 import "./algorithms";
 import { CertificateChain, CertificateChainStatusCode } from "./CertificateChain";
 import { DefaultCertificateStorageHandler } from "./DefaultCertificateStorageHandler";
-import { IResult, IsTrustedResult, RevocationType } from "./ICertificateStorageHandler";
+import type { IResult, IsTrustedResult, RevocationType } from "./ICertificateStorageHandler";
 import { CRL } from "./CRL";
 import { OCSP } from "./OCSP";
 import { CertificateID } from "./CertID";

@@ -1,4 +1,4 @@
-import { PDFString } from "../../objects";
+import type { PDFString } from "../../objects";
 import { PDFLiteralString } from "../../objects/LiteralString";
 import type { PDFDocumentUpdate } from "../DocumentUpdate";
 import type { PDFDocument } from "../Document";

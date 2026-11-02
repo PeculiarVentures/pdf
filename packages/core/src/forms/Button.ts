@@ -1,5 +1,5 @@
-import { PDFArray, PDFArrayField } from "../objects";
-import { FieldFlags, PDFField } from "./Field";
+import { type PDFArray, PDFArrayField } from "../objects";
+import { type FieldFlags, PDFField } from "./Field";
 
 export enum ButtonFlags {
   /**

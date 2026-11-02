@@ -1,4 +1,4 @@
-import { PDFIndirectObject, PDFIndirectReference, PDFNull, PDFObject, PDFStream } from "../objects";
+import { PDFIndirectObject, PDFIndirectReference, PDFNull, type PDFObject, PDFStream } from "../objects";
 import { CompressedObject } from "./CompressedObject";
 import type { CrossReferenceTable } from "./CrossReferenceTable";
 import type { PDFDocumentUpdate } from "./DocumentUpdate";

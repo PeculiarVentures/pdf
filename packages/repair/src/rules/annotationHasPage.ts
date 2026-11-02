@@ -1,4 +1,4 @@
-import { PDFDocument } from "@peculiar/pdf-doc";
+import type { PDFDocument } from "@peculiar/pdf-doc";
 import { globalRepairRegistry } from "../PDFRepairRegistry";
 import { PDFDictionary } from "@peculiar/pdf-core";
 

@@ -1,8 +1,8 @@
 import * as core from "@peculiar/pdf-core";
-import { type PDFDocument } from "./Document";
-import { FormObject } from "./FormObject";
-import { Image } from "./Image";
-import { ImageDrawParameters, TextDrawParams } from "./Page";
+import type { PDFDocument } from "./Document";
+import type { FormObject } from "./FormObject";
+import type { Image } from "./Image";
+import type { ImageDrawParameters, TextDrawParams } from "./Page";
 import { WrapObject } from "./WrapObject";
 
 export interface WatermarkParams {

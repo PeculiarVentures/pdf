@@ -1,5 +1,5 @@
 import * as objects from "../objects";
-import { Maybe } from "../objects";
+import type { Maybe } from "../objects";
 import { PDFField } from "./Field";
 import { SignatureDictionary } from "./Signature";
 import { SignatureLockDictionary } from "./SignatureLock";

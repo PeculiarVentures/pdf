@@ -1,5 +1,5 @@
 import * as core from "@peculiar/pdf-core";
-import { FormComponentHandler, IFormComponentCreateParameters, IFormComponentHandler, IFormComponentParameters } from "./FormComponent.Handler";
+import { FormComponentHandler, type IFormComponentCreateParameters, type IFormComponentHandler, type IFormComponentParameters } from "./FormComponent.Handler";
 import { FormObject } from "../FormObject";
 
 export interface ICheckBoxCreateParameters extends IFormComponentCreateParameters {

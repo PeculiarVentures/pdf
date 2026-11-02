@@ -1,4 +1,4 @@
-import { BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
 
 import { ParsingError } from "../errors";
 import { ViewReader } from "../ViewReader";

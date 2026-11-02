@@ -1,6 +1,6 @@
-import * as pdfDoc from "@peculiar/pdf-doc";
-import { ComponentConverter } from "../index";
-import { IComponentConstructor } from "../types";
+import type * as pdfDoc from "@peculiar/pdf-doc";
+import type { ComponentConverter } from "../index";
+import type { IComponentConstructor } from "../types";
 
 /**
  * The ComponentConverterFactory is a factory that creates ComponentConverter instances for IComponent types.

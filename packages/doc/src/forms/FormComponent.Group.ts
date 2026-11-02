@@ -1,6 +1,6 @@
 import * as core from "@peculiar/pdf-core";
 import { WrapObject } from "../WrapObject";
-import { IComponent } from "./IComponent";
+import type { IComponent } from "./IComponent";
 import { FormComponent } from "./FormComponent";
 import { FormComponentFactory } from "./FormComponent.Factory";
 

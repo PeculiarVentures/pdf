@@ -1,4 +1,4 @@
-import { PDFDocument } from "@peculiar/pdf-doc";
+import type { PDFDocument } from "@peculiar/pdf-doc";
 
 /**
  * An interface representing a repair rule for a PDF document.

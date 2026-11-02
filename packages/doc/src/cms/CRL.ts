@@ -1,4 +1,4 @@
-import { X509Certificate, Name } from "@peculiar/x509";
+import { type X509Certificate, Name } from "@peculiar/x509";
 import * as pkijs from "pkijs";
 
 import { AsnEncoded } from "./AsnEncoded";

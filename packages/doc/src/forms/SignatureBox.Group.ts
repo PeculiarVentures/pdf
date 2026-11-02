@@ -3,10 +3,10 @@ import * as core from "@peculiar/pdf-core";
 import { Convert } from "pvtsutils";
 import * as pkijs from "pkijs";
 import * as cms from "../cms";
-import { type FormObject } from "../FormObject";
+import type { FormObject } from "../FormObject";
 import { FormComponentGroup } from "./FormComponent.Group";
-import { type SignatureBox } from "./SignatureBox";
-import * as types from "./SignatureBox.Types";
+import type { SignatureBox } from "./SignatureBox";
+import type * as types from "./SignatureBox.Types";
 
 const ERR_INCORRECT_BYTE_RANGE = "The range of bytes points to an incorrect data";
 

@@ -1,9 +1,9 @@
 import * as core from "@peculiar/pdf-core";
 import { X509Certificate } from "@peculiar/x509";
-import { BufferSource, BufferSourceConverter } from "pvtsutils";
+import { type BufferSource, BufferSourceConverter } from "pvtsutils";
 
 import * as cms from "./cms";
-import { type PDFDocument } from "./Document";
+import type { PDFDocument } from "./Document";
 import { PDFVersion } from "./Version";
 import { WrapObject } from "./WrapObject";
 

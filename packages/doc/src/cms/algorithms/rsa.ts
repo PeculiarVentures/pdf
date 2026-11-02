@@ -4,7 +4,7 @@ import { AsnConvert } from "@peculiar/asn1-schema";
 import * as asn1js from "asn1js";
 import * as pkijs from "pkijs";
 import { Convert } from "pvtsutils";
-import { AlgorithmFactory, AlgorithmConverter, HashedAlgorithm } from "../AlgorithmFactory";
+import { AlgorithmFactory, type AlgorithmConverter, type HashedAlgorithm } from "../AlgorithmFactory";
 
 const id_pkcs_1 = "1.2.840.113549.1.1";
 const id_rsaEncryption = `${id_pkcs_1}.1`;
