@@ -1,4 +1,15 @@
-# `@peculiar/pdf-font`
+<h1 align="center">
+  @peculiar/pdf-font
+</h1>
+
+<div align="center">
+
+![GitHub License](https://img.shields.io/github/license/PeculiarVentures/pdf)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/PeculiarVentures/pdf/release.yml?branch=main&label=release)
+[![npm version](https://img.shields.io/npm/v/@peculiar/pdf-font.svg)](https://www.npmjs.com/package/@peculiar/pdf-font)
+[![npm downloads](https://img.shields.io/npm/dm/@peculiar/pdf-font.svg)](https://www.npmjs.com/package/@peculiar/pdf-font)
+
+</div>
 
 A library for working with fonts in PDF documents, providing utilities for font loading, embedding, and text rendering.
 
@@ -7,6 +18,15 @@ A library for working with fonts in PDF documents, providing utilities for font 
 ```bash
 npm install @peculiar/pdf-font
 ```
+
+## Breaking Changes In v2
+
+v2 is ESM-only and requires Node.js `^20.19.0 || >=22.12.0` (1.x declared no `engines`). CommonJS code can still `require("@peculiar/pdf-font")` on these versions; Node.js 22.0–22.11 can't. See the [full notes](https://github.com/PeculiarVentures/pdf#breaking-changes-in-v2).
+
+- **TypeScript compiling to CommonJS:** use `"module": "node20"` or `"nodenext"` (`node16` fails with TS1479). ESM and bundler setups need no changes.
+- **Jest in CommonJS mode:** switch to ESM mode or Vitest, or configure an ESM-to-CommonJS transformer and make sure `transformIgnorePatterns` doesn't exclude the `@peculiar/*` packages.
+- **Deep imports** (`@peculiar/pdf-font/build/...`) are blocked by `exports`; import from `@peculiar/pdf-font`.
+- **Peer dependencies:** `@peculiar/asn1-schema` (`^3.0.0`) is a peer, shared with the other `@peculiar/asn1-*` packages in your app. npm installs peers automatically.
 
 ## Usage
 

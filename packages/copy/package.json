@@ -34,13 +34,13 @@
   "license": "AGPL",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PeculiarVentures/pdf.git",
+    "url": "https://github.com/PeculiarVentures/pdf",
     "directory": "packages/copy"
   },
   "bugs": {
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
-  "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/copy#readme",
+  "homepage": "https://github.com/PeculiarVentures/pdf/tree/main/packages/copy#readme",
   "dependencies": {
     "@peculiar/pdf-core": "^1.17.1"
   }

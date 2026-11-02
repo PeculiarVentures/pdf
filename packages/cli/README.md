@@ -1,4 +1,15 @@
-# `@peculiar/pdf-cli`
+<h1 align="center">
+  @peculiar/pdf-cli
+</h1>
+
+<div align="center">
+
+![GitHub License](https://img.shields.io/github/license/PeculiarVentures/pdf)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/PeculiarVentures/pdf/release.yml?branch=main&label=release)
+[![npm version](https://img.shields.io/npm/v/@peculiar/pdf-cli.svg)](https://www.npmjs.com/package/@peculiar/pdf-cli)
+[![npm downloads](https://img.shields.io/npm/dm/@peculiar/pdf-cli.svg)](https://www.npmjs.com/package/@peculiar/pdf-cli)
+
+</div>
 
 Command-line interface for PDF document manipulation and analysis.
 
@@ -7,6 +18,10 @@ Command-line interface for PDF document manipulation and analysis.
 ```bash
 npm install -g @peculiar/pdf-cli
 ```
+
+## Breaking Changes In v2
+
+v2 requires Node.js `^20.19.0 || >=22.12.0` (1.x declared no `engines`). `pvpdf` is an ES module at `build/index.js` (was `build/index.cjs`); the commands are unchanged. See the [full notes](https://github.com/PeculiarVentures/pdf#breaking-changes-in-v2).
 
 ## Commands
 

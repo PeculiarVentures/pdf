@@ -34,13 +34,13 @@
   "license": "AGPL",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PeculiarVentures/pdf.git",
+    "url": "https://github.com/PeculiarVentures/pdf",
     "directory": "packages/font"
   },
   "bugs": {
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
-  "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/pdf-font#readme",
+  "homepage": "https://github.com/PeculiarVentures/pdf/tree/main/packages/font#readme",
   "scripts": {
     "scripts:default": "node scripts/default.ts"
   },

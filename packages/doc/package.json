@@ -26,13 +26,13 @@
   "license": "AGPL",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PeculiarVentures/pdf.git",
+    "url": "https://github.com/PeculiarVentures/pdf",
     "directory": "packages/doc"
   },
   "bugs": {
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
-  "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/pdf-doc#readme",
+  "homepage": "https://github.com/PeculiarVentures/pdf/tree/main/packages/doc#readme",
   "dependencies": {
     "@peculiar/asn1-ocsp": "^3.0.0",
     "@peculiar/asn1-rsa": "^3.0.0",

@@ -1,20 +1,31 @@
-# `@peculiar/pdf-form-json`
+<h1 align="center">
+  @peculiar/pdf-form-json
+</h1>
+
+<div align="center">
+
+![GitHub License](https://img.shields.io/github/license/PeculiarVentures/pdf)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/PeculiarVentures/pdf/release.yml?branch=main&label=release)
+[![npm version](https://img.shields.io/npm/v/@peculiar/pdf-form-json.svg)](https://www.npmjs.com/package/@peculiar/pdf-form-json)
+[![npm downloads](https://img.shields.io/npm/dm/@peculiar/pdf-form-json.svg)](https://www.npmjs.com/package/@peculiar/pdf-form-json)
+
+</div>
 
 `@peculiar/pdf-form-json` is a library for working with PDF form data in JSON format. This library provides a FormConverter class that can convert a PDF document with form data into a JSON representation of that data, and also set values on form components based on a JSON payload.
 
 ## Installation
 
-Using npm:
-
 ```bash
 npm install @peculiar/pdf-form-json
 ```
 
-Using yarn:
+## Breaking Changes In v2
 
-```bash
-yarn add @peculiar/pdf-form-json
-```
+v2 is ESM-only and requires Node.js `^20.19.0 || >=22.12.0` (1.x declared no `engines`). CommonJS code can still `require("@peculiar/pdf-form-json")` on these versions; Node.js 22.0–22.11 can't. See the [full notes](https://github.com/PeculiarVentures/pdf#breaking-changes-in-v2).
+
+- **TypeScript compiling to CommonJS:** use `"module": "node20"` or `"nodenext"` (`node16` fails with TS1479). ESM and bundler setups need no changes.
+- **Jest in CommonJS mode:** switch to ESM mode or Vitest, or configure an ESM-to-CommonJS transformer and make sure `transformIgnorePatterns` doesn't exclude the `@peculiar/*` packages.
+- **Deep imports** (`@peculiar/pdf-form-json/build/...`) are blocked by `exports`; import from `@peculiar/pdf-form-json`.
 
 ## Usage
 

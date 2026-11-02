@@ -4,7 +4,7 @@
   "description": "Test suite for PDF - Utilities and helper tools for testing purposes",
   "keywords": [],
   "author": "microshine <microshine@mail.ru>",
-  "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/pdf-tests#readme",
+  "homepage": "https://github.com/PeculiarVentures/pdf/tree/main/packages/tests#readme",
   "license": "AGPL",
   "private": true,
   "files": [
@@ -12,7 +12,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PeculiarVentures/pdf.git"
+    "url": "https://github.com/PeculiarVentures/pdf"
   },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1"
