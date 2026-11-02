@@ -2,32 +2,37 @@
   "name": "@peculiar/pdf-doc",
   "version": "1.17.2",
   "description": "High-level PDF manipulation and generation module for Node.js and browser",
-  "keywords": [],
-  "author": "microshine <microshine@mail.ru>",
-  "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/pdf-doc#readme",
-  "license": "AGPL",
+  "type": "module",
+  "sideEffects": true,
   "main": "./build/index.js",
-  "module": "./build/index.mjs",
+  "module": "./build/index.js",
   "types": "./build/index.d.ts",
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
+  "exports": {
+    ".": "./build/index.js",
+    "./package.json": "./package.json"
   },
   "files": [
-    "build",
-    "LICENSE",
-    "README.md"
+    "build/",
+    "README.md",
+    "LICENSE"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "author": "microshine <microshine@mail.ru>",
+  "license": "AGPL",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PeculiarVentures/pdf.git"
-  },
-  "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "url": "git+https://github.com/PeculiarVentures/pdf.git",
+    "directory": "packages/doc"
   },
   "bugs": {
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
+  "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/pdf-doc#readme",
   "dependencies": {
     "@peculiar/asn1-ocsp": "^2.3.13",
     "@peculiar/asn1-rsa": "^2.3.13",
@@ -45,12 +50,5 @@
     "pkijs": "^3.2.4",
     "pvtsutils": "^1.3.6",
     "pvutils": "^1.1.3"
-  },
-  "exports": {
-    ".": {
-      "module": "./build/index.mjs",
-      "default": "./build/index.js"
-    },
-    "./package.json": "./package.json"
   }
 }

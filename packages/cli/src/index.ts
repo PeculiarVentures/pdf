@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { Crypto } from "@peculiar/webcrypto";
 import * as core from "@peculiar/pdf-core";
 import { Command } from "commander";

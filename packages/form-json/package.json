@@ -2,6 +2,26 @@
   "name": "@peculiar/pdf-form-json",
   "version": "1.17.2",
   "description": "A PDF module enabling working with form elements through JSON.",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./build/index.js",
+  "module": "./build/index.js",
+  "types": "./build/index.d.ts",
+  "exports": {
+    ".": "./build/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "build/",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "keywords": [
     "pdf",
     "form",
@@ -9,40 +29,19 @@
     "acroform"
   ],
   "author": "microshine <microshine@mail.ru>",
-  "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/form-json#readme",
   "license": "AGPL",
-  "main": "./build/index.js",
-  "module": "./build/index.mjs",
-  "types": "./build/index.d.ts",
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
-  "files": [
-    "build",
-    "LICENSE",
-    "README.md"
-  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PeculiarVentures/pdf.git"
-  },
-  "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "url": "git+https://github.com/PeculiarVentures/pdf.git",
+    "directory": "packages/form-json"
   },
   "bugs": {
     "url": "https://github.com/PeculiarVentures/pdf/issues"
   },
+  "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/form-json#readme",
   "dependencies": {
     "@peculiar/pdf-core": "^1.17.1",
     "@peculiar/pdf-doc": "^1.17.2",
     "pvtsutils": "^1.3.6"
-  },
-  "exports": {
-    ".": {
-      "module": "./build/index.mjs",
-      "default": "./build/index.js"
-    },
-    "./package.json": "./package.json"
   }
 }

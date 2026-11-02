@@ -2,6 +2,26 @@
   "name": "@peculiar/pdf-font",
   "version": "1.17.1",
   "description": "Font handling library for PDF document generation",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./build/index.js",
+  "module": "./build/index.js",
+  "types": "./build/index.d.ts",
+  "exports": {
+    ".": "./build/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "build/",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "keywords": [
     "pdf",
     "font",
@@ -11,30 +31,18 @@
     "typography"
   ],
   "author": "microshine <microshine@mail.ru>",
-  "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/pdf-font#readme",
   "license": "AGPL",
-  "main": "./build/index.js",
-  "module": "./build/index.mjs",
-  "types": "./build/index.d.ts",
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
-  "files": [
-    "build",
-    "LICENSE",
-    "README.md"
-  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PeculiarVentures/pdf.git"
-  },
-  "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1",
-    "scripts:default": "node scripts/default.ts"
+    "url": "git+https://github.com/PeculiarVentures/pdf.git",
+    "directory": "packages/font"
   },
   "bugs": {
     "url": "https://github.com/PeculiarVentures/pdf/issues"
+  },
+  "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/pdf-font#readme",
+  "scripts": {
+    "scripts:default": "node scripts/default.ts"
   },
   "dependencies": {
     "@peculiar/asn1-schema": "^2.3.13",
@@ -42,12 +50,5 @@
     "fontjs": "^3.0.1",
     "pako": "^2.1.0",
     "pvtsutils": "^1.3.6"
-  },
-  "exports": {
-    ".": {
-      "module": "./build/index.mjs",
-      "default": "./build/index.js"
-    },
-    "./package.json": "./package.json"
   }
 }
