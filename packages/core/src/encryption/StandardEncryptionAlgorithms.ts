@@ -1,6 +1,7 @@
 import type * as pkijs from "pkijs";
-import { binary, bytes, toArrayBuffer, toUint8Array, utf8 } from "@peculiar/utils";
+import { binary, bytes, toArrayBuffer, utf8 } from "@peculiar/utils";
 import { algorithms } from "./Constants";
+import { toCryptoBytes } from "./bytes";
 
 export type Password = string | BufferSource;
 
@@ -104,12 +105,12 @@ const passwordPadding = new Uint8Array([
  * @param password Password
  * @returns
  */
-function passwordToView(password: Password): Uint8Array {
+function passwordToView(password: Password): Uint8Array<ArrayBuffer> {
   if (typeof password === "string") {
-    return new Uint8Array(toArrayBuffer(utf8.encode(password)));
+    return toCryptoBytes(utf8.encode(password));
   }
 
-  return toUint8Array(password);
+  return toCryptoBytes(password);
 }
 
 /**
@@ -403,8 +404,8 @@ export class StandardEncryptionAlgorithm {
       //    checking the user password or creating the user key, K1 is the concatenation of the input password
       //    and K.
       const sequence = toArrayBuffer(bytes.concat(passwordToView(params.password), k, u));
-      const sequenceView = toUint8Array(sequence);
-      const k1: Uint8Array = new Uint8Array(sequence.byteLength * 64);
+      const sequenceView = toCryptoBytes(sequence);
+      const k1: Uint8Array<ArrayBuffer> = new Uint8Array(sequence.byteLength * 64);
       for (let i = 0; i < 64; i++) {
         k1.set(sequenceView, sequence.byteLength * i);
       }
@@ -415,7 +416,7 @@ export class StandardEncryptionAlgorithm {
       e = await params.crypto.encrypt(
         {
           name: "AES-CBC",
-          iv: toUint8Array(k).subarray(16, 32),
+          iv: toCryptoBytes(k).subarray(16, 32),
         },
         aesKey,
         k1,
@@ -426,7 +427,7 @@ export class StandardEncryptionAlgorithm {
       //    result is 0, the next hash used is SHA-256, if the result is 1, the next hash used is SHA-384, if the result is 2,
       //    the next hash used is SHA-512.
       const remainder =
-        toUint8Array(e)
+        toCryptoBytes(e)
           .subarray(0, 16)
           .reduce((a, b) => a + b, 0) % 3;
 
@@ -453,7 +454,7 @@ export class StandardEncryptionAlgorithm {
       // Do the following, starting with round number 64:
       // e) Look at the very last byte of E. If the value of that byte (taken as an unsigned integer) is greater than the
       //    round number - 32, repeat steps (a-d) again.
-      const eView = toUint8Array(e);
+      const eView = toCryptoBytes(e);
       if (eView[eView.length - 1] > i - 32) {
         continue;
       }
@@ -482,7 +483,7 @@ export class StandardEncryptionAlgorithm {
       // c) (Security handlers of revision 3 or greater) Do the following 50 times
       hash = await params.crypto.digest(algorithms.md5, hash);
     }
-    const hashView = toUint8Array(hash);
+    const hashView = toCryptoBytes(hash);
 
     // d) Create an RC4 file encryption key using the first n bytes of the output from the final MD5 hash,
     //    where n shall always be 5 for security handlers of revision 2 but, for security handlers of revision 3
@@ -548,7 +549,7 @@ export class StandardEncryptionAlgorithm {
     // a) Create a file encryption key based on the user password string, as described in 7.6.4.3.1, "Algorithm 2:
     //    Computing an encryption key in order to encrypt a document (revision 4 and earlier)".
     const encKey = await this.algorithm2(params);
-    const encKeyView = toUint8Array(encKey);
+    const encKeyView = toCryptoBytes(encKey);
 
     const md5Data = toArrayBuffer(
       bytes.concat(
@@ -609,7 +610,7 @@ export class StandardEncryptionAlgorithm {
     //    16 bytes in the case of security handlers of revision 3 or greater), the password supplied is the correct
     //    user password.
     if (params.revision >= 3) {
-      return bytes.equal(toUint8Array(u).subarray(0, 16), toUint8Array(params.u).subarray(0, 16));
+      return bytes.equal(toCryptoBytes(u).subarray(0, 16), toCryptoBytes(params.u).subarray(0, 16));
     }
 
     //    The file encryption key obtained in step (a) (that is, in the first step of 7.6.4.4.2, "Algorithm
@@ -661,7 +662,7 @@ export class StandardEncryptionAlgorithm {
     //    2.B with an input string consisting of the UTF-8 password concatenated with the User Validation Salt. The
     //    48-byte string consisting of the 32-byte hash followed by the User Validation Salt followed by the User
     //    Key Salt is stored as the U key.
-    const random = toUint8Array(params.random || crypto.getRandomValues(new Uint8Array(16)));
+    const random = toCryptoBytes(params.random || crypto.getRandomValues(new Uint8Array(16)));
     const userValidationSalt = random.subarray(0, 8);
     const userKeySalt = random.subarray(8);
     const hash = await this.algorithm2B({
@@ -701,10 +702,10 @@ export class StandardEncryptionAlgorithm {
   public static async algorithm9(params: StandardAlgorithm9Params): Promise<StandardAlgorithm9Result> {
     const { crypto } = params;
     const password = passwordToView(params.password);
-    const u = toUint8Array(params.u).subarray(0, 48);
+    const u = toCryptoBytes(params.u).subarray(0, 48);
 
     // a) Generate 16 random bytes of data using a strong random number generator.
-    const random = toUint8Array(params.random || crypto.getRandomValues(new Uint8Array(16)));
+    const random = toCryptoBytes(params.random || crypto.getRandomValues(new Uint8Array(16)));
     //    The first 8 bytes are the Owner Validation Salt.
     const ownerValidationSalt = random.subarray(0, 8);
     //    The second 8 bytes are the Owner Key Salt.
@@ -807,7 +808,7 @@ export class StandardEncryptionAlgorithm {
     //     encryption dictionary’s U (user password) and UE (user encryption) values (Security handlers of revision
     //     6)"). If the 32- byte result matches the first 32 bytes of the U string, this is the user password.
     const passwordView = passwordToView(params.password);
-    const uView = toUint8Array(params.u);
+    const uView = toCryptoBytes(params.u);
     const userPassword = uView.subarray(0, 32);
     const userValidationSalt = uView.subarray(32, 40);
 
@@ -830,8 +831,8 @@ export class StandardEncryptionAlgorithm {
     //    the 48 byte U string. If the 32 byte result matches the first 32 bytes of the O string, this is the owner
     //    password.
     const passwordView = passwordToView(params.password);
-    const uView = toUint8Array(params.u).subarray(0, 48);
-    const oView = toUint8Array(params.o).subarray(0, 48);
+    const uView = toCryptoBytes(params.u).subarray(0, 48);
+    const oView = toCryptoBytes(params.o).subarray(0, 48);
     const ownerValidationSalt = oView.subarray(32, 40);
     const hash = await this.algorithm2B({
       data: toArrayBuffer(bytes.concat(passwordView, ownerValidationSalt, uView)),

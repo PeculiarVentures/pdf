@@ -7,7 +7,7 @@ import type { SignatureBoxGroup } from "./SignatureBox.Group";
 
 export type SignatureBoxCreateImageCallback = (this: SignatureBoxGroup) => FormObject;
 export type SignatureDictionaryUpdateCallback = (this: SignatureBoxGroup, filed: core.SignatureDictionary) => Promise<void>;
-export type SignatureFieldSigningCallback = (this: SignatureBoxGroup, data: Uint8Array) => Promise<ArrayBuffer>;
+export type SignatureFieldSigningCallback = (this: SignatureBoxGroup, data: Uint8Array<ArrayBuffer>) => Promise<ArrayBuffer>;
 
 export interface SignatureBoxSignParameters {
   containerSize?: number;

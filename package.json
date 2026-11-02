@@ -31,7 +31,7 @@
     "@arethetypeswrong/core": "^0.18.5",
     "@peculiar/webcrypto": "^2.0.0",
     "@peculiar/x509": "^3.1.0",
-    "@types/node": "^24.0.0",
+    "@types/node": "^26.6.6",
     "@types/pako": "^2.0.0",
     "@vitest/coverage-v8": "^5.0.3",
     "canvas": "^3.2.3",
@@ -40,7 +40,7 @@
     "pdfjs-dist": "^3",
     "reflect-metadata": "^0.2.2",
     "tsdown": "^0.23.0",
-    "typescript": "^5.7.2",
+    "typescript": "^6.0.3",
     "vite": "^8.3.5",
     "vitest": "^5.0.3"
   },

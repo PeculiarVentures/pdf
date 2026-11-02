@@ -1,5 +1,6 @@
 import * as pkijs from "pkijs";
 import { bytes, isBufferSource, toArrayBuffer, toUint8Array } from "@peculiar/utils";
+import { toCryptoBytes } from "./encryption/bytes";
 
 const id_SHA3_256 = "2.16.840.1.101.3.4.2.8";
 const id_SHA3_384 = "2.16.840.1.101.3.4.2.9";
@@ -179,7 +180,7 @@ async function decryptWithPadding(crypto: SubtleCrypto, algorithm: AesCtrParams,
   const moduloBlock = 16 - (data.byteLength % 16);
 
   // Calculate absent tail for encrypted content
-  const iv = toUint8Array(data).subarray(data.byteLength - 16);
+  const iv = toCryptoBytes(data).subarray(data.byteLength - 16);
   const pad = new Uint8Array(moduloBlock).fill(moduloBlock);
   const result = await crypto.encrypt(
     {

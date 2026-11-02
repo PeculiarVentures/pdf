@@ -1,5 +1,5 @@
 import * as core from "@peculiar/pdf-core";
-import { toUint8Array } from "@peculiar/utils";
+import { toUint8Array, type BufferSource } from "@peculiar/utils";
 import { WrapObject } from "../WrapObject";
 import { EmbeddedFile } from "./EmbeddedFile";
 import { NameTree } from "./NameTree";

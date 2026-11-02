@@ -5,7 +5,7 @@ import { ASCII85Filter } from "./ASCII85Filter";
 describe("ASCII85Filter", () => {
   const vector: [string, ArrayBuffer, string][] = [
     ["F)Po,GA(E,+Co1uAnbatCif~>", toArrayBuffer(binary.decode("somewhat difficult")), "simple text"],
-    ['z!<<*"z~>', new Uint8Array([0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]), "data with zero blocks"],
+    ['z!<<*"z~>', new Uint8Array([0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]).buffer, "data with zero blocks"],
     ["F)Po,GA\n(E,+Co1uA\nnbatCif~>", toArrayBuffer(binary.decode("somewhat difficult")), "formatted data"],
   ];
 

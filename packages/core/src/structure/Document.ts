@@ -70,7 +70,7 @@ export class PDFDocument {
   public static readonly DEFAULT_VERSION = 1.5;
   public static readonly DEFAULT_VIEW = new Uint8Array();
 
-  public view = PDFDocument.DEFAULT_VIEW;
+  public view: Uint8Array = PDFDocument.DEFAULT_VIEW;
   public version = PDFDocument.DEFAULT_VERSION;
   public update = new PDFDocumentUpdate(this);
 

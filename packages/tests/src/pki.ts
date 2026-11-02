@@ -1,3 +1,4 @@
+import { toArrayBuffer, type BufferSource } from "@peculiar/utils";
 import { id_sha256 } from "@peculiar/asn1-rsa";
 import { AsnConvert, OctetString } from "@peculiar/asn1-schema";
 import { MessageImprint, TimeStampReq, TimeStampResp } from "@peculiar/asn1-tsp";
@@ -89,7 +90,7 @@ export class RootCertificateStorageHandler extends DefaultCertificateStorageHand
 
 // function to get TimeStampToken from http server
 export async function getTimeStampToken(signatureValue: BufferSource, url = "http://timestamp.digicert.com"): Promise<TimeStampToken> {
-  const signatureValueHash = await crypto.subtle.digest("SHA-256", signatureValue);
+  const signatureValueHash = await crypto.subtle.digest("SHA-256", toArrayBuffer(signatureValue));
   const timeStampRequest = new TimeStampReq({
     version: 1,
     messageImprint: new MessageImprint({

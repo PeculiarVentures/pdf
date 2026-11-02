@@ -161,7 +161,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
 
         const perms = await StandardEncryptionAlgorithm.algorithm10({
           permissions: encrypt.P,
-          key: encryptionKey,
+          key: encryptionKey.buffer,
           encryptMetadata: encrypt.EncryptMetadata,
           crypto,
         });

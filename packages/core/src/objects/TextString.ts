@@ -1,4 +1,4 @@
-import { binary, toArrayBuffer, toUint8Array } from "@peculiar/utils";
+import { binary, toArrayBuffer } from "@peculiar/utils";
 
 import type { EncryptionObject } from "./EncryptionObject";
 
@@ -59,8 +59,8 @@ export abstract class PDFTextString extends PDFString implements EncryptionObjec
     return toArrayBuffer(binary.decode(this.text));
   }
 
-  public toUint8Array(): Uint8Array {
-    return toUint8Array(this.toArrayBuffer());
+  public toUint8Array(): Uint8Array<ArrayBuffer> {
+    return new Uint8Array(this.toArrayBuffer());
   }
 
   protected override onCreate(): void {

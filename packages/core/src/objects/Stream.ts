@@ -106,7 +106,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
     return stream;
   }
 
-  private _stream = {
+  private _stream: { view: Uint8Array } = {
     view: PDFStream.DEFAULT_STREAM,
   };
 

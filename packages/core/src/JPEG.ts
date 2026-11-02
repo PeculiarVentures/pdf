@@ -1,4 +1,4 @@
-import { toUint8Array } from "@peculiar/utils";
+import { toUint8Array, type BufferSource } from "@peculiar/utils";
 import { ViewReader } from "./ViewReader";
 
 const SOI = 0xffd8;
@@ -14,7 +14,7 @@ export class JPEG {
     return reader.readUint16() === SOI;
   }
 
-  public data = JPEG.DEFAULT_VIEW;
+  public data: Uint8Array = JPEG.DEFAULT_VIEW;
   public bitsPerComponent = 0;
   public height = 0;
   public width = 0;

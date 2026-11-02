@@ -4,7 +4,7 @@ import { InputImageBox, PDFDocument } from "@peculiar/pdf-doc";
 
 describe("InputImageBox", () => {
   let docRaw: ArrayBuffer;
-  let testImageData: ArrayBuffer;
+  let testImageData: Uint8Array;
 
   beforeAll(async () => {
     const doc = await PDFDocument.create(xrefTableOptions);

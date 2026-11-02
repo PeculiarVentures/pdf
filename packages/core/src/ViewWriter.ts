@@ -51,7 +51,7 @@ export class ViewWriter {
     return this.toUint8Array().buffer;
   }
 
-  public toUint8Array(): Uint8Array {
+  public toUint8Array(): Uint8Array<ArrayBuffer> {
     const res = new Uint8Array(this.totalLength);
     let offset = 0;
 

@@ -1,3 +1,4 @@
+import type { BufferSource } from "@peculiar/utils";
 import { AsnConvert } from "@peculiar/asn1-schema";
 import { TSTInfo } from "@peculiar/asn1-tsp";
 import type * as pkijs from "pkijs";

@@ -117,7 +117,7 @@ export class PdfRenderingHelper {
       fs.writeFileSync(path.resolve(__dirname, `../../../page_${pageNumber}.png`), pageImage);
     }
 
-    const hash = await crypto.subtle.digest("SHA-256", pageImage);
+    const hash = await crypto.subtle.digest("SHA-256", new Uint8Array(pageImage));
     return hex.encode(hash);
   }
 }

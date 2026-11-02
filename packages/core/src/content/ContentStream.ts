@@ -1,4 +1,4 @@
-import { binary } from "@peculiar/utils";
+import { binary, type BufferSource } from "@peculiar/utils";
 
 import { PDFStream } from "../objects";
 

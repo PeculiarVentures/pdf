@@ -1,6 +1,6 @@
 import * as core from "@peculiar/pdf-core";
 import { X509Certificate } from "@peculiar/x509";
-import { bytes, isBufferSource, toUint8Array, type BufferSource } from "@peculiar/utils";
+import { bytes, isBufferSource, toArrayBuffer, toUint8Array, type BufferSource } from "@peculiar/utils";
 
 import * as cms from "./cms";
 import type { PDFDocument } from "./Document";
@@ -96,7 +96,7 @@ export class Dss extends WrapObject<core.DocumentSecurityStoreDictionary> {
 
     if (isBufferSource(view)) {
       try {
-        const cert = new X509Certificate(view);
+        const cert = new X509Certificate(toArrayBuffer(view));
         this.pushCert(cert, vri);
       } catch {
         try {

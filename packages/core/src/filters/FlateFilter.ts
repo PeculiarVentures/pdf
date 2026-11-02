@@ -92,10 +92,11 @@ export class FlateFilter extends Filter {
       }
     }
 
-    return result.buffer;
+    // pako and the predictors return exact-size arrays over a new ArrayBuffer.
+    return result.buffer as ArrayBuffer;
   }
 
   public encodeSync(stream: Uint8Array): ArrayBuffer {
-    return pako.deflate(stream).buffer;
+    return pako.deflate(stream).buffer as ArrayBuffer;
   }
 }

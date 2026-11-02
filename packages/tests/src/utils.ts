@@ -1,7 +1,7 @@
 import { PDFDocument, type PDFDocumentLoadParameters } from "@peculiar/pdf-doc";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { toArrayBuffer } from "@peculiar/utils";
+import { toArrayBuffer, type BufferSource } from "@peculiar/utils";
 import { xrefTableOptions } from "./options";
 
 export async function writePdfFile(data: BufferSource | PDFDocument, name = "tmp"): Promise<string> {

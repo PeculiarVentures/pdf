@@ -1,3 +1,4 @@
+import type { BufferSource } from "@peculiar/utils";
 import type { PDFString } from "../../objects";
 import { PDFLiteralString } from "../../objects/LiteralString";
 import type { PDFDocumentUpdate } from "../DocumentUpdate";

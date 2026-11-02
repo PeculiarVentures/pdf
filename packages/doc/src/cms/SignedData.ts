@@ -249,7 +249,7 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
   public async sign(key: CryptoKey, signer: CMSSignerInfo, data?: BufferSource): Promise<void> {
     const signerIndex = this.getSignerIndex(signer);
 
-    await this.signedData.sign(key, signerIndex, signer.digestAlgorithm.name, data);
+    await this.signedData.sign(key, signerIndex, signer.digestAlgorithm.name, data && toArrayBuffer(data));
 
     const signerRaw = this.signedData.signerInfos[signerIndex].toSchema().toBER();
     const signerAsn = pkijs.SignerInfo.fromBER(signerRaw);
@@ -269,7 +269,7 @@ export class CMSSignedData extends CMSContentInfo implements ICertificateStorage
   // TODO Move to CMSSignerInfo static method
   public createSigner(source: BufferSource | X509Certificate, params: CMSSignedDataCreateSignerParameters = {}): CMSSignerInfo {
     if (isBufferSource(source)) {
-      const cert = new X509Certificate(source);
+      const cert = new X509Certificate(toArrayBuffer(source));
 
       return this.createSigner(cert, params);
     }

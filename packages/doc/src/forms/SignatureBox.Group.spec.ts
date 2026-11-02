@@ -65,7 +65,7 @@ async function createSelfSignedCertificate() {
 }
 
 function signHandler(hash: string, keys: CryptoKeyPair, cert: x509.X509Certificate) {
-  return async (data: Uint8Array) => {
+  return async (data: Uint8Array<ArrayBuffer>) => {
     const messageDigest = await crypto.subtle.digest(hash, data);
     const signedData = new CMSSignedData();
     const signer = signedData.createSigner(cert, {

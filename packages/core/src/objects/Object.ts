@@ -109,7 +109,7 @@ export abstract class PDFObject {
     return this;
   }
 
-  public view = PDFObject.DEFAULT_VIEW;
+  public view: Uint8Array = PDFObject.DEFAULT_VIEW;
   public documentUpdate: PDFDocumentUpdate | null = null;
   public padding = 0;
 
