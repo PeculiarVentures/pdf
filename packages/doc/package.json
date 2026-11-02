@@ -1,6 +1,6 @@
 {
   "name": "@peculiar/pdf-doc",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "High-level PDF manipulation and generation module for Node.js and browser",
   "type": "module",
   "sideEffects": true,
@@ -38,9 +38,9 @@
     "@peculiar/asn1-rsa": "^3.0.0",
     "@peculiar/asn1-tsp": "^3.0.0",
     "@peculiar/asn1-x509": "^3.0.0",
-    "@peculiar/pdf-copy": "^2.0.0",
-    "@peculiar/pdf-core": "^2.0.0",
-    "@peculiar/pdf-font": "^2.0.0",
+    "@peculiar/pdf-copy": "^2.0.1",
+    "@peculiar/pdf-core": "^2.0.1",
+    "@peculiar/pdf-font": "^2.0.1",
     "@peculiar/utils": "^4.1.0",
     "fast-png": "^8.0.0",
     "pako": "^2.2.0"

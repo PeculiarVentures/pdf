@@ -1,6 +1,6 @@
 {
   "name": "@peculiar/pdf-copy",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "This module allows to recreate the PDF document using specified filters.",
   "type": "module",
   "sideEffects": false,
@@ -42,6 +42,6 @@
   },
   "homepage": "https://github.com/PeculiarVentures/pdf/tree/main/packages/copy#readme",
   "dependencies": {
-    "@peculiar/pdf-core": "^2.0.0"
+    "@peculiar/pdf-core": "^2.0.1"
   }
 }
