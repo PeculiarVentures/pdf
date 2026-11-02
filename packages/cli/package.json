@@ -42,7 +42,7 @@
     "@peculiar/webcrypto": "^2.0.0",
     "@peculiar/x509": "^3.1.0",
     "asn1js": "^4.0.0",
-    "commander": "^12.1.0",
+    "commander": "^14.0.3",
     "pkijs": "^4.0.0",
     "reflect-metadata": "^0.2.2"
   }

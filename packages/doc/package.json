@@ -42,8 +42,8 @@
     "@peculiar/pdf-core": "^1.17.1",
     "@peculiar/pdf-font": "^1.17.1",
     "@peculiar/utils": "^4.1.0",
-    "fast-png": "^6.2.0",
-    "pako": "^2.1.0"
+    "fast-png": "^8.0.0",
+    "pako": "^2.2.0"
   },
   "peerDependencies": {
     "@peculiar/asn1-schema": "^3.0.0",
