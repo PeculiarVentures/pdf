@@ -22,6 +22,12 @@ describe("FlateFilter", () => {
       expect(result).toBeInstanceOf(ArrayBuffer);
     });
 
+    it("should keep incomplete input as is", () => {
+      const input = new Uint8Array(pako.deflate(new Uint8Array(1000).fill(7)).subarray(0, 8));
+      const result = filter.decodeSync(input);
+      expect(new Uint8Array(result)).toEqual(input);
+    });
+
     it("should handle empty input", async () => {
       const input = new Uint8Array([]);
       const result = await filter.decode(input);
