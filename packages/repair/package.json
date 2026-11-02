@@ -1,6 +1,6 @@
 {
   "name": "@peculiar/pdf-repair",
-  "version": "1.17.2",
+  "version": "2.0.0",
   "description": "A comprehensive PDF repair module for Node.js, providing automated diagnosis and correction of PDF documents.",
   "type": "module",
   "sideEffects": true,
@@ -39,7 +39,7 @@
   },
   "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/repair#readme",
   "dependencies": {
-    "@peculiar/pdf-core": "^1.17.1",
-    "@peculiar/pdf-doc": "^1.17.2"
+    "@peculiar/pdf-core": "^2.0.0",
+    "@peculiar/pdf-doc": "^2.0.0"
   }
 }

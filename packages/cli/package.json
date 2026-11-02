@@ -1,6 +1,6 @@
 {
   "name": "@peculiar/pdf-cli",
-  "version": "1.17.2",
+  "version": "2.0.0",
   "description": "Command-line interface for PDF document manipulation and analysis",
   "type": "module",
   "bin": {
@@ -37,8 +37,8 @@
   "homepage": "https://github.com/PeculiarVentures/pdf/tree/master/packages/pdf-cli#readme",
   "dependencies": {
     "@peculiar/asn1-schema": "^3.0.0",
-    "@peculiar/pdf-core": "^1.17.1",
-    "@peculiar/pdf-doc": "^1.17.2",
+    "@peculiar/pdf-core": "^2.0.0",
+    "@peculiar/pdf-doc": "^2.0.0",
     "@peculiar/webcrypto": "^2.0.0",
     "@peculiar/x509": "^3.1.0",
     "asn1js": "^4.0.0",
