@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PeculiarVentures/pdf.git"
+    "url": "https://github.com/PeculiarVentures/pdf"
   },
   "author": "",
   "license": "AGPL",
