@@ -1,6 +1,6 @@
 {
   "name": "@peculiar/pdf-form-json",
-  "version": "1.17.2",
+  "version": "2.0.0",
   "description": "A PDF module enabling working with form elements through JSON.",
   "type": "module",
   "sideEffects": false,
@@ -40,7 +40,7 @@
   },
   "homepage": "https://github.com/PeculiarVentures/pdf/tree/main/packages/form-json#readme",
   "dependencies": {
-    "@peculiar/pdf-core": "^1.17.1",
-    "@peculiar/pdf-doc": "^1.17.2"
+    "@peculiar/pdf-core": "^2.0.0",
+    "@peculiar/pdf-doc": "^2.0.0"
   }
 }
