@@ -1,6 +1,6 @@
-import * as asn1js from "asn1js";
 import type * as pkijs from "pkijs";
 import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { fromBER } from "./ber";
 
 export type AsnEncodedStringFormat = "hex" | "base64" | "base64url";
 
@@ -35,7 +35,7 @@ export abstract class AsnEncoded<TAsn extends pkijs.PkiObject = any> {
    */
   public fromBER(raw: BufferSource): void {
     const arrayBuffer = BufferSourceConverter.toArrayBuffer(raw);
-    const asn = asn1js.fromBER(arrayBuffer);
+    const asn = fromBER(arrayBuffer);
 
     if (asn.offset === -1) {
       throw new Error(`Invalid ASN.1 data. ${asn.result.error}`);

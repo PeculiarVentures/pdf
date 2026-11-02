@@ -1,8 +1,8 @@
-import * as asn1js from "asn1js";
 import { type BufferSource, BufferSourceConverter } from "pvtsutils";
 import * as pkijs from "pkijs";
 
 import { AsnEncoded } from "../AsnEncoded";
+import { fromBER } from "../ber";
 
 export interface CmsAttributeConstructor {
   new (): CmsAttribute;
@@ -27,7 +27,7 @@ export class CmsAttribute extends AsnEncoded<pkijs.Attribute> {
       this.asn.type = type;
       this.asn.values = values.map((o) => {
         const raw = BufferSourceConverter.toArrayBuffer(o);
-        const asn = asn1js.fromBER(raw);
+        const asn = fromBER(raw);
         if (asn.offset === -1) {
           throw new Error("Wrong ASN.1 encoded Attribute value");
         }

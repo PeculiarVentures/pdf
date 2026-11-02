@@ -66,6 +66,25 @@ describe("CRL", () => {
     });
   });
 
+  describe("fromBER", () => {
+    it("should parse a CRL with more ASN.1 nodes than the asn1js default limit", async () => {
+      const algorithm = { name: "ECDSA", namedCurve: "P-256" };
+      const keys = await crypto.subtle.generateKey(algorithm, false, ["sign", "verify"]);
+      const entries = Array.from({ length: 3000 }, (_, i) => ({ serialNumber: (i + 1).toString(16).padStart(6, "0"), revocationDate: new Date(), reason: x509.X509CrlReason.keyCompromise }));
+      const large = await x509.X509CrlGenerator.create({
+        issuer: "CN=CA Test",
+        signingKey: keys.privateKey,
+        signingAlgorithm: { ...algorithm, hash: "SHA-256" },
+        entries,
+      });
+
+      const crl = CRL.fromBER(large.rawData);
+
+      expect(crl.asn.revokedCertificates).toHaveLength(3000);
+      // Signing a 3000-entry CRL takes several seconds on CI with coverage.
+    }, 30_000);
+  });
+
   describe("issuer", () => {
     it("should return issuer name", async () => {
       const crl = CRL.fromBER(crlRaw);

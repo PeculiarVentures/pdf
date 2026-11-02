@@ -1,11 +1,11 @@
 import { CertificateList } from "@peculiar/asn1-x509";
 import { OCSPResponse } from "@peculiar/asn1-ocsp";
 import { AsnConvert, AsnProp, AsnPropTypes, AsnType, AsnTypeTypes } from "@peculiar/asn1-schema";
-import * as asn1js from "asn1js";
 import { CmsAttribute } from "./attributes/Attribute";
 import { CmsAttributeFactory } from "./attributes/AttributeFactory";
 import { CRL } from "./CRL";
 import { OCSP } from "./OCSP";
+import { berOptions, fromBER } from "./ber";
 
 const id_ri_ocsp_response = "1.3.6.1.5.5.7.48.1.1";
 
@@ -105,7 +105,7 @@ export class AdobeRevocationInfoArchival extends CmsAttribute {
   private get value(): RevocationInfoArchival {
     if (!this._value) {
       const raw = this.asn.values[0].toBER(false);
-      this._value = AsnConvert.parse(raw, RevocationInfoArchival);
+      this._value = AsnConvert.parse(raw, RevocationInfoArchival, { berOptions: berOptions(raw) });
     }
     return this._value;
   }
@@ -155,7 +155,8 @@ export class AdobeRevocationInfoArchival extends CmsAttribute {
     const otherRevInfos: OtherRevInfo[] = [];
     for (const revocation of revocations) {
       if (revocation instanceof CRL) {
-        crl.push(AsnConvert.parse(revocation.toBER(), CertificateList));
+        const raw = revocation.toBER();
+        crl.push(AsnConvert.parse(raw, CertificateList, { berOptions: berOptions(raw) }));
       } else if (revocation instanceof OCSP) {
         const raw = revocation.toOCSPResponse();
         const asnValue = AsnConvert.parse(raw, OCSPResponse);
@@ -174,7 +175,7 @@ export class AdobeRevocationInfoArchival extends CmsAttribute {
       otherRevInfo: otherRevInfos,
     });
     const revInfoRaw = AsnConvert.serialize(revInfo);
-    const asnValue = asn1js.fromBER(revInfoRaw);
+    const asnValue = fromBER(revInfoRaw);
     this.asn.values.push(asnValue.result);
   }
 }
