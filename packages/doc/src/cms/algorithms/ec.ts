@@ -1,6 +1,6 @@
 import * as asn1js from "asn1js";
 import * as pkijs from "pkijs";
-import { Convert } from "pvtsutils";
+import { hex, toArrayBuffer } from "@peculiar/utils";
 import { AlgorithmFactory, type AlgorithmConverter, type HashedAlgorithm } from "../AlgorithmFactory";
 
 const id_group = "1.2.840.10045.4";
@@ -11,12 +11,12 @@ const id_sha512WithECDSA = `${id_group}.3.4`;
 const id_ed25519 = "1.3.101.112";
 const id_ed448 = "1.3.101.113";
 
-const ber_sha1WithECDSA = Convert.FromHex("300b06072a8648ce3d04010500");
-const ber_sha256WithECDSA = Convert.FromHex("300c06082a8648ce3d0403020500");
-const ber_sha384WithECDSA = Convert.FromHex("300c06082a8648ce3d0403030500");
-const ber_sha512WithECDSA = Convert.FromHex("300c06082a8648ce3d0403040500");
-const ber_ed25519 = Convert.FromHex("300506032b6570");
-const ber_ed448 = Convert.FromHex("300506032b6571");
+const ber_sha1WithECDSA = toArrayBuffer(hex.decode("300b06072a8648ce3d04010500"));
+const ber_sha256WithECDSA = toArrayBuffer(hex.decode("300c06082a8648ce3d0403020500"));
+const ber_sha384WithECDSA = toArrayBuffer(hex.decode("300c06082a8648ce3d0403030500"));
+const ber_sha512WithECDSA = toArrayBuffer(hex.decode("300c06082a8648ce3d0403040500"));
+const ber_ed25519 = toArrayBuffer(hex.decode("300506032b6570"));
+const ber_ed448 = toArrayBuffer(hex.decode("300506032b6571"));
 
 export const ecAlgorithmConverter: AlgorithmConverter = {
   name: "EC",

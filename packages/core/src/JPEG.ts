@@ -1,4 +1,4 @@
-import { BufferSourceConverter } from "pvtsutils";
+import { toUint8Array } from "@peculiar/utils";
 import { ViewReader } from "./ViewReader";
 
 const SOI = 0xffd8;
@@ -42,7 +42,7 @@ export class JPEG {
 
     const res = new JPEG();
 
-    res.data = BufferSourceConverter.toUint8Array(view);
+    res.data = toUint8Array(view);
     res.bitsPerComponent = reader.readUint8();
     res.height = reader.readUint16();
     res.width = reader.readUint16();

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import * as x509 from "@peculiar/x509";
 import * as pkijs from "pkijs";
-import { Convert } from "pvtsutils";
+import { hex, toArrayBuffer } from "@peculiar/utils";
 import { CertificateID, CRL, DefaultCertificateStorageHandler, type ICertificateStorageHandler, type IResult, type IsTrustedResult, OCSP, type RevocationType } from "@peculiar/pdf-doc";
 
 describe("DefaultCertificateStorageHandler", () => {
@@ -290,7 +290,7 @@ describe("DefaultCertificateStorageHandler", () => {
       const storage = new DefaultCertificateStorageHandler();
       storage.certificates.push(caCert);
 
-      const result = await storage.findCertificate(Convert.FromHex("02020102"), caCert.issuerName.toArrayBuffer());
+      const result = await storage.findCertificate(toArrayBuffer(hex.decode("02020102")), caCert.issuerName.toArrayBuffer());
       expect(result).toBe(caCert);
     });
 
@@ -298,7 +298,7 @@ describe("DefaultCertificateStorageHandler", () => {
       const storage = new DefaultCertificateStorageHandler();
       storage.certificates.push(caCert);
 
-      const result = await storage.findCertificate(Convert.FromHex("02020103"), caCert.issuerName.toArrayBuffer());
+      const result = await storage.findCertificate(toArrayBuffer(hex.decode("02020103")), caCert.issuerName.toArrayBuffer());
       expect(result).toBeNull();
     });
 
@@ -308,7 +308,7 @@ describe("DefaultCertificateStorageHandler", () => {
 
       const childStorage = new DefaultCertificateStorageHandler();
       childStorage.parent = storage;
-      const result = await childStorage.findCertificate(Convert.FromHex("02020102"), caCert.issuerName.toArrayBuffer());
+      const result = await childStorage.findCertificate(toArrayBuffer(hex.decode("02020102")), caCert.issuerName.toArrayBuffer());
       expect(result).toBe(caCert);
     });
 
@@ -317,7 +317,7 @@ describe("DefaultCertificateStorageHandler", () => {
 
       const childStorage = new DefaultCertificateStorageHandler();
       childStorage.parent = storage;
-      const result = await childStorage.findCertificate(Convert.FromHex("02020102"), caCert.issuerName.toArrayBuffer());
+      const result = await childStorage.findCertificate(toArrayBuffer(hex.decode("02020102")), caCert.issuerName.toArrayBuffer());
       expect(result).toBeNull();
     });
   });

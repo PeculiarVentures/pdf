@@ -1,4 +1,4 @@
-import { Convert } from "pvtsutils";
+import { utf8 } from "@peculiar/utils";
 import { BadCharError, ParsingError } from "../errors";
 import { CharSet } from "../CharSet";
 import { PDFNumeric, PDFObjectReader } from "../objects";
@@ -36,7 +36,7 @@ export class CrossReferenceTable extends TrailerDictionary implements CrossRefer
       while (counter--) {
         // nnnnnnnnnn ggggg n eol
         id++;
-        const line = Convert.ToUtf8String(reader.read(18));
+        const line = utf8.decode(reader.read(18));
 
         const view = reader.view.subarray(reader.position);
         const charCode = view[1];

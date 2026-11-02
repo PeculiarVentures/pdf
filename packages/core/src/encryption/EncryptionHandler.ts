@@ -1,5 +1,5 @@
 import type * as pkijs from "pkijs";
-import type { BufferSource } from "pvtsutils";
+import type { BufferSource } from "@peculiar/utils";
 import type { PDFStream, PDFTextString } from "../objects";
 import type { PDFDocument, EncryptDictionary } from "../structure";
 

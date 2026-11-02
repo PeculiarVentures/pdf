@@ -27,7 +27,7 @@ import {
   TimeStampTokenAttribute,
 } from "@peculiar/pdf-doc";
 import { createPdfWithPage, getTimeStampToken, RootCertificateStorageHandler } from "@peculiar/pdf-tests";
-import { BufferSourceConverter, Convert } from "pvtsutils";
+import { base64, binary, bytes, hex, toArrayBuffer } from "@peculiar/utils";
 import * as pkijs from "pkijs";
 
 // Helper functions
@@ -119,6 +119,32 @@ describe("SignatureBoxGroup", () => {
     core.PDFDocumentUpdate.EOF_EOL = "\n"; // restore default value
   });
 
+  describe("Contents", () => {
+    it("should write the signature as lowercase hex padded with zeros to the container size", async () => {
+      const { doc } = await createAndSignDocument();
+      const raw = binary.encode(await doc.save());
+
+      const match = /\/Contents <([^>]*)>/.exec(raw);
+      expect(match).not.toBeNull();
+      const contents = match![1];
+      expect(contents).toHaveLength(SignatureBoxGroup.CONTAINER_SIZE * 2);
+      expect(contents).toMatch(/^[0-9a-f]+$/);
+
+      // The CMS SignedData (a DER SEQUENCE) followed by zero bytes
+      const signature = doc.getComponentByName("box1", SignatureBoxGroup).getSignatureValue();
+      expect(hex.encode(signature.Contents.data)).toBe(contents);
+      expect(contents.startsWith("30")).toBe(true);
+      expect(contents).toMatch(/[1-9a-f]0*$/);
+      expect(contents.endsWith("0000")).toBe(true);
+
+      // ByteRange skips exactly the hex string, including < and >
+      const [, , offset2] = /\/ByteRange \[\s*(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*\]/.exec(raw)!.slice(1).map(Number);
+      const start = raw.indexOf("/Contents <") + "/Contents ".length;
+      expect(raw[offset2 - 1]).toBe(">");
+      expect(offset2 - start).toBe(contents.length + 2);
+    });
+  });
+
   describe("Formatting state validation", () => {
     const validEOLs = [
       ["empty", ""],
@@ -155,7 +181,7 @@ describe("SignatureBoxGroup", () => {
     it("should detect extra bytes after signed data", async () => {
       let { doc } = await createAndSignDocument();
       let raw = await doc.save();
-      raw = BufferSourceConverter.concat(raw, Buffer.from("\n"));
+      raw = toArrayBuffer(bytes.concat(raw, Buffer.from("\n")));
 
       doc = await PDFDocument.load(raw);
       const verify = await doc.verify();
@@ -297,12 +323,14 @@ describe("SignatureBoxGroup", () => {
       );
       rootCert.privateKey = await crypto.subtle.importKey(
         "pkcs8",
-        Convert.FromBase64(
-          [
-            "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgXWn0lBforfLExCzT",
-            "RB7I1DagoCYiy7UvTbnRMMzNks2hRANCAAQTwNTbv6m8/RV19Ce4m2n6/38lAuKS",
-            "LXI63HkuAKHDyy/38cmGsZMzW4suxxY9UQ57gN9Q8qBXLN4/EZP23Wgy",
-          ].join(""),
+        toArrayBuffer(
+          base64.decode(
+            [
+              "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgXWn0lBforfLExCzT",
+              "RB7I1DagoCYiy7UvTbnRMMzNks2hRANCAAQTwNTbv6m8/RV19Ce4m2n6/38lAuKS",
+              "LXI63HkuAKHDyy/38cmGsZMzW4suxxY9UQ57gN9Q8qBXLN4/EZP23Wgy",
+            ].join(""),
+          ),
         ),
         keyAlg,
         false,
@@ -719,9 +747,9 @@ describe("SignatureBoxGroup", () => {
         const doc = await createSignedDocument();
         const signature = doc.getSignatures()[0] as SignatureBoxGroup;
         const contents = signature.target.V!.Contents;
-        const signedData = CMSSignedData.fromBER(Convert.FromBinary(contents.text));
+        const signedData = CMSSignedData.fromBER(toArrayBuffer(binary.decode(contents.text)));
         signedData.signers[0].asn.signature.valueBlock.valueHexView[0] = 0x00; // modify the signature
-        contents.text = Convert.ToBinary(signedData.toBER());
+        contents.text = binary.encode(signedData.toBER());
 
         const verify = await signature.verify();
         const state = getSignatureState(verify, "document_modification") as DocumentModificationState;

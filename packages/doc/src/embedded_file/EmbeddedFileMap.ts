@@ -1,5 +1,5 @@
 import * as core from "@peculiar/pdf-core";
-import { BufferSourceConverter } from "pvtsutils";
+import { toUint8Array } from "@peculiar/utils";
 import { WrapObject } from "../WrapObject";
 import { EmbeddedFile } from "./EmbeddedFile";
 import { NameTree } from "./NameTree";
@@ -181,7 +181,7 @@ export class EmbeddedFileMap extends WrapObject<core.CatalogDictionary> implemen
     fileParams.CreationDate = core.PDFDate.createDate(doc, params.created);
     fileParams.ModDate = core.PDFDate.createDate(doc, params.modified);
     fileParams.Size = params.data.byteLength;
-    file.stream = BufferSourceConverter.toUint8Array(params.data);
+    file.stream = toUint8Array(params.data);
 
     // Add the embedded file to the map using the provided or generated ID
     return this.set(params.id, new EmbeddedFile(embeddedFile, this.document));

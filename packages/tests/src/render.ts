@@ -2,7 +2,7 @@ import { createCanvas, type Canvas } from "canvas";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as pdfjs from "pdfjs-dist";
-import { BufferSourceConverter, Convert } from "pvtsutils";
+import { hex, toArrayBuffer, toUint8Array } from "@peculiar/utils";
 
 interface NodeCanvas {
   canvas: Canvas;
@@ -40,7 +40,7 @@ export class PdfRenderingHelper {
   };
 
   static async load(buffer: BufferSource, password?: string): Promise<PdfRenderingHelper> {
-    const data = BufferSourceConverter.toUint8Array(buffer).slice(); // pdfjs modifies the buffer
+    const data = toUint8Array(buffer).slice(); // pdfjs modifies the buffer
     const doc = await pdfjs.getDocument({
       data,
       cMapUrl: this.CANVAS_PARAMS.url.cMapUrl,
@@ -60,7 +60,7 @@ export class PdfRenderingHelper {
    */
   public static writeToFile(buffer: BufferSource, filePath?: string): void {
     filePath ??= path.resolve(__dirname, `../../../tmp.pdf`);
-    fs.writeFileSync(filePath, Buffer.from(BufferSourceConverter.toArrayBuffer(buffer)));
+    fs.writeFileSync(filePath, Buffer.from(toArrayBuffer(buffer)));
   }
 
   /**
@@ -118,6 +118,6 @@ export class PdfRenderingHelper {
     }
 
     const hash = await crypto.subtle.digest("SHA-256", pageImage);
-    return Convert.ToHex(hash);
+    return hex.encode(hash);
   }
 }

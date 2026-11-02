@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import * as fs from "node:fs";
-import { Convert } from "pvtsutils";
+import { hex, toArrayBuffer } from "@peculiar/utils";
 import * as pkijs from "pkijs";
 import { Crypto } from "@peculiar/webcrypto";
 import { CryptoFilterMethods, PageObjectDictionary, PDFDate, PDFDocument, StandardEncryptDictionary, type TrailerDictionary, UserAccessPermissionFlags, XrefStructure } from "../structure";
@@ -16,7 +16,10 @@ describe("StandardEncryptionHandler", () => {
     pkijs.setEngine("PDF", new PDFCryptoEngine({ name: "PDF", crypto: new Crypto() }));
 
     const doc = PDFDocument.create();
-    doc.update.xref!.set("ID", doc.createArray(doc.createHexString(Convert.FromHex("EC0E03CF3746664B64CEF434F0E42A42")), doc.createHexString(Convert.FromHex("4DEFBFFF5B8678AD9931BBEE19F0E421"))));
+    doc.update.xref!.set(
+      "ID",
+      doc.createArray(doc.createHexString(toArrayBuffer(hex.decode("EC0E03CF3746664B64CEF434F0E42A42"))), doc.createHexString(toArrayBuffer(hex.decode("4DEFBFFF5B8678AD9931BBEE19F0E421")))),
+    );
     const encrypt = StandardEncryptDictionary.create(doc).makeIndirect();
     encrypt.CF.get().set("StdCF", doc.createDictionary(["AuthEvent", doc.createName("DocOpen")], ["CFM", doc.createName("AESV2")], ["Length", doc.createNumber(16)]));
 
@@ -26,8 +29,8 @@ describe("StandardEncryptionHandler", () => {
     encrypt.set("R", doc.createNumber(4));
     encrypt.set("StmF", doc.createName("StdCF"));
     encrypt.set("StrF", doc.createName("StdCF"));
-    encrypt.set("O", doc.createHexString(Convert.FromHex("173764629E9066BEB26F0DEBC7D0A71E40D386243BC28435CC9835F7BF552943")));
-    encrypt.set("U", doc.createHexString(Convert.FromHex("0D39108DA835B45179CC1B1C4B187EBA28BF4E5E4E758A4164004E56FFFA0108")));
+    encrypt.set("O", doc.createHexString(toArrayBuffer(hex.decode("173764629E9066BEB26F0DEBC7D0A71E40D386243BC28435CC9835F7BF552943"))));
+    encrypt.set("U", doc.createHexString(toArrayBuffer(hex.decode("0D39108DA835B45179CC1B1C4B187EBA28BF4E5E4E758A4164004E56FFFA0108"))));
     encrypt.set("V", doc.createNumber(4));
 
     doc.update.xref!.Encrypt = encrypt;
@@ -42,7 +45,10 @@ describe("StandardEncryptionHandler", () => {
     pkijs.setEngine("PDF", new PDFCryptoEngine({ name: "PDF", crypto: new Crypto() }));
 
     const doc = PDFDocument.create();
-    doc.update.xref!.set("ID", doc.createArray(doc.createHexString(Convert.FromHex("8D966A6EA9AE43E68A5B5E262C0AFEB5")), doc.createHexString(Convert.FromHex("BB04B91CB5FD48D8BB4FE7AFE3A56128"))));
+    doc.update.xref!.set(
+      "ID",
+      doc.createArray(doc.createHexString(toArrayBuffer(hex.decode("8D966A6EA9AE43E68A5B5E262C0AFEB5"))), doc.createHexString(toArrayBuffer(hex.decode("BB04B91CB5FD48D8BB4FE7AFE3A56128")))),
+    );
     const encrypt = StandardEncryptDictionary.create(doc).makeIndirect();
     encrypt.CF.get().set("StdCF", doc.createDictionary(["AuthEvent", doc.createName("DocOpen")], ["CFM", doc.createName("AESV2")], ["Length", doc.createNumber(16)]));
 
@@ -52,8 +58,8 @@ describe("StandardEncryptionHandler", () => {
     encrypt.set("R", doc.createNumber(4));
     encrypt.set("StmF", doc.createName("StdCF"));
     encrypt.set("StrF", doc.createName("StdCF"));
-    encrypt.set("O", doc.createHexString(Convert.FromHex("0eba1908e5cd53b188213637794ea65838027c93e38494b55544f4375b294c90")));
-    encrypt.set("U", doc.createHexString(Convert.FromHex("c827c9f262c92199c2208ef11b54294900000000000000000000000000000000")));
+    encrypt.set("O", doc.createHexString(toArrayBuffer(hex.decode("0eba1908e5cd53b188213637794ea65838027c93e38494b55544f4375b294c90"))));
+    encrypt.set("U", doc.createHexString(toArrayBuffer(hex.decode("c827c9f262c92199c2208ef11b54294900000000000000000000000000000000"))));
     encrypt.set("V", doc.createNumber(4));
 
     doc.update.xref!.Encrypt = encrypt;

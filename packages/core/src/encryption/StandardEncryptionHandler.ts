@@ -1,4 +1,4 @@
-import { type BufferSource, BufferSourceConverter } from "pvtsutils";
+import { toUint8Array, type BufferSource } from "@peculiar/utils";
 import * as pkijs from "pkijs";
 
 import { CryptoFilterMethods, CryptoFilterDictionary, EncryptDictionary, StandardEncryptDictionary, type TrailerDictionary, type UserAccessPermissionFlags } from "../structure/dictionaries";
@@ -405,7 +405,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
 
     return {
       type: filter.CFM as CryptoFilterMethods,
-      raw: BufferSourceConverter.toUint8Array(encKey),
+      raw: toUint8Array(encKey),
     };
   }
 
@@ -449,7 +449,7 @@ export class StandardEncryptionHandler extends EncryptionHandler {
       });
       const key: EncryptionKey = {
         type: CryptoFilterMethods.RC4,
-        raw: BufferSourceConverter.toUint8Array(encKeyRaw),
+        raw: toUint8Array(encKeyRaw),
       };
 
       this.#keys = {

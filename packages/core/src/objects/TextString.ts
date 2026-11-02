@@ -1,4 +1,4 @@
-import { BufferSourceConverter, Convert } from "pvtsutils";
+import { binary, toArrayBuffer, toUint8Array } from "@peculiar/utils";
 
 import type { EncryptionObject } from "./EncryptionObject";
 
@@ -11,7 +11,7 @@ export abstract class PDFTextString extends PDFString implements EncryptionObjec
   public async encryptAsync(): Promise<ArrayBuffer> {
     const parent = this.findIndirect(true);
 
-    const textView = Convert.FromBinary(TextEncoder.to(this.text));
+    const textView = toArrayBuffer(binary.decode(TextEncoder.to(this.text)));
     if (!parent || !this.documentUpdate?.document.encryptHandler) {
       return textView;
     }
@@ -34,7 +34,7 @@ export abstract class PDFTextString extends PDFString implements EncryptionObjec
     if (!this.encrypted) {
       if (this.documentUpdate?.document.encryptHandler) {
         const decryptedText = await this.encryptAsync();
-        this.text = Convert.ToBinary(decryptedText);
+        this.text = binary.encode(decryptedText);
         this.encrypted = true;
       }
     }
@@ -46,7 +46,7 @@ export abstract class PDFTextString extends PDFString implements EncryptionObjec
     if (this.encrypted === undefined || this.encrypted) {
       if (this.documentUpdate?.document.encryptHandler) {
         const decryptedText = await this.decryptAsync();
-        this.text = TextEncoder.from(Convert.ToBinary(decryptedText));
+        this.text = TextEncoder.from(binary.encode(decryptedText));
       }
 
       this.encrypted = false;
@@ -56,11 +56,11 @@ export abstract class PDFTextString extends PDFString implements EncryptionObjec
   }
 
   public toArrayBuffer(): ArrayBuffer {
-    return Convert.FromBinary(this.text);
+    return toArrayBuffer(binary.decode(this.text));
   }
 
   public toUint8Array(): Uint8Array {
-    return BufferSourceConverter.toUint8Array(this.toArrayBuffer());
+    return toUint8Array(this.toArrayBuffer());
   }
 
   protected override onCreate(): void {

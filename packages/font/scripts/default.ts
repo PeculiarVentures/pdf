@@ -3,7 +3,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { FontFactory, type FontInfo } from "@peculiar/pdf-font";
 import * as pako from "pako";
-import { Convert } from "pvtsutils";
+import { base64 } from "@peculiar/utils";
 
 const pdfFontNames: { [key: string]: string } = {
   Courier: "Courier",
@@ -69,7 +69,7 @@ function main() {
   constFileText.push("");
   for (const [key, value] of map) {
     const fontInfoRaw = AsnConvert.serialize(value);
-    const compressedValue = Convert.ToBase64(pako.gzip(new Uint8Array(fontInfoRaw), { level: 9 }));
+    const compressedValue = base64.encode(pako.gzip(new Uint8Array(fontInfoRaw), { level: 9 }));
     constFileText.push(`DefaultFontsZip.set(DefaultFonts.${key}, "${compressedValue}");`);
   }
   constFileText.push("");

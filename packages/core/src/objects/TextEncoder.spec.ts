@@ -44,4 +44,16 @@ describe("TextEncoder", () => {
       expect(result).toBe("");
     });
   });
+
+  describe("UTF-16BE bytes", () => {
+    it("should write characters outside the BMP as surrogate pairs after the BOM", () => {
+      const result = TextEncoder.to("A\u{1F600}");
+      expect(Buffer.from(result, "binary").toString("hex")).toBe("feff0041d83dde00");
+      expect(TextEncoder.from(result)).toBe("A\u{1F600}");
+    });
+
+    it("should throw on an odd number of UTF-16 bytes", () => {
+      expect(() => TextEncoder.from("\xFE\xFF\x00A\x00")).toThrow(RangeError);
+    });
+  });
 });

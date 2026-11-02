@@ -1,4 +1,4 @@
-import { Convert } from "pvtsutils";
+import { utf8 } from "@peculiar/utils";
 
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
@@ -40,7 +40,7 @@ export class PDFNumeric extends PDFObject {
       throw new ParsingError(`Numeric sequence not found at position ${reader.position}`, reader.position);
     }
 
-    const value = new Number(Convert.ToUtf8String(view));
+    const value = new Number(utf8.decode(view));
     if (Number.isNaN(value)) {
       throw new ParsingError("Parsed value is not a Number", reader.position);
     }

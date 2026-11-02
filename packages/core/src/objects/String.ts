@@ -1,4 +1,4 @@
-import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { binary, isBufferSource, type BufferSource } from "@peculiar/utils";
 import { PDFObject } from "./Object";
 
 export abstract class PDFString extends PDFObject {
@@ -21,8 +21,8 @@ export abstract class PDFString extends PDFObject {
     } else if (typeof param === "string") {
       // string
       this.text = param;
-    } else if (BufferSourceConverter.isBufferSource(param)) {
-      this.text = Convert.ToBinary(param);
+    } else if (isBufferSource(param)) {
+      this.text = binary.encode(param);
     }
   }
 

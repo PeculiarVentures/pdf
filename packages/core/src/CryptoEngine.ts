@@ -1,5 +1,5 @@
 import * as pkijs from "pkijs";
-import { BufferSourceConverter } from "pvtsutils";
+import { bytes, isBufferSource, toArrayBuffer, toUint8Array } from "@peculiar/utils";
 
 const id_SHA3_256 = "2.16.840.1.101.3.4.2.8";
 const id_SHA3_384 = "2.16.840.1.101.3.4.2.9";
@@ -179,7 +179,7 @@ async function decryptWithPadding(crypto: SubtleCrypto, algorithm: AesCtrParams,
   const moduloBlock = 16 - (data.byteLength % 16);
 
   // Calculate absent tail for encrypted content
-  const iv = BufferSourceConverter.toUint8Array(data).subarray(data.byteLength - 16);
+  const iv = toUint8Array(data).subarray(data.byteLength - 16);
   const pad = new Uint8Array(moduloBlock).fill(moduloBlock);
   const result = await crypto.encrypt(
     {
@@ -192,7 +192,7 @@ async function decryptWithPadding(crypto: SubtleCrypto, algorithm: AesCtrParams,
   );
 
   // Append encrypted tail and decrypt initial data
-  const dataWithPad = BufferSourceConverter.concat(data, result);
+  const dataWithPad = toArrayBuffer(bytes.concat(data, result));
 
   return crypto.decrypt(algorithm, key, dataWithPad);
 }
@@ -426,7 +426,7 @@ export class PDFCryptoEngine extends pkijs.CryptoEngine {
   }
 
   public override async digest(algorithm: AlgorithmIdentifier, data: BufferSource): Promise<ArrayBuffer> {
-    const buf = BufferSourceConverter.toArrayBuffer(data);
+    const buf = toArrayBuffer(data);
 
     if (algorithm instanceof Object) {
       if (algorithm.name.toLowerCase() === "md5") return md5(buf, 0, buf.byteLength);
@@ -460,7 +460,7 @@ export class PDFCryptoEngine extends pkijs.CryptoEngine {
     }
 
     if (algorithm.name.toLowerCase() === "rc4") {
-      return rc4(key as any, BufferSourceConverter.toUint8Array(data));
+      return rc4(key as any, toUint8Array(data));
     }
 
     return super.encrypt(algorithm, key, data);
@@ -474,7 +474,7 @@ export class PDFCryptoEngine extends pkijs.CryptoEngine {
       alg = { name: alg };
     }
 
-    if (BufferSourceConverter.isBufferSource(data) && data.byteLength === 0) {
+    if (isBufferSource(data) && data.byteLength === 0) {
       return new ArrayBuffer(0);
     }
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Convert } from "pvtsutils";
+import { hex, toArrayBuffer } from "@peculiar/utils";
 import { rsaAlgorithmConverter } from "./rsa";
 
 type TestVector = {
@@ -62,8 +62,8 @@ describe("rsaAlgorithmConverter", () => {
       it(`should convert ${name} to BER`, () => {
         const ber = rsaAlgorithmConverter.toBER(webCryptoAlg)!;
         expect(ber).toBeTruthy();
-        const expectedBer = Convert.FromHex(asnAlgIdHex);
-        expect(Convert.ToHex(ber)).toBe(Convert.ToHex(expectedBer));
+        const expectedBer = toArrayBuffer(hex.decode(asnAlgIdHex));
+        expect(hex.encode(ber)).toBe(hex.encode(expectedBer));
       });
     });
 
@@ -94,32 +94,32 @@ describe("rsaAlgorithmConverter", () => {
   describe("fromBER", () => {
     testVectors.forEach(({ name, webAlg: webCryptoAlg, asnAlg: asnAlgIdHex }) => {
       it(`should convert ${name} from BER`, () => {
-        const ber = Convert.FromHex(asnAlgIdHex);
+        const ber = toArrayBuffer(hex.decode(asnAlgIdHex));
         const algorithm = rsaAlgorithmConverter.fromBER(ber);
         expect(algorithm).toEqual(webCryptoAlg);
       });
     });
 
     it("should return null for unsupported algorithm ID", () => {
-      const invalidBer = Convert.FromHex("300d06092a864886f70d01010f0500");
+      const invalidBer = toArrayBuffer(hex.decode("300d06092a864886f70d01010f0500"));
       const result = rsaAlgorithmConverter.fromBER(invalidBer);
       expect(result).toBeNull();
     });
 
     it("should handle RSA-PSS without parameters", () => {
-      const berWithoutParams = Convert.FromHex("300b06092a864886f70d01010a");
+      const berWithoutParams = toArrayBuffer(hex.decode("300b06092a864886f70d01010a"));
       const result = rsaAlgorithmConverter.fromBER(berWithoutParams);
       expect(result).toEqual({ name: "RSA-PSS" });
     });
 
     it("should handle plain RSA encryption", () => {
-      const berRsaEncryption = Convert.FromHex("300d06092a864886f70d0101010500");
+      const berRsaEncryption = toArrayBuffer(hex.decode("300d06092a864886f70d0101010500"));
       const result = rsaAlgorithmConverter.fromBER(berRsaEncryption);
       expect(result).toEqual({ name: "RSASSA-PKCS1-v1_5" });
     });
 
     it("should handle RSA-PSS with specified saltLength", () => {
-      const berUnsupportedHash = Convert.FromHex("301d06092a864886f70d01010a3010a009300706052b0e03021aa203020120");
+      const berUnsupportedHash = toArrayBuffer(hex.decode("301d06092a864886f70d01010a3010a009300706052b0e03021aa203020120"));
       const result = rsaAlgorithmConverter.fromBER(berUnsupportedHash);
       expect(result).toEqual({
         name: "RSA-PSS",

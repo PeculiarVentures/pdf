@@ -1,4 +1,4 @@
-import { type BufferSource, Convert, BufferSourceConverter } from "pvtsutils";
+import { binary, toArrayBuffer, toUint8Array, type BufferSource } from "@peculiar/utils";
 
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
@@ -80,7 +80,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
 
   public static async createAsync(data: BufferSource, filters: Filter[] = [], parameters?: { [key: string]: PDFObjectTypes }): Promise<PDFStream> {
     // Apply filters
-    let filteredStream = BufferSourceConverter.toUint8Array(data);
+    let filteredStream = toUint8Array(data);
     for (const filter of filters) {
       const buffer = await filter.encode(filteredStream);
       filteredStream = new Uint8Array(buffer);
@@ -133,7 +133,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
         this.stream = stream.stream.slice();
         this.encrypted = stream.encrypted;
       } else {
-        this.stream = BufferSourceConverter.toUint8Array(stream);
+        this.stream = toUint8Array(stream);
         this.set("Length", new PDFNumeric(this.stream.length));
       }
     }
@@ -295,7 +295,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
         // The cross-reference stream shall not be encrypted and strings appearing in the cross-reference
         // stream dictionary shall not be encrypted. It shall not have a Filter entry that specifies a Crypt filter
         const encryptedText = await this.encryptAsync();
-        this.stream = BufferSourceConverter.toUint8Array(encryptedText);
+        this.stream = toUint8Array(encryptedText);
         this.length.value = this.stream.length;
       }
     }
@@ -317,7 +317,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
           if (this.documentUpdate?.document.encryptHandler) {
             try {
               const decryptedText = await this.decryptAsync();
-              this.stream = BufferSourceConverter.toUint8Array(decryptedText);
+              this.stream = toUint8Array(decryptedText);
             } catch (e) {
               if (e instanceof Error) {
                 let ref = "";
@@ -346,7 +346,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
   public async encryptAsync(): Promise<ArrayBuffer> {
     const parent = this.findIndirect(true);
 
-    const streamView = BufferSourceConverter.toArrayBuffer(this.stream);
+    const streamView = toArrayBuffer(this.stream);
     if (!parent || !this.documentUpdate?.document.encryptHandler) {
       return streamView;
     }
@@ -357,7 +357,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
   public async decryptAsync(): Promise<ArrayBuffer> {
     const parent = this.findIndirect(true);
 
-    const streamView = BufferSourceConverter.toArrayBuffer(this.stream);
+    const streamView = toArrayBuffer(this.stream);
     if (!parent || !this.documentUpdate?.document.encryptHandler) {
       return streamView;
     }
@@ -398,7 +398,7 @@ export class PDFStream extends PDFDictionary implements EncryptionObject {
   }
 
   protected onToStringStream(): string {
-    return Convert.ToBinary(this.stream);
+    return binary.encode(this.stream);
   }
 
   /**

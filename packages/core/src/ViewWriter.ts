@@ -1,4 +1,4 @@
-import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { binary, toArrayBuffer, toUint8Array, type BufferSource } from "@peculiar/utils";
 import { CharSet } from "./CharSet";
 
 export type ViewWriterCallback = (subarray: Uint8Array) => void;
@@ -15,7 +15,7 @@ export class ViewWriter {
   }
 
   public write(data: BufferSource, cb?: ViewWriterCallback): void {
-    const uint8Data = BufferSourceConverter.toUint8Array(data);
+    const uint8Data = toUint8Array(data);
     this.addToLength(uint8Data.length);
     this.buffer.push([uint8Data, cb]);
   }
@@ -37,7 +37,7 @@ export class ViewWriter {
   }
 
   public writeString(text: string): void {
-    const uint8Text = new Uint8Array(Convert.FromBinary(text));
+    const uint8Text = new Uint8Array(toArrayBuffer(binary.decode(text)));
     this.addToLength(uint8Text.length);
     this.buffer.push([uint8Text]);
   }
@@ -69,6 +69,6 @@ export class ViewWriter {
   }
 
   public toString(): string {
-    return Convert.ToBinary(this.toUint8Array());
+    return binary.encode(this.toUint8Array());
   }
 }

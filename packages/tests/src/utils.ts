@@ -1,7 +1,7 @@
 import { PDFDocument, type PDFDocumentLoadParameters } from "@peculiar/pdf-doc";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { BufferSourceConverter } from "pvtsutils";
+import { toArrayBuffer } from "@peculiar/utils";
 import { xrefTableOptions } from "./options";
 
 export async function writePdfFile(data: BufferSource | PDFDocument, name = "tmp"): Promise<string> {
@@ -9,7 +9,7 @@ export async function writePdfFile(data: BufferSource | PDFDocument, name = "tmp
     data = await data.save();
   }
 
-  const buffer = BufferSourceConverter.toArrayBuffer(data);
+  const buffer = toArrayBuffer(data);
   const filePath = path.resolve(__dirname, `../../../${name}.pdf`);
   fs.writeFileSync(filePath, Buffer.from(buffer), { flag: "w+" });
   return filePath;

@@ -1,4 +1,4 @@
-import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { bytes, hex, isBufferSource, toArrayBuffer, toUint8Array, type BufferSource } from "@peculiar/utils";
 import * as pkijs from "pkijs";
 import { Name, type X509Certificate } from "@peculiar/x509";
 
@@ -46,8 +46,8 @@ async function computeEncryptionKey(params: ComputeEncryptionKeyParams): Promise
   // d) The first n/8 bytes of the resulting digest shall be used as the file encryption key, where n is the bit length
   //    of the file encryption key.
   const encryptMetadata = params.encryptMetadata ? new Uint8Array() : staticDataFF;
-  const combinedBuffer = BufferSourceConverter.concat(seed, recipients, encryptMetadata);
-  // const combinedBuffer = BufferSourceConverter.concat(seed, recipients);
+  const combinedBuffer = toArrayBuffer(bytes.concat(seed, recipients, encryptMetadata));
+  // const combinedBuffer = toArrayBuffer(bytes.concat(seed, recipients));
 
   const digest = await crypto.digest(digestAlg, combinedBuffer);
 
@@ -104,7 +104,7 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
           encrypt.CF.get().set(DefaultCryptFilter, filter);
 
           const seed = crypto.getRandomValues(new Uint8Array(20));
-          const combined = BufferSourceConverter.concat(seed, new Uint8Array([0xff, 0xff, 0xff, 0xff]));
+          const combined = toArrayBuffer(bytes.concat(seed, new Uint8Array([0xff, 0xff, 0xff, 0xff])));
 
           filter.Recipients = doc.createArray();
           const recipientBuffers: BufferSource[] = [];
@@ -138,7 +138,7 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
 
           const key = await computeEncryptionKey({
             algorithm: params.algorithm,
-            recipients: BufferSourceConverter.concat(recipientBuffers),
+            recipients: toArrayBuffer(bytes.concat(recipientBuffers)),
             seed: seed.slice(0, 20),
             encryptMetadata: filter.EncryptMetadata,
             crypto,
@@ -146,7 +146,7 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
 
           encryptionKey = {
             type: params.algorithm,
-            raw: BufferSourceConverter.toUint8Array(key),
+            raw: toUint8Array(key),
           };
         }
 
@@ -312,7 +312,7 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
       }
       recipientViews.push(recipient.toUint8Array());
     }
-    const recipientsBuffer = BufferSourceConverter.concat(...recipientViews);
+    const recipientsBuffer = toArrayBuffer(bytes.concat(...recipientViews));
 
     // Compare each element of the "Recipients" array with each client-side certificate
     let cmsEnveloped;
@@ -355,7 +355,7 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
 
       // Convert the recipient ID to JSON compatible with @peculiar/x509
       const issuerName = new Name(recipientInfo.value.rid.issuer.toSchema().toBER());
-      const serialNumber = Convert.ToHex(recipientInfo.value.rid.serialNumber.valueBlock.valueHexView);
+      const serialNumber = hex.encode(recipientInfo.value.rid.serialNumber.valueBlock.valueHexView);
       const algorithm: Algorithm = this.crypto.getAlgorithmByOID(recipientInfo.value.keyEncryptionAlgorithm.algorithmId, true, "keyEncryptionAlgorithm");
       if (algorithm.name === "RSA-OAEP") {
         const schema = recipientInfo.value.keyEncryptionAlgorithm.algorithmParams;
@@ -370,7 +370,7 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
       });
 
       if (recipient) {
-        const decryptedKey = BufferSourceConverter.isBufferSource(recipient.key)
+        const decryptedKey = isBufferSource(recipient.key)
           ? await cmsEnveloped.decrypt(0, {
               recipientCertificate: pkijs.Certificate.fromBER(recipient.certificate.rawData),
               recipientPrivateKey: recipient.key,
@@ -392,7 +392,7 @@ export class PublicKeyEncryptionHandler extends EncryptionHandler {
 
         return {
           type: filter.CFM,
-          raw: BufferSourceConverter.toUint8Array(key),
+          raw: toUint8Array(key),
         };
       }
     }

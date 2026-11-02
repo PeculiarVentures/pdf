@@ -3,7 +3,7 @@ import * as x509 from "@peculiar/x509";
 import * as pkijs from "pkijs";
 import { CertificateID } from "./CertID";
 import "./algorithms";
-import { Convert } from "pvtsutils";
+import { hex } from "@peculiar/utils";
 
 describe("CertID", () => {
   const caCertBase64Url =
@@ -26,8 +26,8 @@ describe("CertID", () => {
 
       expect(certId.hashAlgorithm.name).toBe("SHA-256");
       expect(certId.serialNumber).toBe("5bf2086cb2f1c16d0e3b3cefb5e3ab18");
-      expect(Convert.ToHex(certId.issuerNameHash)).toBe("fafa8380b3172127a8bf60d6499c9fe162546ef2b2b563f6e681ba54fb339573");
-      expect(Convert.ToHex(certId.issuerKeyHash)).toBe("05855277283c5a102b24a58eeb45a027b7e6630a40740ff1ef2b9373b466ad3d");
+      expect(hex.encode(certId.issuerNameHash)).toBe("fafa8380b3172127a8bf60d6499c9fe162546ef2b2b563f6e681ba54fb339573");
+      expect(hex.encode(certId.issuerKeyHash)).toBe("05855277283c5a102b24a58eeb45a027b7e6630a40740ff1ef2b9373b466ad3d");
     });
 
     it("should create CertID with algorithm object", async () => {
@@ -39,8 +39,8 @@ describe("CertID", () => {
 
       expect(certId.hashAlgorithm.name).toBe("SHA-1");
       expect(certId.serialNumber).toBe("5bf2086cb2f1c16d0e3b3cefb5e3ab18");
-      expect(Convert.ToHex(certId.issuerNameHash)).toBe("b281f5bb852267eb9f56ad104a3f94b275df8630");
-      expect(Convert.ToHex(certId.issuerKeyHash)).toBe("d1a21222fb7b5aa6a9723d8755a22d8f632d8e10");
+      expect(hex.encode(certId.issuerNameHash)).toBe("b281f5bb852267eb9f56ad104a3f94b275df8630");
+      expect(hex.encode(certId.issuerKeyHash)).toBe("d1a21222fb7b5aa6a9723d8755a22d8f632d8e10");
     });
 
     it("should throw error if cert was not signed by issuer", async () => {

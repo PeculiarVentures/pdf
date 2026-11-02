@@ -1,6 +1,6 @@
 import * as asn1js from "asn1js";
 import * as pkijs from "pkijs";
-import { Convert } from "pvtsutils";
+import { hex, toArrayBuffer } from "@peculiar/utils";
 import { AlgorithmFactory, type AlgorithmConverter, type HashedAlgorithm } from "../AlgorithmFactory";
 
 const id_sha1 = "1.3.14.3.2.26";
@@ -8,10 +8,10 @@ const id_sha256 = "2.16.840.1.101.3.4.2.1";
 const id_sha384 = "2.16.840.1.101.3.4.2.2";
 const id_sha512 = "2.16.840.1.101.3.4.2.3";
 
-const ber_sha1 = Convert.FromHex("300906052b0e03021a0500");
-const ber_sha256 = Convert.FromHex("300d06096086480165030402010500");
-const ber_sha384 = Convert.FromHex("300d06096086480165030402020500");
-const ber_sha512 = Convert.FromHex("300d06096086480165030402030500");
+const ber_sha1 = toArrayBuffer(hex.decode("300906052b0e03021a0500"));
+const ber_sha256 = toArrayBuffer(hex.decode("300d06096086480165030402010500"));
+const ber_sha384 = toArrayBuffer(hex.decode("300d06096086480165030402020500"));
+const ber_sha512 = toArrayBuffer(hex.decode("300d06096086480165030402030500"));
 
 export const shaAlgorithmConverter: AlgorithmConverter = {
   name: "SHA",

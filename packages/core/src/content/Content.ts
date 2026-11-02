@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { binary, isBufferSource, toArrayBuffer, type BufferSource } from "@peculiar/utils";
 
 import { ViewReader } from "../ViewReader";
 import * as objects from "../objects";
@@ -151,7 +151,7 @@ export class PDFContent extends EventEmitter {
   }
 
   public fromString(data: string): void {
-    const viewReader = new ViewReader(Convert.FromBinary(data));
+    const viewReader = new ViewReader(toArrayBuffer(binary.decode(data)));
 
     let args: objects.PDFObjectTypes[] = [];
     while (!viewReader.isEOF) {
@@ -169,7 +169,7 @@ export class PDFContent extends EventEmitter {
         }
 
         const operator = new PDFOperator();
-        operator.name = Convert.ToUtf8String(name, "ascii");
+        operator.name = binary.encode(name);
         operator.parameters = args;
         this.operators.push(operator);
 
@@ -191,7 +191,7 @@ export class PDFContent extends EventEmitter {
   public toArrayBuffer(): ArrayBuffer {
     const text = this.toString();
 
-    return Convert.FromBinary(text);
+    return toArrayBuffer(binary.decode(text));
   }
 
   public toUint8Array(): Uint8Array {
@@ -588,7 +588,7 @@ export class PDFContent extends EventEmitter {
   public textShow(text: string | objects.PDFLiteralString | objects.PDFHexString | BufferSource): this {
     if (typeof text === "string") {
       text = new objects.PDFLiteralString(text);
-    } else if (BufferSourceConverter.isBufferSource(text)) {
+    } else if (isBufferSource(text)) {
       text = new objects.PDFHexString(text);
     }
 

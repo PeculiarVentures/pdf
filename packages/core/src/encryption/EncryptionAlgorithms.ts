@@ -1,5 +1,5 @@
 import type { ICryptoEngine } from "pkijs";
-import { BufferSourceConverter } from "pvtsutils";
+import { bytes, toArrayBuffer, toUint8Array } from "@peculiar/utils";
 import type { PDFStream, PDFTextString } from "../objects";
 import { CryptoFilterMethods } from "../structure/dictionaries";
 import { staticData } from "./Constants";
@@ -54,7 +54,7 @@ export abstract class EncryptionAlgorithms {
    */
   private static async cipher(params: EncryptionAlgorithmsCipherParams): Promise<ArrayBuffer> {
     const { crypto, encrypt, key, target, data } = params;
-    const view = BufferSourceConverter.toUint8Array(data);
+    const view = toUint8Array(data);
 
     if (key.type === CryptoFilterMethods.None) {
       return view.slice().buffer;
@@ -77,16 +77,16 @@ export abstract class EncryptionAlgorithms {
     const parent = target.getIndirect(true);
     const id = new Int32Array([parent.id]);
     const generation = new Int32Array([parent.generation]);
-    const combinedKey = BufferSourceConverter.concat([key.raw, id.buffer.slice(0, 3), generation.buffer.slice(0, 2)]);
+    const combinedKey = toArrayBuffer(bytes.concat([key.raw, id.buffer.slice(0, 3), generation.buffer.slice(0, 2)]));
 
     const alg = { name: "AES-CBC", iv };
     switch (key.type) {
       case CryptoFilterMethods.AES128: {
-        const cutHash = await this.getCutHashV2(BufferSourceConverter.concat(combinedKey, staticData), key.raw.length, crypto);
+        const cutHash = await this.getCutHashV2(toArrayBuffer(bytes.concat(combinedKey, staticData)), key.raw.length, crypto);
         const cryptoKey = await crypto.importKey("raw", cutHash, alg.name, false, keyUsages);
 
         if (encrypt) {
-          return BufferSourceConverter.concat([iv, await crypto.encrypt(alg, cryptoKey, cipherData)]);
+          return toArrayBuffer(bytes.concat([iv, await crypto.encrypt(alg, cryptoKey, cipherData)]));
         }
 
         return await crypto.decrypt(alg, cryptoKey, cipherData);
@@ -95,7 +95,7 @@ export abstract class EncryptionAlgorithms {
         const cryptoKey = await crypto.importKey("raw", key.raw, alg.name, false, keyUsages);
 
         if (encrypt) {
-          return BufferSourceConverter.concat([iv, await crypto.encrypt(alg, cryptoKey, cipherData)]);
+          return toArrayBuffer(bytes.concat([iv, await crypto.encrypt(alg, cryptoKey, cipherData)]));
         }
 
         return await crypto.decrypt(alg, cryptoKey, cipherData);

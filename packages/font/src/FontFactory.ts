@@ -2,7 +2,7 @@ import { AsnConvert } from "@peculiar/asn1-schema";
 import * as bs from "bytestreamjs";
 import * as fontjs from "fontjs";
 import * as pako from "pako";
-import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { base64, isBufferSource, toArrayBuffer, type BufferSource } from "@peculiar/utils";
 import { type DefaultFonts, DefaultFontsZip } from "./DefaultFonts";
 import { FontGlyph } from "./FontGlyph";
 import { FontInfo } from "./FontInfo";
@@ -31,7 +31,7 @@ export abstract class FontFactory {
    * @returns A FontInfo object representing the font
    */
   public static create(source: DefaultFonts | BufferSource): FontInfo {
-    if (BufferSourceConverter.isBufferSource(source)) {
+    if (isBufferSource(source)) {
       return this.createFile(source);
     }
 
@@ -56,7 +56,7 @@ export abstract class FontFactory {
     if (!fontZip) {
       throw new Error(`Cannot get default font '${source}. ZIP cached value doesn't exist'`);
     }
-    font = AsnConvert.parse(pako.ungzip(new Uint8Array(Convert.FromBase64(fontZip))), FontInfo);
+    font = AsnConvert.parse(pako.ungzip(new Uint8Array(toArrayBuffer(base64.decode(fontZip)))), FontInfo);
 
     // Add font to cache
     this.cache.set(source, font);
@@ -71,7 +71,7 @@ export abstract class FontFactory {
    * @throws Error if required font tables are missing
    */
   public static createFile(source: BufferSource): FontInfo {
-    const buffer = BufferSourceConverter.toArrayBuffer(source);
+    const buffer = toArrayBuffer(source);
     const font = fontjs.Font.fromStream(toFontjsStream(new bs.SeqStream({ stream: new bs.ByteStream({ buffer }) })));
 
     const fontInfo = new FontInfo();
@@ -163,7 +163,7 @@ export abstract class FontFactory {
    * @returns A new ArrayBuffer containing the subsetted font
    */
   public static subsetFont(source: BufferSource, text: string): ArrayBuffer {
-    const buffer = BufferSourceConverter.toArrayBuffer(source);
+    const buffer = toArrayBuffer(source);
     const font = fontjs.Font.fromStream(toFontjsStream(new bs.SeqStream({ stream: new bs.ByteStream({ buffer }) })));
 
     const gids = this.getIndexes(font, text);

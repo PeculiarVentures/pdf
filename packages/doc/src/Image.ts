@@ -1,5 +1,5 @@
 import * as core from "@peculiar/pdf-core";
-import { type BufferSource, BufferSourceConverter } from "pvtsutils";
+import { toUint8Array, type BufferSource } from "@peculiar/utils";
 import * as fastPng from "fast-png";
 import type { PDFDocument } from "./Document";
 import { WrapObject } from "./WrapObject";
@@ -114,7 +114,7 @@ export class Image extends WrapObject<core.ImageDictionary> {
   }
 
   protected static createPNG(raw: BufferSource, document: PDFDocument): Image {
-    const png = fastPng.decode(BufferSourceConverter.toUint8Array(raw));
+    const png = fastPng.decode(toUint8Array(raw));
     const idat = png.data;
 
     // Create Image dictionary
@@ -166,7 +166,7 @@ export class Image extends WrapObject<core.ImageDictionary> {
       if (!png.palette) {
         throw new Error("Cannot get Palette from the indexed PNG image.");
       }
-      imageDict.stream = BufferSourceConverter.toUint8Array(png.data);
+      imageDict.stream = toUint8Array(png.data);
 
       // The colour table data shall be m*(hival+1) bytes long
       const lookup = new Uint8Array(256 * 3);

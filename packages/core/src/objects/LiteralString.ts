@@ -1,4 +1,4 @@
-import { Convert } from "pvtsutils";
+import { binary } from "@peculiar/utils";
 import { BadCharError } from "../errors";
 import type { ViewReader } from "../ViewReader";
 import type { ViewWriter } from "../ViewWriter";
@@ -79,7 +79,7 @@ export class PDFLiteralString extends PDFTextString {
       throw new Error("Missing closing parenthesis in literal string");
     }
 
-    const text = Convert.ToBinary(data).replace(PDFLiteralString.PARSE_PATTERN, (substring, group1: string) => {
+    const text = binary.encode(data).replace(PDFLiteralString.PARSE_PATTERN, (substring, group1: string) => {
       const escaped = PDFLiteralString.READ_ESCAPE_MAP.get(substring);
       if (escaped !== undefined) {
         return escaped;

@@ -1,6 +1,6 @@
 import { AsnConvert } from "@peculiar/asn1-schema";
 import * as core from "@peculiar/pdf-core";
-import { Convert } from "pvtsutils";
+import { binary, hex, toArrayBuffer } from "@peculiar/utils";
 import * as pkijs from "pkijs";
 import * as cms from "../cms";
 import type { FormObject } from "../FormObject";
@@ -42,7 +42,7 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureField, S
     byteRange.push(blockLength1);
     byteRange.push(blockOffset2);
     byteRange.push(blockLength2);
-    signValue.Contents.text = Convert.ToBinary(new Uint8Array(params.containerSize || SignatureBoxGroup.CONTAINER_SIZE));
+    signValue.Contents.text = binary.encode(new Uint8Array(params.containerSize || SignatureBoxGroup.CONTAINER_SIZE));
 
     const dictUpdateCb = params.dictionaryUpdate || SignatureBoxGroup.dictionaryUpdate;
     await dictUpdateCb.call(this, signValue);
@@ -72,11 +72,11 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureField, S
 
     // Set offsets and lengths for the ByteRange
     blockLength1.value = signValue.Contents.view.byteOffset;
-    blockLength1.view.set(new Uint8Array(Convert.FromBinary(blockLength1.toString())));
+    blockLength1.view.set(new Uint8Array(toArrayBuffer(binary.decode(blockLength1.toString()))));
     blockOffset2.value = signValue.Contents.view.byteOffset + signValue.Contents.view.length;
-    blockOffset2.view.set(new Uint8Array(Convert.FromBinary(blockOffset2.toString())));
+    blockOffset2.view.set(new Uint8Array(toArrayBuffer(binary.decode(blockOffset2.toString()))));
     blockLength2.value = document.view.length - blockOffset2.value;
-    blockLength2.view.set(new Uint8Array(Convert.FromBinary(blockLength2.toString())));
+    blockLength2.view.set(new Uint8Array(toArrayBuffer(binary.decode(blockLength2.toString()))));
 
     // Get signing content
     // Concatenate buffers
@@ -93,8 +93,8 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureField, S
     if (signedData.byteLength > signValue.Contents.text.length) {
       throw new Error(`Received Contents value is greater than allocated buffer. Allocated buffer must be ${signedData.byteLength}.`);
     }
-    signValue.Contents.text = Convert.ToBinary(signedData).padEnd(signValue.Contents.text.length, "\x00");
-    signValue.Contents.view.set(new Uint8Array(Convert.FromBinary(signValue.Contents.toString())));
+    signValue.Contents.text = binary.encode(signedData).padEnd(signValue.Contents.text.length, "\x00");
+    signValue.Contents.view.set(new Uint8Array(toArrayBuffer(binary.decode(signValue.Contents.toString()))));
 
     await this.document.save();
 
@@ -132,7 +132,7 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureField, S
 
     const digest = await crypto.subtle.digest("SHA-1", signatureValue.Contents.data);
 
-    return Convert.ToHex(digest).toUpperCase();
+    return hex.encode(digest).toUpperCase();
   }
 
   public getSignatureValue(): core.SignatureDictionary {
@@ -718,7 +718,7 @@ export class SignatureBoxGroup extends FormComponentGroup<core.SignatureField, S
           // Acrobat allows up to 3 bytes after %%EOF marker
           throw new Error(`${ERR_INCORRECT_BYTE_RANGE}. Too many bytes after %%EOF marker.`);
         }
-        const eolText = Convert.ToBinary(doc.view.subarray(eofIndex, lastOffset));
+        const eolText = binary.encode(doc.view.subarray(eofIndex, lastOffset));
         if (/^(?:\r|\n)*$/.test(eolText) === false) {
           throw new Error(`${ERR_INCORRECT_BYTE_RANGE}. EOL contains invalid characters.`);
         }

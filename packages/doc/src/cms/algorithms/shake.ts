@@ -1,13 +1,13 @@
 import * as asn1js from "asn1js";
 import * as pkijs from "pkijs";
-import { Convert } from "pvtsutils";
+import { hex, toArrayBuffer } from "@peculiar/utils";
 import { AlgorithmFactory, type AlgorithmConverter, type HashedAlgorithm } from "../AlgorithmFactory";
 
 const id_shake128 = "2.16.840.1.101.3.4.2.11";
 const id_shake256 = "2.16.840.1.101.3.4.2.12";
 
-const ber_shake128 = Convert.FromHex("300B060960864801650304020B");
-const ber_shake256 = Convert.FromHex("300B060960864801650304020C");
+const ber_shake128 = toArrayBuffer(hex.decode("300B060960864801650304020B"));
+const ber_shake256 = toArrayBuffer(hex.decode("300B060960864801650304020C"));
 
 export const shakeAlgorithmConverter: AlgorithmConverter = {
   name: "SHAKE",

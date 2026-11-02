@@ -1,4 +1,4 @@
-import { Convert } from "pvtsutils";
+import { toArrayBuffer, utf8 } from "@peculiar/utils";
 
 /**
  * Defines commonly used character codes and sets in PDF document processing
@@ -17,7 +17,7 @@ export class CharSet {
   public static readonly greaterThanChar = 0x3e;
 
   /** Valid hexadecimal characters (0-9, a-f, A-F) */
-  public static readonly hexadecimalChars = new Uint8Array(Convert.FromUtf8String("01234567890abcdefABCDEF"));
+  public static readonly hexadecimalChars = new Uint8Array(toArrayBuffer(utf8.encode("01234567890abcdefABCDEF")));
 
   /** Percent symbol '%' (0x25) */
   public static readonly percentChar = 0x25;

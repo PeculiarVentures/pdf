@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { Convert } from "pvtsutils";
+import { hex } from "@peculiar/utils";
 import { CCITTFaxFilter } from "./CCITTFaxFilter";
 
 describe("CCITTFaxFilter", () => {
@@ -56,7 +56,7 @@ describe("CCITTFaxFilter", () => {
 
     for (const result of [filter.decodeSync(view), filter.encodeSync(view), await filter.decode(view), await filter.encode(view)]) {
       expect(result).toBeInstanceOf(ArrayBuffer);
-      expect(Convert.ToHex(result)).toBe("0102030405");
+      expect(hex.encode(result)).toBe("0102030405");
     }
   });
 });

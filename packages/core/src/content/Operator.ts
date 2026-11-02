@@ -1,4 +1,4 @@
-import { Convert } from "pvtsutils";
+import { binary, toArrayBuffer } from "@peculiar/utils";
 
 export class PDFOperator {
   public static readonly NAME_REGEX = /([A-Z0-9*'"]+)\s*$/i;
@@ -35,7 +35,7 @@ export class PDFOperator {
     const parameters = data.substring(0, nameMatches.index);
 
     if (parameters) {
-      const parametersView = Convert.FromBinary(parameters.trimEnd());
+      const parametersView = toArrayBuffer(binary.decode(parameters.trimEnd()));
       const parametersReader = new ViewReader(parametersView);
 
       while (true) {
@@ -50,7 +50,7 @@ export class PDFOperator {
   }
 
   public toString(): string {
-    const res = [...this.parameters.map((o) => Convert.ToBinary(o.toPDF())), this.name];
+    const res = [...this.parameters.map((o) => binary.encode(o.toPDF())), this.name];
 
     return res.join(PDFOperator.SPACE_CHAR);
   }

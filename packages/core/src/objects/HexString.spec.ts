@@ -22,4 +22,20 @@ describe("HexString", () => {
       });
     });
   });
+
+  describe("hex digits", () => {
+    it("should ignore white space and write lowercase digits", () => {
+      const item = PDFHexString.fromPDF("<AB C\n0 1>");
+      expect(Buffer.from(item.data).toString("hex")).toBe("abc010");
+      expect(item.toString()).toBe("<abc010>");
+    });
+
+    it("should pad an odd number of digits with a trailing zero", () => {
+      expect(Buffer.from(PDFHexString.fromPDF("<ABC>").data).toString("hex")).toBe("abc0");
+    });
+
+    it("should reject characters that are not hex digits", () => {
+      expect(() => PDFHexString.fromPDF("<ABXZ>")).toThrow();
+    });
+  });
 });

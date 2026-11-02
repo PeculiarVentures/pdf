@@ -1,4 +1,4 @@
-import { Convert } from "pvtsutils";
+import { utf8 } from "@peculiar/utils";
 import { BadCharError } from "../errors";
 import { CharSet } from "../CharSet";
 import type { ViewReader } from "../ViewReader";
@@ -19,7 +19,7 @@ export class PDFComment extends PDFString {
     }
 
     const textView = reader.read((c) => c === 0x0d || c === 0x0a);
-    this.text = Convert.ToUtf8String(textView).trim();
+    this.text = utf8.decode(textView).trim();
   }
 
   public override toString(): string {

@@ -1,5 +1,5 @@
 import type * as pkijs from "pkijs";
-import { type BufferSource, BufferSourceConverter, Convert } from "pvtsutils";
+import { base64, base64url, hex, toArrayBuffer, type BufferSource } from "@peculiar/utils";
 import { fromBER } from "./ber";
 
 export type AsnEncodedStringFormat = "hex" | "base64" | "base64url";
@@ -34,7 +34,7 @@ export abstract class AsnEncoded<TAsn extends pkijs.PkiObject = any> {
    * @param raw Buffer source
    */
   public fromBER(raw: BufferSource): void {
-    const arrayBuffer = BufferSourceConverter.toArrayBuffer(raw);
+    const arrayBuffer = toArrayBuffer(raw);
     const asn = fromBER(arrayBuffer);
 
     if (asn.offset === -1) {
@@ -64,6 +64,14 @@ export abstract class AsnEncoded<TAsn extends pkijs.PkiObject = any> {
   }
 
   public toString(encoding: AsnEncodedStringFormat = "hex") {
-    return Convert.ToString(this.toBER(), encoding);
+    const raw = this.toBER();
+    switch (encoding) {
+      case "base64":
+        return base64.encode(raw);
+      case "base64url":
+        return base64url.encode(raw);
+      default:
+        return hex.encode(raw);
+    }
   }
 }

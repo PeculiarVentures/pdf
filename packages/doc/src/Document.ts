@@ -2,7 +2,7 @@ import * as core from "@peculiar/pdf-core";
 import type * as font from "@peculiar/pdf-font";
 import * as copy from "@peculiar/pdf-copy";
 import type { X509Certificate } from "@peculiar/x509";
-import { type BufferSource, Convert } from "pvtsutils";
+import { binary, toArrayBuffer, type BufferSource } from "@peculiar/utils";
 import * as pkijs from "pkijs";
 import { Image } from "./Image";
 import { PDFPages } from "./Pages";
@@ -157,7 +157,7 @@ export class PDFDocument {
 
   public static async load(raw: string | BufferSource, params: PDFDocumentLoadParameters = {}): Promise<PDFDocument> {
     if (typeof raw === "string") {
-      raw = Convert.FromBinary(raw);
+      raw = toArrayBuffer(binary.decode(raw));
     }
 
     const target = await core.PDFDocument.fromPDF(raw);

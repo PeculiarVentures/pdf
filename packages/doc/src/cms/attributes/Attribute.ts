@@ -1,4 +1,4 @@
-import { type BufferSource, BufferSourceConverter } from "pvtsutils";
+import { toArrayBuffer, type BufferSource } from "@peculiar/utils";
 import * as pkijs from "pkijs";
 
 import { AsnEncoded } from "../AsnEncoded";
@@ -26,7 +26,7 @@ export class CmsAttribute extends AsnEncoded<pkijs.Attribute> {
     if (type && values) {
       this.asn.type = type;
       this.asn.values = values.map((o) => {
-        const raw = BufferSourceConverter.toArrayBuffer(o);
+        const raw = toArrayBuffer(o);
         const asn = fromBER(raw);
         if (asn.offset === -1) {
           throw new Error("Wrong ASN.1 encoded Attribute value");

@@ -1,4 +1,4 @@
-import { Convert } from "pvtsutils";
+import { binary } from "@peculiar/utils";
 
 import { PDFStream } from "../objects";
 
@@ -18,7 +18,7 @@ export class PDFContentStream extends PDFStream {
 
   public get content(): PDFContent {
     if (!this.#content) {
-      const content = (this.#content = PDFContent.fromString(Convert.ToBinary(this.stream)));
+      const content = (this.#content = PDFContent.fromString(binary.encode(this.stream)));
 
       const clearCallback = this.clear.bind(this, true);
       content.once("push", clearCallback);
